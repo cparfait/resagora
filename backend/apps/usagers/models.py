@@ -77,6 +77,7 @@ class Usager(models.Model):
         super().save(*args, **kwargs)  # type: ignore[arg-type]
 
     def convention_active(self, jour: date | None = None) -> bool:
+        """USR-04 : convention en cours à la date donnée (utilisée par la priorité RG-03)."""
         jour = jour or timezone.localdate()
         return self.conventionne and (self.convention_fin is None or self.convention_fin >= jour)
 

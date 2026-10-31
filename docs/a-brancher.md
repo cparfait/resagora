@@ -68,6 +68,26 @@ affiche les tables en ajout seul ; `python manage.py verifier_deploiement` doit 
 | Sous-réseaux `dmz_front`, `lan_app` | compose | Plages libres sur les hôtes de la Ville |
 | Sortie Internet des mises à jour ClamAV | réseaux `sortie_dmz`, `sortie_lan` | Proxy HTTP de la Ville vers `database.clamav.net` |
 
-## 5. Messagerie (SMTP) — complété au lot 2
+## 5. Messagerie (SMTP) — COM-01
+
+Recette : Mailpit (`mailpit:1025`, interface web http://localhost:58025 en développement). Production : serveur SMTP de la Ville.
+
+| Paramètre | Où | À fournir | Comment tester |
+| --- | --- | --- | --- |
+| `SMTP_HOTE`, `SMTP_PORT` | `deploy/lan/parametres.env` | Relais SMTP interne de la Ville (ex. port 587) | `docker compose … exec api python manage.py sendtestemail adresse@chatillon92.fr` |
+| `SMTP_STARTTLS` ou `SMTP_TLS` | idem | `1` selon le relais (STARTTLS sur 587, TLS implicite sur 465) | idem, le message doit arriver |
+| `SMTP_UTILISATEUR` + secret `smtp_mot_de_passe` | `parametres.env` + `deploy/lan/secrets/smtp_mot_de_passe` | Compte d'envoi si le relais exige une authentification | idem |
+| `COURRIEL_EXPEDITEUR` | `parametres.env` | Adresse d'expéditeur autorisée (SPF/DKIM du domaine de la Ville) | En-tête `From` du message de test |
+| `PORTAIL_URL`, `BACKOFFICE_URL` | `parametres.env` | Noms de domaine définitifs (liens insérés dans les messages) | Lien d'une notification de validation |
+
+## 5 bis. Calendrier scolaire et jours fériés — ADM-01
+
+L'API sort vers Internet par le réseau `sortie_lan` (proxy de la Ville) ; à défaut, le calendrier s'importe depuis un fichier (écran Saisons et calendrier → « Importer un fichier du calendrier scolaire », export JSON du jeu national) et les jours fériés sont calculés localement (Pâques, Ascension, Pentecôte).
+
+| Paramètre | Valeur par défaut | Comment tester |
+| --- | --- | --- |
+| `URL_CALENDRIER_SCOLAIRE` | API data.education.gouv.fr, jeu `fr-en-calendrier-scolaire` (académie de Versailles, zone C) | Back-office → Référentiel → Saisons et calendrier → « Importer vacances et fériés » sur la saison : les vacances apparaissent |
+| `URL_JOURS_FERIES` | `https://calendrier.api.gouv.fr/jours-feries/metropole/{annee}.json` | Même import : les jours fériés apparaissent (sinon calcul local, signalé dans le journal) |
+| `HTTPS_PROXY` | absent | Proxy de sortie de la Ville si l'API ne joint pas directement Internet |
 
 ## 6. Ciril, PayFiP, DocuSeal, ClamAV, Gotenberg, accès mobile — complétés aux lots concernés

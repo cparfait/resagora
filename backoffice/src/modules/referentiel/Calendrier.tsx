@@ -6,7 +6,7 @@ import type { Periode, Saison } from "../../api/types";
 import { useSession } from "../../auth/session";
 import { Badge } from "../../ui/Badge";
 import { Bouton } from "../../ui/Bouton";
-import { ChampSelection } from "../../ui/Champ";
+import { ChampSelection, ChampTexte } from "../../ui/Champ";
 import { dateSimple } from "../../ui/metier";
 import { useNotifications } from "../../ui/Notifications";
 import { EcranRessource, useOptions } from "../../ui/Ressource";
@@ -21,8 +21,16 @@ export default function Calendrier() {
   const saisons = useOptions("saisons", "/api/gestion/referentiel/saisons", (s) => String(s.nom));
   const [saison, setSaison] = useState("");
   const periodes = useQuery({ queryKey: ["periodes", saison], queryFn: () => requete<Periode[]>("GET", `/api/gestion/referentiel/periodes?saison=${saison}`), enabled: Boolean(saison) });
+  const [fichier, setFichier] = useState<File | null>(null);
   const importer = useMutation({
-    mutationFn: (identifiant: number) => requete<{ periodes: number }>("POST", `/api/gestion/referentiel/saisons/${identifiant}/importer-calendrier`),
+    mutationFn: ({ identifiant, depot }: { identifiant: number | string; depot?: File }) => {
+      let corps: FormData | undefined;
+      if (depot) {
+        corps = new FormData();
+        corps.append("fichier", depot);
+      }
+      return requete<{ periodes: number }>("POST", `/api/gestion/referentiel/saisons/${identifiant}/importer-calendrier`, corps);
+    },
     onSuccess: async (r) => {
       annoncer(`Calendrier importé : ${r.periodes} périodes (vacances de la zone et jours fériés).`);
       await client.invalidateQueries({ queryKey: ["periodes"] });
@@ -46,7 +54,7 @@ export default function Calendrier() {
         ]}
         actionsLigne={(s) =>
           peut("gerer_parametres") ? (
-            <Bouton variante="lien" enCours={importer.isPending} onClick={() => importer.mutate(s.id)}>
+            <Bouton variante="lien" enCours={importer.isPending} onClick={() => importer.mutate({ identifiant: s.id })}>
               Importer vacances et fériés
             </Bouton>
           ) : null
@@ -61,6 +69,26 @@ export default function Calendrier() {
       <section aria-labelledby="titre-periodes">
         <h2 id="titre-periodes">Périodes de la saison</h2>
         <ChampSelection libelle="Saison affichée" options={saisons} value={saison} onChange={(e) => setSaison(e.target.value)} />
+        {saison && peut("gerer_parametres") ? (
+          <form
+            className="formulaire-ligne"
+            onSubmit={(e) => {
+              e.preventDefault();
+              if (fichier) importer.mutate({ identifiant: saison, depot: fichier });
+            }}
+          >
+            <ChampTexte
+              libelle="Importer un fichier du calendrier scolaire"
+              type="file"
+              accept=".json,application/json"
+              aide="Export JSON du jeu « fr-en-calendrier-scolaire » (data.education.gouv.fr), pour un poste sans accès Internet. 1 Mo au plus."
+              onChange={(e) => setFichier(e.target.files?.[0] ?? null)}
+            />
+            <Bouton type="submit" variante="secondaire" disabled={!fichier} enCours={importer.isPending}>
+              Importer le fichier
+            </Bouton>
+          </form>
+        ) : null}
         {periodes.data ? (
           <Tableau<Periode>
             legende="Périodes exclues des créneaux récurrents"

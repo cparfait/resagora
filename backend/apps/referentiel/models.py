@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from datetime import datetime, timedelta
+
 from django.db import models
 
 
@@ -131,6 +133,12 @@ class Espace(models.Model):
         if not descendants:
             return [self]
         return [e for e in descendants if not any(d.parent_id == e.pk for d in descendants)]
+
+    def plage_gardiennage(self, debut: datetime, fin: datetime) -> tuple[datetime, datetime] | None:
+        """REF-04 : présence de gardien exigée par une occupation, élargie des temps d'ouverture et de fermeture."""
+        if not self.gardiennage_requis:
+            return None
+        return debut - timedelta(minutes=self.temps_ouverture_min), fin + timedelta(minutes=self.temps_fermeture_min)
 
     def ids_lies(self) -> set[int]:
         """Espace, ancêtres et descendants : l'ensemble bloqué par une occupation (REF-05, RG-01)."""

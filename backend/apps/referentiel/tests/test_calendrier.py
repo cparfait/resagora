@@ -106,6 +106,25 @@ def test_adm01_import_par_l_api_reserve_aux_parametres(client_agent):
     )
 
 
+def test_adm01_import_d_un_fichier_depose_sans_acces_internet(client_agent, settings):
+
+    settings.URL_JOURS_FERIES = "https://feries.test/{annee}.json"
+    saison = Saison.objects.create(nom="2026-2027", debut=date(2026, 9, 1), fin=date(2027, 6, 30))
+    administrateur = client_agent(agent("administrateur"))
+    depot = SimpleUploadedFile("calendrier.json", json.dumps(OPEN_DATA).encode(), content_type="application/json")
+    reponse = administrateur.post(
+        f"/api/gestion/referentiel/saisons/{saison.pk}/importer-calendrier", {"fichier": depot}, format="multipart"
+    )
+    assert reponse.status_code == 200, reponse.content
+    assert saison.periodes.filter(nature="vacances", source="import").count() == 3
+    assert saison.periodes.filter(nature="ferie").exists()
+    invalide = SimpleUploadedFile("calendrier.json", b"pas du json", content_type="application/json")
+    refus = administrateur.post(
+        f"/api/gestion/referentiel/saisons/{saison.pk}/importer-calendrier", {"fichier": invalide}, format="multipart"
+    )
+    assert refus.status_code == 400 and "export JSON" in refus.json()["message"]
+
+
 def test_adm02_parametres_lus_et_modifies_avec_trace(client_agent):
     from apps.audit.models import JournalAudit
 

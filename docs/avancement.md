@@ -18,7 +18,7 @@ Exigences : SEC-01, SEC-02, SEC-03, SEC-05, SEC-06, SEC-08, SEC-09, REF-01, REF-
 | 0.3 | Référentiel de base (sites, bâtiments, espaces hiérarchiques, familles) | REF-01, REF-02 | fait |
 | 0.4 | Habilitations rôle × périmètre, actions, `peut()`, `/api/gestion/moi` | RG-14, ADM-03 | fait |
 | 0.5 | Journal d'audit chaîné et immuable, `@audite`, consultation, export, vérification | SEC-08, ADM-05 | fait |
-| 0.6 | AD LDAPS (ldap3), groupes → rôles, TOTP admin/régie/finances, limitation de débit | SEC-02, SEC-03, SEC-06, ADM-06 | fait |
+| 0.6 | AD LDAPS (python-ldap, D-004), groupes → rôles, TOTP admin/régie/finances, limitation de débit | SEC-02, SEC-03, SEC-06, ADM-06 | fait |
 | 0.7 | Façade DMZ (liste blanche, sessions, CSRF, quarantaine ClamAV, rappels) + canal portail mTLS | SEC-01, SEC-05, SEC-07 | fait |
 | 0.8 | Images durcies, compose LAN/DMZ/dev, certificats et secrets de dev, annuaire OpenLDAP | SEC-01, SEC-09 | fait |
 | 0.9 | Back-office : connexion AD + TOTP, cadre, référentiel, administration, journal | SEC-02, SEC-03, ADM-03/05/06 | fait |
@@ -40,19 +40,20 @@ Exigences : REF-03 à REF-08, USR-01 à USR-05, PLA-01 à PLA-12, ADM-01, ADM-02
 
 | Étape | Contenu | Exigences | État |
 | --- | --- | --- | --- |
-| 1.1 | Paramètres fonctionnels tracés ; saisons, calendrier scolaire zone C (client open data + import) et jours fériés calculés | ADM-01, ADM-02 | à faire |
-| 1.2 | Horaires d'ouverture, fermetures exceptionnelles, documents d'espace (stockage contrôlé) | REF-03, REF-06, REF-08 | à faire |
-| 1.3 | Usagers, contacts, rattachements, conventionnement, pièces justificatives et alertes | USR-01 à USR-05 | à faire |
-| 1.4 | Dossiers, réservations, récurrences RRULE, occurrences, verrous par espaces feuilles + contrainte d'exclusion | PLA-04, PLA-06, REF-05, REF-07, RG-01, RG-02 | à faire |
-| 1.5 | Cycle de statuts, conditions de confirmation enfichables, options et relance, annulation, présence | PLA-06, PLA-08, PLA-10, PLA-11, RG-06, RG-07 | à faire |
-| 1.6 | Conflits et alternatives, liste d'attente, priorité municipale, fermeture → impacts | PLA-07, PLA-09, PLA-12, REF-06, RG-03 | à faire |
-| 1.7 | Campagne annuelle : dépôt, instruction, arbitrage RG-03, commission, attribution en lot | PLA-05, RG-03 | à faire |
-| 1.8 | Notifications électroniques (socle COM-01) | COM-01 | à faire |
-| 1.9 | Back-office : usagers, dossiers, planning six vues, glisser-déposer contrôlé, vues enregistrées, campagne, calendrier, paramètres | PLA-01, PLA-02, PLA-03 | à faire |
-| 1.10 | e2e du lot, revues, critère de sortie | — | à faire |
+| 1.1 | Paramètres fonctionnels tracés ; saisons, calendrier scolaire zone C (client open data + import) et jours fériés calculés | ADM-01, ADM-02 | fait |
+| 1.2 | Horaires d'ouverture, fermetures exceptionnelles, documents d'espace (stockage contrôlé) | REF-03, REF-06, REF-08 | fait |
+| 1.3 | Usagers, contacts, rattachements, conventionnement, pièces justificatives et alertes | USR-01 à USR-05 | fait |
+| 1.4 | Dossiers, réservations, récurrences RRULE, occurrences, verrous par espaces feuilles + contrainte d'exclusion | PLA-04, PLA-06, REF-05, REF-07, RG-01, RG-02 | fait |
+| 1.5 | Cycle de statuts, conditions de confirmation enfichables, options et relance, annulation, présence | PLA-06, PLA-08, PLA-10, PLA-11, RG-06, RG-07 | fait |
+| 1.6 | Conflits et alternatives, liste d'attente, priorité municipale, fermeture → impacts | PLA-07, PLA-09, PLA-12, REF-06, RG-03 | fait |
+| 1.7 | Campagne annuelle : dépôt, instruction, arbitrage RG-03, commission, attribution en lot | PLA-05, RG-03 | fait |
+| 1.8 | Notifications électroniques (socle COM-01) | COM-01 | fait |
+| 1.9 | Back-office : usagers, dossiers, planning six vues, glisser-déposer contrôlé, vues enregistrées, campagne, calendrier, paramètres | PLA-01, PLA-02, PLA-03 | fait |
+| 1.10 | Jeu de démonstration, e2e du lot (planning six vues, demande → aperçu → validation, fiche usager), revues, critère de sortie | — | en cours (revues lancées) |
 
 ## Journal
 
 - 2026-10-31 — Démarrage. Cahier des charges absent (D-001), référentiel reconstitué.
 - 2026-10-31 — Revues lot 0 : passage à python-ldap (ldap3 non maintenu), rôle PostgreSQL applicatif, HMAC + ancrage + purge du journal, verrouillage et réactivation TOTP, appariement objectGUID, séparation des tâches, routes DocuSeal restreintes. 109 tests API, 26 façade, 21 front, 4 e2e.
 - 2026-10-31 — Lot 0 : 61+ tests API, 19 tests façade, 21 tests front, 4 e2e (axe sans violation) ; pile LAN + DMZ en conteneurs, chaîne mTLS vérifiée.
+- 2026-10-31 — Lot 1 : 173 tests API, 28 tests front, 3 e2e lot 1 (axe sans violation) ; jeu de démonstration chargé (3 sites, 40 espaces, 63 créneaux annuels, locations) ; matrice lots 0–1 complète (49 exigences).

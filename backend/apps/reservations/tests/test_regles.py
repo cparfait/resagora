@@ -11,7 +11,7 @@ from django.db import connection
 from django.utils import timezone
 from freezegun import freeze_time
 
-from apps.noyau.exceptions import ErreurMetier, ErreurValidation
+from apps.noyau.exceptions import AccesRefuse, ErreurMetier, ErreurValidation
 from apps.noyau.models import Parametre
 from apps.noyau.parametres import invalider
 from apps.referentiel.models import Fermeture, HoraireOuverture
@@ -267,6 +267,18 @@ def test_pla06_refus_motive_et_notifie(espace, django_capture_on_commit_callback
 
 
 # --- RG-07 options -------------------------------------------------------------------------------
+
+
+def test_pla08_option_avec_date_d_expiration_parametrable(espace):
+    Parametre.objects.update_or_create(cle="options.duree_jours", defaults={"valeur": 10})
+    invalider()
+    with freeze_time("2026-11-01 09:00"):
+        r = services.mettre_en_option(reserver(espace, date(2026, 12, 10), "18:00", "20:00"), acteur=agent("gestionnaire"))
+        assert r.statut == "option" and r.option_expire_le == timezone.now() + timedelta(days=10)
+        autre = reserver(espace, date(2026, 12, 10), "18:00", "20:00")
+        assert valider_systeme(autre).statut == "validee"
+    with pytest.raises(AccesRefuse):
+        services.mettre_en_option(reserver(espace, date(2026, 12, 11), "18:00", "20:00"), acteur=agent("accueil"))
 
 
 def test_rg07_option_relancee_puis_liberee(espace, django_capture_on_commit_callbacks):

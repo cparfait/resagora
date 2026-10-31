@@ -24,6 +24,7 @@ from django.conf import settings
 from django.db import transaction
 
 from apps.audit.services import journaliser
+from apps.noyau.exceptions import ErreurValidation
 from apps.noyau.parametres import parametre
 
 from .models import PeriodeCalendrier, Saison
@@ -118,14 +119,32 @@ def periodes_depuis_open_data(enregistrements: list[dict[str, Any]]) -> list[Per
     return sorted(par_libelle.values(), key=lambda p: p.debut)
 
 
+def periodes_depuis_fichier(contenu: bytes) -> list[Periode]:
+    """Lit un export JSON du jeu « fr-en-calendrier-scolaire » (objet `{"results": [...]}` ou liste d'enregistrements)."""
+    try:
+        donnees = json.loads(contenu.decode("utf-8"))
+        enregistrements = donnees.get("results", []) if isinstance(donnees, dict) else donnees
+        if not isinstance(enregistrements, list):
+            raise TypeError
+        return periodes_depuis_open_data(enregistrements)
+    except (UnicodeDecodeError, json.JSONDecodeError, TypeError, KeyError, ValueError, AttributeError) as erreur:
+        raise ErreurValidation(
+            "Le fichier n'est pas un export JSON du calendrier scolaire (champs description, start_date, end_date attendus)."
+        ) from erreur
+
+
 @transaction.atomic
 def importer_saison(
-    saison: Saison, client: ClientCalendrier | None = None, fichier: Path | None = None, acteur: Any = None
+    saison: Saison, client: ClientCalendrier | None = None, fichier: Path | bytes | None = None, acteur: Any = None
 ) -> int:
-    """Remplace les vacances et jours fériés importés de la saison ; les fermetures saisies sont conservées."""
+    """Remplace les vacances et jours fériés importés de la saison ; les fermetures saisies sont conservées.
+
+    `fichier` : export JSON du jeu open data (chemin ou contenu déposé), pour un poste sans accès Internet.
+    """
     client = client or ClientCalendrier()
     if fichier is not None:
-        vacances = periodes_depuis_open_data(json.loads(fichier.read_text(encoding="utf-8")).get("results", []))
+        contenu = fichier.read_bytes() if isinstance(fichier, Path) else fichier
+        vacances = periodes_depuis_fichier(contenu)
     else:
         vacances = client.vacances(saison.annee_scolaire)
     saison.periodes.filter(source__in=["import", "calcul"]).delete()

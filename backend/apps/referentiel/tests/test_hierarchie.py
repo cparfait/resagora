@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from datetime import UTC, datetime
+
 import pytest
 
 from apps.referentiel.models import FamilleEspace
@@ -77,3 +79,14 @@ def test_ref02_ecriture_des_familles_autorisee_et_refusee(client_agent):
         .status_code
         == 201
     )
+
+
+def test_ref04_gardiennage_elargi_des_temps_d_ouverture_et_de_fermeture():
+    gymnase = EspaceFabrique(nom="Gymnase gardienné", gardiennage_requis=True, temps_ouverture_min=20, temps_fermeture_min=30)
+    salle = EspaceFabrique(nom="Salle sans gardien", gardiennage_requis=False)
+    debut, fin = datetime(2026, 11, 10, 17, 0, tzinfo=UTC), datetime(2026, 11, 10, 19, 0, tzinfo=UTC)
+    assert gymnase.plage_gardiennage(debut, fin) == (
+        datetime(2026, 11, 10, 16, 40, tzinfo=UTC),
+        datetime(2026, 11, 10, 19, 30, tzinfo=UTC),
+    )
+    assert salle.plage_gardiennage(debut, fin) is None

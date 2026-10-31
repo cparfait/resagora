@@ -17,12 +17,13 @@ from apps.audit.services import instantane, journaliser
 from apps.habilitations.authentification import agent_courant
 from apps.noyau import fichiers
 from apps.noyau.api import VuePerimetre
-from apps.noyau.exceptions import ErreurMetier
+from apps.noyau.exceptions import ErreurMetier, ErreurValidation
 
 from ..calendrier import importer_saison
 from ..models import DocumentEspace, Espace, Fermeture, HoraireOuverture, PeriodeCalendrier, PhotoEspace, Saison
 
 DROITS = {"lecture": "lire_referentiel", "ecriture": "gerer_referentiel"}
+TAILLE_MAX_CALENDRIER = 1024 * 1024
 
 
 class SaisonSerializer(serializers.ModelSerializer):
@@ -89,12 +90,21 @@ class VueSaisons(VuePerimetre):
     serializer_class = SaisonSerializer
     actions_requises = {"lecture": "lire_referentiel", "ecriture": "gerer_parametres", "importer_calendrier": "gerer_parametres"}
 
-    @extend_schema(request=None, responses={200: dict})
-    @action(detail=True, methods=["post"], url_path="importer-calendrier")
+    @extend_schema(
+        request={"multipart/form-data": {"type": "object", "properties": {"fichier": {"type": "string", "format": "binary"}}}},
+        responses={200: dict},
+    )
+    @action(detail=True, methods=["post"], url_path="importer-calendrier", parser_classes=[MultiPartParser, JSONParser])
     def importer_calendrier(self, request: Request, pk: str | None = None) -> Response:
-        """ADM-01 : vacances de la zone et jours fériés de la saison depuis les données nationales."""
+        """ADM-01 : vacances de la zone et jours fériés depuis les données nationales, ou depuis un export JSON déposé."""
         saison = self.get_object()
-        nombre = importer_saison(saison, acteur=agent_courant(request))
+        depose = request.FILES.get("fichier")
+        contenu = None
+        if depose is not None:
+            if depose.size is None or depose.size > TAILLE_MAX_CALENDRIER:
+                raise ErreurValidation("Le fichier du calendrier dépasse 1 Mo.")
+            contenu = depose.read()
+        nombre = importer_saison(saison, fichier=contenu, acteur=agent_courant(request))
         return Response({"periodes": nombre})
 
 
