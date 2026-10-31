@@ -69,7 +69,8 @@ describe("PLA-01 vues du planning", () => {
     Object.assign(evenement, { clientY: 48 * 11, dataTransfer: { getData: () => "1" } });
     fireEvent(cible, evenement);
     expect(deposer).toHaveBeenCalledTimes(1);
-    const { debut, fin, espace } = deposer.mock.calls[0]?.[0] as { debut: Date; fin: Date; espace: number };
+    const appel = deposer.mock.calls[0] as [{ debut: Date; fin: Date; espace: number }];
+    const { debut, fin, espace } = appel[0];
     expect(debut.getDate()).toBe(12);
     expect(debut.getHours()).toBe(18);
     expect((fin.getTime() - debut.getTime()) / 3600000).toBe(2);
