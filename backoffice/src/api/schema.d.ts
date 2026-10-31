@@ -408,6 +408,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/gestion/parametres": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["gestion_parametres_list"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch: operations["gestion_parametres_partial_update"];
+        trace?: never;
+    };
     "/api/gestion/referentiel/batiments": {
         parameters: {
             query?: never;
@@ -444,6 +460,60 @@ export interface paths {
         head?: never;
         /** @description `chemin_site` : chemin ORM vers le site de l'objet (None = objet transversal). */
         patch: operations["gestion_referentiel_batiments_partial_update"];
+        trace?: never;
+    };
+    "/api/gestion/referentiel/documents": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description `chemin_site` : chemin ORM vers le site de l'objet (None = objet transversal). */
+        get: operations["gestion_referentiel_documents_list"];
+        put?: never;
+        /** @description `chemin_site` : chemin ORM vers le site de l'objet (None = objet transversal). */
+        post: operations["gestion_referentiel_documents_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gestion/referentiel/documents/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description `chemin_site` : chemin ORM vers le site de l'objet (None = objet transversal). */
+        get: operations["gestion_referentiel_documents_retrieve"];
+        put?: never;
+        post?: never;
+        /** @description `chemin_site` : chemin ORM vers le site de l'objet (None = objet transversal). */
+        delete: operations["gestion_referentiel_documents_destroy"];
+        options?: never;
+        head?: never;
+        /** @description `chemin_site` : chemin ORM vers le site de l'objet (None = objet transversal). */
+        patch: operations["gestion_referentiel_documents_partial_update"];
+        trace?: never;
+    };
+    "/api/gestion/referentiel/documents/{id}/fichier": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description `chemin_site` : chemin ORM vers le site de l'objet (None = objet transversal). */
+        get: operations["gestion_referentiel_documents_fichier_retrieve"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
         trace?: never;
     };
     "/api/gestion/referentiel/espaces": {
@@ -522,6 +592,227 @@ export interface paths {
         patch: operations["gestion_referentiel_familles_partial_update"];
         trace?: never;
     };
+    "/api/gestion/referentiel/fermetures": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description `chemin_site` : chemin ORM vers le site de l'objet (None = objet transversal). */
+        get: operations["gestion_referentiel_fermetures_list"];
+        put?: never;
+        /** @description `chemin_site` : chemin ORM vers le site de l'objet (None = objet transversal). */
+        post: operations["gestion_referentiel_fermetures_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gestion/referentiel/fermetures/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description `chemin_site` : chemin ORM vers le site de l'objet (None = objet transversal). */
+        get: operations["gestion_referentiel_fermetures_retrieve"];
+        put?: never;
+        post?: never;
+        /** @description `chemin_site` : chemin ORM vers le site de l'objet (None = objet transversal). */
+        delete: operations["gestion_referentiel_fermetures_destroy"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gestion/referentiel/horaires": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description `chemin_site` : chemin ORM vers le site de l'objet (None = objet transversal). */
+        get: operations["gestion_referentiel_horaires_list"];
+        put?: never;
+        /** @description `chemin_site` : chemin ORM vers le site de l'objet (None = objet transversal). */
+        post: operations["gestion_referentiel_horaires_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gestion/referentiel/horaires/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description `chemin_site` : chemin ORM vers le site de l'objet (None = objet transversal). */
+        get: operations["gestion_referentiel_horaires_retrieve"];
+        /** @description `chemin_site` : chemin ORM vers le site de l'objet (None = objet transversal). */
+        put: operations["gestion_referentiel_horaires_update"];
+        post?: never;
+        /** @description `chemin_site` : chemin ORM vers le site de l'objet (None = objet transversal). */
+        delete: operations["gestion_referentiel_horaires_destroy"];
+        options?: never;
+        head?: never;
+        /** @description `chemin_site` : chemin ORM vers le site de l'objet (None = objet transversal). */
+        patch: operations["gestion_referentiel_horaires_partial_update"];
+        trace?: never;
+    };
+    "/api/gestion/referentiel/periodes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description `chemin_site` : chemin ORM vers le site de l'objet (None = objet transversal). */
+        get: operations["gestion_referentiel_periodes_list"];
+        put?: never;
+        /** @description `chemin_site` : chemin ORM vers le site de l'objet (None = objet transversal). */
+        post: operations["gestion_referentiel_periodes_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gestion/referentiel/periodes/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description `chemin_site` : chemin ORM vers le site de l'objet (None = objet transversal). */
+        get: operations["gestion_referentiel_periodes_retrieve"];
+        /** @description `chemin_site` : chemin ORM vers le site de l'objet (None = objet transversal). */
+        put: operations["gestion_referentiel_periodes_update"];
+        post?: never;
+        /** @description `chemin_site` : chemin ORM vers le site de l'objet (None = objet transversal). */
+        delete: operations["gestion_referentiel_periodes_destroy"];
+        options?: never;
+        head?: never;
+        /** @description `chemin_site` : chemin ORM vers le site de l'objet (None = objet transversal). */
+        patch: operations["gestion_referentiel_periodes_partial_update"];
+        trace?: never;
+    };
+    "/api/gestion/referentiel/photos": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description `chemin_site` : chemin ORM vers le site de l'objet (None = objet transversal). */
+        get: operations["gestion_referentiel_photos_list"];
+        put?: never;
+        /** @description `chemin_site` : chemin ORM vers le site de l'objet (None = objet transversal). */
+        post: operations["gestion_referentiel_photos_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gestion/referentiel/photos/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description `chemin_site` : chemin ORM vers le site de l'objet (None = objet transversal). */
+        get: operations["gestion_referentiel_photos_retrieve"];
+        put?: never;
+        post?: never;
+        /** @description `chemin_site` : chemin ORM vers le site de l'objet (None = objet transversal). */
+        delete: operations["gestion_referentiel_photos_destroy"];
+        options?: never;
+        head?: never;
+        /** @description `chemin_site` : chemin ORM vers le site de l'objet (None = objet transversal). */
+        patch: operations["gestion_referentiel_photos_partial_update"];
+        trace?: never;
+    };
+    "/api/gestion/referentiel/photos/{id}/fichier": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description `chemin_site` : chemin ORM vers le site de l'objet (None = objet transversal). */
+        get: operations["gestion_referentiel_photos_fichier_retrieve"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gestion/referentiel/saisons": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description `chemin_site` : chemin ORM vers le site de l'objet (None = objet transversal). */
+        get: operations["gestion_referentiel_saisons_list"];
+        put?: never;
+        /** @description `chemin_site` : chemin ORM vers le site de l'objet (None = objet transversal). */
+        post: operations["gestion_referentiel_saisons_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gestion/referentiel/saisons/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description `chemin_site` : chemin ORM vers le site de l'objet (None = objet transversal). */
+        get: operations["gestion_referentiel_saisons_retrieve"];
+        /** @description `chemin_site` : chemin ORM vers le site de l'objet (None = objet transversal). */
+        put: operations["gestion_referentiel_saisons_update"];
+        post?: never;
+        /** @description `chemin_site` : chemin ORM vers le site de l'objet (None = objet transversal). */
+        delete: operations["gestion_referentiel_saisons_destroy"];
+        options?: never;
+        head?: never;
+        /** @description `chemin_site` : chemin ORM vers le site de l'objet (None = objet transversal). */
+        patch: operations["gestion_referentiel_saisons_partial_update"];
+        trace?: never;
+    };
+    "/api/gestion/referentiel/saisons/{id}/importer-calendrier": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description ADM-01 : vacances de la zone et jours fériés de la saison depuis les données nationales. */
+        post: operations["gestion_referentiel_saisons_importer_calendrier_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/gestion/referentiel/sites": {
         parameters: {
             query?: never;
@@ -560,10 +851,914 @@ export interface paths {
         patch: operations["gestion_referentiel_sites_partial_update"];
         trace?: never;
     };
+    "/api/gestion/reservations/campagnes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description `chemin_site` : chemin ORM vers le site de l'objet (None = objet transversal). */
+        get: operations["gestion_reservations_campagnes_list"];
+        put?: never;
+        /** @description `chemin_site` : chemin ORM vers le site de l'objet (None = objet transversal). */
+        post: operations["gestion_reservations_campagnes_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gestion/reservations/campagnes/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description `chemin_site` : chemin ORM vers le site de l'objet (None = objet transversal). */
+        get: operations["gestion_reservations_campagnes_retrieve"];
+        /** @description `chemin_site` : chemin ORM vers le site de l'objet (None = objet transversal). */
+        put: operations["gestion_reservations_campagnes_update"];
+        post?: never;
+        /** @description `chemin_site` : chemin ORM vers le site de l'objet (None = objet transversal). */
+        delete: operations["gestion_reservations_campagnes_destroy"];
+        options?: never;
+        head?: never;
+        /** @description `chemin_site` : chemin ORM vers le site de l'objet (None = objet transversal). */
+        patch: operations["gestion_reservations_campagnes_partial_update"];
+        trace?: never;
+    };
+    "/api/gestion/reservations/campagnes/{id}/analyse": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Demandes concurrentes et proposition d'arbitrage RG-03. */
+        get: operations["gestion_reservations_campagnes_analyse_retrieve"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gestion/reservations/campagnes/{id}/attribution": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description `chemin_site` : chemin ORM vers le site de l'objet (None = objet transversal). */
+        post: operations["gestion_reservations_campagnes_attribution_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gestion/reservations/campagnes/{id}/statut": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description `chemin_site` : chemin ORM vers le site de l'objet (None = objet transversal). */
+        post: operations["gestion_reservations_campagnes_statut_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gestion/reservations/dossiers": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description `chemin_site` : chemin ORM vers le site de l'objet (None = objet transversal). */
+        get: operations["gestion_reservations_dossiers_list"];
+        put?: never;
+        /** @description `chemin_site` : chemin ORM vers le site de l'objet (None = objet transversal). */
+        post: operations["gestion_reservations_dossiers_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gestion/reservations/dossiers/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description `chemin_site` : chemin ORM vers le site de l'objet (None = objet transversal). */
+        get: operations["gestion_reservations_dossiers_retrieve"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** @description `chemin_site` : chemin ORM vers le site de l'objet (None = objet transversal). */
+        patch: operations["gestion_reservations_dossiers_partial_update"];
+        trace?: never;
+    };
+    "/api/gestion/reservations/dossiers/{id}/apercu": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description Séances générées et conflits avant enregistrement (PLA-04, PLA-07). */
+        post: operations["gestion_reservations_dossiers_apercu_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gestion/reservations/dossiers/{id}/reservations": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description `chemin_site` : chemin ORM vers le site de l'objet (None = objet transversal). */
+        post: operations["gestion_reservations_dossiers_reservations_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gestion/reservations/liste-attente": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description `chemin_site` : chemin ORM vers le site de l'objet (None = objet transversal). */
+        get: operations["gestion_reservations_liste_attente_list"];
+        put?: never;
+        /** @description `chemin_site` : chemin ORM vers le site de l'objet (None = objet transversal). */
+        post: operations["gestion_reservations_liste_attente_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gestion/reservations/liste-attente/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description `chemin_site` : chemin ORM vers le site de l'objet (None = objet transversal). */
+        get: operations["gestion_reservations_liste_attente_retrieve"];
+        put?: never;
+        post?: never;
+        /** @description `chemin_site` : chemin ORM vers le site de l'objet (None = objet transversal). */
+        delete: operations["gestion_reservations_liste_attente_destroy"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gestion/reservations/planning": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description PLA-01 : séances d'une période pour les vues jour, semaine, mois, chronologie, multi-sites et liste. */
+        get: operations["gestion_reservations_planning_list"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gestion/reservations/reservations": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description `chemin_site` : chemin ORM vers le site de l'objet (None = objet transversal). */
+        get: operations["gestion_reservations_reservations_list"];
+        put?: never;
+        /** @description `chemin_site` : chemin ORM vers le site de l'objet (None = objet transversal). */
+        post: operations["gestion_reservations_reservations_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gestion/reservations/reservations/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description `chemin_site` : chemin ORM vers le site de l'objet (None = objet transversal). */
+        get: operations["gestion_reservations_reservations_retrieve"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gestion/reservations/reservations/{id}/alternatives": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description `chemin_site` : chemin ORM vers le site de l'objet (None = objet transversal). */
+        get: operations["gestion_reservations_reservations_alternatives_list"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gestion/reservations/reservations/{id}/annuler": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description `chemin_site` : chemin ORM vers le site de l'objet (None = objet transversal). */
+        post: operations["gestion_reservations_reservations_annuler_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gestion/reservations/reservations/{id}/cloturer": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description `chemin_site` : chemin ORM vers le site de l'objet (None = objet transversal). */
+        post: operations["gestion_reservations_reservations_cloturer_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gestion/reservations/reservations/{id}/confirmer": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description `chemin_site` : chemin ORM vers le site de l'objet (None = objet transversal). */
+        post: operations["gestion_reservations_reservations_confirmer_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gestion/reservations/reservations/{id}/instruire": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description `chemin_site` : chemin ORM vers le site de l'objet (None = objet transversal). */
+        post: operations["gestion_reservations_reservations_instruire_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gestion/reservations/reservations/{id}/modifier-serie": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description `chemin_site` : chemin ORM vers le site de l'objet (None = objet transversal). */
+        post: operations["gestion_reservations_reservations_modifier_serie_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gestion/reservations/reservations/{id}/option": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description `chemin_site` : chemin ORM vers le site de l'objet (None = objet transversal). */
+        post: operations["gestion_reservations_reservations_option_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gestion/reservations/reservations/{id}/priorite-municipale": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description `chemin_site` : chemin ORM vers le site de l'objet (None = objet transversal). */
+        post: operations["gestion_reservations_reservations_priorite_municipale_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gestion/reservations/reservations/{id}/refuser": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description `chemin_site` : chemin ORM vers le site de l'objet (None = objet transversal). */
+        post: operations["gestion_reservations_reservations_refuser_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gestion/reservations/reservations/{id}/valider": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description `chemin_site` : chemin ORM vers le site de l'objet (None = objet transversal). */
+        post: operations["gestion_reservations_reservations_valider_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gestion/reservations/seances": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description `chemin_site` : chemin ORM vers le site de l'objet (None = objet transversal). */
+        get: operations["gestion_reservations_seances_list"];
+        put?: never;
+        /** @description `chemin_site` : chemin ORM vers le site de l'objet (None = objet transversal). */
+        post: operations["gestion_reservations_seances_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gestion/reservations/seances/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description `chemin_site` : chemin ORM vers le site de l'objet (None = objet transversal). */
+        get: operations["gestion_reservations_seances_retrieve"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gestion/reservations/seances/{id}/annuler": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description `chemin_site` : chemin ORM vers le site de l'objet (None = objet transversal). */
+        post: operations["gestion_reservations_seances_annuler_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gestion/reservations/seances/{id}/controle-deplacement": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description PLA-02 : contrôle côté serveur avant validation visuelle du glisser-déposer. */
+        post: operations["gestion_reservations_seances_controle_deplacement_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gestion/reservations/seances/{id}/deplacer": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description `chemin_site` : chemin ORM vers le site de l'objet (None = objet transversal). */
+        post: operations["gestion_reservations_seances_deplacer_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gestion/reservations/seances/{id}/modifier-suivantes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description `chemin_site` : chemin ORM vers le site de l'objet (None = objet transversal). */
+        post: operations["gestion_reservations_seances_modifier_suivantes_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gestion/reservations/seances/{id}/presence": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description `chemin_site` : chemin ORM vers le site de l'objet (None = objet transversal). */
+        post: operations["gestion_reservations_seances_presence_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gestion/reservations/types": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description `chemin_site` : chemin ORM vers le site de l'objet (None = objet transversal). */
+        get: operations["gestion_reservations_types_list"];
+        put?: never;
+        /** @description `chemin_site` : chemin ORM vers le site de l'objet (None = objet transversal). */
+        post: operations["gestion_reservations_types_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gestion/reservations/types/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description `chemin_site` : chemin ORM vers le site de l'objet (None = objet transversal). */
+        get: operations["gestion_reservations_types_retrieve"];
+        /** @description `chemin_site` : chemin ORM vers le site de l'objet (None = objet transversal). */
+        put: operations["gestion_reservations_types_update"];
+        post?: never;
+        /** @description `chemin_site` : chemin ORM vers le site de l'objet (None = objet transversal). */
+        delete: operations["gestion_reservations_types_destroy"];
+        options?: never;
+        head?: never;
+        /** @description `chemin_site` : chemin ORM vers le site de l'objet (None = objet transversal). */
+        patch: operations["gestion_reservations_types_partial_update"];
+        trace?: never;
+    };
+    "/api/gestion/reservations/vues": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description PLA-03 : vues du planning propres à chaque agent. */
+        get: operations["gestion_reservations_vues_list"];
+        put?: never;
+        /** @description PLA-03 : vues du planning propres à chaque agent. */
+        post: operations["gestion_reservations_vues_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gestion/reservations/vues/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description PLA-03 : vues du planning propres à chaque agent. */
+        get: operations["gestion_reservations_vues_retrieve"];
+        /** @description PLA-03 : vues du planning propres à chaque agent. */
+        put: operations["gestion_reservations_vues_update"];
+        post?: never;
+        /** @description PLA-03 : vues du planning propres à chaque agent. */
+        delete: operations["gestion_reservations_vues_destroy"];
+        options?: never;
+        head?: never;
+        /** @description PLA-03 : vues du planning propres à chaque agent. */
+        patch: operations["gestion_reservations_vues_partial_update"];
+        trace?: never;
+    };
+    "/api/gestion/usagers/contacts": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description `chemin_site` : chemin ORM vers le site de l'objet (None = objet transversal). */
+        get: operations["gestion_usagers_contacts_list"];
+        put?: never;
+        /** @description `chemin_site` : chemin ORM vers le site de l'objet (None = objet transversal). */
+        post: operations["gestion_usagers_contacts_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gestion/usagers/contacts/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description `chemin_site` : chemin ORM vers le site de l'objet (None = objet transversal). */
+        get: operations["gestion_usagers_contacts_retrieve"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** @description `chemin_site` : chemin ORM vers le site de l'objet (None = objet transversal). */
+        patch: operations["gestion_usagers_contacts_partial_update"];
+        trace?: never;
+    };
+    "/api/gestion/usagers/pieces": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description `chemin_site` : chemin ORM vers le site de l'objet (None = objet transversal). */
+        get: operations["gestion_usagers_pieces_list"];
+        put?: never;
+        /** @description `chemin_site` : chemin ORM vers le site de l'objet (None = objet transversal). */
+        post: operations["gestion_usagers_pieces_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gestion/usagers/pieces/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description `chemin_site` : chemin ORM vers le site de l'objet (None = objet transversal). */
+        get: operations["gestion_usagers_pieces_retrieve"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gestion/usagers/pieces/{id}/fichier": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description `chemin_site` : chemin ORM vers le site de l'objet (None = objet transversal). */
+        get: operations["gestion_usagers_pieces_fichier_retrieve"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gestion/usagers/pieces/{id}/verifier": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description `chemin_site` : chemin ORM vers le site de l'objet (None = objet transversal). */
+        post: operations["gestion_usagers_pieces_verifier_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gestion/usagers/pieces/alertes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description USR-03 : pièces expirées ou qui expirent dans le délai d'alerte. */
+        get: operations["gestion_usagers_pieces_alertes_list"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gestion/usagers/rattachements": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description `chemin_site` : chemin ORM vers le site de l'objet (None = objet transversal). */
+        get: operations["gestion_usagers_rattachements_list"];
+        put?: never;
+        /** @description `chemin_site` : chemin ORM vers le site de l'objet (None = objet transversal). */
+        post: operations["gestion_usagers_rattachements_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gestion/usagers/rattachements/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description `chemin_site` : chemin ORM vers le site de l'objet (None = objet transversal). */
+        get: operations["gestion_usagers_rattachements_retrieve"];
+        /** @description `chemin_site` : chemin ORM vers le site de l'objet (None = objet transversal). */
+        put: operations["gestion_usagers_rattachements_update"];
+        post?: never;
+        /** @description `chemin_site` : chemin ORM vers le site de l'objet (None = objet transversal). */
+        delete: operations["gestion_usagers_rattachements_destroy"];
+        options?: never;
+        head?: never;
+        /** @description `chemin_site` : chemin ORM vers le site de l'objet (None = objet transversal). */
+        patch: operations["gestion_usagers_rattachements_partial_update"];
+        trace?: never;
+    };
+    "/api/gestion/usagers/types-pieces": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description `chemin_site` : chemin ORM vers le site de l'objet (None = objet transversal). */
+        get: operations["gestion_usagers_types_pieces_list"];
+        put?: never;
+        /** @description `chemin_site` : chemin ORM vers le site de l'objet (None = objet transversal). */
+        post: operations["gestion_usagers_types_pieces_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gestion/usagers/types-pieces/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description `chemin_site` : chemin ORM vers le site de l'objet (None = objet transversal). */
+        get: operations["gestion_usagers_types_pieces_retrieve"];
+        /** @description `chemin_site` : chemin ORM vers le site de l'objet (None = objet transversal). */
+        put: operations["gestion_usagers_types_pieces_update"];
+        post?: never;
+        /** @description `chemin_site` : chemin ORM vers le site de l'objet (None = objet transversal). */
+        delete: operations["gestion_usagers_types_pieces_destroy"];
+        options?: never;
+        head?: never;
+        /** @description `chemin_site` : chemin ORM vers le site de l'objet (None = objet transversal). */
+        patch: operations["gestion_usagers_types_pieces_partial_update"];
+        trace?: never;
+    };
+    "/api/gestion/usagers/usagers": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description `chemin_site` : chemin ORM vers le site de l'objet (None = objet transversal). */
+        get: operations["gestion_usagers_usagers_list"];
+        put?: never;
+        /** @description `chemin_site` : chemin ORM vers le site de l'objet (None = objet transversal). */
+        post: operations["gestion_usagers_usagers_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gestion/usagers/usagers/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description `chemin_site` : chemin ORM vers le site de l'objet (None = objet transversal). */
+        get: operations["gestion_usagers_usagers_retrieve"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** @description `chemin_site` : chemin ORM vers le site de l'objet (None = objet transversal). */
+        patch: operations["gestion_usagers_usagers_partial_update"];
+        trace?: never;
+    };
+    "/api/gestion/usagers/usagers/{id}/historique": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description USR-05 : dossiers et bilan d'occupation de l'usager. */
+        get: operations["gestion_usagers_usagers_historique_retrieve"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gestion/usagers/usagers/types": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description `chemin_site` : chemin ORM vers le site de l'objet (None = objet transversal). */
+        get: operations["gestion_usagers_usagers_types_retrieve"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        Alternative: {
+            espace: number;
+            espace_nom: string;
+            /** Format: date-time */
+            debut: string;
+            /** Format: date-time */
+            fin: string;
+            raison: string;
+        };
+        Apercu: {
+            seances: {
+                [key: string]: unknown;
+            }[];
+            conflits: components["schemas"]["Conflit"][];
+            hors_horaires: string[];
+            fermetures: string[];
+            description: string;
+        };
+        AttributionRequest: {
+            decisions: {
+                [key: string]: components["schemas"]["DecisionRequest"];
+            };
+        };
         Batiment: {
             readonly id: number;
             site: number;
@@ -584,12 +1779,184 @@ export interface components {
             erp_type?: string;
             actif?: boolean;
         };
+        Campagne: {
+            readonly id: number;
+            saison: number;
+            readonly saison_nom: string;
+            nom: string;
+            /** Format: date */
+            ouverture: string;
+            /** Format: date */
+            cloture: string;
+            /** Format: date */
+            date_commission?: string | null;
+            readonly statut: components["schemas"]["StatutCampagneEnum"];
+            /** @description Vide : tous les sites. */
+            sites?: number[];
+            readonly nombre_demandes: number;
+        };
+        CampagneRequest: {
+            saison: number;
+            nom: string;
+            /** Format: date */
+            ouverture: string;
+            /** Format: date */
+            cloture: string;
+            /** Format: date */
+            date_commission?: string | null;
+            /** @description Vide : tous les sites. */
+            sites?: number[];
+        };
         CodeTotpRequest: {
             code: string;
+        };
+        /**
+         * @description * `statut` - Par statut
+         *     * `type_usager` - Par type d'usager
+         * @enum {string}
+         */
+        ColorationEnum: "statut" | "type_usager";
+        Conflit: {
+            occurrence: number;
+            reservation: number;
+            dossier: string;
+            usager: string;
+            espace: string;
+            /** Format: date-time */
+            debut: string;
+            /** Format: date-time */
+            fin: string;
         };
         ConnexionRequest: {
             identifiant: string;
             mot_de_passe: string;
+        };
+        Contact: {
+            readonly id: number;
+            civilite?: string;
+            prenom: string;
+            nom: string;
+            /** Format: email */
+            courriel: string;
+            telephone?: string;
+            readonly rattachements: components["schemas"]["Rattachement"][];
+        };
+        ContactRequest: {
+            civilite?: string;
+            prenom: string;
+            nom: string;
+            /** Format: email */
+            courriel: string;
+            telephone?: string;
+        };
+        Controle: {
+            possible: boolean;
+            hors_horaires: boolean;
+            fermeture: boolean;
+            conflits: components["schemas"]["Conflit"][];
+            alternatives: components["schemas"]["Alternative"][];
+        };
+        /**
+         * @description * `attribuer` - attribuer
+         *     * `refuser` - refuser
+         * @enum {string}
+         */
+        DecisionEnum: "attribuer" | "refuser";
+        DecisionRequest: {
+            decision: components["schemas"]["DecisionEnum"];
+            /** @default  */
+            motif: string;
+        };
+        DeplacementRequest: {
+            espace: number;
+            /** Format: date-time */
+            debut: string;
+            /** Format: date-time */
+            fin: string;
+            /** @default false */
+            forcer_horaires: boolean;
+        };
+        /**
+         * @description * `reglement` - reglement
+         *     * `plan` - plan
+         *     * `securite` - securite
+         *     * `autre` - autre
+         * @enum {string}
+         */
+        DepotNatureEnum: "reglement" | "plan" | "securite" | "autre";
+        DepotPieceRequest: {
+            usager: number;
+            type_piece: number;
+            /** Format: binary */
+            fichier: string;
+            /** Format: date */
+            valide_jusqu_au?: string | null;
+        };
+        DepotRequest: {
+            espace: number;
+            /** Format: binary */
+            fichier: string;
+            /** @default  */
+            description: string;
+            /** @default  */
+            titre: string;
+            /** @default reglement */
+            nature: components["schemas"]["DepotNatureEnum"];
+            /** @default true */
+            public: boolean;
+            /** @default 0 */
+            ordre: number;
+        };
+        Document: {
+            readonly id: number;
+            espace: number;
+            nature?: components["schemas"]["DocumentNatureEnum"];
+            titre: string;
+            /** @description Téléchargeable depuis le portail. */
+            public?: boolean;
+            readonly nom_fichier: string;
+        };
+        /**
+         * @description * `reglement` - Règlement intérieur
+         *     * `plan` - Plan d'accès
+         *     * `securite` - Consignes de sécurité
+         *     * `autre` - Autre
+         * @enum {string}
+         */
+        DocumentNatureEnum: "reglement" | "plan" | "securite" | "autre";
+        Dossier: {
+            readonly id: number;
+            readonly numero: string;
+            usager: number;
+            readonly usager_nom: string;
+            readonly usager_type: string;
+            contact?: number | null;
+            type_reservation: number;
+            readonly type_reservation_libelle: string;
+            objet: string;
+            activite?: string;
+            effectif?: number;
+            saison?: number | null;
+            campagne?: number | null;
+            readonly origine: components["schemas"]["OrigineEnum"];
+            observations?: string;
+            readonly statut: string;
+            /** Format: date-time */
+            readonly cree_le: string;
+            /** Format: date-time */
+            readonly depose_le: string | null;
+            readonly reservations: components["schemas"]["Reservation"][];
+        };
+        DossierRequest: {
+            usager: number;
+            contact?: number | null;
+            type_reservation: number;
+            objet: string;
+            activite?: string;
+            effectif?: number;
+            saison?: number | null;
+            campagne?: number | null;
+            observations?: string;
         };
         Enrolement: {
             uri: string;
@@ -688,6 +2055,29 @@ export interface components {
             libelle: string;
             ordre?: number;
         };
+        Fermeture: {
+            readonly id: number;
+            site?: number | null;
+            espace?: number | null;
+            /** Format: date-time */
+            debut: string;
+            /** Format: date-time */
+            fin: string;
+            motif: string;
+            /** Format: date-time */
+            readonly cree_le: string;
+            /** @default 0 */
+            readonly seances_touchees: number;
+        };
+        FermetureRequest: {
+            site?: number | null;
+            espace?: number | null;
+            /** Format: date-time */
+            debut: string;
+            /** Format: date-time */
+            fin: string;
+            motif: string;
+        };
         GroupeAD: {
             readonly id: number;
             /** DN du groupe */
@@ -742,6 +2132,29 @@ export interface components {
          * @enum {string}
          */
         HabilitationSourceEnum: "ad" | "manuel";
+        Horaire: {
+            readonly id: number;
+            espace: number;
+            saison?: number | null;
+            jour_semaine: components["schemas"]["JourSemaineEnum"];
+            /** Format: time */
+            debut: string;
+            /** Format: time */
+            fin: string;
+            /** @description Plage valable aussi pendant les vacances scolaires. */
+            pendant_vacances?: boolean;
+        };
+        HoraireRequest: {
+            espace: number;
+            saison?: number | null;
+            jour_semaine: components["schemas"]["JourSemaineEnum"];
+            /** Format: time */
+            debut: string;
+            /** Format: time */
+            fin: string;
+            /** @description Plage valable aussi pendant les vacances scolaires. */
+            pendant_vacances?: boolean;
+        };
         JetonEnrolementRequest: {
             jeton: string;
         };
@@ -750,6 +2163,17 @@ export interface components {
             /** Format: date-time */
             expire_le: string;
         };
+        /**
+         * @description * `0` - lundi
+         *     * `1` - mardi
+         *     * `2` - mercredi
+         *     * `3` - jeudi
+         *     * `4` - vendredi
+         *     * `5` - samedi
+         *     * `6` - dimanche
+         * @enum {integer}
+         */
+        JourSemaineEnum: 0 | 1 | 2 | 3 | 4 | 5 | 6;
         JournalAudit: {
             readonly id: number;
             /** Format: date-time */
@@ -766,6 +2190,55 @@ export interface components {
             adresse_ip?: string | null;
             empreinte: string;
         };
+        ListeAttente: {
+            readonly id: number;
+            espace: number;
+            readonly espace_nom: string;
+            /** Format: date-time */
+            debut: string;
+            /** Format: date-time */
+            fin: string;
+            usager: number;
+            readonly usager_nom: string;
+            contact?: number | null;
+            readonly statut: components["schemas"]["StatutListeAttenteEnum"];
+            /** Format: date-time */
+            readonly cree_le: string;
+            /** Format: date-time */
+            readonly notifie_le: string | null;
+        };
+        ListeAttenteRequest: {
+            espace: number;
+            /** Format: date-time */
+            debut: string;
+            /** Format: date-time */
+            fin: string;
+            usager: number;
+            contact?: number | null;
+        };
+        /**
+         * @description * `jour` - Jour
+         *     * `semaine` - Semaine
+         *     * `mois` - Mois
+         *     * `chronologie` - Chronologie par espace
+         *     * `multi_sites` - Occupation multi-sites
+         *     * `liste` - Liste
+         * @enum {string}
+         */
+        ModeEnum: "jour" | "semaine" | "mois" | "chronologie" | "multi_sites" | "liste";
+        ModificationSerieRequest: {
+            espace?: number;
+            /** Format: time */
+            heure_debut?: string;
+            /** Format: time */
+            heure_fin?: string;
+            /** Format: date */
+            date_fin?: string;
+            recurrence?: string;
+            exclure_vacances?: boolean;
+            exclure_feries?: boolean;
+            exdates?: string[];
+        };
         Moi: {
             id: number;
             identifiant: string;
@@ -775,6 +2248,92 @@ export interface components {
             double_authentification_active: boolean;
             double_authentification_validee: boolean;
             habilitations: components["schemas"]["HabilitationMoi"][];
+        };
+        MotifRequest: {
+            motif: string;
+        };
+        NouvelleReservationRequest: {
+            espace: number;
+            /** Format: date */
+            date_debut: string;
+            /** Format: date */
+            date_fin: string;
+            /** Format: time */
+            heure_debut: string;
+            /** Format: time */
+            heure_fin: string;
+            /** @default  */
+            recurrence: string;
+            /** @default true */
+            exclure_vacances: boolean;
+            /** @default true */
+            exclure_feries: boolean;
+            exdates?: string[];
+            /** @default false */
+            forcer_horaires: boolean;
+        };
+        Occurrence: {
+            readonly id: number;
+            readonly reservation: number;
+            readonly espace: number;
+            readonly espace_nom: string;
+            /** Format: date-time */
+            readonly debut: string;
+            /** Format: date-time */
+            readonly fin: string;
+            readonly statut: components["schemas"]["StatutReservationEnum"];
+            readonly bloquante: boolean;
+            readonly presence: components["schemas"]["OccurrencePresenceEnum"];
+            /** Format: date-time */
+            readonly debut_reel: string | null;
+            /** Format: date-time */
+            readonly fin_reel: string | null;
+            /** Format: date-time */
+            readonly annulee_le: string | null;
+            readonly motif_annulation: string;
+            readonly annulation_tardive: boolean;
+            readonly annulee_par_usager: boolean;
+            /** @description Fermeture ou conflit à traiter (REF-06). */
+            readonly signalement: string;
+            /**
+             * Format: date-time
+             * @description Avant déplacement.
+             */
+            readonly debut_origine: string | null;
+            readonly modifiee_individuellement: boolean;
+        };
+        /**
+         * @description * `present` - Présent
+         *     * `absent_signale` - Absence signalée
+         *     * `absent_non_signale` - Absence non signalée
+         * @enum {string}
+         */
+        OccurrencePresenceEnum: "present" | "absent_signale" | "absent_non_signale";
+        OptionRequest: {
+            jours?: number;
+        };
+        /**
+         * @description * `guichet` - Guichet
+         *     * `portail` - Portail
+         *     * `campagne` - Campagne annuelle
+         *     * `ville` - Service municipal
+         * @enum {string}
+         */
+        OrigineEnum: "guichet" | "portail" | "campagne" | "ville";
+        PaginatedAlternativeList: {
+            /** @example 123 */
+            count: number;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?page=4
+             */
+            next?: string | null;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?page=2
+             */
+            previous?: string | null;
+            results: components["schemas"]["Alternative"][];
         };
         PaginatedBatimentList: {
             /** @example 123 */
@@ -790,6 +2349,66 @@ export interface components {
              */
             previous?: string | null;
             results: components["schemas"]["Batiment"][];
+        };
+        PaginatedCampagneList: {
+            /** @example 123 */
+            count: number;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?page=4
+             */
+            next?: string | null;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?page=2
+             */
+            previous?: string | null;
+            results: components["schemas"]["Campagne"][];
+        };
+        PaginatedContactList: {
+            /** @example 123 */
+            count: number;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?page=4
+             */
+            next?: string | null;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?page=2
+             */
+            previous?: string | null;
+            results: components["schemas"]["Contact"][];
+        };
+        PaginatedDocumentList: {
+            /** @example 123 */
+            count: number;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?page=4
+             */
+            next?: string | null;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?page=2
+             */
+            previous?: string | null;
+            results: components["schemas"]["Document"][];
+        };
+        PaginatedDossierList: {
+            /** @example 123 */
+            count: number;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?page=4
+             */
+            next?: string | null;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?page=2
+             */
+            previous?: string | null;
+            results: components["schemas"]["Dossier"][];
         };
         PaginatedEspaceList: {
             /** @example 123 */
@@ -820,6 +2439,21 @@ export interface components {
              */
             previous?: string | null;
             results: components["schemas"]["FamilleEspace"][];
+        };
+        PaginatedFermetureList: {
+            /** @example 123 */
+            count: number;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?page=4
+             */
+            next?: string | null;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?page=2
+             */
+            previous?: string | null;
+            results: components["schemas"]["Fermeture"][];
         };
         PaginatedGroupeADList: {
             /** @example 123 */
@@ -866,6 +2500,36 @@ export interface components {
             previous?: string | null;
             results: components["schemas"]["JournalAudit"][];
         };
+        PaginatedListeAttenteList: {
+            /** @example 123 */
+            count: number;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?page=4
+             */
+            next?: string | null;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?page=2
+             */
+            previous?: string | null;
+            results: components["schemas"]["ListeAttente"][];
+        };
+        PaginatedOccurrenceList: {
+            /** @example 123 */
+            count: number;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?page=4
+             */
+            next?: string | null;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?page=2
+             */
+            previous?: string | null;
+            results: components["schemas"]["Occurrence"][];
+        };
         PaginatedPerimetreList: {
             /** @example 123 */
             count: number;
@@ -880,6 +2544,66 @@ export interface components {
              */
             previous?: string | null;
             results: components["schemas"]["Perimetre"][];
+        };
+        PaginatedPhotoList: {
+            /** @example 123 */
+            count: number;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?page=4
+             */
+            next?: string | null;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?page=2
+             */
+            previous?: string | null;
+            results: components["schemas"]["Photo"][];
+        };
+        PaginatedPieceList: {
+            /** @example 123 */
+            count: number;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?page=4
+             */
+            next?: string | null;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?page=2
+             */
+            previous?: string | null;
+            results: components["schemas"]["Piece"][];
+        };
+        PaginatedRattachementList: {
+            /** @example 123 */
+            count: number;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?page=4
+             */
+            next?: string | null;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?page=2
+             */
+            previous?: string | null;
+            results: components["schemas"]["Rattachement"][];
+        };
+        PaginatedReservationList: {
+            /** @example 123 */
+            count: number;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?page=4
+             */
+            next?: string | null;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?page=2
+             */
+            previous?: string | null;
+            results: components["schemas"]["Reservation"][];
         };
         PaginatedRoleList: {
             /** @example 123 */
@@ -896,6 +2620,21 @@ export interface components {
             previous?: string | null;
             results: components["schemas"]["Role"][];
         };
+        PaginatedSaisonList: {
+            /** @example 123 */
+            count: number;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?page=4
+             */
+            next?: string | null;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?page=2
+             */
+            previous?: string | null;
+            results: components["schemas"]["Saison"][];
+        };
         PaginatedSiteList: {
             /** @example 123 */
             count: number;
@@ -910,6 +2649,21 @@ export interface components {
              */
             previous?: string | null;
             results: components["schemas"]["Site"][];
+        };
+        PaginatedUsagerList: {
+            /** @example 123 */
+            count: number;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?page=4
+             */
+            next?: string | null;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?page=2
+             */
+            previous?: string | null;
+            results: components["schemas"]["Usager"][];
         };
         PaginatedUtilisateurList: {
             /** @example 123 */
@@ -926,6 +2680,14 @@ export interface components {
             previous?: string | null;
             results: components["schemas"]["Utilisateur"][];
         };
+        Parametre: {
+            cle: string;
+            libelle: string;
+            groupe: string;
+            aide: string;
+            valeur: unknown;
+            defaut: unknown;
+        };
         PatchedBatimentRequest: {
             site?: number;
             nom?: string;
@@ -934,6 +2696,44 @@ export interface components {
             /** Type ERP */
             erp_type?: string;
             actif?: boolean;
+        };
+        PatchedCampagneRequest: {
+            saison?: number;
+            nom?: string;
+            /** Format: date */
+            ouverture?: string;
+            /** Format: date */
+            cloture?: string;
+            /** Format: date */
+            date_commission?: string | null;
+            /** @description Vide : tous les sites. */
+            sites?: number[];
+        };
+        PatchedContactRequest: {
+            civilite?: string;
+            prenom?: string;
+            nom?: string;
+            /** Format: email */
+            courriel?: string;
+            telephone?: string;
+        };
+        PatchedDocumentRequest: {
+            espace?: number;
+            nature?: components["schemas"]["DocumentNatureEnum"];
+            titre?: string;
+            /** @description Téléchargeable depuis le portail. */
+            public?: boolean;
+        };
+        PatchedDossierRequest: {
+            usager?: number;
+            contact?: number | null;
+            type_reservation?: number;
+            objet?: string;
+            activite?: string;
+            effectif?: number;
+            saison?: number | null;
+            campagne?: number | null;
+            observations?: string;
         };
         PatchedEspaceRequest: {
             code?: string;
@@ -989,10 +2789,53 @@ export interface components {
             /** Format: date */
             fin?: string | null;
         };
+        PatchedHoraireRequest: {
+            espace?: number;
+            saison?: number | null;
+            jour_semaine?: components["schemas"]["JourSemaineEnum"];
+            /** Format: time */
+            debut?: string;
+            /** Format: time */
+            fin?: string;
+            /** @description Plage valable aussi pendant les vacances scolaires. */
+            pendant_vacances?: boolean;
+        };
+        PatchedModificationRequest: {
+            valeurs?: {
+                [key: string]: unknown;
+            };
+        };
         PatchedPerimetreRequest: {
             nom?: string;
             tous_sites?: boolean;
             sites?: number[];
+        };
+        PatchedPeriodeRequest: {
+            saison?: number;
+            nature?: components["schemas"]["PeriodeNatureEnum"];
+            libelle?: string;
+            /** Format: date */
+            debut?: string;
+            /**
+             * Format: date
+             * @description Incluse.
+             */
+            fin?: string;
+            zone?: string;
+        };
+        PatchedPhotoRequest: {
+            espace?: number;
+            /** Description (texte alternatif) */
+            description?: string;
+            ordre?: number;
+        };
+        PatchedRattachementRequest: {
+            usager?: number;
+            contact?: number;
+            role?: components["schemas"]["RoleEnum"];
+            principal?: boolean;
+            /** @description Signe les conventions au nom de l'usager. */
+            peut_signer?: boolean;
         };
         PatchedRoleRequest: {
             code?: string;
@@ -1000,6 +2843,14 @@ export interface components {
             actions?: string[];
             /** @description Double authentification obligatoire (administration, régie : SEC-03). */
             double_authentification?: boolean;
+        };
+        PatchedSaisonRequest: {
+            nom?: string;
+            /** Format: date */
+            debut?: string;
+            /** Format: date */
+            fin?: string;
+            active?: boolean;
         };
         PatchedSiteRequest: {
             code?: string;
@@ -1010,12 +2861,67 @@ export interface components {
             telephone?: string;
             actif?: boolean;
         };
+        PatchedTypePieceRequest: {
+            code?: string;
+            libelle?: string;
+            description?: string;
+            types_usager?: components["schemas"]["TypeUsagerEnum"][];
+            obligatoire?: boolean;
+            /** @description Vide : pas d'expiration. */
+            validite_mois?: number | null;
+        };
+        PatchedTypeReservationRequest: {
+            code?: string;
+            libelle?: string;
+            /** Pièces justificatives valides */
+            exige_pieces?: boolean;
+            /** Convention ou contrat signé */
+            exige_convention?: boolean;
+            /** Acompte payé */
+            exige_acompte?: boolean;
+            /** Caution reçue */
+            exige_caution?: boolean;
+            ordre?: number;
+        };
+        PatchedUsagerRequest: {
+            type?: components["schemas"]["TypeUsagerEnum"];
+            /** Nom ou raison sociale */
+            nom?: string;
+            sigle?: string;
+            siret?: string;
+            /** Numéro RNA */
+            rna?: string;
+            adresse?: string;
+            code_postal?: string;
+            commune?: string;
+            telephone?: string;
+            courriel?: string;
+            /**
+             * Association locale
+             * @description Siège sur la commune (priorité RG-03).
+             */
+            local?: boolean;
+            /** Conventionné(e) avec la Ville */
+            conventionne?: boolean;
+            convention_reference?: string;
+            /** Format: date */
+            convention_fin?: string | null;
+            statut?: components["schemas"]["StatutUsagerEnum"];
+            observations?: string;
+        };
         PatchedUtilisateurRequest: {
             /**
              * Actif
              * @description Précise si l’utilisateur doit être considéré comme actif. Décochez ceci plutôt que de supprimer le compte.
              */
             is_active?: boolean;
+        };
+        PatchedVueEnregistreeRequest: {
+            nom?: string;
+            mode?: components["schemas"]["ModeEnum"];
+            filtres?: unknown;
+            coloration?: components["schemas"]["ColorationEnum"];
+            par_defaut?: boolean;
         };
         Perimetre: {
             readonly id: number;
@@ -1028,6 +2934,155 @@ export interface components {
             tous_sites?: boolean;
             sites?: number[];
         };
+        Periode: {
+            readonly id: number;
+            saison: number;
+            nature: components["schemas"]["PeriodeNatureEnum"];
+            libelle: string;
+            /** Format: date */
+            debut: string;
+            /**
+             * Format: date
+             * @description Incluse.
+             */
+            fin: string;
+            zone?: string;
+            readonly source: components["schemas"]["PeriodeSourceEnum"];
+        };
+        /**
+         * @description * `vacances` - Vacances scolaires
+         *     * `ferie` - Jour férié
+         *     * `fermeture_ville` - Fermeture générale de la Ville
+         * @enum {string}
+         */
+        PeriodeNatureEnum: "vacances" | "ferie" | "fermeture_ville";
+        PeriodeRequest: {
+            saison: number;
+            nature: components["schemas"]["PeriodeNatureEnum"];
+            libelle: string;
+            /** Format: date */
+            debut: string;
+            /**
+             * Format: date
+             * @description Incluse.
+             */
+            fin: string;
+            zone?: string;
+        };
+        /**
+         * @description * `import` - Open data Éducation nationale
+         *     * `calcul` - Calcul des jours fériés
+         *     * `saisie` - Saisie
+         * @enum {string}
+         */
+        PeriodeSourceEnum: "import" | "calcul" | "saisie";
+        Photo: {
+            readonly id: number;
+            espace: number;
+            /** Description (texte alternatif) */
+            description: string;
+            ordre?: number;
+        };
+        Piece: {
+            readonly id: number;
+            usager: number;
+            readonly usager_nom: string;
+            type_piece: number;
+            readonly type_libelle: string;
+            readonly nom_fichier: string;
+            /** Format: date */
+            valide_du?: string | null;
+            /** Format: date */
+            valide_jusqu_au?: string | null;
+            readonly statut: components["schemas"]["StatutPieceEnum"];
+            readonly motif_refus: string;
+            /** Format: date-time */
+            readonly verifie_le: string | null;
+            /** Format: date-time */
+            readonly depose_le: string;
+            readonly depose_par_portail: boolean;
+        };
+        /**
+         * @description * `present` - present
+         *     * `absent_signale` - absent_signale
+         *     * `absent_non_signale` - absent_non_signale
+         * @enum {string}
+         */
+        PresencePresenceEnum: "present" | "absent_signale" | "absent_non_signale";
+        PresenceRequest: {
+            presence: components["schemas"]["PresencePresenceEnum"];
+            /** Format: date-time */
+            debut_reel?: string | null;
+            /** Format: date-time */
+            fin_reel?: string | null;
+        };
+        PrioriteMunicipaleRequest: {
+            motif: string;
+            deplacements?: {
+                [key: string]: components["schemas"]["DeplacementRequest"];
+            };
+        };
+        Rattachement: {
+            readonly id: number;
+            usager: number;
+            readonly usager_nom: string;
+            contact: number;
+            readonly contact_nom: string;
+            readonly contact_courriel: string;
+            role?: components["schemas"]["RoleEnum"];
+            principal?: boolean;
+            /** @description Signe les conventions au nom de l'usager. */
+            peut_signer?: boolean;
+        };
+        RattachementRequest: {
+            usager: number;
+            contact: number;
+            role?: components["schemas"]["RoleEnum"];
+            principal?: boolean;
+            /** @description Signe les conventions au nom de l'usager. */
+            peut_signer?: boolean;
+        };
+        RefusRequest: {
+            motif: string;
+            /** @default  */
+            alternatives: string;
+        };
+        Reservation: {
+            readonly id: number;
+            readonly dossier: number;
+            readonly espace: number;
+            readonly espace_nom: string;
+            readonly site_nom: string;
+            readonly statut: components["schemas"]["StatutReservationEnum"];
+            /** Règle de récurrence (RFC 5545) */
+            readonly recurrence: string;
+            readonly description: string;
+            /** Format: date */
+            readonly date_debut: string;
+            /** Format: date */
+            readonly date_fin: string;
+            /** Format: time */
+            readonly heure_debut: string;
+            /** Format: time */
+            readonly heure_fin: string;
+            readonly exclure_vacances: boolean;
+            readonly exclure_feries: boolean;
+            readonly exdates: string[];
+            /** Format: date-time */
+            readonly option_expire_le: string | null;
+            /** Format: date-time */
+            readonly option_relancee_le: string | null;
+            readonly motif_refus: string;
+            readonly motif_annulation: string;
+            /** Format: date-time */
+            readonly annulee_le: string | null;
+            /** Format: date-time */
+            readonly valide_le: string | null;
+            /** Format: date-time */
+            readonly confirme_le: string | null;
+            readonly nombre_occurrences: number;
+            readonly conditions_manquantes: string[];
+        };
         Role: {
             readonly id: number;
             code: string;
@@ -1036,12 +3091,58 @@ export interface components {
             /** @description Double authentification obligatoire (administration, régie : SEC-03). */
             double_authentification?: boolean;
         };
+        /**
+         * @description * `president` - Président(e)
+         *     * `tresorier` - Trésorier(ère)
+         *     * `secretaire` - Secrétaire
+         *     * `referent` - Référent(e)
+         *     * `directeur` - Directeur(trice)
+         *     * `responsable` - Responsable
+         *     * `autre` - Autre
+         * @enum {string}
+         */
+        RoleEnum: "president" | "tresorier" | "secretaire" | "referent" | "directeur" | "responsable" | "autre";
         RoleRequest: {
             code: string;
             libelle: string;
             actions?: string[];
             /** @description Double authentification obligatoire (administration, régie : SEC-03). */
             double_authentification?: boolean;
+        };
+        Saison: {
+            readonly id: number;
+            nom: string;
+            /** Format: date */
+            debut: string;
+            /** Format: date */
+            fin: string;
+            active?: boolean;
+        };
+        SaisonRequest: {
+            nom: string;
+            /** Format: date */
+            debut: string;
+            /** Format: date */
+            fin: string;
+            active?: boolean;
+        };
+        SeancePlanning: {
+            id: number;
+            reservation: number;
+            dossier: number;
+            numero: string;
+            objet: string;
+            usager: string;
+            type_usager: string;
+            espace: number;
+            espace_nom: string;
+            site: number;
+            /** Format: date-time */
+            debut: string;
+            /** Format: date-time */
+            fin: string;
+            statut: string;
+            signalement: string;
         };
         Site: {
             readonly id: number;
@@ -1061,6 +3162,180 @@ export interface components {
             commune?: string;
             telephone?: string;
             actif?: boolean;
+        };
+        /**
+         * @description * `preparation` - En préparation
+         *     * `ouverte` - Ouverte aux demandes
+         *     * `instruction` - En instruction
+         *     * `commission` - En commission
+         *     * `attribuee` - Attribuée
+         *     * `close` - Close
+         * @enum {string}
+         */
+        StatutCampagneEnum: "preparation" | "ouverte" | "instruction" | "commission" | "attribuee" | "close";
+        StatutCampagneRequest: {
+            statut: components["schemas"]["StatutCampagneStatutEnum"];
+        };
+        /**
+         * @description * `preparation` - preparation
+         *     * `ouverte` - ouverte
+         *     * `instruction` - instruction
+         *     * `commission` - commission
+         *     * `attribuee` - attribuee
+         *     * `close` - close
+         * @enum {string}
+         */
+        StatutCampagneStatutEnum: "preparation" | "ouverte" | "instruction" | "commission" | "attribuee" | "close";
+        /**
+         * @description * `attente` - En attente
+         *     * `proposee` - Place proposée
+         *     * `satisfaite` - Satisfaite
+         *     * `abandonnee` - Abandonnée
+         * @enum {string}
+         */
+        StatutListeAttenteEnum: "attente" | "proposee" | "satisfaite" | "abandonnee";
+        /**
+         * @description * `a_verifier` - À vérifier
+         *     * `valide` - Valide
+         *     * `refuse` - Refusée
+         * @enum {string}
+         */
+        StatutPieceEnum: "a_verifier" | "valide" | "refuse";
+        /**
+         * @description * `demande` - Demande
+         *     * `en_instruction` - En instruction
+         *     * `option` - Option
+         *     * `validee` - Validée
+         *     * `confirmee` - Confirmée
+         *     * `realisee` - Réalisée
+         *     * `cloturee` - Clôturée
+         *     * `refusee` - Refusée
+         *     * `annulee` - Annulée
+         * @enum {string}
+         */
+        StatutReservationEnum: "demande" | "en_instruction" | "option" | "validee" | "confirmee" | "realisee" | "cloturee" | "refusee" | "annulee";
+        /**
+         * @description * `en_attente` - En attente de validation
+         *     * `valide` - Validé
+         *     * `suspendu` - Suspendu
+         *     * `anonymise` - Anonymisé
+         * @enum {string}
+         */
+        StatutUsagerEnum: "en_attente" | "valide" | "suspendu" | "anonymise";
+        TypePiece: {
+            readonly id: number;
+            code: string;
+            libelle: string;
+            description?: string;
+            types_usager?: components["schemas"]["TypeUsagerEnum"][];
+            obligatoire?: boolean;
+            /** @description Vide : pas d'expiration. */
+            validite_mois?: number | null;
+        };
+        TypePieceRequest: {
+            code: string;
+            libelle: string;
+            description?: string;
+            types_usager?: components["schemas"]["TypeUsagerEnum"][];
+            obligatoire?: boolean;
+            /** @description Vide : pas d'expiration. */
+            validite_mois?: number | null;
+        };
+        TypeReservation: {
+            readonly id: number;
+            code: string;
+            libelle: string;
+            /** Pièces justificatives valides */
+            exige_pieces?: boolean;
+            /** Convention ou contrat signé */
+            exige_convention?: boolean;
+            /** Acompte payé */
+            exige_acompte?: boolean;
+            /** Caution reçue */
+            exige_caution?: boolean;
+            ordre?: number;
+        };
+        TypeReservationRequest: {
+            code: string;
+            libelle: string;
+            /** Pièces justificatives valides */
+            exige_pieces?: boolean;
+            /** Convention ou contrat signé */
+            exige_convention?: boolean;
+            /** Acompte payé */
+            exige_acompte?: boolean;
+            /** Caution reçue */
+            exige_caution?: boolean;
+            ordre?: number;
+        };
+        /**
+         * @description * `association` - Association
+         *     * `ecole` - École ou établissement scolaire
+         *     * `entreprise` - Entreprise ou comité social et économique
+         *     * `particulier` - Particulier
+         *     * `service_municipal` - Service municipal
+         *     * `autre_collectivite` - Autre collectivité ou organisme public
+         * @enum {string}
+         */
+        TypeUsagerEnum: "association" | "ecole" | "entreprise" | "particulier" | "service_municipal" | "autre_collectivite";
+        Usager: {
+            readonly id: number;
+            type: components["schemas"]["TypeUsagerEnum"];
+            readonly type_libelle: string;
+            /** Nom ou raison sociale */
+            nom: string;
+            sigle?: string;
+            siret?: string;
+            /** Numéro RNA */
+            rna?: string;
+            adresse?: string;
+            code_postal?: string;
+            commune?: string;
+            telephone?: string;
+            courriel?: string;
+            /** @description Calculé : siège ou domicile sur la commune (tarif résident). */
+            readonly resident: boolean;
+            /**
+             * Association locale
+             * @description Siège sur la commune (priorité RG-03).
+             */
+            local?: boolean;
+            /** Conventionné(e) avec la Ville */
+            conventionne?: boolean;
+            convention_reference?: string;
+            /** Format: date */
+            convention_fin?: string | null;
+            statut?: components["schemas"]["StatutUsagerEnum"];
+            observations?: string;
+            /** Format: date-time */
+            readonly cree_le: string;
+            readonly rattachements: components["schemas"]["Rattachement"][];
+        };
+        UsagerRequest: {
+            type: components["schemas"]["TypeUsagerEnum"];
+            /** Nom ou raison sociale */
+            nom: string;
+            sigle?: string;
+            siret?: string;
+            /** Numéro RNA */
+            rna?: string;
+            adresse?: string;
+            code_postal?: string;
+            commune?: string;
+            telephone?: string;
+            courriel?: string;
+            /**
+             * Association locale
+             * @description Siège sur la commune (priorité RG-03).
+             */
+            local?: boolean;
+            /** Conventionné(e) avec la Ville */
+            conventionne?: boolean;
+            convention_reference?: string;
+            /** Format: date */
+            convention_fin?: string | null;
+            statut?: components["schemas"]["StatutUsagerEnum"];
+            observations?: string;
         };
         Utilisateur: {
             readonly id: number;
@@ -1112,6 +3387,28 @@ export interface components {
             entrees_verifiees: number;
             integre: boolean;
             anomalies: string[];
+        };
+        VerificationPieceRequest: {
+            valide: boolean;
+            /** @default  */
+            motif: string;
+            /** Format: date */
+            valide_jusqu_au?: string | null;
+        };
+        VueEnregistree: {
+            readonly id: number;
+            nom: string;
+            mode?: components["schemas"]["ModeEnum"];
+            filtres?: unknown;
+            coloration?: components["schemas"]["ColorationEnum"];
+            par_defaut?: boolean;
+        };
+        VueEnregistreeRequest: {
+            nom: string;
+            mode?: components["schemas"]["ModeEnum"];
+            filtres?: unknown;
+            coloration?: components["schemas"]["ColorationEnum"];
+            par_defaut?: boolean;
         };
     };
     responses: never;
@@ -2136,6 +4433,50 @@ export interface operations {
             };
         };
     };
+    gestion_parametres_list: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Parametre"][];
+                };
+            };
+        };
+    };
+    gestion_parametres_partial_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["PatchedModificationRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["PatchedModificationRequest"];
+                "multipart/form-data": components["schemas"]["PatchedModificationRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Parametre"][];
+                };
+            };
+        };
+    };
     gestion_referentiel_batiments_list: {
         parameters: {
             query?: {
@@ -2282,6 +4623,146 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["Batiment"];
+                };
+            };
+        };
+    };
+    gestion_referentiel_documents_list: {
+        parameters: {
+            query?: {
+                espace?: number;
+                /** @description Un numéro de page de l'ensemble des résultats. */
+                page?: number;
+                /** @description Nombre de résultats à retourner par page. */
+                taille?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PaginatedDocumentList"];
+                };
+            };
+        };
+    };
+    gestion_referentiel_documents_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "multipart/form-data": components["schemas"]["DepotRequest"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Document"];
+                };
+            };
+        };
+    };
+    gestion_referentiel_documents_retrieve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) document espace. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Document"];
+                };
+            };
+        };
+    };
+    gestion_referentiel_documents_destroy: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) document espace. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No response body */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    gestion_referentiel_documents_partial_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) document espace. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "multipart/form-data": components["schemas"]["PatchedDocumentRequest"];
+                "application/json": components["schemas"]["PatchedDocumentRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Document"];
+                };
+            };
+        };
+    };
+    gestion_referentiel_documents_fichier_retrieve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) document espace. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Document"];
                 };
             };
         };
@@ -2589,6 +5070,719 @@ export interface operations {
             };
         };
     };
+    gestion_referentiel_fermetures_list: {
+        parameters: {
+            query?: {
+                espace?: number;
+                /** @description Un numéro de page de l'ensemble des résultats. */
+                page?: number;
+                site?: number;
+                /** @description Nombre de résultats à retourner par page. */
+                taille?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PaginatedFermetureList"];
+                };
+            };
+        };
+    };
+    gestion_referentiel_fermetures_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["FermetureRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["FermetureRequest"];
+                "multipart/form-data": components["schemas"]["FermetureRequest"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Fermeture"];
+                };
+            };
+        };
+    };
+    gestion_referentiel_fermetures_retrieve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) fermeture. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Fermeture"];
+                };
+            };
+        };
+    };
+    gestion_referentiel_fermetures_destroy: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) fermeture. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No response body */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    gestion_referentiel_horaires_list: {
+        parameters: {
+            query?: {
+                espace?: number;
+                /**
+                 * @description * `0` - lundi
+                 *     * `1` - mardi
+                 *     * `2` - mercredi
+                 *     * `3` - jeudi
+                 *     * `4` - vendredi
+                 *     * `5` - samedi
+                 *     * `6` - dimanche
+                 */
+                jour_semaine?: 0 | 1 | 2 | 3 | 4 | 5 | 6;
+                saison?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Horaire"][];
+                };
+            };
+        };
+    };
+    gestion_referentiel_horaires_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["HoraireRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["HoraireRequest"];
+                "multipart/form-data": components["schemas"]["HoraireRequest"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Horaire"];
+                };
+            };
+        };
+    };
+    gestion_referentiel_horaires_retrieve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) horaire ouverture. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Horaire"];
+                };
+            };
+        };
+    };
+    gestion_referentiel_horaires_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) horaire ouverture. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["HoraireRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["HoraireRequest"];
+                "multipart/form-data": components["schemas"]["HoraireRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Horaire"];
+                };
+            };
+        };
+    };
+    gestion_referentiel_horaires_destroy: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) horaire ouverture. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No response body */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    gestion_referentiel_horaires_partial_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) horaire ouverture. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["PatchedHoraireRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["PatchedHoraireRequest"];
+                "multipart/form-data": components["schemas"]["PatchedHoraireRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Horaire"];
+                };
+            };
+        };
+    };
+    gestion_referentiel_periodes_list: {
+        parameters: {
+            query?: {
+                /**
+                 * @description * `vacances` - Vacances scolaires
+                 *     * `ferie` - Jour férié
+                 *     * `fermeture_ville` - Fermeture générale de la Ville
+                 */
+                nature?: "ferie" | "fermeture_ville" | "vacances";
+                saison?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Periode"][];
+                };
+            };
+        };
+    };
+    gestion_referentiel_periodes_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PeriodeRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["PeriodeRequest"];
+                "multipart/form-data": components["schemas"]["PeriodeRequest"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Periode"];
+                };
+            };
+        };
+    };
+    gestion_referentiel_periodes_retrieve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) periode calendrier. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Periode"];
+                };
+            };
+        };
+    };
+    gestion_referentiel_periodes_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) periode calendrier. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PeriodeRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["PeriodeRequest"];
+                "multipart/form-data": components["schemas"]["PeriodeRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Periode"];
+                };
+            };
+        };
+    };
+    gestion_referentiel_periodes_destroy: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) periode calendrier. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No response body */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    gestion_referentiel_periodes_partial_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) periode calendrier. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["PatchedPeriodeRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["PatchedPeriodeRequest"];
+                "multipart/form-data": components["schemas"]["PatchedPeriodeRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Periode"];
+                };
+            };
+        };
+    };
+    gestion_referentiel_photos_list: {
+        parameters: {
+            query?: {
+                espace?: number;
+                /** @description Un numéro de page de l'ensemble des résultats. */
+                page?: number;
+                /** @description Nombre de résultats à retourner par page. */
+                taille?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PaginatedPhotoList"];
+                };
+            };
+        };
+    };
+    gestion_referentiel_photos_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "multipart/form-data": components["schemas"]["DepotRequest"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Photo"];
+                };
+            };
+        };
+    };
+    gestion_referentiel_photos_retrieve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) photo espace. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Photo"];
+                };
+            };
+        };
+    };
+    gestion_referentiel_photos_destroy: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) photo espace. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No response body */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    gestion_referentiel_photos_partial_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) photo espace. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "multipart/form-data": components["schemas"]["PatchedPhotoRequest"];
+                "application/json": components["schemas"]["PatchedPhotoRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Photo"];
+                };
+            };
+        };
+    };
+    gestion_referentiel_photos_fichier_retrieve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) photo espace. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Photo"];
+                };
+            };
+        };
+    };
+    gestion_referentiel_saisons_list: {
+        parameters: {
+            query?: {
+                /** @description Un numéro de page de l'ensemble des résultats. */
+                page?: number;
+                /** @description Nombre de résultats à retourner par page. */
+                taille?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PaginatedSaisonList"];
+                };
+            };
+        };
+    };
+    gestion_referentiel_saisons_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SaisonRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["SaisonRequest"];
+                "multipart/form-data": components["schemas"]["SaisonRequest"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Saison"];
+                };
+            };
+        };
+    };
+    gestion_referentiel_saisons_retrieve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) saison. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Saison"];
+                };
+            };
+        };
+    };
+    gestion_referentiel_saisons_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) saison. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SaisonRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["SaisonRequest"];
+                "multipart/form-data": components["schemas"]["SaisonRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Saison"];
+                };
+            };
+        };
+    };
+    gestion_referentiel_saisons_destroy: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) saison. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No response body */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    gestion_referentiel_saisons_partial_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) saison. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["PatchedSaisonRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["PatchedSaisonRequest"];
+                "multipart/form-data": components["schemas"]["PatchedSaisonRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Saison"];
+                };
+            };
+        };
+    };
+    gestion_referentiel_saisons_importer_calendrier_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) saison. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
     gestion_referentiel_sites_list: {
         parameters: {
             query?: {
@@ -2734,6 +5928,2113 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["Site"];
+                };
+            };
+        };
+    };
+    gestion_reservations_campagnes_list: {
+        parameters: {
+            query?: {
+                /** @description Un numéro de page de l'ensemble des résultats. */
+                page?: number;
+                /** @description Nombre de résultats à retourner par page. */
+                taille?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PaginatedCampagneList"];
+                };
+            };
+        };
+    };
+    gestion_reservations_campagnes_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CampagneRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["CampagneRequest"];
+                "multipart/form-data": components["schemas"]["CampagneRequest"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Campagne"];
+                };
+            };
+        };
+    };
+    gestion_reservations_campagnes_retrieve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) campagne. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Campagne"];
+                };
+            };
+        };
+    };
+    gestion_reservations_campagnes_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) campagne. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CampagneRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["CampagneRequest"];
+                "multipart/form-data": components["schemas"]["CampagneRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Campagne"];
+                };
+            };
+        };
+    };
+    gestion_reservations_campagnes_destroy: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) campagne. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No response body */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    gestion_reservations_campagnes_partial_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) campagne. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["PatchedCampagneRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["PatchedCampagneRequest"];
+                "multipart/form-data": components["schemas"]["PatchedCampagneRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Campagne"];
+                };
+            };
+        };
+    };
+    gestion_reservations_campagnes_analyse_retrieve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) campagne. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
+    gestion_reservations_campagnes_attribution_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) campagne. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AttributionRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["AttributionRequest"];
+                "multipart/form-data": components["schemas"]["AttributionRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
+    gestion_reservations_campagnes_statut_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) campagne. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["StatutCampagneRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["StatutCampagneRequest"];
+                "multipart/form-data": components["schemas"]["StatutCampagneRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Campagne"];
+                };
+            };
+        };
+    };
+    gestion_reservations_dossiers_list: {
+        parameters: {
+            query?: {
+                campagne?: number;
+                /**
+                 * @description * `guichet` - Guichet
+                 *     * `portail` - Portail
+                 *     * `campagne` - Campagne annuelle
+                 *     * `ville` - Service municipal
+                 */
+                origine?: "campagne" | "guichet" | "portail" | "ville";
+                /** @description Un numéro de page de l'ensemble des résultats. */
+                page?: number;
+                recherche?: string;
+                saison?: number;
+                site?: number;
+                statut?: string;
+                /** @description Nombre de résultats à retourner par page. */
+                taille?: number;
+                type_reservation?: number;
+                usager?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PaginatedDossierList"];
+                };
+            };
+        };
+    };
+    gestion_reservations_dossiers_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DossierRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["DossierRequest"];
+                "multipart/form-data": components["schemas"]["DossierRequest"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Dossier"];
+                };
+            };
+        };
+    };
+    gestion_reservations_dossiers_retrieve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) dossier. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Dossier"];
+                };
+            };
+        };
+    };
+    gestion_reservations_dossiers_partial_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) dossier. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["PatchedDossierRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["PatchedDossierRequest"];
+                "multipart/form-data": components["schemas"]["PatchedDossierRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Dossier"];
+                };
+            };
+        };
+    };
+    gestion_reservations_dossiers_apercu_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) dossier. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["NouvelleReservationRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["NouvelleReservationRequest"];
+                "multipart/form-data": components["schemas"]["NouvelleReservationRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Apercu"];
+                };
+            };
+        };
+    };
+    gestion_reservations_dossiers_reservations_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) dossier. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["NouvelleReservationRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["NouvelleReservationRequest"];
+                "multipart/form-data": components["schemas"]["NouvelleReservationRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Reservation"];
+                };
+            };
+        };
+    };
+    gestion_reservations_liste_attente_list: {
+        parameters: {
+            query?: {
+                espace?: number;
+                /** @description Un numéro de page de l'ensemble des résultats. */
+                page?: number;
+                /**
+                 * @description * `attente` - En attente
+                 *     * `proposee` - Place proposée
+                 *     * `satisfaite` - Satisfaite
+                 *     * `abandonnee` - Abandonnée
+                 */
+                statut?: "abandonnee" | "attente" | "proposee" | "satisfaite";
+                /** @description Nombre de résultats à retourner par page. */
+                taille?: number;
+                usager?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PaginatedListeAttenteList"];
+                };
+            };
+        };
+    };
+    gestion_reservations_liste_attente_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ListeAttenteRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["ListeAttenteRequest"];
+                "multipart/form-data": components["schemas"]["ListeAttenteRequest"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ListeAttente"];
+                };
+            };
+        };
+    };
+    gestion_reservations_liste_attente_retrieve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) liste attente. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ListeAttente"];
+                };
+            };
+        };
+    };
+    gestion_reservations_liste_attente_destroy: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) liste attente. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No response body */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    gestion_reservations_planning_list: {
+        parameters: {
+            query?: {
+                debut?: string;
+                espace?: string;
+                famille?: string;
+                fin?: string;
+                site?: string;
+                statut?: string;
+                type_usager?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SeancePlanning"][];
+                };
+            };
+        };
+    };
+    gestion_reservations_reservations_list: {
+        parameters: {
+            query?: {
+                dossier?: number;
+                dossier__campagne?: number;
+                dossier__usager?: number;
+                espace?: number;
+                /** @description Un numéro de page de l'ensemble des résultats. */
+                page?: number;
+                /**
+                 * @description * `demande` - Demande
+                 *     * `en_instruction` - En instruction
+                 *     * `option` - Option
+                 *     * `validee` - Validée
+                 *     * `confirmee` - Confirmée
+                 *     * `realisee` - Réalisée
+                 *     * `cloturee` - Clôturée
+                 *     * `refusee` - Refusée
+                 *     * `annulee` - Annulée
+                 */
+                statut?: "annulee" | "cloturee" | "confirmee" | "demande" | "en_instruction" | "option" | "realisee" | "refusee" | "validee";
+                /** @description Nombre de résultats à retourner par page. */
+                taille?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PaginatedReservationList"];
+                };
+            };
+        };
+    };
+    gestion_reservations_reservations_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Reservation"];
+                };
+            };
+        };
+    };
+    gestion_reservations_reservations_retrieve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) reservation. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Reservation"];
+                };
+            };
+        };
+    };
+    gestion_reservations_reservations_alternatives_list: {
+        parameters: {
+            query?: {
+                dossier?: number;
+                dossier__campagne?: number;
+                dossier__usager?: number;
+                espace?: number;
+                /** @description Un numéro de page de l'ensemble des résultats. */
+                page?: number;
+                /**
+                 * @description * `demande` - Demande
+                 *     * `en_instruction` - En instruction
+                 *     * `option` - Option
+                 *     * `validee` - Validée
+                 *     * `confirmee` - Confirmée
+                 *     * `realisee` - Réalisée
+                 *     * `cloturee` - Clôturée
+                 *     * `refusee` - Refusée
+                 *     * `annulee` - Annulée
+                 */
+                statut?: "annulee" | "cloturee" | "confirmee" | "demande" | "en_instruction" | "option" | "realisee" | "refusee" | "validee";
+                /** @description Nombre de résultats à retourner par page. */
+                taille?: number;
+            };
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) reservation. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PaginatedAlternativeList"];
+                };
+            };
+        };
+    };
+    gestion_reservations_reservations_annuler_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) reservation. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MotifRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["MotifRequest"];
+                "multipart/form-data": components["schemas"]["MotifRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Reservation"];
+                };
+            };
+        };
+    };
+    gestion_reservations_reservations_cloturer_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) reservation. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Reservation"];
+                };
+            };
+        };
+    };
+    gestion_reservations_reservations_confirmer_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) reservation. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Reservation"];
+                };
+            };
+        };
+    };
+    gestion_reservations_reservations_instruire_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) reservation. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Reservation"];
+                };
+            };
+        };
+    };
+    gestion_reservations_reservations_modifier_serie_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) reservation. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["ModificationSerieRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["ModificationSerieRequest"];
+                "multipart/form-data": components["schemas"]["ModificationSerieRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Reservation"];
+                };
+            };
+        };
+    };
+    gestion_reservations_reservations_option_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) reservation. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["OptionRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["OptionRequest"];
+                "multipart/form-data": components["schemas"]["OptionRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Reservation"];
+                };
+            };
+        };
+    };
+    gestion_reservations_reservations_priorite_municipale_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) reservation. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PrioriteMunicipaleRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["PrioriteMunicipaleRequest"];
+                "multipart/form-data": components["schemas"]["PrioriteMunicipaleRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Reservation"];
+                };
+            };
+        };
+    };
+    gestion_reservations_reservations_refuser_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) reservation. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RefusRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["RefusRequest"];
+                "multipart/form-data": components["schemas"]["RefusRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Reservation"];
+                };
+            };
+        };
+    };
+    gestion_reservations_reservations_valider_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) reservation. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Reservation"];
+                };
+            };
+        };
+    };
+    gestion_reservations_seances_list: {
+        parameters: {
+            query?: {
+                debut?: string;
+                espace?: number;
+                fin?: string;
+                /** @description Un numéro de page de l'ensemble des résultats. */
+                page?: number;
+                /**
+                 * @description * `present` - Présent
+                 *     * `absent_signale` - Absence signalée
+                 *     * `absent_non_signale` - Absence non signalée
+                 */
+                presence?: "absent_non_signale" | "absent_signale" | "present";
+                reservation?: number;
+                signalees?: boolean;
+                /**
+                 * @description * `demande` - Demande
+                 *     * `en_instruction` - En instruction
+                 *     * `option` - Option
+                 *     * `validee` - Validée
+                 *     * `confirmee` - Confirmée
+                 *     * `realisee` - Réalisée
+                 *     * `cloturee` - Clôturée
+                 *     * `refusee` - Refusée
+                 *     * `annulee` - Annulée
+                 */
+                statut?: "annulee" | "cloturee" | "confirmee" | "demande" | "en_instruction" | "option" | "realisee" | "refusee" | "validee";
+                /** @description Nombre de résultats à retourner par page. */
+                taille?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PaginatedOccurrenceList"];
+                };
+            };
+        };
+    };
+    gestion_reservations_seances_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Occurrence"];
+                };
+            };
+        };
+    };
+    gestion_reservations_seances_retrieve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) occurrence. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Occurrence"];
+                };
+            };
+        };
+    };
+    gestion_reservations_seances_annuler_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) occurrence. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MotifRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["MotifRequest"];
+                "multipart/form-data": components["schemas"]["MotifRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Occurrence"];
+                };
+            };
+        };
+    };
+    gestion_reservations_seances_controle_deplacement_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) occurrence. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DeplacementRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["DeplacementRequest"];
+                "multipart/form-data": components["schemas"]["DeplacementRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Controle"];
+                };
+            };
+        };
+    };
+    gestion_reservations_seances_deplacer_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) occurrence. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DeplacementRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["DeplacementRequest"];
+                "multipart/form-data": components["schemas"]["DeplacementRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Occurrence"];
+                };
+            };
+        };
+    };
+    gestion_reservations_seances_modifier_suivantes_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) occurrence. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["ModificationSerieRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["ModificationSerieRequest"];
+                "multipart/form-data": components["schemas"]["ModificationSerieRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Reservation"];
+                };
+            };
+        };
+    };
+    gestion_reservations_seances_presence_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) occurrence. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PresenceRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["PresenceRequest"];
+                "multipart/form-data": components["schemas"]["PresenceRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Occurrence"];
+                };
+            };
+        };
+    };
+    gestion_reservations_types_list: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TypeReservation"][];
+                };
+            };
+        };
+    };
+    gestion_reservations_types_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TypeReservationRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["TypeReservationRequest"];
+                "multipart/form-data": components["schemas"]["TypeReservationRequest"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TypeReservation"];
+                };
+            };
+        };
+    };
+    gestion_reservations_types_retrieve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) type reservation. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TypeReservation"];
+                };
+            };
+        };
+    };
+    gestion_reservations_types_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) type reservation. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TypeReservationRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["TypeReservationRequest"];
+                "multipart/form-data": components["schemas"]["TypeReservationRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TypeReservation"];
+                };
+            };
+        };
+    };
+    gestion_reservations_types_destroy: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) type reservation. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No response body */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    gestion_reservations_types_partial_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) type reservation. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["PatchedTypeReservationRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["PatchedTypeReservationRequest"];
+                "multipart/form-data": components["schemas"]["PatchedTypeReservationRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TypeReservation"];
+                };
+            };
+        };
+    };
+    gestion_reservations_vues_list: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["VueEnregistree"][];
+                };
+            };
+        };
+    };
+    gestion_reservations_vues_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["VueEnregistreeRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["VueEnregistreeRequest"];
+                "multipart/form-data": components["schemas"]["VueEnregistreeRequest"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["VueEnregistree"];
+                };
+            };
+        };
+    };
+    gestion_reservations_vues_retrieve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) vue enregistree. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["VueEnregistree"];
+                };
+            };
+        };
+    };
+    gestion_reservations_vues_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) vue enregistree. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["VueEnregistreeRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["VueEnregistreeRequest"];
+                "multipart/form-data": components["schemas"]["VueEnregistreeRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["VueEnregistree"];
+                };
+            };
+        };
+    };
+    gestion_reservations_vues_destroy: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) vue enregistree. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No response body */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    gestion_reservations_vues_partial_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) vue enregistree. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["PatchedVueEnregistreeRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["PatchedVueEnregistreeRequest"];
+                "multipart/form-data": components["schemas"]["PatchedVueEnregistreeRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["VueEnregistree"];
+                };
+            };
+        };
+    };
+    gestion_usagers_contacts_list: {
+        parameters: {
+            query?: {
+                courriel?: string;
+                /** @description Un numéro de page de l'ensemble des résultats. */
+                page?: number;
+                /** @description Nombre de résultats à retourner par page. */
+                taille?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PaginatedContactList"];
+                };
+            };
+        };
+    };
+    gestion_usagers_contacts_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ContactRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["ContactRequest"];
+                "multipart/form-data": components["schemas"]["ContactRequest"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Contact"];
+                };
+            };
+        };
+    };
+    gestion_usagers_contacts_retrieve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) contact. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Contact"];
+                };
+            };
+        };
+    };
+    gestion_usagers_contacts_partial_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) contact. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["PatchedContactRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["PatchedContactRequest"];
+                "multipart/form-data": components["schemas"]["PatchedContactRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Contact"];
+                };
+            };
+        };
+    };
+    gestion_usagers_pieces_list: {
+        parameters: {
+            query?: {
+                /** @description Un numéro de page de l'ensemble des résultats. */
+                page?: number;
+                /**
+                 * @description * `a_verifier` - À vérifier
+                 *     * `valide` - Valide
+                 *     * `refuse` - Refusée
+                 */
+                statut?: "a_verifier" | "refuse" | "valide";
+                /** @description Nombre de résultats à retourner par page. */
+                taille?: number;
+                type_piece?: number;
+                usager?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PaginatedPieceList"];
+                };
+            };
+        };
+    };
+    gestion_usagers_pieces_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "multipart/form-data": components["schemas"]["DepotPieceRequest"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Piece"];
+                };
+            };
+        };
+    };
+    gestion_usagers_pieces_retrieve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) piece justificative. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Piece"];
+                };
+            };
+        };
+    };
+    gestion_usagers_pieces_fichier_retrieve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) piece justificative. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/octet-stream": string;
+                };
+            };
+        };
+    };
+    gestion_usagers_pieces_verifier_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) piece justificative. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["VerificationPieceRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Piece"];
+                };
+            };
+        };
+    };
+    gestion_usagers_pieces_alertes_list: {
+        parameters: {
+            query?: {
+                /** @description Un numéro de page de l'ensemble des résultats. */
+                page?: number;
+                /**
+                 * @description * `a_verifier` - À vérifier
+                 *     * `valide` - Valide
+                 *     * `refuse` - Refusée
+                 */
+                statut?: "a_verifier" | "refuse" | "valide";
+                /** @description Nombre de résultats à retourner par page. */
+                taille?: number;
+                type_piece?: number;
+                usager?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PaginatedPieceList"];
+                };
+            };
+        };
+    };
+    gestion_usagers_rattachements_list: {
+        parameters: {
+            query?: {
+                contact?: number;
+                /** @description Un numéro de page de l'ensemble des résultats. */
+                page?: number;
+                /** @description Nombre de résultats à retourner par page. */
+                taille?: number;
+                usager?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PaginatedRattachementList"];
+                };
+            };
+        };
+    };
+    gestion_usagers_rattachements_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RattachementRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["RattachementRequest"];
+                "multipart/form-data": components["schemas"]["RattachementRequest"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Rattachement"];
+                };
+            };
+        };
+    };
+    gestion_usagers_rattachements_retrieve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) rattachement. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Rattachement"];
+                };
+            };
+        };
+    };
+    gestion_usagers_rattachements_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) rattachement. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RattachementRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["RattachementRequest"];
+                "multipart/form-data": components["schemas"]["RattachementRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Rattachement"];
+                };
+            };
+        };
+    };
+    gestion_usagers_rattachements_destroy: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) rattachement. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No response body */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    gestion_usagers_rattachements_partial_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) rattachement. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["PatchedRattachementRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["PatchedRattachementRequest"];
+                "multipart/form-data": components["schemas"]["PatchedRattachementRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Rattachement"];
+                };
+            };
+        };
+    };
+    gestion_usagers_types_pieces_list: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TypePiece"][];
+                };
+            };
+        };
+    };
+    gestion_usagers_types_pieces_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TypePieceRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["TypePieceRequest"];
+                "multipart/form-data": components["schemas"]["TypePieceRequest"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TypePiece"];
+                };
+            };
+        };
+    };
+    gestion_usagers_types_pieces_retrieve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) type piece. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TypePiece"];
+                };
+            };
+        };
+    };
+    gestion_usagers_types_pieces_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) type piece. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TypePieceRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["TypePieceRequest"];
+                "multipart/form-data": components["schemas"]["TypePieceRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TypePiece"];
+                };
+            };
+        };
+    };
+    gestion_usagers_types_pieces_destroy: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) type piece. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No response body */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    gestion_usagers_types_pieces_partial_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) type piece. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["PatchedTypePieceRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["PatchedTypePieceRequest"];
+                "multipart/form-data": components["schemas"]["PatchedTypePieceRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TypePiece"];
+                };
+            };
+        };
+    };
+    gestion_usagers_usagers_list: {
+        parameters: {
+            query?: {
+                conventionne?: boolean;
+                local?: boolean;
+                /** @description Un numéro de page de l'ensemble des résultats. */
+                page?: number;
+                recherche?: string;
+                resident?: boolean;
+                /**
+                 * @description * `en_attente` - En attente de validation
+                 *     * `valide` - Validé
+                 *     * `suspendu` - Suspendu
+                 *     * `anonymise` - Anonymisé
+                 */
+                statut?: "anonymise" | "en_attente" | "suspendu" | "valide";
+                /** @description Nombre de résultats à retourner par page. */
+                taille?: number;
+                /**
+                 * @description * `association` - Association
+                 *     * `ecole` - École ou établissement scolaire
+                 *     * `entreprise` - Entreprise ou comité social et économique
+                 *     * `particulier` - Particulier
+                 *     * `service_municipal` - Service municipal
+                 *     * `autre_collectivite` - Autre collectivité ou organisme public
+                 */
+                type?: "association" | "autre_collectivite" | "ecole" | "entreprise" | "particulier" | "service_municipal";
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PaginatedUsagerList"];
+                };
+            };
+        };
+    };
+    gestion_usagers_usagers_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UsagerRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["UsagerRequest"];
+                "multipart/form-data": components["schemas"]["UsagerRequest"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Usager"];
+                };
+            };
+        };
+    };
+    gestion_usagers_usagers_retrieve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) usager. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Usager"];
+                };
+            };
+        };
+    };
+    gestion_usagers_usagers_partial_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) usager. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["PatchedUsagerRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["PatchedUsagerRequest"];
+                "multipart/form-data": components["schemas"]["PatchedUsagerRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Usager"];
+                };
+            };
+        };
+    };
+    gestion_usagers_usagers_historique_retrieve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) usager. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
+    gestion_usagers_usagers_types_retrieve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
                 };
             };
         };

@@ -106,14 +106,14 @@ class VueDossiers(VuePerimetre):
         return Response(s.ReservationSerializer(reservation).data, status=status.HTTP_201_CREATED)
 
     @extend_schema(request=s.NouvelleReservationSerializer, responses=s.ApercuSerializer)
-    @action(detail=True, methods=["post"])
-    def apercu(self, request: Request, pk: str | None = None) -> Response:
-        """Séances générées et conflits avant enregistrement (PLA-04, PLA-07)."""
-        dossier = self.get_object()
+    @action(detail=False, methods=["post"])
+    def apercu(self, request: Request) -> Response:
+        """Séances générées et conflits d'un créneau, avant tout enregistrement (PLA-04, PLA-07)."""
         donnees = s.NouvelleReservationSerializer(data=request.data)
         donnees.is_valid(raise_exception=True)
         champs = {k: v for k, v in donnees.validated_data.items() if k != "forcer_horaires"}
-        brouillon = Reservation(dossier=dossier, **champs)
+        exiger(agent_courant(request), "lire_referentiel", champs["espace"])
+        brouillon = Reservation(**champs)
         resultat = services.apercu(champs["espace"], brouillon)
         return Response(
             {

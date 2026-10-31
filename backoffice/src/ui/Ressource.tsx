@@ -15,7 +15,7 @@ import { useNotifications } from "./Notifications";
 import { Page } from "./Page";
 import { Tableau, type Colonne } from "./Tableau";
 
-export type TypeChamp = "texte" | "nombre" | "zone" | "booleen" | "selection" | "multiple" | "date" | "heure" | "courriel" | "euros";
+export type TypeChamp = "texte" | "nombre" | "zone" | "booleen" | "selection" | "multiple" | "date" | "heure" | "dateheure" | "courriel" | "euros";
 
 export interface DefinitionChamp {
   nom: string;
@@ -54,6 +54,11 @@ interface Proprietes<T extends Objet> {
   valeursInitiales?: Partial<T>;
 }
 
+function versSaisieLocale(d: Date): string {
+  const deux = (n: number) => String(n).padStart(2, "0");
+  return `${d.getFullYear()}-${deux(d.getMonth() + 1)}-${deux(d.getDate())}T${deux(d.getHours())}:${deux(d.getMinutes())}`;
+}
+
 function versFormulaire(champs: DefinitionChamp[], objet: Partial<Objet>): Record<string, unknown> {
   const resultat: Record<string, unknown> = {};
   for (const champ of champs) {
@@ -61,6 +66,7 @@ function versFormulaire(champs: DefinitionChamp[], objet: Partial<Objet>): Recor
     if (champ.type === "booleen") resultat[champ.nom] = Boolean(valeur);
     else if (champ.type === "multiple") resultat[champ.nom] = Array.isArray(valeur) ? valeur.map(String) : [];
     else if (champ.type === "euros") resultat[champ.nom] = typeof valeur === "number" ? (valeur / 100).toFixed(2).replace(".", ",") : "";
+    else if (champ.type === "dateheure") resultat[champ.nom] = typeof valeur === "string" && valeur ? versSaisieLocale(new Date(valeur)) : "";
     else resultat[champ.nom] = valeur === null || valeur === undefined ? "" : String(valeur);
   }
   return resultat;
@@ -76,6 +82,7 @@ function versApi(champs: DefinitionChamp[], valeurs: Record<string, unknown>, cr
     else if (champ.type === "nombre") corps[champ.nom] = valeur === "" ? null : Number(valeur);
     else if (champ.type === "euros") corps[champ.nom] = valeur === "" ? null : Math.round(Number(String(valeur).replace(/\s/g, "").replace(",", ".")) * 100);
     else if (champ.type === "selection") corps[champ.nom] = valeur === "" ? null : /^\d+$/.test(String(valeur)) ? Number(valeur) : valeur;
+    else if (champ.type === "dateheure") corps[champ.nom] = valeur === "" ? null : new Date(String(valeur)).toISOString();
     else corps[champ.nom] = valeur === "" && (champ.type === "date" || champ.type === "heure") ? null : valeur;
   }
   return corps;
@@ -144,7 +151,7 @@ export function Formulaire({
               />
             );
           default: {
-            const types: Record<string, string> = { nombre: "number", date: "date", heure: "time", courriel: "email", euros: "text" };
+            const types: Record<string, string> = { nombre: "number", date: "date", heure: "time", dateheure: "datetime-local", courriel: "email", euros: "text" };
             return (
               <ChampTexte
                 key={champ.nom}

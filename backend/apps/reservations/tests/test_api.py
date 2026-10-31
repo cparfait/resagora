@@ -98,14 +98,13 @@ def test_rg01_api_conflit_detaille(client_agent, contexte):
 def test_pla04_apercu_avant_enregistrement(client_agent, contexte):
     saison_2026()
     client = client_agent(contexte["gestionnaire_a"])
-    dossier = creer_dossier(client, contexte["usager"], "creneau_annuel")
     corps = corps_reservation(
         contexte["espace_a"], date_debut="2026-09-01", date_fin="2026-12-31", recurrence="FREQ=WEEKLY;BYDAY=TU"
     )
-    apercu = client.post(f"{DOSSIERS}/{dossier['id']}/apercu", corps, format="json").json()
+    apercu = client.post(f"{DOSSIERS}/apercu", corps, format="json").json()
     assert apercu["description"].startswith("tous les mardis de 18 h à 20 h")
     assert len(apercu["seances"]) == 14 and apercu["conflits"] == []
-    assert not Reservation.objects.filter(dossier_id=dossier["id"]).exists()
+    assert not Reservation.objects.exists()
 
 
 def test_pla04_validation_des_champs(client_agent, contexte):

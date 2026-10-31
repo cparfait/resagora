@@ -163,3 +163,92 @@ code { background: var(--bleu-clair); padding: 0 0.25em; border-radius: 3px; fon
   .cadre__corps { display: block; }
   body, :root { background: #fff; color: #000; }
 }
+
+/* Détails et groupes de formulaire */
+.details { display: grid; grid-template-columns: max-content 1fr; gap: 0.35rem 1rem; margin: 0 0 1rem; }
+.details dt { font-weight: 700; color: var(--texte-doux); }
+.details dd { margin: 0; }
+.details--grille { background: var(--surface); border: 1px solid var(--bordure); border-radius: var(--rayon); padding: 1rem; }
+.groupe { border: 1px solid var(--bordure); border-radius: var(--rayon); padding: 0.75rem 1rem; margin: 0 0 1rem; background: var(--surface); }
+.groupe legend { font-weight: 700; padding: 0 0.4rem; }
+.groupe--cases { display: flex; flex-wrap: wrap; gap: 0.25rem 1rem; }
+.formulaire__actions--gauche { justify-content: flex-start; flex-wrap: wrap; align-items: flex-end; }
+.option-jours { display: inline-flex; gap: 0.5rem; align-items: flex-end; }
+.option-jours .champ { margin: 0; width: 11rem; }
+.texte-doux { color: var(--texte-doux); }
+.carte--reservation { margin-bottom: 1rem; }
+.carte__entete { display: flex; justify-content: space-between; align-items: center; gap: 1rem; }
+.carte__entete h2 { margin: 0; }
+.liste-arbitrage { padding-left: 1.25rem; }
+.liste-arbitrage li { margin-bottom: 0.75rem; }
+
+/* Barre du planning */
+.barre-planning { display: flex; flex-wrap: wrap; gap: 1rem; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
+.segments { display: inline-flex; flex-wrap: wrap; border: 2px solid var(--bleu); border-radius: var(--rayon); overflow: hidden; }
+.segment { font: inherit; border: 0; background: var(--surface); color: var(--bleu); padding: 0.45rem 0.8rem; cursor: pointer; border-right: 1px solid var(--bleu); }
+.segment:last-child { border-right: 0; }
+.segment--actif { background: var(--bleu); color: #fff; font-weight: 700; }
+.navigation-periode { display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap; }
+.periode-libelle { margin: 0 0 0 0.5rem; font-weight: 700; text-transform: capitalize; }
+
+/* Séances : couleur + motif + texte (jamais la couleur seule) */
+.seance { position: absolute; left: 2px; right: 2px; display: flex; flex-direction: column; overflow: hidden; text-align: left; font: inherit; font-size: 0.78rem; line-height: 1.2; padding: 2px 4px; border-radius: 4px; border: 1px solid rgb(0 0 0 / 35%); cursor: pointer; color: #111; }
+.mois__seances .seance, .legende .seance { position: static; }
+.seance__heure { font-weight: 700; }
+.seance__titre { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.seance--signalee { outline: 3px solid var(--attention); }
+.statut-demande, .statut-en_instruction { background-color: #dbe9f8; }
+.statut-option { background-color: #fff0cc; }
+.statut-validee { background-color: #c9ecd5; }
+.statut-confirmee { background-color: #8fd3a7; }
+.statut-realisee, .statut-cloturee { background-color: #e1e4e8; }
+.statut-refusee, .statut-annulee { background-color: #f8d4d6; }
+.type-association { background-color: #cfe3ff; }
+.type-ecole { background-color: #ffe2b8; }
+.type-entreprise { background-color: #e6d6ff; }
+.type-particulier { background-color: #ffd6e5; }
+.type-ville { background-color: #c8eedf; }
+.type-autre { background-color: #e8e8e8; }
+.motif-hachure-legere { background-image: repeating-linear-gradient(135deg, rgb(255 255 255 / 70%) 0 4px, transparent 4px 8px); }
+.motif-pointille { border-style: dashed; border-width: 2px; }
+.motif-barre { text-decoration: line-through; }
+
+/* Grille jour / semaine */
+.grille { display: grid; grid-template-columns: 3rem repeat(auto-fit, minmax(7rem, 1fr)); background: var(--surface); border: 1px solid var(--bordure); border-radius: var(--rayon); overflow-x: auto; }
+.grille__heures { padding-top: 2rem; }
+.grille__heure { font-size: 0.75rem; color: var(--texte-doux); border-top: 1px solid #eef0f3; text-align: right; padding-right: 0.25rem; }
+.grille__colonne { border-left: 1px solid #e1e6ec; min-width: 7rem; }
+.grille__entete { height: 2rem; display: flex; align-items: center; justify-content: center; font-weight: 700; background: var(--bleu-clair); text-transform: capitalize; }
+.grille__corps { position: relative; background-image: linear-gradient(#eef0f3 1px, transparent 1px); background-size: 100% 48px; }
+
+/* Chronologie par espace */
+.chronologie { background: var(--surface); border: 1px solid var(--bordure); border-radius: var(--rayon); overflow-x: auto; }
+.chronologie__ligne { display: grid; grid-template-columns: 13rem 1fr; border-bottom: 1px solid #e1e6ec; min-height: 2.6rem; }
+.chronologie__ligne--entete { background: var(--bleu-clair); font-weight: 700; min-height: 2rem; }
+.chronologie__espace { padding: 0.4rem 0.6rem; border-right: 1px solid #e1e6ec; }
+.chronologie__piste { position: relative; display: flex; min-width: 48rem; }
+.chronologie__jour { border-right: 1px solid #e1e6ec; text-align: center; padding: 0.4rem 0; text-transform: capitalize; }
+.chronologie__piste .seance { top: 3px; bottom: 3px; height: auto; right: auto; }
+
+/* Mois */
+.mois { width: 100%; border-collapse: collapse; table-layout: fixed; background: var(--surface); }
+.mois th { background: var(--bleu-clair); padding: 0.4rem; }
+.mois td { border: 1px solid #e1e6ec; vertical-align: top; height: 7.5rem; padding: 0.25rem; }
+.mois__hors { background: #f7f8fa; color: var(--texte-doux); }
+.mois__numero { all: unset; cursor: pointer; font-weight: 700; padding: 0 0.3rem; border-radius: 3px; }
+.mois__numero:focus-visible { outline: 3px solid var(--focus); }
+.mois__seances { list-style: none; margin: 0.2rem 0 0; padding: 0; display: flex; flex-direction: column; gap: 2px; }
+.mois__plus { font-size: 0.78rem; color: var(--texte-doux); }
+
+/* Multi-sites et légende */
+.multi-sites caption { text-align: left; padding: 0.5rem 0.75rem; font-weight: 700; }
+.jauge { display: inline-block; width: 4rem; height: 0.6rem; border: 1px solid #6b7684; border-radius: 3px; margin-right: 0.4rem; vertical-align: middle; background: #fff; }
+.jauge__remplissage { display: block; height: 100%; background: var(--bleu); }
+.legende { list-style: none; display: flex; flex-wrap: wrap; gap: 0.5rem 1rem; padding: 0; margin: 0 0 1rem; font-size: 0.9rem; }
+.legende li { display: inline-flex; align-items: center; gap: 0.35rem; }
+.legende__pastille { display: inline-block; width: 1.1rem; height: 1.1rem; border: 1px solid rgb(0 0 0 / 40%); border-radius: 3px; }
+
+@media print {
+  .barre-planning, .legende { display: none !important; }
+  .seance { border: 1px solid #000; background-image: none !important; }
+}

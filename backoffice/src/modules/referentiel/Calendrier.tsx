@@ -1,0 +1,81 @@
+/** ADM-01 : saisons, vacances scolaires de la zone C, jours fériés et fermetures générales de la Ville. */
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useState } from "react";
+import { ErreurApi, requete } from "../../api/http";
+import type { Periode, Saison } from "../../api/types";
+import { useSession } from "../../auth/session";
+import { Badge } from "../../ui/Badge";
+import { Bouton } from "../../ui/Bouton";
+import { ChampSelection } from "../../ui/Champ";
+import { dateSimple } from "../../ui/metier";
+import { useNotifications } from "../../ui/Notifications";
+import { EcranRessource, useOptions } from "../../ui/Ressource";
+import { Tableau } from "../../ui/Tableau";
+
+const NATURES: Record<string, string> = { vacances: "Vacances scolaires", ferie: "Jour férié", fermeture_ville: "Fermeture générale" };
+
+export default function Calendrier() {
+  const { peut } = useSession();
+  const client = useQueryClient();
+  const { annoncer } = useNotifications();
+  const saisons = useOptions("saisons", "/api/gestion/referentiel/saisons", (s) => String(s.nom));
+  const [saison, setSaison] = useState("");
+  const periodes = useQuery({ queryKey: ["periodes", saison], queryFn: () => requete<Periode[]>("GET", `/api/gestion/referentiel/periodes?saison=${saison}`), enabled: Boolean(saison) });
+  const importer = useMutation({
+    mutationFn: (identifiant: number) => requete<{ periodes: number }>("POST", `/api/gestion/referentiel/saisons/${identifiant}/importer-calendrier`),
+    onSuccess: async (r) => {
+      annoncer(`Calendrier importé : ${r.periodes} périodes (vacances de la zone et jours fériés).`);
+      await client.invalidateQueries({ queryKey: ["periodes"] });
+    },
+    onError: (e) => annoncer(e instanceof ErreurApi ? e.message : "Import impossible.", "erreur"),
+  });
+  return (
+    <>
+      <EcranRessource<Saison & Record<string, unknown>>
+        titre="Saisons et calendrier"
+        description="Les créneaux récurrents excluent automatiquement les vacances de la zone C, les jours fériés et les fermetures générales."
+        chemin="/api/gestion/referentiel/saisons"
+        cleRequete="saisons"
+        actionLecture="lire_referentiel"
+        actionEcriture="gerer_parametres"
+        libelleObjet="Saison"
+        colonnes={[
+          { cle: "nom", titre: "Saison", rendu: (s) => s.nom },
+          { cle: "periode", titre: "Période", rendu: (s) => `du ${dateSimple(s.debut)} au ${dateSimple(s.fin)}` },
+          { cle: "active", titre: "État", rendu: (s) => (s.active ? <Badge libelle="Saison en cours" ton="succes" /> : <Badge libelle="Inactive" />) },
+        ]}
+        actionsLigne={(s) =>
+          peut("gerer_parametres") ? (
+            <Bouton variante="lien" enCours={importer.isPending} onClick={() => importer.mutate(s.id)}>
+              Importer vacances et fériés
+            </Bouton>
+          ) : null
+        }
+        champs={[
+          { nom: "nom", libelle: "Nom (ex. 2026-2027)", type: "texte", obligatoire: true },
+          { nom: "debut", libelle: "Début", type: "date", obligatoire: true },
+          { nom: "fin", libelle: "Fin", type: "date", obligatoire: true },
+          { nom: "active", libelle: "Saison en cours", type: "booleen" },
+        ]}
+      />
+      <section aria-labelledby="titre-periodes">
+        <h2 id="titre-periodes">Périodes de la saison</h2>
+        <ChampSelection libelle="Saison affichée" options={saisons} value={saison} onChange={(e) => setSaison(e.target.value)} />
+        {periodes.data ? (
+          <Tableau<Periode>
+            legende="Périodes exclues des créneaux récurrents"
+            lignes={periodes.data}
+            cleLigne={(p) => p.id}
+            messageVide="Aucune période : importez le calendrier de la saison."
+            colonnes={[
+              { cle: "nature", titre: "Nature", rendu: (p) => NATURES[p.nature] ?? p.nature },
+              { cle: "libelle", titre: "Libellé", rendu: (p) => p.libelle },
+              { cle: "dates", titre: "Dates", rendu: (p) => (p.debut === p.fin ? dateSimple(p.debut) : `du ${dateSimple(p.debut)} au ${dateSimple(p.fin)}`), valeurTri: (p) => p.debut },
+              { cle: "source", titre: "Origine", rendu: (p) => ({ import: "Éducation nationale", calcul: "Calcul", saisie: "Saisie" })[p.source] ?? p.source },
+            ]}
+          />
+        ) : null}
+      </section>
+    </>
+  );
+}
