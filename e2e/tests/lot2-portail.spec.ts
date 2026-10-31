@@ -239,6 +239,33 @@ test.describe.serial("Lot 2 — parcours d'une association", () => {
     await sansViolationAxe(page, "mes factures");
   });
 
+  test("POR-07 TAR-07 R7-01 @a11y la facture se paie en ligne sur le simulateur PayFiP, résultat relu par la Ville", async ({ page }) => {
+    await connecterUsager(page);
+    await page.goto(`${PORTAIL}/espace/factures`);
+    await expect(page.getByRole("heading", { level: 1, name: "Mes devis, factures et cautions" })).toBeVisible();
+    const payer = page.getByRole("button", { name: /Payer en ligne/ }).first();
+    await expect(payer).toBeVisible();
+    await sansViolationAxe(page, "mes factures avec le paiement en ligne");
+    await payer.click();
+    // La Ville prépare l'opération (worker), puis redirige vers le site de la DGFiP (simulateur de recette).
+    await expect(page).toHaveURL(/\/payfip\/paiementws\.web\?idop=/, { timeout: 20_000 });
+    await expect(page.getByRole("heading", { name: /PayFiP/ })).toBeVisible();
+    await page.getByLabel(/Paiement accepté/).check();
+    await page.getByRole("button", { name: "Valider" }).click();
+    await expect(page).toHaveURL(/\/espace\/paiement\//);
+    // La notification de PayFiP suffit : sans attendre la page de retour, la facture passe à « Réglée ».
+    await page.goto(`${PORTAIL}/espace/factures`);
+    await expect(async () => {
+      await page.reload();
+      await expect(page.getByText(/Réglée/).first()).toBeVisible({ timeout: 2_000 });
+    }).toPass({ timeout: 30_000 });
+    await expect(page.getByRole("button", { name: /Payer en ligne/ })).toHaveCount(0);
+    await page.goBack();
+    await expect(page.getByText(/Paiement accepté : merci/)).toBeVisible({ timeout: 20_000 });
+    await expect(page.getByText(/Numéro d'autorisation/)).toBeVisible();
+    await sansViolationAxe(page, "le retour de paiement");
+  });
+
   test("VAL-04 @a11y la page des attestations de valorisation est accessible et explique quand l'attestation arrive", async ({ page }) => {
     await connecterUsager(page);
     await page.getByRole("link", { name: "Attestations de valorisation" }).click();

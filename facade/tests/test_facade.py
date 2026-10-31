@@ -265,11 +265,29 @@ def test_sig02_webhook_docuseal_secret_verifie(config, api):
     )
 
 
+REF = "2b4c7f0e-0000-4000-8000-000000000001"
+SIG = "0123456789abcdef0123456789abcdef"
+
+
 def test_tar07_notification_payfip_filtree_par_adresse(config, api):
     c = client(config, api)
-    assert c.post("/api/portail/payfip/notification", content=b"idop=ABC").status_code == 403
-    autorise = c.post("/api/portail/payfip/notification", content=b"idop=ABC", headers={"X-Forwarded-For": "203.0.113.10"})
+    url = f"/api/portail/payfip/notification?ref={REF}&sig={SIG}"
+    assert c.post(url, content=b"idop=ABC").status_code == 403
+    autorise = c.post(url, content=b"idop=ABC", headers={"X-Forwarded-For": "203.0.113.10"})
     assert autorise.status_code == 200 and api.requetes[-1].content == b"idop=ABC"
+
+
+def test_tar07_notification_payfip_transmet_la_reference_signee_et_rien_d_autre(config, api):
+    """Revue sécurité du lot 7 (B1) : sans `ref` et `sig`, l'API ne pourrait jamais vérifier la notification."""
+    c = client(config, api)
+    entete = {"X-Forwarded-For": "203.0.113.10"}
+    reponse = c.post(f"/api/portail/payfip/notification?ref={REF}&sig={SIG}&autre=x", content=b"idop=ABC", headers=entete)
+    assert reponse.status_code == 200
+    assert dict(api.requetes[-1].url.params) == {"ref": REF, "sig": SIG}
+    nombre = len(api.requetes)
+    for requete in (f"?ref={REF}", f"?ref=pas-un-uuid&sig={SIG}", f"?ref={REF}&sig=court", ""):
+        assert c.post(f"/api/portail/payfip/notification{requete}", content=b"idop=ABC", headers=entete).status_code == 403
+    assert len(api.requetes) == nombre, "rien n'est relayé à l'API"
 
 
 def test_sec10_api_mobile_absente_en_option_a(config, api):

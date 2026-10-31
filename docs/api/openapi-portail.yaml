@@ -1346,6 +1346,28 @@ paths:
                 type: string
                 format: binary
           description: ''
+  /api/portail/factures/{id}/paiement-en-ligne:
+    post:
+      operationId: portail_factures_paiement_en_ligne_create
+      description: |-
+        POR-07 : la tentative est enregistrée ; le portail suit son état et redirige vers PayFiP quand l'opération est
+        créée par le worker.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - portail
+      responses:
+        '202':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
   /api/portail/materiel:
     get:
       operationId: portail_materiel_retrieve
@@ -1397,6 +1419,53 @@ paths:
       responses:
         '204':
           description: No response body
+  /api/portail/paiements/{uuid}:
+    get:
+      operationId: portail_paiements_retrieve
+      description: |-
+        Retour du navigateur : l'état vient de la base ; une relecture chez PayFiP est demandée au worker (30 s au plus
+        souvent). Jamais déduit de l'adresse de retour.
+      parameters:
+      - in: path
+        name: uuid
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - portail
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+  /api/portail/payfip/notification:
+    post:
+      operationId: portail_payfip_notification_create
+      description: |-
+        TAR-07 : la façade a filtré l'adresse de PayFiP et transmis `ref` et `sig` ; l'API contrôle la signature, puis
+        confie la relecture du résultat au worker. Réponse neutre dans tous les cas.
+      tags:
+      - portail
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                idop:
+                  type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
   /api/portail/pieces-exigees:
     get:
       operationId: portail_pieces_exigees_retrieve

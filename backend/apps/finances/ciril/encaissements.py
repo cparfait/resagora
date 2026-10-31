@@ -107,7 +107,7 @@ def importer(nom: str, contenu: bytes, *, acteur: Any) -> ImportEncaissements:
     )
     lot = ImportEncaissements.objects.create(fichier=fichier, lignes_lues=len(rangees), cree_par=acteur)
     rejets: list[dict[str, Any]] = []
-    rapprochees = 0
+    rapprochees = confirmees = 0
     for rang, rangee in enumerate(rangees, start=2):
         valeur = {cle: rangee.get(entete, "") for cle, entete in correspondance.items()}
         try:
@@ -130,6 +130,10 @@ def importer(nom: str, contenu: bytes, *, acteur: Any) -> ImportEncaissements:
             proche = Encaissement.objects.filter(
                 piece=piece, montant=montant, date__gte=jour - timedelta(days=7), date__lte=jour + timedelta(days=7)
             ).first()
+            if proche is not None and proche.origine == "payfip":
+                # Lot 7 : le comptable confirme un paiement en ligne déjà enregistré ; rien n'est encaissé deux fois.
+                confirmees += 1
+                continue
             if proche is not None:
                 raise ErreurMetier(
                     f"un règlement de même montant est déjà enregistré le {proche.date:%d/%m/%Y} ({proche.get_origine_display().lower()}) : à vérifier",
@@ -144,8 +148,8 @@ def importer(nom: str, contenu: bytes, *, acteur: Any) -> ImportEncaissements:
             rejets.append(
                 {"ligne": rang, "titre": valeur.get("titre", ""), "facture": valeur.get("facture", ""), "motif": erreur.message}
             )
-    lot.rapprochees, lot.rejets = rapprochees, rejets
-    lot.save(update_fields=["rapprochees", "rejets"])
+    lot.rapprochees, lot.rejets, lot.confirmees = rapprochees, rejets, confirmees
+    lot.save(update_fields=["rapprochees", "rejets", "confirmees"])
     journaliser(
         "importer_encaissements",
         lot,

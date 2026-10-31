@@ -44,6 +44,7 @@ export const MODULES: Module[] = [
   { chemin: "/finances/retards", libelle: "Factures en retard", groupe: "Finances", action: "lire_finances", composant: charger(() => import("../modules/finances/Pieces").then((m) => ({ default: m.Retards }))) },
   { chemin: "/finances/titres", libelle: "Titres vers Ciril", groupe: "Finances", action: "exporter_titres", composant: charger(() => import("../modules/finances/Pieces").then((m) => ({ default: m.TitresCiril }))) },
   { chemin: "/finances/encaissements", libelle: "Encaissements", groupe: "Finances", action: "encaisser", composant: charger(() => import("../modules/finances/Pieces").then((m) => ({ default: m.Encaissements }))) },
+  { chemin: "/finances/paiements-en-ligne", libelle: "Paiements en ligne (PayFiP)", groupe: "Finances", action: "lire_finances", composant: charger(() => import("../modules/finances/PaiementsEnLigne")) },
   { chemin: "/finances/cautions", libelle: "Cautions", groupe: "Finances", action: "lire_finances", composant: charger(() => import("../modules/finances/Cautions")) },
   { chemin: "/finances/cautions-en-retard", libelle: "Cautions en retard", groupe: "Finances", action: "lire_finances", composant: charger(() => import("../modules/finances/Cautions").then((m) => ({ default: m.CautionsEnAlerte }))) },
   { chemin: "/finances/grilles", libelle: "Grilles tarifaires", groupe: "Finances", action: "lire_finances", composant: charger(() => import("../modules/finances/Tarifs").then((m) => ({ default: m.Grilles }))) },

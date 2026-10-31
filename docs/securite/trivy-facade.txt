@@ -1,0 +1,80 @@
+
+Report Summary
+
+┌──────────────────────────────────────────────────────────────────────────────────┬────────────┬─────────────────┬─────────┐
+│                                      Target                                      │    Type    │ Vulnerabilities │ Secrets │
+├──────────────────────────────────────────────────────────────────────────────────┼────────────┼─────────────────┼─────────┤
+│ equipements/facade:dev (debian 13.7)                                             │   debian   │        0        │    -    │
+├──────────────────────────────────────────────────────────────────────────────────┼────────────┼─────────────────┼─────────┤
+│ Python                                                                           │ python-pkg │        5        │    -    │
+├──────────────────────────────────────────────────────────────────────────────────┼────────────┼─────────────────┼─────────┤
+│ app/.venv/lib/python3.14/site-packages/anyio-4.15.1.dist-info/METADATA           │ python-pkg │        0        │    -    │
+├──────────────────────────────────────────────────────────────────────────────────┼────────────┼─────────────────┼─────────┤
+│ app/.venv/lib/python3.14/site-packages/certifi-2026.10.23.dist-info/METADATA     │ python-pkg │        0        │    -    │
+├──────────────────────────────────────────────────────────────────────────────────┼────────────┼─────────────────┼─────────┤
+│ app/.venv/lib/python3.14/site-packages/click-8.5.0.dist-info/METADATA            │ python-pkg │        0        │    -    │
+├──────────────────────────────────────────────────────────────────────────────────┼────────────┼─────────────────┼─────────┤
+│ app/.venv/lib/python3.14/site-packages/h11-0.16.0.dist-info/METADATA             │ python-pkg │        0        │    -    │
+├──────────────────────────────────────────────────────────────────────────────────┼────────────┼─────────────────┼─────────┤
+│ app/.venv/lib/python3.14/site-packages/httpcore-1.0.9.dist-info/METADATA         │ python-pkg │        0        │    -    │
+├──────────────────────────────────────────────────────────────────────────────────┼────────────┼─────────────────┼─────────┤
+│ app/.venv/lib/python3.14/site-packages/httpx-0.28.1.dist-info/METADATA           │ python-pkg │        0        │    -    │
+├──────────────────────────────────────────────────────────────────────────────────┼────────────┼─────────────────┼─────────┤
+│ app/.venv/lib/python3.14/site-packages/idna-3.20.dist-info/METADATA              │ python-pkg │        0        │    -    │
+├──────────────────────────────────────────────────────────────────────────────────┼────────────┼─────────────────┼─────────┤
+│ app/.venv/lib/python3.14/site-packages/python_multipart-0.0.32.dist-info/METADA- │ python-pkg │        0        │    -    │
+│ TA                                                                               │            │                 │         │
+├──────────────────────────────────────────────────────────────────────────────────┼────────────┼─────────────────┼─────────┤
+│ app/.venv/lib/python3.14/site-packages/redis-8.1.0.dist-info/METADATA            │ python-pkg │        0        │    -    │
+├──────────────────────────────────────────────────────────────────────────────────┼────────────┼─────────────────┼─────────┤
+│ app/.venv/lib/python3.14/site-packages/starlette-1.10.0.dist-info/METADATA       │ python-pkg │        0        │    -    │
+├──────────────────────────────────────────────────────────────────────────────────┼────────────┼─────────────────┼─────────┤
+│ app/.venv/lib/python3.14/site-packages/typing_extensions-4.16.0.dist-info/METAD- │ python-pkg │        0        │    -    │
+│ ATA                                                                              │            │                 │         │
+├──────────────────────────────────────────────────────────────────────────────────┼────────────┼─────────────────┼─────────┤
+│ app/.venv/lib/python3.14/site-packages/uvicorn-0.54.0.dist-info/METADATA         │ python-pkg │        0        │    -    │
+├──────────────────────────────────────────────────────────────────────────────────┼────────────┼─────────────────┼─────────┤
+│ usr/local/lib/python3.14/site-packages/pip-26.2.2.dist-info/METADATA             │ python-pkg │        0        │    -    │
+└──────────────────────────────────────────────────────────────────────────────────┴────────────┴─────────────────┴─────────┘
+Legend:
+- '-': Not scanned
+- '0': Clean (no security findings detected)
+
+
+Python (python-pkg)
+===================
+Total: 5 (HIGH: 5, CRITICAL: 0)
+
+┌────────────┬─────────────────────┬──────────┬────────┬───────────────────┬───────────────┬────────────────────────────────────────────────────────────┐
+│  Library   │    Vulnerability    │ Severity │ Status │ Installed Version │ Fixed Version │                           Title                            │
+├────────────┼─────────────────────┼──────────┼────────┼───────────────────┼───────────────┼────────────────────────────────────────────────────────────┤
+│ msgpack    │ CVE-2026-114613     │ HIGH     │ fixed  │ 1.1.2             │ 1.2.3         │ msgpack: msgpack: Denial of Service via memory leak during │
+│            │                     │          │        │                   │               │ map deserialization                                        │
+│            │                     │          │        │                   │               │ https://avd.aquasec.com/nvd/cve-2026-114613                │
+│            ├─────────────────────┤          │        │                   ├───────────────┼────────────────────────────────────────────────────────────┤
+│            │ GHSA-6v7p-g79w-8964 │          │        │                   │ 1.2.1         │ MessagePack for Python: Out-of-bounds read / crash on      │
+│            │                     │          │        │                   │               │ Unpacker reuse after a...                                  │
+│            │                     │          │        │                   │               │ https://github.com/advisories/GHSA-6v7p-g79w-8964          │
+├────────────┼─────────────────────┤          │        ├───────────────────┼───────────────┼────────────────────────────────────────────────────────────┤
+│ setuptools │ CVE-2025-47273      │          │        │ 70.3.0            │ 78.1.1        │ setuptools: Path Traversal Vulnerability in setuptools     │
+│            │                     │          │        │                   │               │ PackageIndex                                               │
+│            │                     │          │        │                   │               │ https://avd.aquasec.com/nvd/cve-2025-47273                 │
+├────────────┼─────────────────────┤          │        ├───────────────────┼───────────────┼────────────────────────────────────────────────────────────┤
+│ urllib3    │ CVE-2026-97687      │          │        │ 2.7.0             │ 2.8.0         │ urllib3: urllib3: Traffic interception via HTTPS proxy TLS │
+│            │                     │          │        │                   │               │ configuration override                                     │
+│            │                     │          │        │                   │               │ https://avd.aquasec.com/nvd/cve-2026-97687                 │
+│            ├─────────────────────┤          │        │                   │               ├────────────────────────────────────────────────────────────┤
+│            │ CVE-2026-97689      │          │        │                   │               │ urllib3: urllib3: Denial of Service via unbounded memory   │
+│            │                     │          │        │                   │               │ allocation in chunk parser...                              │
+│            │                     │          │        │                   │               │ https://avd.aquasec.com/nvd/cve-2026-97689                 │
+└────────────┴─────────────────────┴──────────┴────────┴───────────────────┴───────────────┴────────────────────────────────────────────────────────────┘
+2026-10-31T23:23:02Z	INFO	[vuln] Vulnerability scanning is enabled
+2026-10-31T23:23:02Z	INFO	[secret] Secret scanning is enabled
+2026-10-31T23:23:02Z	INFO	[secret] If your scanning is slow, please try '--scanners vuln' to disable secret scanning
+2026-10-31T23:23:02Z	INFO	[secret] Please see https://trivy.dev/docs/v0.76/guide/scanner/secret#recommendation for faster secret detection
+2026-10-31T23:23:04Z	INFO	[python] Licenses acquired from one or more METADATA files may be subject to additional terms. Use `--debug` flag to see all affected packages.
+2026-10-31T23:23:04Z	INFO	Detected OS	family="debian" version="13.7"
+2026-10-31T23:23:04Z	INFO	[debian] Detecting vulnerabilities...	os_version="13" pkg_num=87
+2026-10-31T23:23:04Z	INFO	Number of language-specific files	num=1
+2026-10-31T23:23:04Z	INFO	[python-pkg] Detecting vulnerabilities...
+2026-10-31T23:23:04Z	WARN	Using severities from other vendors for some vulnerabilities. Read https://trivy.dev/docs/v0.76/guide/scanner/vulnerability#severity-selection for details.

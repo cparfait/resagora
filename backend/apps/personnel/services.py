@@ -60,7 +60,11 @@ def _texte(instant: datetime) -> str:
 
 def _plages_du_jour(site_id: int, jour: date) -> list[tuple[datetime, datetime, list[Occurrence]]]:
     """Plages de présence du jour : séances gardiennées commençant ce jour-là, temps d'ouverture et de fermeture
-    compris, fusionnées quand elles se touchent (tri sur le début de plage, propre à chaque espace)."""
+    compris, fusionnées quand elles se touchent (tri sur le début de plage, propre à chaque espace). Une séance prise
+    dans une fermeture exceptionnelle (REF-06) n'appelle pas de gardien : l'enregistrement de la fermeture recalcule
+    les besoins et met les vacations concernées « à revoir » (scénario transverse 3)."""
+    from apps.reservations.services import fermetures_touchant
+
     debut, fin = _bornes_jour(jour)
     seances = Occurrence.objects.filter(
         espace__batiment__site_id=site_id,
@@ -68,9 +72,11 @@ def _plages_du_jour(site_id: int, jour: date) -> list[tuple[datetime, datetime, 
         statut__in=STATUTS_GARDIENNES,
         debut__gte=debut,
         debut__lt=fin,
-    ).select_related("espace")
+    ).select_related("espace__batiment")
     brutes = []
     for occurrence in seances:
+        if fermetures_touchant(occurrence.espace, occurrence.debut, occurrence.fin).exists():
+            continue
         plage = occurrence.espace.plage_gardiennage(occurrence.debut, occurrence.fin)
         if plage is not None:
             brutes.append((plage[0], plage[1], occurrence))

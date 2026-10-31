@@ -1424,6 +1424,118 @@ export interface paths {
         patch: operations["gestion_finances_majorations_partial_update"];
         trace?: never;
     };
+    "/api/gestion/finances/paiements-en-ligne": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * @description Lecture seule : une tentative ne naît que du portail et ne change que par le résultat lu chez PayFiP, ou par la
+         *     clôture motivée d'un agent après contrôle.
+         */
+        get: operations["gestion_finances_paiements_en_ligne_list"];
+        put?: never;
+        /**
+         * @description Lecture seule : une tentative ne naît que du portail et ne change que par le résultat lu chez PayFiP, ou par la
+         *     clôture motivée d'un agent après contrôle.
+         */
+        post: operations["gestion_finances_paiements_en_ligne_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gestion/finances/paiements-en-ligne/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * @description Lecture seule : une tentative ne naît que du portail et ne change que par le résultat lu chez PayFiP, ou par la
+         *     clôture motivée d'un agent après contrôle.
+         */
+        get: operations["gestion_finances_paiements_en_ligne_retrieve"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gestion/finances/paiements-en-ligne/{id}/clore": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description Clôture d'une tentative à contrôler, après vérification auprès de la DGFiP (motif tracé). */
+        post: operations["gestion_finances_paiements_en_ligne_clore_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gestion/finances/paiements-en-ligne/{id}/rembourser": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description Trace le remboursement d'un trop-perçu (par la régie ou par le comptable public). */
+        post: operations["gestion_finances_paiements_en_ligne_rembourser_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gestion/finances/paiements-en-ligne/{id}/verifier": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description Demande au worker de relire le résultat auprès de PayFiP (notification perdue, usager au guichet). */
+        post: operations["gestion_finances_paiements_en_ligne_verifier_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gestion/finances/paiements-en-ligne/rapprocher": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description Rapprochement à la demande (il tourne aussi chaque heure) ; réservé à la régie « tous sites ». */
+        post: operations["gestion_finances_paiements_en_ligne_rapprocher_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/gestion/finances/pieces": {
         parameters: {
             query?: never;
@@ -5208,6 +5320,8 @@ export interface components {
          * @enum {string}
          */
         BesoinStatutEnum: "a_couvrir" | "couvert" | "supprime";
+        /** @enum {unknown} */
+        BlankEnum: "";
         Campagne: {
             readonly id: number;
             saison: number;
@@ -5454,6 +5568,16 @@ export interface components {
             conflits: components["schemas"]["Conflit"][];
             alternatives: components["schemas"]["Alternative"][];
         };
+        /**
+         * @description * `` - —
+         *     * `trop_percu` - Trop-perçu à rembourser
+         *     * `doublon_probable` - Déjà encaissé par ailleurs ? À vérifier
+         *     * `incoherent` - Résultat PayFiP incohérent
+         *     * `resultat_inconnu` - Résultat PayFiP inconnu
+         *     * `saisie_test` - Paiement de test hors recette
+         * @enum {string}
+         */
+        ControleEnum: "trop_percu" | "doublon_probable" | "incoherent" | "resultat_inconnu" | "saisie_test";
         ControleMateriel: {
             readonly id: number;
             readonly stock: number;
@@ -5665,6 +5789,9 @@ export interface components {
             readonly prochain_envoi_le: string | null;
             /** Format: date-time */
             readonly dernier_envoi_le: string | null;
+            /** @description Échecs consécutifs ; l'envoi se suspend au 5e. */
+            readonly echecs: number;
+            readonly suspendu_motif: string;
         };
         EnvoiGroupeRequest: {
             titre: string;
@@ -5808,8 +5935,15 @@ export interface components {
              * @description Date avant laquelle les attestations sont déposées sur le portail (VAL-04).
              */
             date_limite_attestations?: string | null;
+            /** Format: date */
+            readonly date_limite: string;
             /** Format: date-time */
             readonly cloture_le: string | null;
+            /** @description Coût chargé d'une heure de personnel dédié (centimes). */
+            cout_horaire_personnel_centimes?: number | null;
+            absences_non_signalees_valorisees?: boolean | null;
+            readonly cout_personnel: number;
+            readonly absences_valorisees: boolean;
         };
         ExerciceRequest: {
             annee: number;
@@ -5818,6 +5952,9 @@ export interface components {
              * @description Date avant laquelle les attestations sont déposées sur le portail (VAL-04).
              */
             date_limite_attestations?: string | null;
+            /** @description Coût chargé d'une heure de personnel dédié (centimes). */
+            cout_horaire_personnel_centimes?: number | null;
+            absences_non_signalees_valorisees?: boolean | null;
         };
         /**
          * @description * `ouvert` - Ouvert
@@ -6055,6 +6192,8 @@ export interface components {
             readonly id: number;
             lignes_lues?: number;
             rapprochees?: number;
+            /** @description Paiements en ligne déjà enregistrés, confirmés par l'état. */
+            confirmees?: number;
             rejets?: unknown;
             /** Format: date-time */
             readonly cree_le: string;
@@ -7475,6 +7614,21 @@ export interface components {
             previous?: string | null;
             results: components["schemas"]["Tarif"][];
         };
+        PaginatedTentativeList: {
+            /** @example 123 */
+            count: number;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?page=4
+             */
+            next?: string | null;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?page=2
+             */
+            previous?: string | null;
+            results: components["schemas"]["Tentative"][];
+        };
         PaginatedTrameList: {
             /** @example 123 */
             count: number;
@@ -7583,6 +7737,12 @@ export interface components {
             quantite: number;
             description: string;
         };
+        /**
+         * @description * `ville` - ville
+         *     * `comptable` - comptable
+         * @enum {string}
+         */
+        ParEnum: "ville" | "comptable";
         Parametre: {
             cle: string;
             libelle: string;
@@ -7708,6 +7868,9 @@ export interface components {
              * @description Date avant laquelle les attestations sont déposées sur le portail (VAL-04).
              */
             date_limite_attestations?: string | null;
+            /** @description Coût chargé d'une heure de personnel dédié (centimes). */
+            cout_horaire_personnel_centimes?: number | null;
+            absences_non_signalees_valorisees?: boolean | null;
         };
         PatchedFamilleEspaceRequest: {
             code?: string;
@@ -8386,6 +8549,12 @@ export interface components {
             /** @default  */
             alternatives: string;
         };
+        RemboursementRequest: {
+            /** Format: date */
+            date: string;
+            reference: string;
+            par: components["schemas"]["ParEnum"];
+        };
         Reservation: {
             readonly id: number;
             readonly dossier: number;
@@ -8758,6 +8927,67 @@ export interface components {
             /** @description CAU-01 : caution exigée (0 : aucune). */
             caution_centimes?: number;
         };
+        Tentative: {
+            readonly id: number;
+            /**
+             * Format: uuid
+             * @description Identifiant public (portail).
+             */
+            readonly uuid: string;
+            readonly piece: number;
+            readonly facture: string;
+            readonly dossier: number;
+            readonly usager_nom: string;
+            readonly mode: components["schemas"]["TentativeModeEnum"];
+            readonly refdet: string;
+            readonly exer: string;
+            /** @description Montant demandé à PayFiP (centimes). */
+            readonly montant: number;
+            /** @default creee */
+            readonly statut: components["schemas"]["TentativeStatutEnum"];
+            readonly statut_libelle: string;
+            readonly numauto: string;
+            /** Format: date-time */
+            readonly paye_le: string | null;
+            readonly encaissement: number | null;
+            /** @description Montant payé au-delà du reste dû. */
+            readonly trop_percu: number;
+            readonly controle: components["schemas"]["ControleEnum"] | components["schemas"]["BlankEnum"];
+            readonly controle_libelle: string;
+            /** Format: date */
+            readonly rembourse_le: string | null;
+            /** @description Détail technique (jamais montré à l'usager). */
+            readonly erreur: string;
+            readonly motif_cloture: string;
+            /** Format: date-time */
+            readonly cree_le: string;
+            /**
+             * Format: date-time
+             * @description Dernière demande de lecture du résultat.
+             */
+            readonly verifiee_le: string | null;
+            /** @description Notifications reçues de PayFiP. */
+            readonly notifications: number;
+        };
+        /**
+         * @description * `titres` - PayFiP Titres et Rôles
+         *     * `regie` - PayFiP Régie
+         * @enum {string}
+         */
+        TentativeModeEnum: "titres" | "regie";
+        /**
+         * @description * `creee` - En préparation
+         *     * `redirigee` - En cours sur PayFiP
+         *     * `remplacee` - Remplacée par une autre tentative (encore relue)
+         *     * `payee` - Payée
+         *     * `refusee` - Refusée par la banque
+         *     * `abandonnee` - Abandonnée par l'usager
+         *     * `expiree` - Sans résultat de PayFiP (encore relue 7 jours)
+         *     * `a_controler` - À contrôler par le service financier
+         *     * `erreur` - Close sans paiement
+         * @enum {string}
+         */
+        TentativeStatutEnum: "creee" | "redirigee" | "remplacee" | "payee" | "refusee" | "abandonnee" | "expiree" | "a_controler" | "erreur";
         TitreRequest: {
             titre: string;
             /** Format: date */
@@ -9062,6 +9292,7 @@ export interface components {
              * @description Attestation mise à disposition sur le portail.
              */
             readonly deposee_le: string | null;
+            /** @description Détail des séances et prêts ; un agent limité à des sites n'en voit que les lignes de ses sites (m4). */
             readonly lignes: {
                 [key: string]: unknown;
             }[];
@@ -12036,6 +12267,198 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["Majoration"];
+                };
+            };
+        };
+    };
+    gestion_finances_paiements_en_ligne_list: {
+        parameters: {
+            query?: {
+                /**
+                 * @description * `` - —
+                 *     * `trop_percu` - Trop-perçu à rembourser
+                 *     * `doublon_probable` - Déjà encaissé par ailleurs ? À vérifier
+                 *     * `incoherent` - Résultat PayFiP incohérent
+                 *     * `resultat_inconnu` - Résultat PayFiP inconnu
+                 *     * `saisie_test` - Paiement de test hors recette
+                 */
+                controle?: "" | "doublon_probable" | "incoherent" | "resultat_inconnu" | "saisie_test" | "trop_percu";
+                /** @description Les valeurs multiples doivent être séparées par des virgules. */
+                controle__in?: string[];
+                cree_le__gte?: string;
+                cree_le__lt?: string;
+                /** @description Un numéro de page de l'ensemble des résultats. */
+                page?: number;
+                piece?: number;
+                /**
+                 * @description * `creee` - En préparation
+                 *     * `redirigee` - En cours sur PayFiP
+                 *     * `remplacee` - Remplacée par une autre tentative (encore relue)
+                 *     * `payee` - Payée
+                 *     * `refusee` - Refusée par la banque
+                 *     * `abandonnee` - Abandonnée par l'usager
+                 *     * `expiree` - Sans résultat de PayFiP (encore relue 7 jours)
+                 *     * `a_controler` - À contrôler par le service financier
+                 *     * `erreur` - Close sans paiement
+                 */
+                statut?: "a_controler" | "abandonnee" | "creee" | "erreur" | "expiree" | "payee" | "redirigee" | "refusee" | "remplacee";
+                /** @description Les valeurs multiples doivent être séparées par des virgules. */
+                statut__in?: string[];
+                /** @description Nombre de résultats à retourner par page. */
+                taille?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PaginatedTentativeList"];
+                };
+            };
+        };
+    };
+    gestion_finances_paiements_en_ligne_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Tentative"];
+                };
+            };
+        };
+    };
+    gestion_finances_paiements_en_ligne_retrieve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) tentative paiement. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Tentative"];
+                };
+            };
+        };
+    };
+    gestion_finances_paiements_en_ligne_clore_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) tentative paiement. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": {
+                    motif?: string;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Tentative"];
+                };
+            };
+        };
+    };
+    gestion_finances_paiements_en_ligne_rembourser_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) tentative paiement. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RemboursementRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["RemboursementRequest"];
+                "multipart/form-data": components["schemas"]["RemboursementRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Tentative"];
+                };
+            };
+        };
+    };
+    gestion_finances_paiements_en_ligne_verifier_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) tentative paiement. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Tentative"];
+                };
+            };
+        };
+    };
+    gestion_finances_paiements_en_ligne_rapprocher_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
                 };
             };
         };
@@ -17405,6 +17828,7 @@ export interface operations {
         parameters: {
             query?: {
                 campagne?: number;
+                options_expirant_heures?: number;
                 /**
                  * @description * `guichet` - Guichet
                  *     * `portail` - Portail

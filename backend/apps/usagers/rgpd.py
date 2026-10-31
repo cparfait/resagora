@@ -247,6 +247,9 @@ def anonymiser_usager(usager: Usager, *, acteur: Any, motif: str) -> Usager:
 
         Dossier.objects.filter(usager=usager).update(objet="Réservation d'un particulier", observations="")
     usager.telephone, usager.courriel, usager.observations = "", "", ""
+    from apps.paiements.services import anonymiser_usager as anonymiser_paiements
+
+    anonymiser_paiements(usager)  # adresse transmise à PayFiP (lot 7) ; montants et références restent (RG-13)
     usager.statut, usager.anonymise_le = "anonymise", timezone.now()
     usager.save()
     journaliser("anonymiser_usager", usager, apres={"motif": motif, "personne_physique": personne}, acteur=acteur)

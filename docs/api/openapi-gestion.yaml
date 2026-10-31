@@ -3322,6 +3322,260 @@ paths:
       responses:
         '204':
           description: No response body
+  /api/gestion/finances/paiements-en-ligne:
+    get:
+      operationId: gestion_finances_paiements_en_ligne_list
+      description: |-
+        Lecture seule : une tentative ne naît que du portail et ne change que par le résultat lu chez PayFiP, ou par la
+        clôture motivée d'un agent après contrôle.
+      parameters:
+      - in: query
+        name: controle
+        schema:
+          type: string
+          enum:
+          - ''
+          - doublon_probable
+          - incoherent
+          - resultat_inconnu
+          - saisie_test
+          - trop_percu
+        description: |-
+          * `` - —
+          * `trop_percu` - Trop-perçu à rembourser
+          * `doublon_probable` - Déjà encaissé par ailleurs ? À vérifier
+          * `incoherent` - Résultat PayFiP incohérent
+          * `resultat_inconnu` - Résultat PayFiP inconnu
+          * `saisie_test` - Paiement de test hors recette
+      - in: query
+        name: controle__in
+        schema:
+          type: array
+          items:
+            type: string
+        description: Les valeurs multiples doivent être séparées par des virgules.
+        explode: false
+        style: form
+      - in: query
+        name: cree_le__gte
+        schema:
+          type: string
+          format: date-time
+      - in: query
+        name: cree_le__lt
+        schema:
+          type: string
+          format: date-time
+      - name: page
+        required: false
+        in: query
+        description: Un numéro de page de l'ensemble des résultats.
+        schema:
+          type: integer
+      - in: query
+        name: piece
+        schema:
+          type: integer
+      - in: query
+        name: statut
+        schema:
+          type: string
+          enum:
+          - a_controler
+          - abandonnee
+          - creee
+          - erreur
+          - expiree
+          - payee
+          - redirigee
+          - refusee
+          - remplacee
+        description: |-
+          * `creee` - En préparation
+          * `redirigee` - En cours sur PayFiP
+          * `remplacee` - Remplacée par une autre tentative (encore relue)
+          * `payee` - Payée
+          * `refusee` - Refusée par la banque
+          * `abandonnee` - Abandonnée par l'usager
+          * `expiree` - Sans résultat de PayFiP (encore relue 7 jours)
+          * `a_controler` - À contrôler par le service financier
+          * `erreur` - Close sans paiement
+      - in: query
+        name: statut__in
+        schema:
+          type: array
+          items:
+            type: string
+        description: Les valeurs multiples doivent être séparées par des virgules.
+        explode: false
+        style: form
+      - name: taille
+        required: false
+        in: query
+        description: Nombre de résultats à retourner par page.
+        schema:
+          type: integer
+      tags:
+      - gestion
+      security:
+      - sessionAgent: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedTentativeList'
+          description: ''
+    post:
+      operationId: gestion_finances_paiements_en_ligne_create
+      description: |-
+        Lecture seule : une tentative ne naît que du portail et ne change que par le résultat lu chez PayFiP, ou par la
+        clôture motivée d'un agent après contrôle.
+      tags:
+      - gestion
+      security:
+      - sessionAgent: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Tentative'
+          description: ''
+  /api/gestion/finances/paiements-en-ligne/{id}:
+    get:
+      operationId: gestion_finances_paiements_en_ligne_retrieve
+      description: |-
+        Lecture seule : une tentative ne naît que du portail et ne change que par le résultat lu chez PayFiP, ou par la
+        clôture motivée d'un agent après contrôle.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un(une) valeur entière unique identifiant ce(cette) tentative
+          paiement.
+        required: true
+      tags:
+      - gestion
+      security:
+      - sessionAgent: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Tentative'
+          description: ''
+  /api/gestion/finances/paiements-en-ligne/{id}/clore:
+    post:
+      operationId: gestion_finances_paiements_en_ligne_clore_create
+      description: Clôture d'une tentative à contrôler, après vérification auprès
+        de la DGFiP (motif tracé).
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un(une) valeur entière unique identifiant ce(cette) tentative
+          paiement.
+        required: true
+      tags:
+      - gestion
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                motif:
+                  type: string
+      security:
+      - sessionAgent: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Tentative'
+          description: ''
+  /api/gestion/finances/paiements-en-ligne/{id}/rembourser:
+    post:
+      operationId: gestion_finances_paiements_en_ligne_rembourser_create
+      description: Trace le remboursement d'un trop-perçu (par la régie ou par le
+        comptable public).
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un(une) valeur entière unique identifiant ce(cette) tentative
+          paiement.
+        required: true
+      tags:
+      - gestion
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RemboursementRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/RemboursementRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/RemboursementRequest'
+        required: true
+      security:
+      - sessionAgent: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Tentative'
+          description: ''
+  /api/gestion/finances/paiements-en-ligne/{id}/verifier:
+    post:
+      operationId: gestion_finances_paiements_en_ligne_verifier_create
+      description: Demande au worker de relire le résultat auprès de PayFiP (notification
+        perdue, usager au guichet).
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un(une) valeur entière unique identifiant ce(cette) tentative
+          paiement.
+        required: true
+      tags:
+      - gestion
+      security:
+      - sessionAgent: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Tentative'
+          description: ''
+  /api/gestion/finances/paiements-en-ligne/rapprocher:
+    post:
+      operationId: gestion_finances_paiements_en_ligne_rapprocher_create
+      description: Rapprochement à la demande (il tourne aussi chaque heure) ; réservé
+        à la régie « tous sites ».
+      tags:
+      - gestion
+      security:
+      - sessionAgent: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
   /api/gestion/finances/pieces:
     get:
       operationId: gestion_finances_pieces_list
@@ -9698,6 +9952,10 @@ paths:
         schema:
           type: integer
       - in: query
+        name: options_expirant_heures
+        schema:
+          type: number
+      - in: query
         name: origine
         schema:
           type: string
@@ -13611,6 +13869,9 @@ components:
         * `a_couvrir` - À couvrir
         * `couvert` - Couvert
         * `supprime` - Supprimé (séances annulées)
+    BlankEnum:
+      enum:
+      - ''
     Campagne:
       type: object
       properties:
@@ -14197,6 +14458,21 @@ components:
       - fermeture
       - hors_horaires
       - possible
+    ControleEnum:
+      enum:
+      - trop_percu
+      - doublon_probable
+      - incoherent
+      - resultat_inconnu
+      - saisie_test
+      type: string
+      description: |-
+        * `` - —
+        * `trop_percu` - Trop-perçu à rembourser
+        * `doublon_probable` - Déjà encaissé par ailleurs ? À vérifier
+        * `incoherent` - Résultat PayFiP incohérent
+        * `resultat_inconnu` - Résultat PayFiP inconnu
+        * `saisie_test` - Paiement de test hors recette
     ControleMateriel:
       type: object
       properties:
@@ -14745,12 +15021,21 @@ components:
           format: date-time
           readOnly: true
           nullable: true
+        echecs:
+          type: integer
+          readOnly: true
+          description: Échecs consécutifs ; l'envoi se suspend au 5e.
+        suspendu_motif:
+          type: string
+          readOnly: true
       required:
       - cible
       - dernier_envoi_le
+      - echecs
       - id
       - libelle
       - prochain_envoi_le
+      - suspendu_motif
     EnvoiGroupeRequest:
       type: object
       properties:
@@ -15090,14 +15375,36 @@ components:
           nullable: true
           description: Date avant laquelle les attestations sont déposées sur le portail
             (VAL-04).
+        date_limite:
+          type: string
+          format: date
+          readOnly: true
         cloture_le:
           type: string
           format: date-time
           readOnly: true
           nullable: true
+        cout_horaire_personnel_centimes:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+          nullable: true
+          description: Coût chargé d'une heure de personnel dédié (centimes).
+        absences_non_signalees_valorisees:
+          type: boolean
+          nullable: true
+        cout_personnel:
+          type: integer
+          readOnly: true
+        absences_valorisees:
+          type: boolean
+          readOnly: true
       required:
+      - absences_valorisees
       - annee
       - cloture_le
+      - cout_personnel
+      - date_limite
       - id
       - statut
     ExerciceRequest:
@@ -15113,6 +15420,15 @@ components:
           nullable: true
           description: Date avant laquelle les attestations sont déposées sur le portail
             (VAL-04).
+        cout_horaire_personnel_centimes:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+          nullable: true
+          description: Coût chargé d'une heure de personnel dédié (centimes).
+        absences_non_signalees_valorisees:
+          type: boolean
+          nullable: true
       required:
       - annee
     ExerciceStatutEnum:
@@ -15626,6 +15942,11 @@ components:
           type: integer
           maximum: 2147483647
           minimum: 0
+        confirmees:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+          description: Paiements en ligne déjà enregistrés, confirmés par l'état.
         rejets: {}
         cree_le:
           type: string
@@ -18365,6 +18686,29 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Tarif'
+    PaginatedTentativeList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Tentative'
     PaginatedTrameList:
       type: object
       required:
@@ -18563,6 +18907,14 @@ components:
           maxLength: 2000
       required:
       - description
+    ParEnum:
+      enum:
+      - ville
+      - comptable
+      type: string
+      description: |-
+        * `ville` - ville
+        * `comptable` - comptable
     Parametre:
       type: object
       properties:
@@ -18856,6 +19208,15 @@ components:
           nullable: true
           description: Date avant laquelle les attestations sont déposées sur le portail
             (VAL-04).
+        cout_horaire_personnel_centimes:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+          nullable: true
+          description: Coût chargé d'une heure de personnel dédié (centimes).
+        absences_non_signalees_valorisees:
+          type: boolean
+          nullable: true
     PatchedFamilleEspaceRequest:
       type: object
       properties:
@@ -20386,6 +20747,22 @@ components:
           maxLength: 500
       required:
       - motif
+    RemboursementRequest:
+      type: object
+      properties:
+        date:
+          type: string
+          format: date
+        reference:
+          type: string
+          minLength: 1
+          maxLength: 100
+        par:
+          $ref: '#/components/schemas/ParEnum'
+      required:
+      - date
+      - par
+      - reference
     Reservation:
       type: object
       properties:
@@ -21314,6 +21691,156 @@ components:
       - categorie
       - grille
       - prix_centimes
+    Tentative:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        uuid:
+          type: string
+          format: uuid
+          readOnly: true
+          description: Identifiant public (portail).
+        piece:
+          type: integer
+          readOnly: true
+        facture:
+          type: string
+          readOnly: true
+        dossier:
+          type: integer
+          readOnly: true
+        usager_nom:
+          type: string
+          readOnly: true
+        mode:
+          allOf:
+          - $ref: '#/components/schemas/TentativeModeEnum'
+          readOnly: true
+        refdet:
+          type: string
+          readOnly: true
+        exer:
+          type: string
+          readOnly: true
+        montant:
+          type: integer
+          readOnly: true
+          description: Montant demandé à PayFiP (centimes).
+        statut:
+          allOf:
+          - $ref: '#/components/schemas/TentativeStatutEnum'
+          readOnly: true
+          default: creee
+        statut_libelle:
+          type: string
+          readOnly: true
+        numauto:
+          type: string
+          readOnly: true
+        paye_le:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        encaissement:
+          type: integer
+          readOnly: true
+          nullable: true
+        trop_percu:
+          type: integer
+          readOnly: true
+          description: Montant payé au-delà du reste dû.
+        controle:
+          readOnly: true
+          oneOf:
+          - $ref: '#/components/schemas/ControleEnum'
+          - $ref: '#/components/schemas/BlankEnum'
+        controle_libelle:
+          type: string
+          readOnly: true
+        rembourse_le:
+          type: string
+          format: date
+          nullable: true
+          readOnly: true
+        erreur:
+          type: string
+          readOnly: true
+          description: Détail technique (jamais montré à l'usager).
+        motif_cloture:
+          type: string
+          readOnly: true
+        cree_le:
+          type: string
+          format: date-time
+          readOnly: true
+        verifiee_le:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+          description: Dernière demande de lecture du résultat.
+        notifications:
+          type: integer
+          readOnly: true
+          description: Notifications reçues de PayFiP.
+      required:
+      - controle
+      - controle_libelle
+      - cree_le
+      - dossier
+      - encaissement
+      - erreur
+      - exer
+      - facture
+      - id
+      - mode
+      - montant
+      - motif_cloture
+      - notifications
+      - numauto
+      - paye_le
+      - piece
+      - refdet
+      - rembourse_le
+      - statut
+      - statut_libelle
+      - trop_percu
+      - usager_nom
+      - uuid
+      - verifiee_le
+    TentativeModeEnum:
+      enum:
+      - titres
+      - regie
+      type: string
+      description: |-
+        * `titres` - PayFiP Titres et Rôles
+        * `regie` - PayFiP Régie
+    TentativeStatutEnum:
+      enum:
+      - creee
+      - redirigee
+      - remplacee
+      - payee
+      - refusee
+      - abandonnee
+      - expiree
+      - a_controler
+      - erreur
+      type: string
+      description: |-
+        * `creee` - En préparation
+        * `redirigee` - En cours sur PayFiP
+        * `remplacee` - Remplacée par une autre tentative (encore relue)
+        * `payee` - Payée
+        * `refusee` - Refusée par la banque
+        * `abandonnee` - Abandonnée par l'usager
+        * `expiree` - Sans résultat de PayFiP (encore relue 7 jours)
+        * `a_controler` - À contrôler par le service financier
+        * `erreur` - Close sans paiement
     TitreRequest:
       type: object
       properties:
@@ -22042,6 +22569,8 @@ components:
           items:
             type: object
             additionalProperties: {}
+          description: Détail des séances et prêts ; un agent limité à des sites n'en
+            voit que les lignes de ses sites (m4).
           readOnly: true
       required:
       - actuelle

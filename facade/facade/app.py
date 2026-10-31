@@ -12,6 +12,7 @@ import hmac
 import ipaddress
 import json
 import logging
+import re
 import secrets
 import ssl
 import uuid
@@ -29,6 +30,9 @@ from .config import Configuration, controler_production
 from .fichiers import AnalyseurClamAV, FichierRefuse, Quarantaine
 from .routes import DEBITS, Nature, Route, trouver
 from .sessions import GestionnaireSessions, Magasin, MagasinValkey
+
+REF_PAYFIP = re.compile(r"[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}")
+SIG_PAYFIP = re.compile(r"[0-9a-f]{32}")
 
 journal = logging.getLogger("facade")
 
@@ -331,12 +335,20 @@ class Facade:
         if not self.config.payfip_sans_filtre_ip and adresse not in self.config.ips_payfip:
             journal.warning("Notification PayFiP refusée depuis %s", adresse)
             return erreur(403, "non_autorise", "Non autorisé.")
+        # TAR-07 : seuls `ref` (UUID de la tentative) et `sig` (signature de l'API) sont transmis, après contrôle
+        # de leur format ; l'API vérifie la signature puis relit le résultat chez PayFiP.
+        ref, sig = request.query_params.get("ref", ""), request.query_params.get("sig", "")
+        if not REF_PAYFIP.fullmatch(ref) or not SIG_PAYFIP.fullmatch(sig):
+            journal.warning("Notification PayFiP sans référence signée valide depuis %s", adresse)
+            return erreur(403, "non_autorise", "Non autorisé.")
         corps = await request.body()
+        if len(corps) > 4096:
+            return erreur(413, "trop_volumineux", "Requête trop volumineuse.")
         entetes = {
             **self.entetes_api(request, None),
             "Content-Type": request.headers.get("content-type", "application/x-www-form-urlencoded"),
         }
-        reponse_api = await self.appeler("POST", chemin, content=corps, headers=entetes)
+        reponse_api = await self.appeler("POST", chemin, content=corps, headers=entetes, params={"ref": ref, "sig": sig})
         if reponse_api is None:
             return erreur(503, "indisponible", "Service indisponible.")
         return self.reponse_relayee(reponse_api)
@@ -393,7 +405,11 @@ class Facade:
         donnees = {k: v for k, v in formulaire.items() if isinstance(v, str) and k == "uuid"}
         entetes = {**entetes, "X-Empreinte-Sha256": controle.sha256, "X-Fichier-Controle": "clamav"}
         reponse_api = await self.appeler(
-            "POST", chemin, data=donnees, files={"fichier": (controle.nom_origine, controle.contenu, controle.type_mime)}, headers=entetes
+            "POST",
+            chemin,
+            data=donnees,
+            files={"fichier": (controle.nom_origine, controle.contenu, controle.type_mime)},
+            headers=entetes,
         )
         if reponse_api is None:
             return erreur(503, "indisponible", "Service indisponible.")

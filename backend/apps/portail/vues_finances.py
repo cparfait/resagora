@@ -62,6 +62,8 @@ def _pieces(contact: Any) -> QuerySet[PieceComptable]:
 
 
 def representation_piece(piece: PieceComptable) -> dict[str, Any]:
+    from apps.paiements import services as paiements
+
     reglement = piece.nature in {"facture", "acompte"} and piece.statut in {"a_titrer", "titre_emis", "solde_partiel"}
     return {
         "id": piece.pk,
@@ -93,6 +95,8 @@ def representation_piece(piece: PieceComptable) -> dict[str, Any]:
         ],
         "a_accepter": piece.nature == "devis" and piece.statut == "emis",
         "pdf": piece.document_id is not None,
+        # POR-07 : bouton « Payer en ligne » (PayFiP) seulement si la facture se paie en ligne dans le mode configuré.
+        "paiement_en_ligne": paiements.payable(piece),
         "reglement": {
             "titulaire": piece.reglement.get("titulaire", ""),
             "iban": piece.reglement.get("iban", ""),

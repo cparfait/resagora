@@ -4,6 +4,8 @@ from __future__ import annotations
 
 from typing import Any
 
+from django.conf import settings
+
 from apps.documents.contexte import base, contexte_usager, date_longue, fournisseur
 from apps.noyau.montants import euros
 from apps.noyau.parametres import parametre
@@ -18,6 +20,12 @@ def _quantite(ligne: Any) -> str:
         heures, minutes = divmod(ligne.quantite, 60)
         return f"{heures} h {minutes:02d}" if minutes else f"{heures} h"
     return f"{ligne.quantite} {UNITES.get(ligne.unite, '')}".strip()
+
+
+def _payable_en_ligne(piece: Any) -> bool:
+    from apps.paiements import services as paiements
+
+    return paiements.actif() and getattr(piece, "nature", "") in {"facture", "acompte"}
 
 
 @fournisseur(
@@ -85,7 +93,10 @@ def contexte_piece(piece: PieceComptable) -> dict[str, Any]:
             "iban": parametre("comptable.iban"),
             "bic": parametre("comptable.bic"),
             "titulaire": parametre("comptable.titulaire"),
-            "payfip": False,
+            # POR-07 : la facture mentionne le paiement en ligne s'il est ouvert (en mode Titres, il se fait après
+            # réception de l'avis des sommes à payer ; en Régie, avant la transmission au comptable).
+            "payfip": _payable_en_ligne(piece),
+            "payfip_mode": settings.PAYFIP_MODE,
         },
         "caution": {"montant": ""},
     }

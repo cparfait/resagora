@@ -5,6 +5,7 @@ import { Demande } from "./espace/Demande";
 import { FicheDossier, MesDossiers, TableauDeBord } from "./espace/Dossiers";
 import { MesAttestations } from "./espace/Attestations";
 import { MesFinances } from "./espace/Finances";
+import { RetourPaiement } from "./espace/Paiement";
 import { Campagnes, MaStructure, MonCompte } from "./espace/Profil";
 import { Confirmation, ConfirmationNouvelleAdresse, Connexion, Inscription, Invitation, MotDePasseOublie, Reinitialisation } from "./pages/Comptes";
 import { Accueil, Catalogue, DisponibilitesPage, FicheEquipement } from "./pages/Publiques";
@@ -50,6 +51,7 @@ export function Routage() {
         <Route path="/espace/compte" element={<Protege><MonCompte /></Protege>} />
         <Route path="/espace/factures" element={<Protege><MesFinances /></Protege>} />
         <Route path="/espace/attestations" element={<Protege><MesAttestations /></Protege>} />
+        <Route path="/espace/paiement/:uuid" element={<Protege><RetourPaiement /></Protege>} />
         <Route path="*" element={<PageIntrouvable />} />
       </Routes>
     </Cadre>

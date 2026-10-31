@@ -174,4 +174,24 @@ convenir avec l'éditeur et le service financier.
 | Domaines des destinataires des plannings | Paramètre `pilotage.domaines_destinataires` (défaut chatillon92.fr) | Domaines de messagerie professionnels autorisés (Ville, éventuellement établissements partenaires) | Une adresse hors domaine est refusée à la saisie de l'envoi programmé |
 | Plage d'ouverture par défaut des statistiques | Paramètre `statistiques.ouverture_defaut` (8 h – 22 h) | Heures d'ouverture retenues pour un espace sans horaires saisis | Le taux d'occupation d'un espace sans horaires est calculé sur cette plage |
 
-## 12. PayFiP — complété au lot 7
+## 12. PayFiP — TAR-07, POR-07 (lot 7)
+
+À ouvrir **seulement après la signature de la convention d'adhésion à PayFiP avec la DGFiP** (skill `finances-ciril`).
+Tant que `PAYFIP_ACTIF=0`, aucun bouton de paiement n'apparaît et la facture ne mentionne pas le paiement en ligne.
+
+| Élément | Où le saisir | Ce que la Ville fournit | Vérification |
+| --- | --- | --- | --- |
+| Mode PayFiP | `PAYFIP_MODE` (`deploy/lan/parametres.env`) : `titres` (défaut, Titres et Rôles : factures titrées dans CIVIL Finances Publiques) ou `regie` (factures payées à la régie avant leur transmission au comptable) — ADR 0008 | Choix fait avec le comptable public lors de l'adhésion ; acte constitutif de la régie pour le mode Régie | En `titres`, seule une facture portant un numéro de titre affiche « Payer en ligne » ; en `regie`, seule une facture non encore transmise. En Régie, l'export des titres signale les sommes encaissées (`mode_encaissement`) pour un titre de régularisation |
+| Sortie vers la DGFiP | `PAYFIP_PROXY` (proxy de la Ville, liste blanche `www.payfip.gouv.fr`) ; seul le worker sort | Adresse du proxy et ouverture du flux 443 | Le rapprochement horaire relit une tentative de test sans erreur « injoignable » |
+| Montant minimal | `PAYFIP_MONTANT_MINIMUM_CENTIMES` (défaut 100 = 1 €) | Montant minimal accepté par PayFiP (guide en vigueur) | Une facture en deçà ne propose pas le paiement en ligne |
+| Numéro de client (`numcli`) | `PAYFIP_NUMCLI` | Numéro attribué par la DGFiP | `verifier_deploiement` refuse un numéro vide |
+| Saisie | `PAYFIP_SAISIE` : T (test), X (activation), W (production) | Calendrier d'ouverture convenu avec la DGFiP | `verifier_deploiement` refuse T hors recette |
+| Adresses PayFiP | `PAYFIP_URL_SERVICE` (service SOAP), `PAYFIP_URL_PAIEMENT` (page de paiement) | Adresses du guide de mise en œuvre en vigueur (défaut : www.payfip.gouv.fr) | Un paiement de test aboutit, saisie X |
+| Adresse de notification | `PAYFIP_URL_NOTIFICATION` (défaut : portail + `/api/portail/payfip/notification`) | Nom public du portail | La notification arrive à la façade, qui ne l'accepte que des adresses de la DGFiP |
+| Adresses IP des notifications | `IPS_NOTIFICATION_PAYFIP` (`deploy/dmz/parametres.env`, D-020) | Liste communiquée par la DGFiP | Une notification venue d'ailleurs est refusée (403) et journalisée |
+| Clé de signature des notifications | secret `payfip_secret` (24 caractères au moins, `make secrets`) | Rien (générée localement) | Une notification à l'adresse modifiée est écartée sans appel à PayFiP |
+| Encaissements PayFiP dans Ciril | Import des encaissements (Finances → Encaissements) | Avec l'éditeur : présence des paiements PayFiP dans l'état des encaissements | Une ligne qui correspond à un paiement en ligne déjà enregistré est comptée « confirmée par le comptable », sans doublon (D-072) |
+| Trop-perçus | Finances → Paiements en ligne (« Enregistrer le remboursement ») | Procédure de remboursement (régie ou comptable public) | Un paiement arrivé sur une facture réglée entre-temps est signalé au service (`portail.service_courriel`) ; « à vérifier » si un règlement de même montant existe déjà |
+| Points à confirmer dans le guide PayFiP | — | Valeurs de `resultrans` (dont V), format de `refdet` et `objet`, durée de validité d'un idOp, nouvelles tentatives de notification | Paiement de test en saisie X avant l'ouverture (W) |
+
+

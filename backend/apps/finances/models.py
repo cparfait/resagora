@@ -325,6 +325,7 @@ class ImportEncaissements(models.Model):
     fichier = models.ForeignKey("noyau.Fichier", on_delete=models.PROTECT, related_name="+")
     lignes_lues = models.PositiveIntegerField(default=0)
     rapprochees = models.PositiveIntegerField(default=0)
+    confirmees = models.PositiveIntegerField(default=0, help_text="Paiements en ligne déjà enregistrés, confirmés par l'état.")
     rejets = models.JSONField(default=list)
     cree_par = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, on_delete=models.SET_NULL, related_name="+")
     cree_le = models.DateTimeField(auto_now_add=True)

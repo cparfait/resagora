@@ -568,7 +568,7 @@ class VueLotsTitres(VuePerimetre):
 class ImportSerializer(serializers.ModelSerializer):
     class Meta:
         model = ImportEncaissements
-        fields = ["id", "lignes_lues", "rapprochees", "rejets", "cree_le"]
+        fields = ["id", "lignes_lues", "rapprochees", "confirmees", "rejets", "cree_le"]
 
 
 class DepotImportSerializer(serializers.Serializer):

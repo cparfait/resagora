@@ -1,6 +1,7 @@
 /** Mes devis, factures et cautions (TAR-04, TAR-12, CAU-02) et simulateur de tarif public (TAR-11). */
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
+import { useNavigate } from "react-router";
 import { messageErreur, requete, telecharger } from "../api/http";
 import { Bouton } from "../ui/Bouton";
 import { Case, Champ, Liste } from "../ui/Champs";
@@ -26,6 +27,7 @@ export interface PiecePortail {
   lignes: { libelle: string; montant_reference: number; reduction: number; montant_du: number }[];
   a_accepter: boolean;
   pdf: boolean;
+  paiement_en_ligne: boolean;
   reglement: { titulaire: string; iban: string; bic: string; reference: string } | null;
 }
 
@@ -52,6 +54,13 @@ export function ListePieces({ pieces, dossier }: { pieces: PiecePortail[]; dossi
       setAnnonce({ ton: "succes", texte: `Devis ${p.numero} accepté. Le service vous adresse la suite (acompte, convention).` });
       await client.invalidateQueries({ queryKey: ["factures"] });
     },
+    onError: (e) => setAnnonce({ ton: "erreur", texte: messageErreur(e) }),
+  });
+  // POR-07 : la tentative est enregistrée par la Ville, puis l'usager part sur PayFiP (site de la DGFiP).
+  const naviguer = useNavigate();
+  const payer = useMutation({
+    mutationFn: (p: PiecePortail) => requete<{ uuid: string }>("POST", `/api/portail/factures/${p.id}/paiement-en-ligne`),
+    onSuccess: (r) => void naviguer(`/espace/paiement/${encodeURIComponent(r.uuid)}?depart=1`),
     onError: (e) => setAnnonce({ ton: "erreur", texte: messageErreur(e) }),
   });
   if (!pieces.length) return <p>{dossier ? "Aucun devis ni facture pour ce dossier." : "Aucun devis ni facture pour le moment."}</p>;
@@ -120,6 +129,11 @@ export function ListePieces({ pieces, dossier }: { pieces: PiecePortail[]; dossi
               {p.a_accepter ? (
                 <Bouton onClick={() => accepter.mutate(p)} enCours={accepter.isPending}>
                   Accepter le devis<span className="visuellement-masque"> {p.numero}</span>
+                </Bouton>
+              ) : null}
+              {p.paiement_en_ligne ? (
+                <Bouton onClick={() => payer.mutate(p)} enCours={payer.isPending}>
+                  Payer en ligne {p.reste_texte}<span className="visuellement-masque"> la facture {p.numero}</span> (PayFiP, site de la DGFiP)
                 </Bouton>
               ) : null}
             </p>

@@ -30,7 +30,7 @@ if TYPE_CHECKING:
 
 
 # Champs numériques : jamais préfixés (un avoir de -12,00 reste un montant) ; tous les autres sont neutralisés.
-CHAMPS_NUMERIQUES = {"montant", "montant_centimes", "exercice"}
+CHAMPS_NUMERIQUES = {"montant", "montant_centimes", "exercice", "montant_encaisse_regie_centimes"}
 
 
 def _montant(centimes: int) -> str:
@@ -43,6 +43,12 @@ def _montant(centimes: int) -> str:
 def _champ_usager(piece: PieceComptable, champ: str) -> str:
     usager: Usager = piece.usager
     return str(getattr(usager, champ) or "")
+
+
+def _encaisse_regie(piece: PieceComptable) -> int:
+    """Lot 7 (ADR 0008) : sommes déjà encaissées par la régie (PayFiP Régie) — le comptable émet un titre de
+    régularisation au lieu de recouvrer une seconde fois."""
+    return sum(e.montant for e in piece.encaissements.all() if e.origine == "payfip")
 
 
 def _numero_dossier(piece: PieceComptable) -> str:
@@ -70,6 +76,9 @@ CHAMPS: dict[str, Callable[[PieceComptable], Any]] = {
     "facture_origine": lambda p: p.origine.numero if p.nature == "avoir" and p.origine else "",
     "imputation": lambda p: parametre("ciril.imputation"),
     "code_produit": lambda p: parametre("ciril.code_produit"),
+    "mode_encaissement": lambda p: "REGIE" if _encaisse_regie(p) else "",
+    "montant_encaisse_regie": lambda p: _montant(_encaisse_regie(p)),
+    "montant_encaisse_regie_centimes": _encaisse_regie,
 }
 
 

@@ -472,3 +472,36 @@ MODELES_LOT6: dict[str, tuple[str, str, str, str]] = {
         "",
     ),
 }
+
+
+MODELES_LOT7: dict[str, tuple[str, str, str, str]] = {
+    "paiement_en_ligne_recu": (
+        "Paiement en ligne accepté (PayFiP)",
+        "Paiement accepté : facture {{ piece.numero }}",
+        "Bonjour {{ contact.prenom }},\n\nVotre paiement en ligne de {{ montant }} pour la facture {{ piece.numero }} a été "
+        "accepté (autorisation {{ numauto }}). Ce message vaut accusé de réception." + SIGNATURE,
+        "Ville de Châtillon : paiement de {{ montant }} accepté pour la facture {{ piece.numero }}.",
+    ),
+    "paiement_en_ligne_trop_percu": (
+        "Paiement en ligne : trop-perçu (service financier)",
+        "Trop-perçu PayFiP sur la facture {{ piece.numero }}",
+        "Un paiement en ligne de {{ montant }} (autorisation {{ numauto }}) est arrivé sur la facture {{ piece.numero }}, déjà "
+        "réglée en tout ou partie. Excédent : {{ trop_percu }}. {{ verification }}\nVoir Finances → Paiements en ligne.",
+        "",
+    ),
+    "paiement_en_ligne_a_controler": (
+        "Paiement en ligne à contrôler (service financier)",
+        "Paiement PayFiP à contrôler : facture {{ piece.numero }}",
+        "Le résultat d'un paiement en ligne de {{ montant }} sur la facture {{ piece.numero }} demande une vérification "
+        "auprès de la DGFiP : {{ motif }}.\nLe paiement en ligne de cette facture est suspendu jusqu'à la clôture du "
+        "contrôle (Finances → Paiements en ligne).",
+        "",
+    ),
+    "paiements_en_ligne_rapprochement": (
+        "Rapprochement des paiements en ligne (service financier)",
+        "Paiements en ligne : actions à mener",
+        "Rapprochement des paiements PayFiP.\nTentatives à contrôler : {{ a_controler }}.\nTrop-perçus non remboursés : "
+        "{{ trop_percus }}.\nPaiements dont l'encaissement ne correspond pas : {{ ecarts }}.\nVoir Finances → Paiements en ligne.",
+        "",
+    ),
+}

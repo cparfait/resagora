@@ -11,6 +11,14 @@ x-simulateurs: &simulateurs
   SMS_ADAPTATEUR: http
   SMS_URL: http://simulateurs:8090/sms/messages
   PORTAIL_URL: https://equipements.chatillon.test:9443
+  # PayFiP (lot 7) : simulateur en mode Régie, saisie « T » (test) ; la notification repasse par la façade.
+  PAYFIP_ACTIF: "1"
+  PAYFIP_MODE: regie
+  PAYFIP_SAISIE: T
+  PAYFIP_NUMCLI: "000000"
+  PAYFIP_URL_SERVICE: http://simulateurs:8090/payfip/services/securite
+  PAYFIP_URL_PAIEMENT: http://localhost:53010/payfip/paiementws.web
+  PAYFIP_URL_NOTIFICATION: https://equipements.chatillon.test:9443/api/portail/payfip/notification
   # Parcours automatisés répétés depuis une seule adresse : seuils élargis (valeurs par défaut en production).
   DEBIT_CONNEXION: 500/min
   DEBIT_INSCRIPTION: 250/hour

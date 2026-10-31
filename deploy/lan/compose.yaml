@@ -84,7 +84,7 @@ services:
     build: { context: ../.., dockerfile: deploy/images/api.Dockerfile }
     env_file: [parametres.env]
     environment: { POSTGRES_USER: equipements }
-    secrets: [django_secret_key, cle_chiffrement, audit_cle_hmac, postgres_password, valkey_url]
+    secrets: [django_secret_key, cle_chiffrement, audit_cle_hmac, postgres_password, valkey_url, payfip_secret]
     command: ["sh", "-c", "python manage.py migrate --noinput && python manage.py accorder_droits equipements_app && python manage.py verifier_deploiement"]
     restart: "no"
     # Les migrations de données écrivent les modèles de documents livrés (DOC-02) dans le stockage.
@@ -111,7 +111,9 @@ services:
       - api_portail.crt
       - api_portail.key
       - ac_facade.crt
-    # Moindre privilège : api-portail ne joint ni DocuSeal, ni le serveur de messagerie (D-030).
+      # Vérification de la signature des notifications PayFiP (TAR-07) ; api-portail ne joint pas PayFiP (ADR 0008).
+      - payfip_secret
+    # Moindre privilège : api-portail ne joint ni DocuSeal, ni le serveur de messagerie, ni PayFiP (D-030, ADR 0008).
     command: ["gunicorn", "config.wsgi", "--bind", "0.0.0.0:8443", "--control-socket", "/tmp/gunicorn.ctl", "--workers", "3",
               "--timeout", "60", "--certfile", "/run/secrets/api_portail.crt", "--keyfile", "/run/secrets/api_portail.key",
               "--ca-certs", "/run/secrets/ac_facade.crt", "--cert-reqs", "2"]

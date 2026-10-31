@@ -11,7 +11,7 @@ from django.urls import URLPattern, URLResolver, get_resolver
 RACINE = Path(__file__).resolve().parents[4]
 sys.path.insert(0, str(RACINE / "facade"))
 
-from facade.routes import ROUTES, ROUTES_MOBILE  # noqa: E402
+from facade.routes import ROUTES, ROUTES_MOBILE, UUID  # noqa: E402
 
 
 def _motifs_django() -> set[str]:
@@ -22,7 +22,8 @@ def _motifs_django() -> set[str]:
             if isinstance(motif, URLResolver):
                 resultat += parcourir(motif.url_patterns, texte)
             else:
-                resultat.append("/" + re.sub(r"<int:\w+>", "{id}", texte).removeprefix("^").removesuffix("$"))
+                texte = re.sub(r"<uuid:\w+>", "{uuid}", re.sub(r"<int:\w+>", "{id}", texte))
+                resultat.append("/" + texte.removeprefix("^").removesuffix("$"))
         return resultat
 
     return {
@@ -33,22 +34,11 @@ def _motifs_django() -> set[str]:
 
 
 def _motifs_facade() -> set[str]:
-    return {
-        r.motif.pattern.replace("[0-9]{1,12}", "{id}")
-        for r in [*ROUTES, *ROUTES_MOBILE]
-        if not r.motif.pattern.startswith("/api/portail/payfip")
-    }
+    return {r.motif.pattern.replace("[0-9]{1,12}", "{id}").replace(UUID, "{uuid}") for r in [*ROUTES, *ROUTES_MOBILE]}
 
 
 def test_sec01_toute_route_de_la_facade_existe_dans_l_api():
-    absentes = {m for m in _motifs_facade() if "{uuid}" not in m} - _motifs_django()
-    # Routes des lots suivants : attestations de valorisation (lot 6), paiement en ligne PayFiP (lot 7).
-    lots_suivants = {
-        m
-        for m in absentes
-        if m.startswith(("/api/portail/attestations", "/api/portail/paiements")) or m.endswith("/paiement-en-ligne")
-    }
-    assert absentes - lots_suivants == set()
+    assert _motifs_facade() - _motifs_django() == set()
 
 
 def test_sec01_toute_route_de_l_api_portail_est_dans_la_liste_blanche():

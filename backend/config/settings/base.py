@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     "apps.materiel",
     "apps.valorisation",
     "apps.pilotage",
+    "apps.paiements",
     "apps.portail",
 ]
 
@@ -249,6 +250,26 @@ DOCUSEAL_URL_PUBLIQUE = os.environ.get("DOCUSEAL_URL_PUBLIQUE", "https://signatu
 DOCUSEAL_JETON = secret("docuseal_api_jeton", defaut="")
 DOCUSEAL_VERIFIER_TLS = booleen("DOCUSEAL_VERIFIER_TLS", True)
 
+# Paiement en ligne PayFiP (lot 7, TAR-07, POR-07) : ouvert seulement après la convention avec la DGFiP.
+PAYFIP_ACTIF = booleen("PAYFIP_ACTIF", False)
+# titres (Titres et Rôles : circuit titre puis comptable, défaut) | regie (factures payées à la régie avant le titre)
+PAYFIP_MODE = os.environ.get("PAYFIP_MODE", "titres")
+if PAYFIP_MODE not in {"regie", "titres"}:
+    raise ValueError("PAYFIP_MODE : « regie » ou « titres ».")
+PAYFIP_SAISIE = os.environ.get("PAYFIP_SAISIE", "T")  # T test, X activation, W production
+if PAYFIP_SAISIE not in {"T", "X", "W"}:
+    raise ValueError("PAYFIP_SAISIE : T (test), X (activation) ou W (production).")
+PAYFIP_NUMCLI = os.environ.get("PAYFIP_NUMCLI", "")
+PAYFIP_URL_SERVICE = os.environ.get("PAYFIP_URL_SERVICE", "https://www.payfip.gouv.fr/tpa/services/securite")
+PAYFIP_URL_PAIEMENT = os.environ.get("PAYFIP_URL_PAIEMENT", "https://www.payfip.gouv.fr/tpa/paiementws.web")
+PAYFIP_URL_NOTIFICATION = os.environ.get("PAYFIP_URL_NOTIFICATION", f"{PORTAIL_URL.rstrip('/')}/api/portail/payfip/notification")
+PAYFIP_VERIFIER_TLS = booleen("PAYFIP_VERIFIER_TLS", True)
+# Sortie vers la DGFiP par le proxy de la Ville (worker seulement, ADR 0008) ; montant minimal accepté par PayFiP.
+PAYFIP_PROXY = os.environ.get("PAYFIP_PROXY", "")
+PAYFIP_MONTANT_MINIMUM = entier("PAYFIP_MONTANT_MINIMUM_CENTIMES", 100)
+# Clé de signature des adresses de notification (secret « payfip_secret ») : une notification forgée est écartée.
+PAYFIP_SECRET = secret("payfip_secret", defaut="")
+
 # Calendrier national (ADM-01)
 URL_CALENDRIER_SCOLAIRE = os.environ.get(
     "URL_CALENDRIER_SCOLAIRE",
@@ -278,6 +299,7 @@ CELERY_BEAT_SCHEDULE: dict[str, dict[str, object]] = {
     "relancer-signatures": {"task": "apps.documents.tasks.relancer_signatures", "schedule": timedelta(hours=6)},
     "expirer-devis": {"task": "apps.finances.tasks.expirer_devis", "schedule": crontab(hour=1, minute=15)},
     "envoyer-plannings": {"task": "apps.pilotage.tasks.envoyer_plannings", "schedule": crontab(minute=5)},
+    "rapprocher-paiements-en-ligne": {"task": "apps.paiements.tasks.rapprocher", "schedule": crontab(minute=15)},
     "alerter-controles-materiel": {
         "task": "apps.materiel.tasks.alerter_controles",
         "schedule": crontab(hour=7, minute=30, day_of_week=1),

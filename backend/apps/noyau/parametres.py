@@ -238,6 +238,8 @@ DEFINITIONS: list[DefinitionParametre] = [
             {"entete": "Montant", "champ": "montant"},
             {"entete": "Échéance", "champ": "echeance"},
             {"entete": "Facture d'origine", "champ": "facture_origine"},
+            {"entete": "Encaissement", "champ": "mode_encaissement"},
+            {"entete": "Encaissé en régie", "champ": "montant_encaisse_regie"},
         ],
         "Finances",
         "TAR-06 : à aligner sur le format d'import défini avec Ciril GROUP.",

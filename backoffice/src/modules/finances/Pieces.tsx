@@ -377,6 +377,7 @@ interface Import {
   id: number;
   lignes_lues: number;
   rapprochees: number;
+  confirmees: number;
   rejets: { ligne: number; titre: string; facture: string; motif: string }[];
   cree_le: string;
 }
@@ -394,7 +395,10 @@ export function Encaissements() {
       return requete<Import>("POST", "/api/gestion/finances/imports-encaissements", formulaire);
     },
     onSuccess: async (r) => {
-      annoncer(`${r.rapprochees} encaissement(s) rapproché(s) sur ${r.lignes_lues} ligne(s) ; ${r.rejets.length} rejet(s).`, r.rejets.length ? "erreur" : "succes");
+      annoncer(
+        `${r.rapprochees} encaissement(s) rapproché(s) sur ${r.lignes_lues} ligne(s)${r.confirmees ? ` ; ${r.confirmees} paiement(s) en ligne confirmé(s) par le comptable` : ""} ; ${r.rejets.length} rejet(s).`,
+        r.rejets.length ? "erreur" : "succes",
+      );
       setFichier(null);
       await client.invalidateQueries({ queryKey: ["imports-encaissements"] });
       await client.invalidateQueries({ queryKey: ["pieces"] });
@@ -426,6 +430,7 @@ export function Encaissements() {
             { cle: "date", titre: "Importé le", rendu: (i) => dateHeure(i.cree_le), valeurTri: (i) => i.cree_le },
             { cle: "lues", titre: "Lignes lues", rendu: (i) => i.lignes_lues },
             { cle: "rapprochees", titre: "Rapprochées", rendu: (i) => i.rapprochees },
+            { cle: "confirmees", titre: "Paiements en ligne confirmés", rendu: (i) => i.confirmees },
             {
               cle: "rejets",
               titre: "Rejets",

@@ -50,3 +50,30 @@ def test_com05_jeton_sms_jamais_en_clair_hors_recette(settings, monkeypatch):
     monkeypatch.setenv("SMS_URL", "http://operateur.exemple.test/messages")
     with pytest.raises(sms.SmsIndisponible, match="HTTPS"):
         sms.envoyer_sms("0612345678", "Test", "N1")
+
+
+def test_tar07_payfip_de_recette_refuse_en_production(production):
+    production.PAYFIP_ACTIF = True
+    production.PAYFIP_URL_SERVICE = "http://simulateurs:8090/payfip/services/securite"
+    production.PAYFIP_URL_PAIEMENT = "http://localhost:53010/payfip/paiementws.web"
+    production.PAYFIP_URL_NOTIFICATION = "https://equipements.chatillon.fr/api/portail/payfip/notification"
+    production.PAYFIP_SAISIE = "T"
+    production.PAYFIP_NUMCLI = ""
+    production.PAYFIP_SECRET = ""
+    erreurs = " ".join(controles_production())
+    for attendu in ("PAYFIP_URL_SERVICE", "PAYFIP_URL_PAIEMENT", "PAYFIP_SAISIE", "PAYFIP_NUMCLI", "payfip_secret"):
+        assert attendu in erreurs, attendu
+    assert "PAYFIP_URL_NOTIFICATION" not in erreurs
+
+
+def test_tar07_payfip_de_production_conforme(production, monkeypatch):
+    monkeypatch.setenv("SMS_ADAPTATEUR", "desactive")
+    production.PAYFIP_ACTIF = True
+    production.PAYFIP_URL_SERVICE = "https://www.payfip.gouv.fr/tpa/services/securite"
+    production.PAYFIP_URL_PAIEMENT = "https://www.payfip.gouv.fr/tpa/paiementws.web"
+    production.PAYFIP_URL_NOTIFICATION = "https://equipements.chatillon.fr/api/portail/payfip/notification"
+    production.PAYFIP_SAISIE = "W"
+    production.PAYFIP_NUMCLI = "012345"
+    production.PAYFIP_SECRET = "s" * 32
+    production.PAYFIP_VERIFIER_TLS = True
+    assert controles_production() == []

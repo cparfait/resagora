@@ -26,6 +26,7 @@ MIGRATIONS_DE_REFERENCE = [
     ("apps.communication.migrations.0010_modeles_corrections_lot4", "creer"),
     ("apps.communication.migrations.0011_modeles_lot5", "creer"),
     ("apps.communication.migrations.0013_modeles_lot6", "creer"),
+    ("apps.communication.migrations.0014_modeles_lot7", "creer"),
     ("apps.documents.migrations.0002_modeles_initiaux", "creer"),
     ("apps.personnel.migrations.0002_types_habilitation", "creer"),
 ]

@@ -70,4 +70,17 @@ def controles_production() -> list[str]:
     if os.environ.get("SMS_ADAPTATEUR", "desactive") == "http":
         erreurs.append(_https_hors_simulateur("SMS_URL", os.environ.get("SMS_URL", "")) or "")
     erreurs.append(_https_hors_simulateur("PORTAIL_URL", settings.PORTAIL_URL) or "")
+    if settings.PAYFIP_ACTIF:
+        # Lot 7 : PayFiP n'ouvre en production qu'avec la DGFiP réelle, une saisie d'activation ou de production,
+        # un numéro de client et une clé de signature des notifications.
+        for nom in ("PAYFIP_URL_SERVICE", "PAYFIP_URL_PAIEMENT", "PAYFIP_URL_NOTIFICATION"):
+            erreurs.append(_https_hors_simulateur(nom, getattr(settings, nom)) or "")
+        if settings.PAYFIP_SAISIE == "T":
+            erreurs.append("PAYFIP_SAISIE vaut T (test) : X (activation) ou W (production) attendu.")
+        if not settings.PAYFIP_NUMCLI:
+            erreurs.append("PAYFIP_NUMCLI (numéro de client PayFiP fourni par la DGFiP) est vide.")
+        if len(settings.PAYFIP_SECRET) < 24:
+            erreurs.append("Secret payfip_secret absent ou trop court (signature des notifications).")
+        if not settings.PAYFIP_VERIFIER_TLS:
+            erreurs.append("PAYFIP_VERIFIER_TLS est désactivé.")
     return [e for e in erreurs if e]

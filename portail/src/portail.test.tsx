@@ -6,6 +6,7 @@ import { MemoryRouter } from "react-router";
 import { describe, expect, it, vi } from "vitest";
 import { Routage } from "./App";
 import { Indicateur } from "./espace/Demande";
+import { adresseDePaiementSure } from "./espace/Paiement";
 import { SessionProvider } from "./session";
 
 function reponses(table: Record<string, unknown>) {
@@ -91,5 +92,50 @@ describe("Portail", () => {
     expect(within(tableau).getByRole("rowheader", { name: "2025" })).toBeInTheDocument();
     expect(within(tableau).getByText("12 345,00 €")).toBeInTheDocument();
     expect(within(tableau).getByRole("button", { name: /attestation 2025.*Basket club.*PDF/ })).toBeInTheDocument();
+  });
+
+  it("POR-07 le retour de PayFiP affiche l'état relu par la Ville, pas celui de l'adresse", async () => {
+    const etat = { uuid: "2b4c7f0e-0000-4000-8000-000000000001", facture: "F2026-00012", facture_id: 12, montant: 16000, montant_texte: "160,00 €", statut: "redirigee", message: "Paiement en cours de vérification auprès de la DGFiP.", termine: false, numero_autorisation: "", url: "https://www.payfip.gouv.fr/tpa/paiementws.web?idop=abc" };
+    const table: Record<string, unknown> = {
+      "/api/portail/session": { connecte: true, csrf: "jeton", expire_dans: 1800, contact: { id: 1, prenom: "Camille", nom: "Martin", totp: false } },
+      "/api/portail/accessibilite": DECLARATION,
+      "/api/portail/paiements/": etat,
+    };
+    vi.spyOn(globalThis, "fetch").mockImplementation(async (entree) => {
+      const url = typeof entree === "string" ? entree : entree instanceof URL ? entree.href : entree.url;
+      const cle = Object.keys(table).find((c) => url.startsWith(c));
+      return new Response(JSON.stringify(cle ? table[cle] : {}), { status: cle ? 200 : 404, headers: { "Content-Type": "application/json" } });
+    });
+    afficher("/espace/paiement/2b4c7f0e-0000-4000-8000-000000000001?resultat=P");
+    expect(await screen.findByRole("heading", { level: 1, name: "Paiement en ligne" })).toBeInTheDocument();
+    expect(await screen.findByText("Paiement en cours de vérification auprès de la DGFiP.")).toBeInTheDocument();
+    expect(screen.queryByText(/merci/)).not.toBeInTheDocument();
+  });
+
+  it("POR-07 seule une adresse de paiement HTTPS est suivie", () => {
+    expect(adresseDePaiementSure("https://www.payfip.gouv.fr/tpa/paiementws.web?idop=abc")).toBe(true);
+    expect(adresseDePaiementSure("http://localhost:53010/payfip/paiementws.web?idop=abc")).toBe(true);
+    expect(adresseDePaiementSure("http://evil.example/payfip")).toBe(false);
+    expect(adresseDePaiementSure("javascript:alert(1)")).toBe(false);
+  });
+
+  it("POR-07 au départ, la page redirige vers PayFiP une fois l'opération préparée ; au retour, jamais", async () => {
+    const etat = { uuid: "2b4c7f0e-0000-4000-8000-000000000002", facture: "F2026-00013", facture_id: 13, montant: 16000, montant_texte: "160,00 €", statut: "redirigee", message: "Paiement en cours de vérification auprès de la DGFiP.", termine: false, numero_autorisation: "", url: "https://www.payfip.gouv.fr/tpa/paiementws.web?idop=abc" };
+    const table: Record<string, unknown> = {
+      "/api/portail/session": { connecte: true, csrf: "jeton", expire_dans: 1800, contact: { id: 1, prenom: "Camille", nom: "Martin", totp: false } },
+      "/api/portail/accessibilite": DECLARATION,
+      "/api/portail/paiements/": etat,
+    };
+    vi.spyOn(globalThis, "fetch").mockImplementation(async (entree) => {
+      const url = typeof entree === "string" ? entree : entree instanceof URL ? entree.href : entree.url;
+      const cle = Object.keys(table).find((c) => url.startsWith(c));
+      return new Response(JSON.stringify(cle ? table[cle] : {}), { status: cle ? 200 : 404, headers: { "Content-Type": "application/json" } });
+    });
+    const assign = vi.fn();
+    vi.stubGlobal("location", { ...window.location, assign });
+    afficher("/espace/paiement/2b4c7f0e-0000-4000-8000-000000000002?depart=1");
+    expect(await screen.findByText(/Vous allez être redirigé vers PayFiP/)).toBeInTheDocument();
+    expect(assign).toHaveBeenCalledWith("https://www.payfip.gouv.fr/tpa/paiementws.web?idop=abc");
+    vi.unstubAllGlobals();
   });
 });

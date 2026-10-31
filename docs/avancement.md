@@ -195,6 +195,29 @@ Critère de sortie (reconstitué) :
 
 **Lot 6 terminé le 2026-10-31.**
 
+## Lot 7 — PayFiP
+
+Exigences : TAR-07, POR-07 (et TAR-06, TAR-13 pour le circuit comptable).
+
+| Étape | Contenu | Exigences | État |
+| --- | --- | --- | --- |
+| 7.1 | Client SOAP PayFiP (création d'opération, lecture du résultat), lecture XML sûre, sortie par le proxy de la Ville, simulateur de recette | TAR-07 | fait |
+| 7.2 | Tentative créée avant la redirection, opération créée par le worker, portail qui suit l'état et redirige, retour sans valeur de preuve | POR-07, TAR-07 | fait |
+| 7.3 | Notification filtrée par la façade, adresse signée (HMAC), relecture par le worker, idempotence (un seul encaissement), tentative remplacée ou sans résultat encore relue | TAR-07 | fait |
+| 7.4 | Modes Titres et Rôles (défaut) et Régie ; export des titres avec l'encaissement en régie ; import Ciril qui confirme les paiements en ligne | TAR-07, TAR-06, TAR-13 | fait |
+| 7.5 | Contrôles : résultat incohérent ou inconnu, paiement de test hors recette, trop-perçu et paiement déjà encaissé, remboursement tracé ; rapprochement horaire et alertes au service financier | TAR-07 | fait |
+| 7.6 | Portail (paiement, page de retour), back-office (suivi, contrôle, remboursement, rapprochement), garde-fous de mise en service, e2e et axe, revues (4 bloquants et 10 majeurs corrigés, D-069 à D-073, ADR 0008) | — | fait |
+
+Critère de sortie (reconstitué) :
+- [x] payer une facture en ligne sur le simulateur PayFiP : facture réglée par la seule notification, état relu au retour (R7-01) ;
+- [x] deux notifications de PayFiP : un seul encaissement (R7-02) ;
+- [x] un paiement sur une tentative remplacée ou arrivé tard est encaissé ou signalé, jamais perdu ;
+- [x] en Régie, une facture payée en ligne n'est pas recouvrée une seconde fois ;
+- [x] notification forgée, croisée ou mal formée écartée sans appel à PayFiP ; droits rôle × périmètre testés ;
+- [x] e2e et axe sans violation ; revues sécurité et métier traitées.
+
+**Lot 7 terminé le 2026-11-01.**
+
 ## Journal
 
 - 2026-10-31 — Démarrage. Cahier des charges absent (D-001), référentiel reconstitué.
@@ -208,3 +231,4 @@ Critère de sortie (reconstitué) :
 - 2026-10-31 — Revues lot 4 : moteur de besoins (jour de rattachement, séances réalisées, vacations existantes), contrôles des trames et des horaires, compteurs au prorata et astreintes à part, saisies terrain bornées, cautions bloquées par des dégâts intermédiaires, appareils à autoriser, connexion sans oracle, code de déverrouillage local (PBKDF2 600 000), photos mobiles en quarantaine DMZ (option B). Types Node épinglés pour le typage des parcours e2e.
 - 2026-10-31 — Lot 5 et revues : prêts séance par séance qui suivent les séances (déplacement, annulation, refus), facturation et avoirs par séance, caution bloquée par les manquants, consommables cumulés, équipement fixe limité à son espace, prix fixés par l'ordonnateur, pannes réservées aux rôles habilités. Amorçage des données de référence complété (cause des pertes de données sur base de test réutilisée).
 - 2026-10-31 — Lot 6 : valorisation, statistiques, tableaux de bord et éditions ; revues sécurité (1 bloquant, 6 majeurs) et métier (3 bloquants, 13 majeurs) corrigées : montant payé avec frais et avoirs, prix du devis, clôture qui recalcule, exercice clos protégé en base, attestation signée par l'élu, envois programmés limités aux domaines de la Ville, taux d'occupation par saisons et sous-espaces, recettes après avoirs, compteurs alignés sur leurs listes.
+- 2026-11-01 — Lot 7 : PayFiP (Titres et Rôles, Régie) sur le simulateur ; revues sécurité (2 bloquants, 4 majeurs) et métier (2 bloquants, 6 majeurs) corrigées : notification signée transmise par la façade, appels PayFiP par le worker seulement, tentative jamais close sans résultat, double recouvrement en Régie évité, contrôles et rapprochement horaire ; scénarios transverses §9.3 automatisés (5/5).
