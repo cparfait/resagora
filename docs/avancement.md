@@ -61,6 +61,22 @@ Critère de sortie (reconstitué) :
 
 **Lot 1 terminé le 2026-10-31.**
 
+## Lot 2 — Portail et échanges
+
+Exigences : POR-01 à POR-06, POR-08 à POR-10, SEC-04, SEC-07, COM-01 à COM-05, DOC-01 à DOC-07, SIG-01 à SIG-05, USR-06, ADM-04, RG-13.
+
+| Étape | Contenu | Exigences | État |
+| --- | --- | --- | --- |
+| 2.1 | Comptes usagers : inscription, confirmation, validation par la Ville, connexion sans énumération, verrouillage progressif, TOTP, réinitialisation, invitation de contacts | POR-01, SEC-04 | en cours |
+| 2.2 | API portail : compte, structures, contacts, pièces (quarantaine DMZ + ClamAV), disponibilités anonymisées, catalogue, demandes en quatre étapes avec brouillon, suivi, annulation, campagnes, notifications | POR-02 à POR-06, SEC-07 | à faire |
+| 2.3 | Messagerie par dossier, notifications groupées, journal des envois, préférences, SMS par adaptateur + simulateur, modèles de messages éditables | COM-01 à COM-05, POR-08, ADM-04 | à faire |
+| 2.4 | Documents : modèles .docx versionnés, catalogue DOC-02, contexte typé, PDF/A-2b par Gotenberg, SHA-256, génération en lot, avenants, téléchargement contrôlé, immuabilité | DOC-01 à DOC-07, RG-13 | à faire |
+| 2.5 | Signature : client DocuSeal (signataires ordonnés, expiration, relances, annulation, PDF signé + preuve, purge), webhooks via la façade revérifiés, circuit manuel, condition RG-06 « convention » | SIG-01 à SIG-05, POR-10 | à faire |
+| 2.6 | RGPD : durées de conservation, anonymisation, export des données | USR-06 | à faire |
+| 2.7 | Back-office : comptes à valider, messagerie, documents et signature, génération en lot, modèles, journal des envois, RGPD | ADM-04, COM-02, DOC-06 | à faire |
+| 2.8 | Portail public React RGAA 4.1.2 : catalogue, disponibilités, compte, demandes, dossiers, documents, signature, messagerie, déclaration d'accessibilité | POR-01 à POR-10 | à faire |
+| 2.9 | Déploiement (portail DMZ, Gotenberg, DocuSeal, simulateurs), e2e + axe sur toutes les pages, revues, critère de sortie | POR-09 | à faire |
+
 ## Journal
 
 - 2026-10-31 — Démarrage. Cahier des charges absent (D-001), référentiel reconstitué.

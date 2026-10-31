@@ -2,20 +2,33 @@
 # Mailpit, simulateurs PayFiP/SMS/Ciril) joints par le réseau d'outillage. Jamais en production.
 # L'API de gestion n'est jamais sur le réseau de liaison avec la DMZ : seule api-portail l'est.
 # DocuSeal (DMZ) est joint par le réseau « liaison_signature », sans la façade.
+x-simulateurs: &simulateurs
+  # Recette sur un seul hôte : DocuSeal et l'opérateur SMS sont remplacés par les simulateurs (deploy/dev).
+  DOCUSEAL_URL: http://simulateurs:8090
+  DOCUSEAL_URL_PUBLIQUE: http://localhost:53010
+  SMS_ADAPTATEUR: http
+  SMS_URL: http://simulateurs:8090/sms/messages
+  PORTAIL_URL: https://equipements.chatillon.test:9443
+  BACKOFFICE_URL: https://localhost
+
 services:
   api:
+    environment: { <<: *simulateurs, CANAL: gestion, POSTGRES_USER: equipements_app, FORWARDED_ALLOW_IPS: 10.231.20.250 }
     networks:
       lan_app: {}
       lan_data: {}
       outillage: {}
       liaison_signature: {}
   api-portail:
+    environment: { <<: *simulateurs, CANAL: portail, POSTGRES_USER: equipements_app, FORWARDED_ALLOW_IPS: 10.231.20.250 }
     # Sur un hôte unique, la façade joint api-portail par le réseau de liaison : pas de port publié.
     ports: !reset []
     networks: [lan_data, liaison_dmz, outillage]
   worker:
+    environment: { <<: *simulateurs, POSTGRES_USER: equipements_app, FORWARDED_ALLOW_IPS: 10.231.20.250 }
     networks: [lan_app, lan_data, sortie_lan, outillage, liaison_signature]
   beat:
+    environment: { <<: *simulateurs, POSTGRES_USER: equipements_app, FORWARDED_ALLOW_IPS: 10.231.20.250 }
     networks: [lan_data, outillage]
 
 networks:

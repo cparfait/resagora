@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     "apps.communication",
     "apps.comptes",
     "apps.reservations",
+    "apps.documents",
     "apps.portail",
 ]
 
@@ -226,6 +227,15 @@ DEFAULT_FROM_EMAIL = os.environ.get(
 PORTAIL_URL = os.environ.get("PORTAIL_URL", "https://equipements.chatillon.test")
 BACKOFFICE_URL = os.environ.get("BACKOFFICE_URL", "https://equipements.chatillon.local")
 
+# Documents et signature (DOC-04, SIG-01) : Gotenberg (LAN) et DocuSeal (DMZ) ou simulateur de recette.
+GOTENBERG_URL = os.environ.get("GOTENBERG_URL", "http://gotenberg:3000")
+GOTENBERG_DELAI_SECONDES = entier("GOTENBERG_DELAI_SECONDES", 120)
+SIGNATURE_MODE = os.environ.get("SIGNATURE_MODE", "docuseal")  # docuseal | manuel
+DOCUSEAL_URL = os.environ.get("DOCUSEAL_URL", "http://docuseal:3000")
+DOCUSEAL_URL_PUBLIQUE = os.environ.get("DOCUSEAL_URL_PUBLIQUE", "https://signature.chatillon.test")
+DOCUSEAL_JETON = secret("docuseal_api_jeton", defaut="")
+DOCUSEAL_VERIFIER_TLS = booleen("DOCUSEAL_VERIFIER_TLS", True)
+
 # Calendrier national (ADM-01)
 URL_CALENDRIER_SCOLAIRE = os.environ.get(
     "URL_CALENDRIER_SCOLAIRE",
@@ -246,6 +256,11 @@ CELERY_BEAT_SCHEDULE: dict[str, dict[str, object]] = {
     "traiter-options": {"task": "apps.reservations.tasks.traiter_options", "schedule": timedelta(hours=1)},
     "marquer-realisees": {"task": "apps.reservations.tasks.marquer_realisees", "schedule": timedelta(hours=6)},
     "relancer-notifications": {"task": "apps.communication.tasks.relancer_echecs", "schedule": timedelta(minutes=30)},
+    "relancer-pieces": {"task": "apps.usagers.tasks.relancer_pieces", "schedule": timedelta(hours=24)},
+    "anonymiser-inactifs": {"task": "apps.usagers.tasks.anonymiser_inactifs", "schedule": timedelta(days=7)},
+    "purger-pieces-expirees": {"task": "apps.usagers.tasks.purger_pieces_expirees", "schedule": timedelta(days=7)},
+    "synchroniser-signatures": {"task": "apps.documents.tasks.synchroniser_signatures", "schedule": timedelta(minutes=15)},
+    "relancer-signatures": {"task": "apps.documents.tasks.relancer_signatures", "schedule": timedelta(hours=6)},
 }
 
 # Journal d'audit (SEC-08) : clé HMAC de la chaîne et conservation minimale 6 mois.

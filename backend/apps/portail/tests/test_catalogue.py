@@ -47,3 +47,11 @@ def test_por03_sites_et_familles_publics(client_api):
 @override_settings(CANAL="gestion")
 def test_sec01_vue_portail_refusee_hors_canal_portail(client_api):
     assert client_api.get("/api/portail/catalogue/sites").status_code in {403, 404}
+
+
+@override_settings(CANAL="portail")
+def test_sec01_liens_de_pagination_sans_nom_de_serveur_interne(client_api):
+    for numero in range(3):
+        EspaceFabrique(nom=f"Salle {numero}")
+    suivant = client_api.get("/api/portail/catalogue/espaces", {"taille": 1}).json()["next"]
+    assert suivant.startswith("/api/portail/catalogue/espaces?") and "testserver" not in suivant

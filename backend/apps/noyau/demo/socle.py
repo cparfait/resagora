@@ -423,8 +423,9 @@ def _reserver(
         )
         if statut in {"validee", "confirmee"}:
             services._changer_statut(reservation, "validee", SYSTEME, valide_le=timezone.now())
+            feuilles = espace.feuilles()
             for occurrence in reservation.occurrences.filter(statut="validee"):
-                services.poser_verrous(occurrence)
+                services.poser_verrous(occurrence, feuilles)
             if statut == "confirmee":
                 services._changer_statut(reservation, "confirmee", SYSTEME, confirme_le=timezone.now())
         elif statut == "option":

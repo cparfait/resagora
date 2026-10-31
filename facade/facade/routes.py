@@ -79,11 +79,13 @@ ROUTES: list[Route] = [
     r("POST", "/api/portail/usagers/{id}/pieces", Nature.TELEVERSEMENT, session=True, debit="televersement"),
     r("GET", "/api/portail/usagers/{id}/pieces/{id}/fichier", Nature.TELECHARGEMENT, session=True),
     r("GET", "/api/portail/pieces-exigees", session=True),
+    r("GET", "/api/portail/types-demande", session=True),
     # Demandes et dossiers (POR-04, POR-05)
     r("GET", "/api/portail/dossiers", session=True),
     r("POST", "/api/portail/dossiers", session=True, debit="depot"),
     r("GET", "/api/portail/dossiers/{id}", session=True),
     r("PATCH", "/api/portail/dossiers/{id}", session=True),
+    r("DELETE", "/api/portail/dossiers/{id}", session=True),
     r("POST", "/api/portail/dossiers/{id}/envoyer", session=True, debit="depot"),
     r("POST", "/api/portail/dossiers/{id}/annuler", session=True),
     r("POST", "/api/portail/dossiers/{id}/occurrences/{id}/annuler", session=True),

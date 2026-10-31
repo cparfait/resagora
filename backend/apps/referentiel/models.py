@@ -109,30 +109,49 @@ class Espace(models.Model):
     def sites_concernes(self) -> set[int]:
         return {self.batiment.site_id}
 
-    def ancetres(self) -> list[Espace]:
-        resultat: list[Espace] = []
-        courant = self.parent
-        while courant is not None and courant not in resultat:
+    @staticmethod
+    def _liens() -> dict[int, int | None]:
+        """Hiérarchie complète en une requête (30 à 50 espaces : volume modeste, pas de requête récursive)."""
+        return dict(Espace.objects.values_list("pk", "parent_id"))
+
+    def _ids_ancetres(self, liens: dict[int, int | None]) -> list[int]:
+        resultat: list[int] = []
+        courant = liens.get(self.pk) if self.pk in liens else self.parent_id
+        while courant is not None and courant not in resultat and courant != self.pk:
             resultat.append(courant)
-            courant = courant.parent
+            courant = liens.get(courant)
         return resultat
 
-    def descendants(self) -> list[Espace]:
-        resultat: list[Espace] = []
-        a_visiter = list(self.sous_espaces.all())
+    def _ids_descendants(self, liens: dict[int, int | None]) -> list[int]:
+        enfants: dict[int, list[int]] = {}
+        for identifiant, parent in liens.items():
+            if parent is not None:
+                enfants.setdefault(parent, []).append(identifiant)
+        resultat: list[int] = []
+        a_visiter = list(enfants.get(self.pk, []))
         while a_visiter:
-            espace = a_visiter.pop()
-            if espace not in resultat:
-                resultat.append(espace)
-                a_visiter.extend(espace.sous_espaces.all())
+            courant = a_visiter.pop()
+            if courant not in resultat and courant != self.pk:
+                resultat.append(courant)
+                a_visiter.extend(enfants.get(courant, []))
         return resultat
+
+    def ancetres(self) -> list[Espace]:
+        identifiants = self._ids_ancetres(self._liens())
+        par_id = {e.pk: e for e in Espace.objects.filter(pk__in=identifiants)}
+        return [par_id[i] for i in identifiants if i in par_id]
+
+    def descendants(self) -> list[Espace]:
+        return list(Espace.objects.filter(pk__in=self._ids_descendants(self._liens())))
 
     def feuilles(self) -> list[Espace]:
         """Espaces sans sous-espace couverts par celui-ci (lui-même s'il n'en a pas) : base des verrous RG-01."""
-        descendants = self.descendants()
+        liens = self._liens()
+        descendants = set(self._ids_descendants(liens))
         if not descendants:
             return [self]
-        return [e for e in descendants if not any(d.parent_id == e.pk for d in descendants)]
+        parents = {p for p in liens.values() if p is not None}
+        return list(Espace.objects.filter(pk__in=[i for i in descendants if i not in parents]))
 
     def plage_gardiennage(self, debut: datetime, fin: datetime) -> tuple[datetime, datetime] | None:
         """REF-04 : présence de gardien exigée par une occupation, élargie des temps d'ouverture et de fermeture."""
@@ -142,7 +161,8 @@ class Espace(models.Model):
 
     def ids_lies(self) -> set[int]:
         """Espace, ancêtres et descendants : l'ensemble bloqué par une occupation (REF-05, RG-01)."""
-        return {self.pk, *(e.pk for e in self.ancetres()), *(e.pk for e in self.descendants())}
+        liens = self._liens()
+        return {self.pk, *self._ids_ancetres(liens), *self._ids_descendants(liens)}
 
 
 class PhotoEspace(models.Model):

@@ -10,6 +10,8 @@ services:
     environment:
       FORWARDED_ALLOW_IPS: 10.231.10.250
       PAYFIP_SANS_FILTRE_IP: "1"
+      # Sur le poste de recette, le portail est servi sur le port 9443 (en-tête Origin contrôlé par la façade).
+      ORIGINE_PORTAIL: https://equipements.chatillon.test:9443
   docuseal:
     networks: [dmz_signature, liaison_signature]
 

@@ -1097,6 +1097,1091 @@ paths:
               schema:
                 $ref: '#/components/schemas/EtapeConnexion'
           description: ''
+  /api/gestion/communication/envois:
+    get:
+      operationId: gestion_communication_envois_list
+      description: 'COM-04 : journal des envois ; réémission d''un envoi en échec.'
+      parameters:
+      - in: query
+        name: canal
+        schema:
+          type: string
+          enum:
+          - courriel
+          - portail
+          - sms
+        description: |-
+          * `courriel` - Courriel
+          * `sms` - SMS
+          * `portail` - Portail
+      - in: query
+        name: depuis
+        schema:
+          type: string
+          format: date-time
+      - in: query
+        name: groupe
+        schema:
+          type: string
+      - in: query
+        name: modele
+        schema:
+          type: integer
+      - in: query
+        name: objet_id
+        schema:
+          type: string
+      - in: query
+        name: objet_type
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: Un numéro de page de l'ensemble des résultats.
+        schema:
+          type: integer
+      - in: query
+        name: recherche
+        schema:
+          type: string
+      - in: query
+        name: statut
+        schema:
+          type: string
+          enum:
+          - a_envoyer
+          - echec
+          - envoyee
+          - ignoree
+        description: |-
+          * `a_envoyer` - À envoyer
+          * `envoyee` - Envoyée
+          * `echec` - Échec
+          * `ignoree` - Ignorée (préférences)
+      - name: taille
+        required: false
+        in: query
+        description: Nombre de résultats à retourner par page.
+        schema:
+          type: integer
+      - in: query
+        name: usager
+        schema:
+          type: integer
+      tags:
+      - gestion
+      security:
+      - sessionAgent: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedNotificationList'
+          description: ''
+    post:
+      operationId: gestion_communication_envois_create
+      description: 'COM-04 : journal des envois ; réémission d''un envoi en échec.'
+      tags:
+      - gestion
+      security:
+      - sessionAgent: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Notification'
+          description: ''
+  /api/gestion/communication/envois-groupes:
+    post:
+      operationId: gestion_communication_envois_groupes_create
+      description: 'COM-03 : information à un ensemble d''usagers (occupants d''un
+        espace sur une période, ou liste choisie).'
+      tags:
+      - gestion
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EnvoiGroupeRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/EnvoiGroupeRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/EnvoiGroupeRequest'
+        required: true
+      security:
+      - sessionAgent: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+  /api/gestion/communication/envois/{id}:
+    get:
+      operationId: gestion_communication_envois_retrieve
+      description: 'COM-04 : journal des envois ; réémission d''un envoi en échec.'
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un(une) valeur entière unique identifiant ce(cette) notification.
+        required: true
+      tags:
+      - gestion
+      security:
+      - sessionAgent: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Notification'
+          description: ''
+  /api/gestion/communication/envois/{id}/renvoyer:
+    post:
+      operationId: gestion_communication_envois_renvoyer_create
+      description: 'COM-04 : journal des envois ; réémission d''un envoi en échec.'
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un(une) valeur entière unique identifiant ce(cette) notification.
+        required: true
+      tags:
+      - gestion
+      security:
+      - sessionAgent: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Notification'
+          description: ''
+  /api/gestion/communication/messages:
+    get:
+      operationId: gestion_communication_messages_list
+      description: 'COM-02 : fil de messages d''un dossier, filtré par le périmètre
+        des dossiers.'
+      parameters:
+      - in: query
+        name: dossier
+        schema:
+          type: integer
+      - name: page
+        required: false
+        in: query
+        description: Un numéro de page de l'ensemble des résultats.
+        schema:
+          type: integer
+      - name: taille
+        required: false
+        in: query
+        description: Nombre de résultats à retourner par page.
+        schema:
+          type: integer
+      tags:
+      - gestion
+      security:
+      - sessionAgent: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedMessageList'
+          description: ''
+    post:
+      operationId: gestion_communication_messages_create
+      description: 'COM-02 : fil de messages d''un dossier, filtré par le périmètre
+        des dossiers.'
+      tags:
+      - gestion
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MessageRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/MessageRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/MessageRequest'
+        required: true
+      security:
+      - sessionAgent: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+          description: ''
+  /api/gestion/communication/messages/{id}:
+    get:
+      operationId: gestion_communication_messages_retrieve
+      description: 'COM-02 : fil de messages d''un dossier, filtré par le périmètre
+        des dossiers.'
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un(une) valeur entière unique identifiant ce(cette) message.
+        required: true
+      tags:
+      - gestion
+      security:
+      - sessionAgent: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+          description: ''
+  /api/gestion/communication/messages/non-lus:
+    get:
+      operationId: gestion_communication_messages_non_lus_retrieve
+      description: Dossiers ayant des messages d'usagers non lus (tableau de bord,
+        COM-02).
+      tags:
+      - gestion
+      security:
+      - sessionAgent: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+  /api/gestion/communication/modeles:
+    get:
+      operationId: gestion_communication_modeles_list
+      description: |-
+        ADM-04 : les modèles livrés se modifient (texte, activation) mais ne se créent ni ne se suppriment :
+        chaque code est appelé par une règle de gestion.
+      tags:
+      - gestion
+      security:
+      - sessionAgent: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ModeleMessage'
+          description: ''
+    post:
+      operationId: gestion_communication_modeles_create
+      description: |-
+        ADM-04 : les modèles livrés se modifient (texte, activation) mais ne se créent ni ne se suppriment :
+        chaque code est appelé par une règle de gestion.
+      tags:
+      - gestion
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ModeleMessageRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ModeleMessageRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ModeleMessageRequest'
+        required: true
+      security:
+      - sessionAgent: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ModeleMessage'
+          description: ''
+  /api/gestion/communication/modeles/{id}:
+    get:
+      operationId: gestion_communication_modeles_retrieve
+      description: |-
+        ADM-04 : les modèles livrés se modifient (texte, activation) mais ne se créent ni ne se suppriment :
+        chaque code est appelé par une règle de gestion.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un(une) valeur entière unique identifiant ce(cette) modele message.
+        required: true
+      tags:
+      - gestion
+      security:
+      - sessionAgent: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ModeleMessage'
+          description: ''
+    patch:
+      operationId: gestion_communication_modeles_partial_update
+      description: |-
+        ADM-04 : les modèles livrés se modifient (texte, activation) mais ne se créent ni ne se suppriment :
+        chaque code est appelé par une règle de gestion.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un(une) valeur entière unique identifiant ce(cette) modele message.
+        required: true
+      tags:
+      - gestion
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedModeleMessageRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedModeleMessageRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedModeleMessageRequest'
+      security:
+      - sessionAgent: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ModeleMessage'
+          description: ''
+  /api/gestion/communication/modeles/{id}/apercu:
+    post:
+      operationId: gestion_communication_modeles_apercu_create
+      description: Rendu avec des valeurs d'exemple, pour relire un modèle avant de
+        l'enregistrer.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un(une) valeur entière unique identifiant ce(cette) modele message.
+        required: true
+      tags:
+      - gestion
+      security:
+      - sessionAgent: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+  /api/gestion/documents/documents:
+    get:
+      operationId: gestion_documents_documents_list
+      description: 'DOC-02 à DOC-07, SIG-01 à SIG-05 : documents d''un dossier, génération,
+        signature, avenants.'
+      parameters:
+      - in: query
+        name: dossier
+        schema:
+          type: integer
+      - in: query
+        name: modele
+        schema:
+          type: integer
+      - in: query
+        name: nature
+        schema:
+          type: string
+          enum:
+          - attestation_valorisation
+          - attribution
+          - avenant
+          - avoir
+          - contrat_location
+          - convention
+          - devis
+          - etat_des_lieux
+          - facture
+          - fermeture
+          - refus
+        description: |-
+          * `convention` - Convention d'occupation
+          * `contrat_location` - Contrat de location
+          * `avenant` - Avenant
+          * `devis` - Devis
+          * `facture` - Facture
+          * `avoir` - Avoir
+          * `etat_des_lieux` - État des lieux
+          * `attribution` - Courrier d'attribution de créneaux
+          * `refus` - Courrier de refus motivé
+          * `attestation_valorisation` - Attestation de valorisation des avantages en nature
+          * `fermeture` - Avis de fermeture exceptionnelle
+      - name: page
+        required: false
+        in: query
+        description: Un numéro de page de l'ensemble des résultats.
+        schema:
+          type: integer
+      - in: query
+        name: statut
+        schema:
+          type: string
+          enum:
+          - annule
+          - en_signature
+          - genere
+          - signe
+          - signe_manuellement
+        description: |-
+          * `genere` - Généré
+          * `en_signature` - En signature
+          * `signe` - Signé électroniquement
+          * `signe_manuellement` - Signé manuellement
+          * `annule` - Annulé
+      - name: taille
+        required: false
+        in: query
+        description: Nombre de résultats à retourner par page.
+        schema:
+          type: integer
+      - in: query
+        name: usager
+        schema:
+          type: integer
+      tags:
+      - gestion
+      security:
+      - sessionAgent: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedDocumentList'
+          description: ''
+    post:
+      operationId: gestion_documents_documents_create
+      description: 'DOC-02 à DOC-07, SIG-01 à SIG-05 : documents d''un dossier, génération,
+        signature, avenants.'
+      tags:
+      - gestion
+      security:
+      - sessionAgent: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Document'
+          description: ''
+  /api/gestion/documents/documents/{id}:
+    get:
+      operationId: gestion_documents_documents_retrieve
+      description: 'DOC-02 à DOC-07, SIG-01 à SIG-05 : documents d''un dossier, génération,
+        signature, avenants.'
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un(une) valeur entière unique identifiant ce(cette) document.
+        required: true
+      tags:
+      - gestion
+      security:
+      - sessionAgent: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Document'
+          description: ''
+  /api/gestion/documents/documents/{id}/annuler:
+    post:
+      operationId: gestion_documents_documents_annuler_create
+      description: 'DOC-02 à DOC-07, SIG-01 à SIG-05 : documents d''un dossier, génération,
+        signature, avenants.'
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un(une) valeur entière unique identifiant ce(cette) document.
+        required: true
+      tags:
+      - gestion
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MotifRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/MotifRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/MotifRequest'
+        required: true
+      security:
+      - sessionAgent: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Document'
+          description: ''
+  /api/gestion/documents/documents/{id}/annuler-signature:
+    post:
+      operationId: gestion_documents_documents_annuler_signature_create
+      description: 'DOC-02 à DOC-07, SIG-01 à SIG-05 : documents d''un dossier, génération,
+        signature, avenants.'
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un(une) valeur entière unique identifiant ce(cette) document.
+        required: true
+      tags:
+      - gestion
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MotifRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/MotifRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/MotifRequest'
+        required: true
+      security:
+      - sessionAgent: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Document'
+          description: ''
+  /api/gestion/documents/documents/{id}/avenant:
+    post:
+      operationId: gestion_documents_documents_avenant_create
+      description: 'DOC-02 à DOC-07, SIG-01 à SIG-05 : documents d''un dossier, génération,
+        signature, avenants.'
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un(une) valeur entière unique identifiant ce(cette) document.
+        required: true
+      tags:
+      - gestion
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MotifRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/MotifRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/MotifRequest'
+        required: true
+      security:
+      - sessionAgent: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Document'
+          description: ''
+  /api/gestion/documents/documents/{id}/envoyer-signature:
+    post:
+      operationId: gestion_documents_documents_envoyer_signature_create
+      description: 'DOC-02 à DOC-07, SIG-01 à SIG-05 : documents d''un dossier, génération,
+        signature, avenants.'
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un(une) valeur entière unique identifiant ce(cette) document.
+        required: true
+      tags:
+      - gestion
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EnvoiSignatureRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/EnvoiSignatureRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/EnvoiSignatureRequest'
+      security:
+      - sessionAgent: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Document'
+          description: ''
+  /api/gestion/documents/documents/{id}/fichier:
+    get:
+      operationId: gestion_documents_documents_fichier_retrieve
+      description: 'Exemplaire de référence : le PDF signé s''il existe, sinon le
+        PDF généré.'
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un(une) valeur entière unique identifiant ce(cette) document.
+        required: true
+      tags:
+      - gestion
+      security:
+      - sessionAgent: []
+      responses:
+        '200':
+          content:
+            application/pdf:
+              schema:
+                type: string
+                format: binary
+          description: ''
+  /api/gestion/documents/documents/{id}/original:
+    get:
+      operationId: gestion_documents_documents_original_retrieve
+      description: 'DOC-02 à DOC-07, SIG-01 à SIG-05 : documents d''un dossier, génération,
+        signature, avenants.'
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un(une) valeur entière unique identifiant ce(cette) document.
+        required: true
+      tags:
+      - gestion
+      security:
+      - sessionAgent: []
+      responses:
+        '200':
+          content:
+            application/pdf:
+              schema:
+                type: string
+                format: binary
+          description: ''
+  /api/gestion/documents/documents/{id}/preuve:
+    get:
+      operationId: gestion_documents_documents_preuve_retrieve
+      description: 'DOC-02 à DOC-07, SIG-01 à SIG-05 : documents d''un dossier, génération,
+        signature, avenants.'
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un(une) valeur entière unique identifiant ce(cette) document.
+        required: true
+      tags:
+      - gestion
+      security:
+      - sessionAgent: []
+      responses:
+        '200':
+          content:
+            application/pdf:
+              schema:
+                type: string
+                format: binary
+          description: ''
+  /api/gestion/documents/documents/{id}/scan-signe:
+    post:
+      operationId: gestion_documents_documents_scan_signe_create
+      description: 'DOC-02 à DOC-07, SIG-01 à SIG-05 : documents d''un dossier, génération,
+        signature, avenants.'
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un(une) valeur entière unique identifiant ce(cette) document.
+        required: true
+      tags:
+      - gestion
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ScanRequest'
+        required: true
+      security:
+      - sessionAgent: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Document'
+          description: ''
+  /api/gestion/documents/documents/generer:
+    post:
+      operationId: gestion_documents_documents_generer_create
+      description: 'DOC-02 à DOC-07, SIG-01 à SIG-05 : documents d''un dossier, génération,
+        signature, avenants.'
+      tags:
+      - gestion
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GenerationRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/GenerationRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/GenerationRequest'
+        required: true
+      security:
+      - sessionAgent: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Document'
+          description: ''
+  /api/gestion/documents/lots:
+    get:
+      operationId: gestion_documents_lots_list
+      description: 'DOC-06 : génération en lot en tâche de fond, avec progression
+        et rapport d''erreurs.'
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: Un numéro de page de l'ensemble des résultats.
+        schema:
+          type: integer
+      - name: taille
+        required: false
+        in: query
+        description: Nombre de résultats à retourner par page.
+        schema:
+          type: integer
+      tags:
+      - gestion
+      security:
+      - sessionAgent: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedLotList'
+          description: ''
+    post:
+      operationId: gestion_documents_lots_create
+      description: 'DOC-06 : génération en lot en tâche de fond, avec progression
+        et rapport d''erreurs.'
+      tags:
+      - gestion
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LotRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/LotRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/LotRequest'
+        required: true
+      security:
+      - sessionAgent: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Lot'
+          description: ''
+  /api/gestion/documents/lots/{id}:
+    get:
+      operationId: gestion_documents_lots_retrieve
+      description: 'DOC-06 : génération en lot en tâche de fond, avec progression
+        et rapport d''erreurs.'
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un(une) valeur entière unique identifiant ce(cette) lot generation.
+        required: true
+      tags:
+      - gestion
+      security:
+      - sessionAgent: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Lot'
+          description: ''
+  /api/gestion/documents/modeles:
+    get:
+      operationId: gestion_documents_modeles_list
+      description: 'DOC-01, ADM-04 : modèles livrés, versions déposées (.docx éditables
+        dans Word).'
+      tags:
+      - gestion
+      security:
+      - sessionAgent: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ModeleDocument'
+          description: ''
+    post:
+      operationId: gestion_documents_modeles_create
+      description: 'DOC-01, ADM-04 : modèles livrés, versions déposées (.docx éditables
+        dans Word).'
+      tags:
+      - gestion
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ModeleDocumentRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ModeleDocumentRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ModeleDocumentRequest'
+        required: true
+      security:
+      - sessionAgent: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ModeleDocument'
+          description: ''
+  /api/gestion/documents/modeles/{id}:
+    get:
+      operationId: gestion_documents_modeles_retrieve
+      description: 'DOC-01, ADM-04 : modèles livrés, versions déposées (.docx éditables
+        dans Word).'
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un(une) valeur entière unique identifiant ce(cette) modele document.
+        required: true
+      tags:
+      - gestion
+      security:
+      - sessionAgent: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ModeleDocument'
+          description: ''
+    patch:
+      operationId: gestion_documents_modeles_partial_update
+      description: 'DOC-01, ADM-04 : modèles livrés, versions déposées (.docx éditables
+        dans Word).'
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un(une) valeur entière unique identifiant ce(cette) modele document.
+        required: true
+      tags:
+      - gestion
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedModeleDocumentRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedModeleDocumentRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedModeleDocumentRequest'
+      security:
+      - sessionAgent: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ModeleDocument'
+          description: ''
+  /api/gestion/documents/modeles/{id}/activer-version:
+    post:
+      operationId: gestion_documents_modeles_activer_version_create
+      description: 'DOC-01, ADM-04 : modèles livrés, versions déposées (.docx éditables
+        dans Word).'
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un(une) valeur entière unique identifiant ce(cette) modele document.
+        required: true
+      tags:
+      - gestion
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                version:
+                  type: integer
+      security:
+      - sessionAgent: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ModeleDocument'
+          description: ''
+  /api/gestion/documents/modeles/{id}/deposer-version:
+    post:
+      operationId: gestion_documents_modeles_deposer_version_create
+      description: 'DOC-01, ADM-04 : modèles livrés, versions déposées (.docx éditables
+        dans Word).'
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un(une) valeur entière unique identifiant ce(cette) modele document.
+        required: true
+      tags:
+      - gestion
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/DepotVersionRequest'
+        required: true
+      security:
+      - sessionAgent: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Version'
+          description: ''
+  /api/gestion/documents/modeles/{id}/versions:
+    get:
+      operationId: gestion_documents_modeles_versions_list
+      description: 'DOC-01, ADM-04 : modèles livrés, versions déposées (.docx éditables
+        dans Word).'
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un(une) valeur entière unique identifiant ce(cette) modele document.
+        required: true
+      tags:
+      - gestion
+      security:
+      - sessionAgent: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Version'
+          description: ''
+  /api/gestion/documents/modeles/{id}/versions/{version}/fichier:
+    get:
+      operationId: gestion_documents_modeles_versions_fichier_retrieve
+      description: 'DOC-01, ADM-04 : modèles livrés, versions déposées (.docx éditables
+        dans Word).'
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un(une) valeur entière unique identifiant ce(cette) modele document.
+        required: true
+      - in: path
+        name: version
+        schema:
+          type: string
+          pattern: ^\d+$
+        required: true
+      tags:
+      - gestion
+      security:
+      - sessionAgent: []
+      responses:
+        '200':
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+          description: ''
   /api/gestion/moi:
     get:
       operationId: gestion_moi_retrieve
@@ -4526,6 +5611,253 @@ paths:
       responses:
         '204':
           description: No response body
+  /api/gestion/usagers/comptes:
+    get:
+      operationId: gestion_usagers_comptes_list
+      description: '`chemin_site` : chemin ORM vers le site de l''objet (None = objet
+        transversal).'
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: Un numéro de page de l'ensemble des résultats.
+        schema:
+          type: integer
+      - in: query
+        name: recherche
+        schema:
+          type: string
+      - in: query
+        name: statut
+        schema:
+          type: string
+          enum:
+          - a_confirmer
+          - a_valider
+          - actif
+          - ferme
+          - suspendu
+        description: |-
+          * `a_confirmer` - Courriel à confirmer
+          * `a_valider` - En attente de validation par la Ville
+          * `actif` - Actif
+          * `suspendu` - Suspendu
+          * `ferme` - Fermé
+      - name: taille
+        required: false
+        in: query
+        description: Nombre de résultats à retourner par page.
+        schema:
+          type: integer
+      tags:
+      - gestion
+      security:
+      - sessionAgent: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedCompteList'
+          description: ''
+    post:
+      operationId: gestion_usagers_comptes_create
+      description: '`chemin_site` : chemin ORM vers le site de l''objet (None = objet
+        transversal).'
+      tags:
+      - gestion
+      security:
+      - sessionAgent: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Compte'
+          description: ''
+  /api/gestion/usagers/comptes/{id}:
+    get:
+      operationId: gestion_usagers_comptes_retrieve
+      description: '`chemin_site` : chemin ORM vers le site de l''objet (None = objet
+        transversal).'
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un(une) valeur entière unique identifiant ce(cette) compte du
+          portail.
+        required: true
+      tags:
+      - gestion
+      security:
+      - sessionAgent: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Compte'
+          description: ''
+  /api/gestion/usagers/comptes/{id}/reactiver:
+    post:
+      operationId: gestion_usagers_comptes_reactiver_create
+      description: '`chemin_site` : chemin ORM vers le site de l''objet (None = objet
+        transversal).'
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un(une) valeur entière unique identifiant ce(cette) compte du
+          portail.
+        required: true
+      tags:
+      - gestion
+      security:
+      - sessionAgent: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Compte'
+          description: ''
+  /api/gestion/usagers/comptes/{id}/refuser:
+    post:
+      operationId: gestion_usagers_comptes_refuser_create
+      description: '`chemin_site` : chemin ORM vers le site de l''objet (None = objet
+        transversal).'
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un(une) valeur entière unique identifiant ce(cette) compte du
+          portail.
+        required: true
+      tags:
+      - gestion
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MotifRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/MotifRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/MotifRequest'
+        required: true
+      security:
+      - sessionAgent: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Compte'
+          description: ''
+  /api/gestion/usagers/comptes/{id}/suspendre:
+    post:
+      operationId: gestion_usagers_comptes_suspendre_create
+      description: '`chemin_site` : chemin ORM vers le site de l''objet (None = objet
+        transversal).'
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un(une) valeur entière unique identifiant ce(cette) compte du
+          portail.
+        required: true
+      tags:
+      - gestion
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MotifRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/MotifRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/MotifRequest'
+        required: true
+      security:
+      - sessionAgent: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Compte'
+          description: ''
+  /api/gestion/usagers/comptes/{id}/valider:
+    post:
+      operationId: gestion_usagers_comptes_valider_create
+      description: '`chemin_site` : chemin ORM vers le site de l''objet (None = objet
+        transversal).'
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un(une) valeur entière unique identifiant ce(cette) compte du
+          portail.
+        required: true
+      tags:
+      - gestion
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ValidationRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ValidationRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ValidationRequest'
+      security:
+      - sessionAgent: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Compte'
+          description: ''
+  /api/gestion/usagers/comptes/inviter:
+    post:
+      operationId: gestion_usagers_comptes_inviter_create
+      description: Un agent invite un contact déjà connu au guichet à créer son compte
+        (lien de 7 jours).
+      tags:
+      - gestion
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InvitationRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/InvitationRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/InvitationRequest'
+        required: true
+      security:
+      - sessionAgent: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Compte'
+          description: ''
   /api/gestion/usagers/contacts:
     get:
       operationId: gestion_usagers_contacts_list
@@ -5321,6 +6653,64 @@ paths:
               schema:
                 $ref: '#/components/schemas/Usager'
           description: ''
+  /api/gestion/usagers/usagers/{id}/anonymiser:
+    post:
+      operationId: gestion_usagers_usagers_anonymiser_create
+      description: 'USR-06 : droit à l''effacement ou durée échue ; les pièces comptables
+        restent conservées.'
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un(une) valeur entière unique identifiant ce(cette) usager.
+        required: true
+      tags:
+      - gestion
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MotifUsagerRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/MotifUsagerRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/MotifUsagerRequest'
+        required: true
+      security:
+      - sessionAgent: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Usager'
+          description: ''
+  /api/gestion/usagers/usagers/{id}/export:
+    get:
+      operationId: gestion_usagers_usagers_export_retrieve
+      description: 'USR-06 : réponse à une demande d''accès (export complet, journalisé).'
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un(une) valeur entière unique identifiant ce(cette) usager.
+        required: true
+      tags:
+      - gestion
+      security:
+      - sessionAgent: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: string
+                format: binary
+          description: ''
   /api/gestion/usagers/usagers/{id}/historique:
     get:
       operationId: gestion_usagers_usagers_historique_retrieve
@@ -5655,6 +7045,112 @@ components:
       - nom
       - ouverture
       - saison
+    CanalEnum:
+      enum:
+      - courriel
+      - sms
+      - portail
+      type: string
+      description: |-
+        * `courriel` - Courriel
+        * `sms` - SMS
+        * `portail` - Portail
+    Circuit:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        mode:
+          $ref: '#/components/schemas/CircuitModeEnum'
+        statut:
+          $ref: '#/components/schemas/CircuitStatutEnum'
+        envoye_le:
+          type: string
+          format: date-time
+          readOnly: true
+        expire_le:
+          type: string
+          format: date-time
+          nullable: true
+        relance_le:
+          type: string
+          format: date-time
+          nullable: true
+        termine_le:
+          type: string
+          format: date-time
+          nullable: true
+        purge_le:
+          type: string
+          format: date-time
+          nullable: true
+          description: Soumission supprimée côté DocuSeal (SIG-03).
+        erreur:
+          type: string
+          maxLength: 300
+        signataires:
+          type: array
+          items:
+            $ref: '#/components/schemas/Signataire'
+          readOnly: true
+      required:
+      - envoye_le
+      - id
+      - signataires
+    CircuitModeEnum:
+      enum:
+      - docuseal
+      - manuel
+      type: string
+      description: |-
+        * `docuseal` - Signature électronique (DocuSeal)
+        * `manuel` - Signature manuscrite (scan déposé)
+    CircuitRequest:
+      type: object
+      properties:
+        mode:
+          $ref: '#/components/schemas/CircuitModeEnum'
+        statut:
+          $ref: '#/components/schemas/CircuitStatutEnum'
+        expire_le:
+          type: string
+          format: date-time
+          nullable: true
+        relance_le:
+          type: string
+          format: date-time
+          nullable: true
+        termine_le:
+          type: string
+          format: date-time
+          nullable: true
+        purge_le:
+          type: string
+          format: date-time
+          nullable: true
+          description: Soumission supprimée côté DocuSeal (SIG-03).
+        erreur:
+          type: string
+          maxLength: 300
+    CircuitStatutEnum:
+      enum:
+      - preparation
+      - envoye
+      - signe
+      - expire
+      - annule
+      - refuse
+      - erreur
+      type: string
+      description: |-
+        * `preparation` - Dépôt en cours auprès du service de signature
+        * `envoye` - Envoyé
+        * `signe` - Signé
+        * `expire` - Expiré
+        * `annule` - Annulé
+        * `refuse` - Refusé par un signataire
+        * `erreur` - Erreur d'envoi
     CodeTotpRequest:
       type: object
       properties:
@@ -5672,6 +7168,89 @@ components:
       description: |-
         * `statut` - Par statut
         * `type_usager` - Par type d'usager
+    Compte:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        identifiant:
+          type: string
+          format: email
+          readOnly: true
+          title: Identifiant (adresse électronique)
+        contact:
+          type: integer
+          readOnly: true
+        contact_nom:
+          type: string
+          readOnly: true
+        telephone:
+          type: string
+          readOnly: true
+        statut:
+          allOf:
+          - $ref: '#/components/schemas/CompteStatutEnum'
+          readOnly: true
+        courriel_confirme_le:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        valide_le:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        motif_suspension:
+          type: string
+          readOnly: true
+        totp_actif:
+          type: boolean
+          readOnly: true
+        derniere_connexion:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        cree_le:
+          type: string
+          format: date-time
+          readOnly: true
+        structures:
+          type: array
+          items:
+            type: object
+            additionalProperties: {}
+          readOnly: true
+      required:
+      - contact
+      - contact_nom
+      - courriel_confirme_le
+      - cree_le
+      - derniere_connexion
+      - id
+      - identifiant
+      - motif_suspension
+      - statut
+      - structures
+      - telephone
+      - totp_actif
+      - valide_le
+    CompteStatutEnum:
+      enum:
+      - a_confirmer
+      - a_valider
+      - actif
+      - suspendu
+      - ferme
+      type: string
+      description: |-
+        * `a_confirmer` - Courriel à confirmer
+        * `a_valider` - En attente de validation par la Ville
+        * `actif` - Actif
+        * `suspendu` - Suspendu
+        * `ferme` - Fermé
     ConditionEnum:
       enum:
       - pieces
@@ -5909,30 +7488,129 @@ components:
       required:
       - espace
       - fichier
+    DepotVersionRequest:
+      type: object
+      properties:
+        fichier:
+          type: string
+          format: binary
+        commentaire:
+          type: string
+          default: ''
+          maxLength: 250
+      required:
+      - fichier
     Document:
       type: object
       properties:
         id:
           type: integer
           readOnly: true
-        espace:
-          type: integer
-        nature:
-          $ref: '#/components/schemas/DocumentNatureEnum'
-        titre:
-          type: string
-          maxLength: 200
-        public:
-          type: boolean
-          description: Téléchargeable depuis le portail.
-        nom_fichier:
+        numero:
           type: string
           readOnly: true
+        modele:
+          type: integer
+          readOnly: true
+        modele_libelle:
+          type: string
+          readOnly: true
+        version_numero:
+          type: integer
+          readOnly: true
+        nature:
+          allOf:
+          - $ref: '#/components/schemas/NatureA83Enum'
+          readOnly: true
+        titre:
+          type: string
+          readOnly: true
+        dossier:
+          type: integer
+          readOnly: true
+          nullable: true
+        dossier_numero:
+          type: string
+          readOnly: true
+          default: ''
+        usager:
+          type: integer
+          readOnly: true
+          nullable: true
+        usager_nom:
+          type: string
+          readOnly: true
+          default: ''
+        parent:
+          type: integer
+          readOnly: true
+          nullable: true
+          description: Document modifié (avenant).
+        parent_numero:
+          type: string
+          readOnly: true
+          default: ''
+        sha256:
+          type: string
+          readOnly: true
+        statut:
+          allOf:
+          - $ref: '#/components/schemas/DocumentStatutEnum'
+          readOnly: true
+        signe_le:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        signe_par:
+          type: string
+          readOnly: true
+          description: Signataires ou agent ayant constaté.
+        signature_requise:
+          type: boolean
+          readOnly: true
+        visible_portail:
+          type: boolean
+          readOnly: true
+        motif_annulation:
+          type: string
+          readOnly: true
+        cree_par:
+          type: string
+          readOnly: true
+        cree_le:
+          type: string
+          format: date-time
+          readOnly: true
+        circuits:
+          type: array
+          items:
+            $ref: '#/components/schemas/Circuit'
+          readOnly: true
       required:
-      - espace
+      - circuits
+      - cree_le
+      - cree_par
+      - dossier
+      - dossier_numero
       - id
-      - nom_fichier
+      - modele
+      - modele_libelle
+      - motif_annulation
+      - nature
+      - numero
+      - parent
+      - parent_numero
+      - sha256
+      - signature_requise
+      - signe_le
+      - signe_par
+      - statut
       - titre
+      - usager
+      - usager_nom
+      - version_numero
+      - visible_portail
     DocumentNatureEnum:
       enum:
       - reglement
@@ -5945,6 +7623,20 @@ components:
         * `plan` - Plan d'accès
         * `securite` - Consignes de sécurité
         * `autre` - Autre
+    DocumentStatutEnum:
+      enum:
+      - genere
+      - en_signature
+      - signe
+      - signe_manuellement
+      - annule
+      type: string
+      description: |-
+        * `genere` - Généré
+        * `en_signature` - En signature
+        * `signe` - Signé électroniquement
+        * `signe_manuellement` - Signé manuellement
+        * `annule` - Annulé
     Dossier:
       type: object
       properties:
@@ -6074,6 +7766,51 @@ components:
       - graine
       - qr_svg
       - uri
+    EnvoiGroupeRequest:
+      type: object
+      properties:
+        titre:
+          type: string
+          minLength: 1
+          maxLength: 150
+        texte:
+          type: string
+          minLength: 1
+          maxLength: 4000
+        usagers:
+          type: array
+          items:
+            type: integer
+            minimum: 1
+          maxItems: 500
+        espace:
+          type: integer
+          minimum: 1
+        debut:
+          type: string
+          format: date-time
+        fin:
+          type: string
+          format: date-time
+        sms:
+          type: boolean
+          default: false
+      required:
+      - texte
+      - titre
+    EnvoiSignatureModeEnum:
+      enum:
+      - docuseal
+      - manuel
+      type: string
+      description: |-
+        * `docuseal` - docuseal
+        * `manuel` - manuel
+    EnvoiSignatureRequest:
+      type: object
+      properties:
+        mode:
+          $ref: '#/components/schemas/EnvoiSignatureModeEnum'
     Espace:
       type: object
       properties:
@@ -6358,6 +8095,17 @@ components:
       - debut
       - fin
       - motif
+    GenerationRequest:
+      type: object
+      properties:
+        modele:
+          type: string
+          minLength: 1
+        dossier:
+          type: integer
+      required:
+      - dossier
+      - modele
     GroupeAD:
       type: object
       properties:
@@ -6553,6 +8301,13 @@ components:
       - espace
       - fin
       - jour_semaine
+    InvitationRequest:
+      type: object
+      properties:
+        contact:
+          type: integer
+      required:
+      - contact
     JetonEnrolementRequest:
       type: object
       properties:
@@ -6706,22 +8461,264 @@ components:
       - espace
       - fin
       - usager
-    ModeEnum:
+    Lot:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        modele_code:
+          type: string
+        libelle:
+          type: string
+          maxLength: 200
+        envoyer_signature:
+          type: boolean
+        statut:
+          allOf:
+          - $ref: '#/components/schemas/LotStatutEnum'
+          readOnly: true
+        total:
+          type: integer
+          readOnly: true
+        faits:
+          type: integer
+          readOnly: true
+        erreurs:
+          readOnly: true
+        cree_le:
+          type: string
+          format: date-time
+          readOnly: true
+        termine_le:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+      required:
+      - cree_le
+      - erreurs
+      - faits
+      - id
+      - libelle
+      - modele_code
+      - statut
+      - termine_le
+      - total
+    LotRequest:
+      type: object
+      properties:
+        modele_code:
+          type: string
+          minLength: 1
+        libelle:
+          type: string
+          minLength: 1
+          maxLength: 200
+        dossiers:
+          type: array
+          items:
+            type: integer
+            writeOnly: true
+          writeOnly: true
+        envoyer_signature:
+          type: boolean
+      required:
+      - dossiers
+      - libelle
+      - modele_code
+    LotStatutEnum:
       enum:
-      - jour
-      - semaine
-      - mois
-      - chronologie
-      - multi_sites
-      - liste
+      - en_attente
+      - en_cours
+      - termine
+      - echec
       type: string
       description: |-
-        * `jour` - Jour
-        * `semaine` - Semaine
-        * `mois` - Mois
-        * `chronologie` - Chronologie par espace
-        * `multi_sites` - Occupation multi-sites
-        * `liste` - Liste
+        * `en_attente` - En attente
+        * `en_cours` - En cours
+        * `termine` - Terminé
+        * `echec` - En échec
+    Message:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        dossier:
+          type: integer
+        auteur:
+          type: string
+          readOnly: true
+        de_la_ville:
+          type: boolean
+          readOnly: true
+        corps:
+          type: string
+          maxLength: 5000
+        cree_le:
+          type: string
+          format: date-time
+          readOnly: true
+        lu_par_ville_le:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        lu_par_usager_le:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+      required:
+      - auteur
+      - corps
+      - cree_le
+      - de_la_ville
+      - dossier
+      - id
+      - lu_par_usager_le
+      - lu_par_ville_le
+    MessageRequest:
+      type: object
+      properties:
+        dossier:
+          type: integer
+        corps:
+          type: string
+          minLength: 1
+          maxLength: 5000
+      required:
+      - corps
+      - dossier
+    ModeleDocument:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        code:
+          type: string
+          readOnly: true
+          pattern: ^[-a-zA-Z0-9_]+$
+        libelle:
+          type: string
+          maxLength: 150
+        nature:
+          allOf:
+          - $ref: '#/components/schemas/NatureA83Enum'
+          readOnly: true
+        description:
+          type: string
+        signature_requise:
+          type: boolean
+        signataires:
+          description: 'Rôles des signataires dans l''ordre : « usager », « elu »,
+            « agent ».'
+        actif:
+          type: boolean
+        version_active:
+          type: integer
+          readOnly: true
+          nullable: true
+          description: Version utilisée.
+        version_active_numero:
+          type: integer
+          readOnly: true
+        variables:
+          type: array
+          items:
+            type: string
+          readOnly: true
+      required:
+      - code
+      - id
+      - libelle
+      - nature
+      - variables
+      - version_active
+      - version_active_numero
+    ModeleDocumentRequest:
+      type: object
+      properties:
+        libelle:
+          type: string
+          minLength: 1
+          maxLength: 150
+        description:
+          type: string
+        signature_requise:
+          type: boolean
+        signataires:
+          description: 'Rôles des signataires dans l''ordre : « usager », « elu »,
+            « agent ».'
+        actif:
+          type: boolean
+      required:
+      - libelle
+    ModeleMessage:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        code:
+          type: string
+          readOnly: true
+          pattern: ^[-a-zA-Z0-9_]+$
+        libelle:
+          type: string
+          maxLength: 150
+        sujet:
+          type: string
+          maxLength: 200
+        corps:
+          type: string
+          description: Texte du message ; variables entre doubles accolades.
+        sms:
+          type: string
+          title: Texte du SMS
+          description: 'Vide : pas de SMS pour ce message (COM-05).'
+          maxLength: 320
+        actif:
+          type: boolean
+        modifie_le:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - code
+      - corps
+      - id
+      - libelle
+      - modifie_le
+      - sujet
+    ModeleMessageRequest:
+      type: object
+      properties:
+        libelle:
+          type: string
+          minLength: 1
+          maxLength: 150
+        sujet:
+          type: string
+          minLength: 1
+          maxLength: 200
+        corps:
+          type: string
+          minLength: 1
+          description: Texte du message ; variables entre doubles accolades.
+        sms:
+          type: string
+          title: Texte du SMS
+          description: 'Vide : pas de SMS pour ce message (COM-05).'
+          maxLength: 320
+        actif:
+          type: boolean
+      required:
+      - corps
+      - libelle
+      - sujet
     ModificationSerieRequest:
       type: object
       properties:
@@ -6783,6 +8780,15 @@ components:
       - id
       - identifiant
       - nom_affiche
+    MotifRequest:
+      type: object
+      properties:
+        motif:
+          type: string
+          minLength: 1
+          maxLength: 300
+      required:
+      - motif
     MotifUsagerRequest:
       type: object
       properties:
@@ -6792,6 +8798,117 @@ components:
           maxLength: 250
       required:
       - motif
+    NatureA83Enum:
+      enum:
+      - convention
+      - contrat_location
+      - avenant
+      - devis
+      - facture
+      - avoir
+      - etat_des_lieux
+      - attribution
+      - refus
+      - attestation_valorisation
+      - fermeture
+      type: string
+      description: |-
+        * `convention` - Convention d'occupation
+        * `contrat_location` - Contrat de location
+        * `avenant` - Avenant
+        * `devis` - Devis
+        * `facture` - Facture
+        * `avoir` - Avoir
+        * `etat_des_lieux` - État des lieux
+        * `attribution` - Courrier d'attribution de créneaux
+        * `refus` - Courrier de refus motivé
+        * `attestation_valorisation` - Attestation de valorisation des avantages en nature
+        * `fermeture` - Avis de fermeture exceptionnelle
+    Notification:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        canal:
+          allOf:
+          - $ref: '#/components/schemas/CanalEnum'
+          readOnly: true
+        modele:
+          type: integer
+          readOnly: true
+          nullable: true
+        modele_libelle:
+          type: string
+          readOnly: true
+          default: ''
+        destinataire:
+          type: string
+          readOnly: true
+        sujet:
+          type: string
+          readOnly: true
+        corps:
+          type: string
+          readOnly: true
+          description: Texte conservé ; les liens à usage unique y sont masqués.
+        objet_type:
+          type: string
+          readOnly: true
+        objet_id:
+          type: string
+          readOnly: true
+        groupe:
+          type: string
+          readOnly: true
+          description: Identifiant d'un envoi groupé.
+        statut:
+          allOf:
+          - $ref: '#/components/schemas/NotificationStatutEnum'
+          readOnly: true
+        tentatives:
+          type: integer
+          readOnly: true
+        erreur:
+          type: string
+          readOnly: true
+        cree_le:
+          type: string
+          format: date-time
+          readOnly: true
+        envoyee_le:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+      required:
+      - canal
+      - corps
+      - cree_le
+      - destinataire
+      - envoyee_le
+      - erreur
+      - groupe
+      - id
+      - modele
+      - modele_libelle
+      - objet_id
+      - objet_type
+      - statut
+      - sujet
+      - tentatives
+    NotificationStatutEnum:
+      enum:
+      - a_envoyer
+      - envoyee
+      - echec
+      - ignoree
+      type: string
+      description: |-
+        * `a_envoyer` - À envoyer
+        * `envoyee` - Envoyée
+        * `echec` - Échec
+        * `ignoree` - Ignorée (préférences)
     NouvelleReservationRequest:
       type: object
       properties:
@@ -7026,6 +9143,29 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Campagne'
+    PaginatedCompteList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Compte'
     PaginatedContactList:
       type: object
       required:
@@ -7256,6 +9396,75 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/ListeAttente'
+    PaginatedLotList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Lot'
+    PaginatedMessageList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Message'
+    PaginatedNotificationList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Notification'
     PaginatedOccurrenceList:
       type: object
       required:
@@ -7776,6 +9985,44 @@ components:
         pendant_vacances:
           type: boolean
           description: Plage valable aussi pendant les vacances scolaires.
+    PatchedModeleDocumentRequest:
+      type: object
+      properties:
+        libelle:
+          type: string
+          minLength: 1
+          maxLength: 150
+        description:
+          type: string
+        signature_requise:
+          type: boolean
+        signataires:
+          description: 'Rôles des signataires dans l''ordre : « usager », « elu »,
+            « agent ».'
+        actif:
+          type: boolean
+    PatchedModeleMessageRequest:
+      type: object
+      properties:
+        libelle:
+          type: string
+          minLength: 1
+          maxLength: 150
+        sujet:
+          type: string
+          minLength: 1
+          maxLength: 200
+        corps:
+          type: string
+          minLength: 1
+          description: Texte du message ; variables entre doubles accolades.
+        sms:
+          type: string
+          title: Texte du SMS
+          description: 'Vide : pas de SMS pour ce message (COM-05).'
+          maxLength: 320
+        actif:
+          type: boolean
     PatchedModificationRequest:
       type: object
       properties:
@@ -8047,7 +10294,7 @@ components:
           minLength: 1
           maxLength: 100
         mode:
-          $ref: '#/components/schemas/ModeEnum'
+          $ref: '#/components/schemas/VueEnregistreeModeEnum'
         filtres: {}
         coloration:
           $ref: '#/components/schemas/ColorationEnum'
@@ -8588,6 +10835,14 @@ components:
       - debut
       - fin
       - nom
+    ScanRequest:
+      type: object
+      properties:
+        fichier:
+          type: string
+          format: binary
+      required:
+      - fichier
     SeancePlanning:
       type: object
       properties:
@@ -8636,6 +10891,60 @@ components:
       - statut
       - type_usager
       - usager
+    Signataire:
+      type: object
+      properties:
+        ordre:
+          type: integer
+        role:
+          type: string
+        nom:
+          type: string
+        courriel:
+          type: string
+          format: email
+        statut:
+          type: string
+        signe_le:
+          type: string
+          format: date-time
+          nullable: true
+      required:
+      - courriel
+      - nom
+      - ordre
+      - role
+      - signe_le
+      - statut
+    SignataireRequest:
+      type: object
+      properties:
+        ordre:
+          type: integer
+        role:
+          type: string
+          minLength: 1
+        nom:
+          type: string
+          minLength: 1
+        courriel:
+          type: string
+          format: email
+          minLength: 1
+        statut:
+          type: string
+          minLength: 1
+        signe_le:
+          type: string
+          format: date-time
+          nullable: true
+      required:
+      - courriel
+      - nom
+      - ordre
+      - role
+      - signe_le
+      - statut
     Site:
       type: object
       properties:
@@ -9178,6 +11487,12 @@ components:
       description: |-
         * `ad` - Active Directory
         * `local` - Compte technique local
+    ValidationRequest:
+      type: object
+      properties:
+        usager_existant:
+          type: integer
+          nullable: true
     Verification:
       type: object
       properties:
@@ -9208,6 +11523,38 @@ components:
           nullable: true
       required:
       - valide
+    Version:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        numero:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+        nom_fichier:
+          type: string
+          readOnly: true
+        sha256:
+          type: string
+          readOnly: true
+        commentaire:
+          type: string
+          maxLength: 250
+        deposee_par:
+          type: string
+          maxLength: 200
+        deposee_le:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - deposee_le
+      - id
+      - nom_fichier
+      - numero
+      - sha256
     VueEnregistree:
       type: object
       properties:
@@ -9218,7 +11565,7 @@ components:
           type: string
           maxLength: 100
         mode:
-          $ref: '#/components/schemas/ModeEnum'
+          $ref: '#/components/schemas/VueEnregistreeModeEnum'
         filtres: {}
         coloration:
           $ref: '#/components/schemas/ColorationEnum'
@@ -9227,6 +11574,22 @@ components:
       required:
       - id
       - nom
+    VueEnregistreeModeEnum:
+      enum:
+      - jour
+      - semaine
+      - mois
+      - chronologie
+      - multi_sites
+      - liste
+      type: string
+      description: |-
+        * `jour` - Jour
+        * `semaine` - Semaine
+        * `mois` - Mois
+        * `chronologie` - Chronologie par espace
+        * `multi_sites` - Occupation multi-sites
+        * `liste` - Liste
     VueEnregistreeRequest:
       type: object
       properties:
@@ -9235,7 +11598,7 @@ components:
           minLength: 1
           maxLength: 100
         mode:
-          $ref: '#/components/schemas/ModeEnum'
+          $ref: '#/components/schemas/VueEnregistreeModeEnum'
         filtres: {}
         coloration:
           $ref: '#/components/schemas/ColorationEnum'

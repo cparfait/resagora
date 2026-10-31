@@ -45,6 +45,7 @@ export default function FicheUsager() {
   const [refus, setRefus] = useState<{ piece: Piece; motif: string } | null>(null);
   const [erreur, setErreur] = useState<string | null>(null);
   const [suspension, setSuspension] = useState<string | null>(null);
+  const [effacement, setEffacement] = useState<string | null>(null);
 
   const usager = useQuery({ queryKey: ["usager", id], queryFn: () => requete<Usager>("GET", `/api/gestion/usagers/usagers/${id}`) });
   const pieces = useQuery({ queryKey: ["pieces", id], queryFn: () => requete<PageApi<Piece>>("GET", construireChemin("/api/gestion/usagers/pieces", { usager: id, taille: 200 })) });
@@ -113,6 +114,16 @@ export default function FicheUsager() {
     onError: (e) => annoncer(e instanceof ErreurApi ? e.message : "Action impossible.", "erreur"),
   });
 
+  const anonymiser = useMutation({
+    mutationFn: (motif: string) => requete<Usager>("POST", `/api/gestion/usagers/usagers/${id}/anonymiser`, { motif }),
+    onSuccess: async () => {
+      annoncer("Données personnelles effacées ; les dossiers et pièces comptables sont conservés.");
+      setEffacement(null);
+      await rafraichir();
+    },
+    onError: (e) => annoncer(e instanceof ErreurApi ? e.message : "Anonymisation impossible.", "erreur"),
+  });
+
   if (usager.isPending) return <Chargement />;
   if (usager.isError) return <Erreur erreur={usager.error} reessayer={() => void usager.refetch()} />;
   const u = usager.data;
@@ -146,7 +157,23 @@ export default function FicheUsager() {
                 Réactiver
               </Bouton>
             ) : null}
+            {peut("anonymiser_usager") ? (
+              <>
+                <Bouton variante="secondaire" onClick={() => void telecharger(`/api/gestion/usagers/usagers/${id}/export`, `usager-${id}-donnees.json`)}>
+                  Exporter ses données
+                </Bouton>
+                {u.statut !== "anonymise" ? (
+                  <Bouton variante="danger" onClick={() => setEffacement("")}>
+                    Anonymiser…
+                  </Bouton>
+                ) : null}
+              </>
+            ) : null}
           </>
+        ) : peut("anonymiser_usager") ? (
+          <Bouton variante="secondaire" onClick={() => void telecharger(`/api/gestion/usagers/usagers/${id}/export`, `usager-${id}-donnees.json`)}>
+            Exporter ses données
+          </Bouton>
         ) : null
       }
     >
@@ -355,6 +382,30 @@ export default function FicheUsager() {
               </Bouton>
               <Bouton type="submit" variante="danger" enCours={statut.isPending}>
                 Suspendre
+              </Bouton>
+            </div>
+          </form>
+        ) : null}
+      </Dialogue>
+      <Dialogue ouvert={effacement !== null} titre="Anonymiser l'usager" onFermer={() => setEffacement(null)}>
+        {effacement !== null ? (
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              anonymiser.mutate(effacement);
+            }}
+          >
+            <p>
+              Les noms, coordonnées, messages et pièces justificatives des personnes sont effacés définitivement. Les dossiers, réservations et pièces comptables restent conservés sous un
+              libellé neutre. Impossible s'il reste des réservations en cours.
+            </p>
+            <ChampTexte libelle="Motif (demande d'effacement, durée échue…)" obligatoire value={effacement} onChange={(e) => setEffacement(e.target.value)} />
+            <div className="formulaire__actions">
+              <Bouton variante="secondaire" onClick={() => setEffacement(null)}>
+                Retour
+              </Bouton>
+              <Bouton type="submit" variante="danger" enCours={anonymiser.isPending}>
+                Anonymiser définitivement
               </Bouton>
             </div>
           </form>

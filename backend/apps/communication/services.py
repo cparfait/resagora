@@ -29,6 +29,7 @@ from .sms import envoyer_sms
 journal = logging.getLogger(__name__)
 MOTEUR = Engine(autoescape=False, string_if_invalid="")
 MASQUE = "[lien personnel masqué]"
+CODES_INFORMATION = {"information_generale"}
 
 
 def rendre(gabarit: str, contexte: dict[str, Any]) -> str:
@@ -122,9 +123,11 @@ def notifier(
     for contact in destinataires:
         if not getattr(contact, "courriel", "") or getattr(contact, "anonymise_le", None):
             continue
+        preferences = _preferences(contact)
+        if code_modele in CODES_INFORMATION and preferences is not None and not preferences.informations:
+            continue
         local = {**base, "contact": _fiche(contact)}
         creees.append(creer(contact.courriel, local, contact=contact, usager=usager))
-        preferences = _preferences(contact)
         if sms and modele.sms and preferences is not None and preferences.sms and preferences.telephone_sms:
             creees.append(
                 Notification.objects.create(
@@ -146,11 +149,13 @@ def notifier(
     return creees
 
 
-def notifier_groupe(code_modele: str, elements: Iterable[tuple[Any, dict[str, Any], models.Model | None]]) -> str:
+def notifier_groupe(
+    code_modele: str, elements: Iterable[tuple[Any, dict[str, Any], models.Model | None]], *, sms: bool = True
+) -> str:
     """Envoi groupé (COM-03) : un identifiant commun permet de suivre l'envoi dans le journal des envois."""
     groupe = uuid.uuid4().hex
     for usager, contexte, objet in elements:
-        notifier(code_modele, contexte, usager=usager, objet=objet, groupe=groupe)
+        notifier(code_modele, contexte, usager=usager, objet=objet, groupe=groupe, sms=sms)
     return groupe
 
 

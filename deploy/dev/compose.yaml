@@ -48,6 +48,27 @@ services:
     ports: ["127.0.0.1:53001:3000"]
     volumes: [docuseal-dev:/data]
 
+  simulateurs:
+    # SMS (COM-05), DocuSeal (SIG-01 à SIG-04) et PayFiP (lot 7) simulés ; pages de consultation sur http://localhost:53010.
+    build: { context: ../.., dockerfile: deploy/images/simulateurs.Dockerfile }
+    ports: ["127.0.0.1:53010:8090"]
+    environment:
+      SIMULATEUR_URL_PUBLIQUE: http://localhost:53010
+      SIMULATEUR_SMS_JETON_FICHIER: /run/secrets/simulateur_sms_jeton
+      SIMULATEUR_DOCUSEAL_JETON_FICHIER: /run/secrets/simulateur_docuseal_api_jeton
+      SIMULATEUR_DOCUSEAL_WEBHOOK_SECRET_FICHIER: /run/secrets/simulateur_docuseal_webhook_secret
+      SIMULATEUR_DOCUSEAL_WEBHOOK_URL: https://equipements.chatillon.test:9443/api/portail/webhooks/docuseal
+      SIMULATEUR_DOCUSEAL_WEBHOOK_ENTETE: X-Docuseal-Secret
+      SIMULATEUR_VERIFIER_TLS: "0"
+      SIMULATEUR_PAYFIP_NUMCLI: "000000"
+    # Les webhooks passent par le proxy DMZ et la façade, comme ceux du vrai DocuSeal.
+    extra_hosts: ["equipements.chatillon.test:host-gateway"]
+    secrets: [simulateur_sms_jeton, simulateur_docuseal_api_jeton, simulateur_docuseal_webhook_secret]
+    read_only: true
+    tmpfs: [/tmp]
+    cap_drop: [ALL]
+    security_opt: ["no-new-privileges:true"]
+
   outils:
     # make sous Linux pour les postes Windows (D-005) : dépendances natives dans des volumes dédiés.
     profiles: [outils]
@@ -89,3 +110,6 @@ secrets:
   annuaire.crt: { file: ./secrets/annuaire.crt }
   annuaire.key: { file: ./secrets/annuaire.key }
   ac_interne.crt: { file: ./secrets/ac_interne.crt }
+  simulateur_sms_jeton: { file: ./secrets/simulateur_sms_jeton }
+  simulateur_docuseal_api_jeton: { file: ./secrets/simulateur_docuseal_api_jeton }
+  simulateur_docuseal_webhook_secret: { file: ./secrets/simulateur_docuseal_webhook_secret }

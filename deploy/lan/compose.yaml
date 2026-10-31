@@ -40,6 +40,7 @@ x-api: &api
     - docuseal_api_jeton
     - payfip_secret
     - smtp_mot_de_passe
+    - sms_jeton
   volumes: [stockage:/stockage]
   networks: [lan_app, lan_data]
   depends_on:
@@ -86,6 +87,8 @@ services:
     secrets: [django_secret_key, cle_chiffrement, audit_cle_hmac, postgres_password, valkey_url]
     command: ["sh", "-c", "python manage.py migrate --noinput && python manage.py accorder_droits equipements_app && python manage.py verifier_deploiement"]
     restart: "no"
+    # Les migrations de données écrivent les modèles de documents livrés (DOC-02) dans le stockage.
+    volumes: [stockage:/stockage]
     networks: [lan_data]
     depends_on: { postgres: { condition: service_healthy } }
 
@@ -167,7 +170,8 @@ services:
     <<: *journaux
     image: clamav/clamav:1.5.4-debian13-slim@sha256:cce3e1a43ae2bb40e11335c52c0e1e98273b12fa3d587e617f63a6907cc4b70b
     cap_drop: [ALL]
-    cap_add: [CHOWN, SETUID, SETGID]
+    # Démarrage en root le temps de préparer le volume des signatures, puis passage à l'utilisateur clamav.
+    cap_add: [CHOWN, SETUID, SETGID, DAC_OVERRIDE, FOWNER]
     security_opt: ["no-new-privileges:true"]
     mem_limit: 3g
     volumes: [clamav-lan:/var/lib/clamav]
@@ -200,6 +204,7 @@ secrets:
   docuseal_api_jeton: { file: ./secrets/docuseal_api_jeton }
   payfip_secret: { file: ./secrets/payfip_secret }
   smtp_mot_de_passe: { file: ./secrets/smtp_mot_de_passe }
+  sms_jeton: { file: ./secrets/sms_jeton }
   api_portail.crt: { file: ./secrets/api_portail.crt }
   api_portail.key: { file: ./secrets/api_portail.key }
   ac_facade.crt: { file: ./secrets/ac_facade.crt }

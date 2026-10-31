@@ -63,7 +63,8 @@ services:
     <<: *journaux
     image: clamav/clamav:1.5.4-debian13-slim@sha256:cce3e1a43ae2bb40e11335c52c0e1e98273b12fa3d587e617f63a6907cc4b70b
     cap_drop: [ALL]
-    cap_add: [CHOWN, SETUID, SETGID]
+    # Démarrage en root le temps de préparer le volume des signatures, puis passage à l'utilisateur clamav.
+    cap_add: [CHOWN, SETUID, SETGID, DAC_OVERRIDE, FOWNER]
     security_opt: ["no-new-privileges:true"]
     mem_limit: 3g
     volumes: [clamav-dmz:/var/lib/clamav]
@@ -79,7 +80,7 @@ services:
     read_only: true
     tmpfs: [/tmp, /app/tmp]
     cap_drop: [ALL]
-    cap_add: [CHOWN, SETUID, SETGID]
+    cap_add: [CHOWN, SETUID, SETGID, DAC_OVERRIDE, FOWNER]
     security_opt: ["no-new-privileges:true"]
     pids_limit: 256
     mem_limit: 1g

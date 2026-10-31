@@ -214,6 +214,12 @@ MODELES_LOT2: dict[str, tuple[str, str, str, str]] = {
         "En cas de difficulté, répondez à ce message." + SIGNATURE,
         "Ville de Châtillon : séance du {{ date }} déplacée : {{ nouveau }}.",
     ),
+    "information_generale": (
+        "Information aux usagers (envoi groupé)",
+        "{{ titre }}",
+        "Bonjour {{ contact.prenom }},\n\n{{ texte }}" + SIGNATURE,
+        "Ville de Châtillon : {{ titre }}. Détails par courriel.",
+    ),
     "usager_anonymise": (
         "Données personnelles effacées",
         "Effacement de vos données personnelles",

@@ -44,6 +44,24 @@ def alertes_expiration(jour: date | None = None) -> QuerySet[PieceJustificative]
     )
 
 
+def relancer_pieces(jour: date | None = None) -> int:
+    """USR-03 : chaque usager est prévenu une fois qu'une pièce valide arrive à expiration."""
+    from apps.communication.services import notifier
+
+    nombre = 0
+    for piece in alertes_expiration(jour).filter(alerte_envoyee_le__isnull=True):
+        with transaction.atomic():
+            notifier(
+                "piece_expiree",
+                {"piece": piece.type_piece.libelle, "fin": f"{piece.valide_jusqu_au:%d/%m/%Y}"},
+                usager=piece.usager,
+                objet=piece,
+            )
+            PieceJustificative.objects.filter(pk=piece.pk).update(alerte_envoyee_le=timezone.now())
+            nombre += 1
+    return nombre
+
+
 @transaction.atomic
 def deposer_piece(
     usager: Usager,

@@ -57,7 +57,11 @@ def main() -> int:
             (zone / nom).unlink()
         ecrire(zone / nom, f"redis://:{lire(zone / 'valkey_mot_de_passe')}@{hote}:6379/0")
     ecrire(LAN / "ldap_mot_de_passe", jeton(18))
-    ecrire(LAN / "docuseal_api_jeton", "a-renseigner-apres-creation-du-compte-docuseal")
+    # Jeton d'API DocuSeal : en recette, partagé avec le simulateur ; à remplacer par celui du compte DocuSeal réel.
+    if (LAN / "docuseal_api_jeton").exists() and lire(LAN / "docuseal_api_jeton").startswith("a-renseigner"):
+        (LAN / "docuseal_api_jeton").unlink()
+    ecrire(LAN / "docuseal_api_jeton", jeton(32))
+    ecrire(LAN / "sms_jeton", jeton(32))
     ecrire(LAN / "docuseal_webhook_secret", jeton(24))
     ecrire(LAN / "payfip_secret", jeton(24))
     ecrire(LAN / "smtp_mot_de_passe", "")
@@ -65,6 +69,8 @@ def main() -> int:
     ecrire(DEV / "ldap_mot_de_passe", lire(LAN / "ldap_mot_de_passe"))
     ecrire(DEV / "ldap_admin_mot_de_passe", jeton(18))
     ecrire(DEV / "mdp_agents_demo", "Demo-" + jeton(9))
+    for nom in ("docuseal_api_jeton", "sms_jeton", "docuseal_webhook_secret"):
+        ecrire(DEV / f"simulateur_{nom}", lire(LAN / nom))
     print("Secrets de développement présents dans deploy/lan/secrets, deploy/dmz/secrets et deploy/dev/secrets.")
     return 0
 

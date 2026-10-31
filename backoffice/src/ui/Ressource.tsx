@@ -186,7 +186,11 @@ export function EcranRessource<T extends Objet>(p: Proprietes<T>) {
 
   const liste = useQuery({
     queryKey: [p.cleRequete, page, filtres],
-    queryFn: ({ signal }) => requete<PageApi<T>>("GET", construireChemin(p.chemin, { page, ...filtres }), undefined, signal),
+    queryFn: async ({ signal }) => {
+      const reponse = await requete<PageApi<T> | T[]>("GET", construireChemin(p.chemin, { page, ...filtres }), undefined, signal);
+      // Les référentiels courts (types, modèles) ne sont pas paginés : on présente la même forme.
+      return Array.isArray(reponse) ? { count: reponse.length, next: null, previous: null, results: reponse } : reponse;
+    },
     placeholderData: keepPreviousData,
     enabled: peut(p.actionLecture),
   });

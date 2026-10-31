@@ -33,6 +33,21 @@ def _vider_cache() -> None:
 
 
 @pytest.fixture(autouse=True)
+def _donnees_de_reference(request: pytest.FixtureRequest) -> None:
+    """Après un test transactionnel (tables vidées), les données de référence sont recréées."""
+    if "django_db" not in request.keywords:
+        return
+    if "transactional_db" not in request.fixturenames:
+        request.getfixturevalue("db")
+    from apps.habilitations.models import Role
+
+    if not Role.objects.exists():
+        from apps.noyau.amorcage import amorcer_donnees_de_reference
+
+        amorcer_donnees_de_reference()
+
+
+@pytest.fixture(autouse=True)
 def _stockage(settings, tmp_path) -> None:  # type: ignore[no-untyped-def]
     settings.MEDIA_ROOT = tmp_path / "stockage"
 
@@ -55,3 +70,21 @@ def client_agent() -> Callable[[Utilisateur], APIClient]:
         return client
 
     return fabriquer
+
+
+@pytest.fixture
+def modeles_documents(settings):  # type: ignore[no-untyped-def]
+    """Fichiers des modèles livrés (écrits par la migration dans le stockage de la base de test)."""
+    import shutil
+    from pathlib import Path
+
+    from django.conf import settings as reglages_initiaux
+
+    source = Path(reglages_initiaux.BASE_DIR) / ".stockage-tests"
+    if source.exists():
+        shutil.copytree(source, settings.MEDIA_ROOT, dirs_exist_ok=True)
+    from apps.documents.models import ModeleDocument
+
+    manquants = [m.code for m in ModeleDocument.objects.select_related("version_active__fichier") if m.version_active is None]
+    assert not manquants, manquants
+    return ModeleDocument.objects.all()

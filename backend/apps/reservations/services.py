@@ -131,27 +131,60 @@ def _verifier_transition(reservation: Reservation, cible: str) -> None:
 # --- Horaires, fermetures, conflits -------------------------------------------------------------
 
 
+@dataclass
+class ContexteEspace:
+    """Horaires, vacances et fermetures d'un espace sur une période, chargés une fois (séries de 400 séances)."""
+
+    espace: Espace
+    horaires: list[HoraireOuverture]
+    jours_vacances: set[date]
+    fermetures: list[Fermeture]
+
+    @classmethod
+    def charger(cls, espace: Espace, debut: datetime, fin: datetime) -> ContexteEspace:
+        from apps.referentiel.models import PeriodeCalendrier
+
+        jour_debut = timezone.localtime(debut, PARIS).date()
+        jour_fin = timezone.localtime(fin, PARIS).date()
+        jours: set[date] = set()
+        for periode in PeriodeCalendrier.objects.filter(nature="vacances", debut__lte=jour_fin, fin__gte=jour_debut):
+            courant = max(periode.debut, jour_debut)
+            while courant <= min(periode.fin, jour_fin):
+                jours.add(courant)
+                courant += timedelta(days=1)
+        return cls(
+            espace,
+            list(HoraireOuverture.objects.filter(espace=espace).select_related("saison")),
+            jours,
+            list(fermetures_touchant(espace, debut, fin)),
+        )
+
+    def ouvert(self, debut: datetime, fin: datetime) -> bool:
+        """REF-03 : sans horaire saisi, l'espace est ouvert ; sinon le créneau tient dans une plage du jour."""
+        if not self.horaires:
+            return True
+        local_debut, local_fin = timezone.localtime(debut, PARIS), timezone.localtime(fin, PARIS)
+        if local_fin.date() != local_debut.date() and local_fin.time() != time(0, 0):
+            return False
+        jour = local_debut.date()
+        du_jour = [h for h in self.horaires if h.jour_semaine == local_debut.weekday()]
+        propres = [h for h in du_jour if h.saison is not None and h.saison.debut <= jour <= h.saison.fin]
+        candidates = propres or [h for h in du_jour if h.saison_id is None]
+        if jour in self.jours_vacances:
+            candidates = [h for h in candidates if h.pendant_vacances]
+        jusqua_minuit = local_fin.time() == time(0, 0)
+        return any(
+            h.debut <= local_debut.time() and (h.fin >= time(23, 59) if jusqua_minuit else local_fin.time() <= h.fin)
+            for h in candidates
+        )
+
+    def fermeture(self, debut: datetime, fin: datetime) -> Fermeture | None:
+        return next((f for f in self.fermetures if f.debut < fin and f.fin > debut), None)
+
+
 def dans_les_horaires(espace: Espace, debut: datetime, fin: datetime) -> bool:
     """REF-03 : sans horaire saisi, l'espace est ouvert ; sinon le créneau tient dans une plage du jour."""
-    from apps.referentiel.calendrier import est_vacances
-
-    horaires = HoraireOuverture.objects.filter(espace=espace)
-    if not horaires.exists():
-        return True
-    local_debut, local_fin = timezone.localtime(debut, PARIS), timezone.localtime(fin, PARIS)
-    if local_fin.date() != local_debut.date() and local_fin.time() != time(0, 0):
-        return False
-    jour = local_debut.date()
-    du_jour = horaires.filter(jour_semaine=local_debut.weekday())
-    propres = du_jour.filter(saison__debut__lte=jour, saison__fin__gte=jour)
-    candidates = propres if propres.exists() else du_jour.filter(saison__isnull=True)
-    if est_vacances(jour):
-        candidates = candidates.filter(pendant_vacances=True)
-    jusqua_minuit = local_fin.time() == time(0, 0)
-    return any(
-        h.debut <= local_debut.time() and (h.fin >= time(23, 59) if jusqua_minuit else local_fin.time() <= h.fin)
-        for h in candidates
-    )
+    return ContexteEspace.charger(espace, debut, fin).ouvert(debut, fin)
 
 
 def fermetures_touchant(espace: Espace, debut: datetime, fin: datetime) -> QuerySet[Fermeture]:
@@ -159,28 +192,38 @@ def fermetures_touchant(espace: Espace, debut: datetime, fin: datetime) -> Query
     return Fermeture.objects.filter(Q(espace_id__in=lies) | Q(site_id=espace.batiment.site_id), debut__lt=fin, fin__gt=debut)
 
 
-def conflits(espace: Espace, debut: datetime, fin: datetime, exclure: Iterable[int] = ()) -> list[Conflit]:
+def conflits(
+    espace: Espace, debut: datetime, fin: datetime, exclure: Iterable[int] = (), *, feuilles: list[Espace] | None = None
+) -> list[Conflit]:
     """RG-01 : occurrences bloquantes qui occupent une feuille de cet espace sur la période.
 
     Pour une feuille partageable (REF-07), il y a conflit si la capacité simultanée est atteinte ou si une
     occupation exclusive (réservation de l'espace englobant) la couvre.
     """
     plage = DateTimeTZRange(debut, fin, "[)")
-    trouves: dict[int, Conflit] = {}
-    for feuille in espace.feuilles():
-        verrous = Verrou.objects.filter(feuille=feuille, plage__overlap=plage).exclude(occurrence_id__in=list(exclure))
-        verrous = verrous.select_related("occurrence__reservation__dossier__usager", "occurrence__espace")
+    retenus: set[int] = set()
+    exclus = list(exclure)
+    for feuille in feuilles if feuilles is not None else espace.feuilles():
+        # Requête légère sur les seuls verrous (index sur la feuille) : le détail n'est lu qu'en cas de conflit.
+        liste = list(
+            Verrou.objects.filter(feuille=feuille, plage__overlap=plage)
+            .exclude(occurrence_id__in=exclus)
+            .only("id", "occurrence_id", "plage", "partage")
+        )
+        if not liste:
+            continue
         if feuille.partageable and feuille.pk == espace.pk:
-            liste = list(verrous)
             exclusifs = [v for v in liste if not v.partage]
             if not exclusifs and _occupation_simultanee(liste, debut, fin) < feuille.capacite_simultanee:
                 continue
-            retenus = exclusifs or liste
-        else:
-            retenus = list(verrous)
-        for v in retenus:
-            o = v.occurrence
-            trouves[o.pk] = Conflit(
+            liste = exclusifs or liste
+        retenus |= {v.occurrence_id for v in liste}
+    if not retenus:
+        return []
+    occurrences = Occurrence.objects.filter(pk__in=retenus).select_related("reservation__dossier__usager", "espace")
+    return sorted(
+        (
+            Conflit(
                 o.pk,
                 o.reservation_id,
                 o.reservation.dossier.numero,
@@ -189,7 +232,10 @@ def conflits(espace: Espace, debut: datetime, fin: datetime, exclure: Iterable[i
                 o.debut,
                 o.fin,
             )
-    return sorted(trouves.values(), key=lambda c: c.debut)
+            for o in occurrences
+        ),
+        key=lambda c: c.debut,
+    )
 
 
 def _occupation_simultanee(verrous: list[Verrou], debut: datetime, fin: datetime) -> int:
@@ -205,15 +251,15 @@ def _occupation_simultanee(verrous: list[Verrou], debut: datetime, fin: datetime
     return maximum
 
 
-def poser_verrous(occurrence: Occurrence) -> None:
+def poser_verrous(occurrence: Occurrence, feuilles: list[Espace] | None = None) -> None:
     """Pose les verrous d'une occurrence bloquante ; la contrainte d'exclusion tranche les accès concurrents."""
     if occurrence.statut not in STATUTS_BLOQUANTS or occurrence.verrous.exists():
         return
-    feuilles = occurrence.espace.feuilles()
+    feuilles = feuilles if feuilles is not None else occurrence.espace.feuilles()
     partageables = [f.pk for f in feuilles if f.partageable]
     if partageables:
         list(Espace.objects.select_for_update().filter(pk__in=partageables))
-    trouves = conflits(occurrence.espace, occurrence.debut, occurrence.fin, exclure=[occurrence.pk])
+    trouves = conflits(occurrence.espace, occurrence.debut, occurrence.fin, exclure=[occurrence.pk], feuilles=feuilles)
     if trouves:
         raise ErreurMetier(
             f"Créneau déjà occupé le {_texte_date(occurrence.debut)} ({trouves[0].usager}, dossier {trouves[0].dossier}).",
@@ -249,11 +295,15 @@ def apercu(
 ) -> Apercu:
     plages = generer_plages(plages_ou_reservation) if isinstance(plages_ou_reservation, Reservation) else plages_ou_reservation
     resultat = Apercu(plages)
+    if not plages:
+        return resultat
+    contexte = ContexteEspace.charger(espace, plages[0][0], plages[-1][1])
+    feuilles = espace.feuilles()
     for debut, fin in plages:
-        resultat.conflits.extend(conflits(espace, debut, fin, exclure))
-        if not dans_les_horaires(espace, debut, fin):
+        resultat.conflits.extend(conflits(espace, debut, fin, exclure, feuilles=feuilles))
+        if not contexte.ouvert(debut, fin):
             resultat.hors_horaires.append(debut)
-        if fermetures_touchant(espace, debut, fin).exists():
+        if contexte.fermeture(debut, fin) is not None:
             resultat.fermetures.append(debut)
     return resultat
 
@@ -393,20 +443,22 @@ def _valider_creneau(
                 code="delai_minimal",
             )
     retenues = []
+    contexte = ContexteEspace.charger(espace, plages[0][0], plages[-1][1]) if plages else None
     for debut, fin in plages:
         if (fin - debut).total_seconds() / 60 > duree_max:
             raise ErreurValidation(
                 f"Séance de plus de {duree_max // 60} heures : découpez la réservation en séances.", code="duree_excessive"
             )
-        if not forcer_horaires and not dans_les_horaires(espace, debut, fin):
+        assert contexte is not None
+        if not forcer_horaires and not contexte.ouvert(debut, fin):
             raise ErreurValidation(
                 f"Le {_texte_date(debut)} est en dehors des horaires d'ouverture de {espace.nom}.", code="hors_horaires"
             )
-        if fermetures_touchant(espace, debut, fin).exists():
+        fermeture = contexte.fermeture(debut, fin)
+        if fermeture is not None:
             if not reservation.recurrence:
                 raise ErreurValidation(
-                    f"{espace.nom} est fermé le {_texte_date(debut)} ({_signalement_fermeture(espace, debut, fin)}).",
-                    code="fermeture",
+                    f"{espace.nom} est fermé le {_texte_date(debut)} (Fermeture : {fermeture.motif}).", code="fermeture"
                 )
             continue
         retenues.append((debut, fin))
@@ -598,12 +650,20 @@ def valider(reservation: Reservation, *, acteur: Any) -> Reservation:
     _changer_statut(
         reservation, "validee", acteur, valide_par=acteur if hasattr(acteur, "habilitations") else None, valide_le=timezone.now()
     )
-    for occurrence in reservation.occurrences.filter(statut="validee"):
-        signalement = _signalement_fermeture(occurrence.espace, occurrence.debut, occurrence.fin)
+    seances = list(reservation.occurrences.filter(statut="validee").select_related("espace"))
+    contextes: dict[int, ContexteEspace] = {}
+    feuilles: dict[int, list[Espace]] = {}
+    for occurrence in seances:
+        if occurrence.espace_id not in contextes:
+            du_meme = [o for o in seances if o.espace_id == occurrence.espace_id]
+            contextes[occurrence.espace_id] = ContexteEspace.charger(occurrence.espace, du_meme[0].debut, du_meme[-1].fin)
+            feuilles[occurrence.espace_id] = occurrence.espace.feuilles()
+        fermeture = contextes[occurrence.espace_id].fermeture(occurrence.debut, occurrence.fin)
+        signalement = f"Fermeture : {fermeture.motif}" if fermeture else ""
         if signalement and occurrence.signalement != signalement:
             occurrence.signalement = signalement
             occurrence.save(update_fields=["signalement"])
-        poser_verrous(occurrence)
+        poser_verrous(occurrence, feuilles[occurrence.espace_id])
     manques = conditions.conditions_manquantes(reservation)
     notifier(
         "reservation_validee",

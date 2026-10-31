@@ -127,7 +127,60 @@ DEFINITIONS: list[DefinitionParametre] = [
         "Portail",
         "COM-02",
     ),
+    # Accessibilité du portail (déclaration RGAA, POR-09)
+    DefinitionParametre(
+        "accessibilite.etat",
+        "État de conformité déclaré",
+        "non conforme",
+        "Portail",
+        "Sans audit, l'état est « non conforme » (obligation légale). Valeurs : non conforme, partiellement conforme, totalement conforme.",
+    ),
+    DefinitionParametre("accessibilite.taux", "Taux de conformité de l'audit (%)", 0, "Portail", "POR-09", bornes=(0, 100)),
+    DefinitionParametre("accessibilite.date_audit", "Date de l'audit (JJ/MM/AAAA, vide si non réalisé)", "", "Portail", "POR-09"),
+    DefinitionParametre("accessibilite.auditeur", "Organisme ayant réalisé l'audit", "", "Portail", "POR-09"),
+    DefinitionParametre(
+        "accessibilite.non_conformites",
+        "Contenus non accessibles connus (un par ligne)",
+        "Les documents PDF signés électroniquement ne sont pas balisés (alternative : version HTML du dossier).",
+        "Portail",
+        "POR-09",
+    ),
+    DefinitionParametre(
+        "accessibilite.contact",
+        "Contact pour signaler un défaut d'accessibilité",
+        "equipements@chatillon.test",
+        "Portail",
+        "POR-09",
+    ),
+    DefinitionParametre(
+        "accessibilite.date_declaration", "Date de la déclaration (JJ/MM/AAAA)", "31/10/2026", "Portail", "POR-09"
+    ),
     # Documents et signature
+    DefinitionParametre("ville.nom", "Nom de la collectivité (documents)", "Ville de Châtillon", "Documents", "DOC-03"),
+    DefinitionParametre(
+        "ville.adresse", "Adresse de la mairie (documents)", "Hôtel de Ville, 92320 Châtillon", "Documents", "DOC-03"
+    ),
+    DefinitionParametre(
+        "ville.service", "Service émetteur", "Service des équipements sportifs et associatifs", "Documents", "DOC-03"
+    ),
+    DefinitionParametre("ville.telephone", "Téléphone du service", "01 00 00 00 00", "Documents", "DOC-03"),
+    DefinitionParametre("ville.courriel", "Courriel du service", "equipements@chatillon.test", "Documents", "DOC-03"),
+    DefinitionParametre(
+        "signature.elu_nom", "Signataire pour la Ville", "L'adjoint au maire délégué aux sports", "Documents", "SIG-01"
+    ),
+    DefinitionParametre(
+        "signature.elu_qualite", "Qualité du signataire", "Pour le Maire et par délégation", "Documents", "SIG-01"
+    ),
+    DefinitionParametre(
+        "signature.elu_courriel", "Courriel du signataire pour la Ville", "elu.sports@chatillon.test", "Documents", "SIG-01"
+    ),
+    DefinitionParametre(
+        "documents.deliberation_reference",
+        "Référence de la délibération tarifaire citée dans les documents",
+        "délibération tarifaire en vigueur",
+        "Documents",
+        "DOC-03",
+    ),
     DefinitionParametre("signature.expiration_jours", "Délai de signature électronique (jours)", 21, "Documents", "SIG-01"),
     DefinitionParametre(
         "signature.relance_jours_avant", "Relance avant expiration de la signature (jours)", 3, "Documents", "SIG-04"
@@ -248,6 +301,11 @@ def _verifier_specifique(cle: str, valeur: Any) -> str | None:
     elif cle == "valorisation.date_depot_attestations":
         if not re.fullmatch(r"(0[1-9]|[12]\d|3[01])-(0[1-9]|1[0-2])", valeur):
             return "Format JJ-MM attendu."
+    elif cle == "accessibilite.etat":
+        if valeur not in {"non conforme", "partiellement conforme", "totalement conforme"}:
+            return "État : non conforme, partiellement conforme ou totalement conforme."
+    elif cle in {"accessibilite.date_audit", "accessibilite.auditeur", "accessibilite.non_conformites"}:
+        return None
     elif isinstance(valeur, str) and not valeur.strip():
         return "Valeur obligatoire."
     return None
@@ -270,7 +328,7 @@ def valider_valeur(cle: str, valeur: Any) -> str | None:
             return f"Valeur entre {minimum} et {maximum} attendue."
     elif not isinstance(valeur, type(defaut)):
         return f"Valeur du même type que la valeur par défaut ({type(defaut).__name__}) attendue."
-    if isinstance(valeur, str) and len(valeur) > 250:
+    if isinstance(valeur, str) and len(valeur) > (4000 if cle == "accessibilite.non_conformites" else 250):
         return "Texte trop long (250 caractères au plus)."
     return _verifier_specifique(cle, valeur)
 

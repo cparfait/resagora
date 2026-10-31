@@ -162,6 +162,7 @@ class PieceJustificative(models.Model):
     depose_le = models.DateTimeField(auto_now_add=True)
     depose_par_portail = models.BooleanField(default=False)
     deposee_par = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL, related_name="+")
+    alerte_envoyee_le = models.DateTimeField(null=True, blank=True, help_text="Relance de renouvellement envoyée (USR-03).")
 
     class Meta:
         ordering = ["usager", "type_piece", "-depose_le"]

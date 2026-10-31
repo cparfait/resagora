@@ -14,9 +14,11 @@
 from __future__ import annotations
 
 import logging
+import re
 import secrets
 from dataclasses import dataclass
 from datetime import timedelta
+from difflib import SequenceMatcher
 from types import SimpleNamespace
 from typing import Any
 
@@ -91,11 +93,30 @@ class ValidateurFamilles:
         return "Trois types de caractères, ou une phrase de passe de 16 caractères."
 
 
+class ValidateurSimilarite:
+    """Le mot de passe ne doit pas reprendre l'adresse, le prénom ou le nom du titulaire."""
+
+    def validate(self, password: str, user: Any = None) -> None:
+        if user is None:
+            return
+        mot = password.lower()
+        valeurs: list[str] = []
+        for attribut in ("identifiant", "prenom", "nom"):
+            valeur = str(getattr(user, attribut, "") or "").lower()
+            valeurs += [valeur, *re.split(r"\W+", valeur)]
+        for valeur in {v for v in valeurs if len(v) >= 3}:
+            if valeur in mot or SequenceMatcher(a=mot, b=valeur).ratio() >= 0.7:
+                raise ValidationError("Mot de passe trop proche du nom ou de l'adresse.", code="password_too_similar")
+
+    def get_help_text(self) -> str:
+        return "Le mot de passe ne reprend ni votre nom ni votre adresse électronique."
+
+
 VALIDATEURS = [
     password_validation.MinimumLengthValidator(min_length=12),
     password_validation.CommonPasswordValidator(),
     password_validation.NumericPasswordValidator(),
-    password_validation.UserAttributeSimilarityValidator(user_attributes=("identifiant", "prenom", "nom"), max_similarity=0.6),
+    ValidateurSimilarite(),
     ValidateurFamilles(),
 ]
 

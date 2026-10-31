@@ -2,11 +2,12 @@
 
 from __future__ import annotations
 
+import json
 from typing import Any
 
 import django_filters
 from django.db.models import QuerySet
-from django.http import FileResponse
+from django.http import FileResponse, HttpResponse
 from drf_spectacular.utils import extend_schema
 from rest_framework import serializers, status
 from rest_framework.decorators import action
@@ -21,7 +22,7 @@ from apps.noyau import fichiers
 from apps.noyau.api import VuePerimetre
 from apps.noyau.exceptions import ErreurValidation
 
-from .. import services
+from .. import rgpd, services
 from ..models import TYPES_USAGER, Contact, PieceJustificative, Rattachement, TypePiece, Usager
 
 LECTURE_ECRITURE = {"lecture": "lire_usager", "ecriture": "gerer_usager"}
@@ -169,6 +170,8 @@ class VueUsagers(VuePerimetre):
         "valider": "valider_compte_usager",
         "suspendre": "valider_compte_usager",
         "reactiver": "valider_compte_usager",
+        "export": "anonymiser_usager",
+        "anonymiser": "anonymiser_usager",
     }
     filterset_class = FiltreUsagers
     http_method_names = ["get", "post", "patch", "head", "options"]
@@ -194,6 +197,28 @@ class VueUsagers(VuePerimetre):
     @action(detail=True, methods=["post"])
     def reactiver(self, request: Request, pk: str | None = None) -> Response:
         return self._changer_statut(request, "valide", {"suspendu"})
+
+    @extend_schema(responses={(200, "application/json"): bytes})
+    @action(detail=True, methods=["get"])
+    def export(self, request: Request, pk: str | None = None) -> HttpResponse:
+        """USR-06 : réponse à une demande d'accès (export complet, journalisé)."""
+        usager = self.get_object()
+        journaliser("exporter_donnees_usager", usager, acteur=agent_courant(request))
+        reponse = HttpResponse(
+            json.dumps(rgpd.exporter_usager(usager), ensure_ascii=False, indent=2, default=str),
+            content_type="application/json; charset=utf-8",
+        )
+        reponse["Content-Disposition"] = f'attachment; filename="usager-{usager.pk}-donnees.json"'
+        return reponse
+
+    @extend_schema(request=MotifUsagerSerializer, responses=UsagerSerializer)
+    @action(detail=True, methods=["post"])
+    def anonymiser(self, request: Request, pk: str | None = None) -> Response:
+        """USR-06 : droit à l'effacement ou durée échue ; les pièces comptables restent conservées."""
+        donnees = MotifUsagerSerializer(data=request.data)
+        donnees.is_valid(raise_exception=True)
+        usager = rgpd.anonymiser_usager(self.get_object(), acteur=agent_courant(request), motif=donnees.validated_data["motif"])
+        return Response(UsagerSerializer(usager, context={"request": request}).data)
 
     @extend_schema(responses={200: dict})
     @action(detail=True, methods=["get"])

@@ -391,6 +391,519 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/gestion/communication/envois": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description COM-04 : journal des envois ; réémission d'un envoi en échec. */
+        get: operations["gestion_communication_envois_list"];
+        put?: never;
+        /** @description COM-04 : journal des envois ; réémission d'un envoi en échec. */
+        post: operations["gestion_communication_envois_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gestion/communication/envois-groupes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description COM-03 : information à un ensemble d'usagers (occupants d'un espace sur une période, ou liste choisie). */
+        post: operations["gestion_communication_envois_groupes_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gestion/communication/envois/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description COM-04 : journal des envois ; réémission d'un envoi en échec. */
+        get: operations["gestion_communication_envois_retrieve"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gestion/communication/envois/{id}/renvoyer": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description COM-04 : journal des envois ; réémission d'un envoi en échec. */
+        post: operations["gestion_communication_envois_renvoyer_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gestion/communication/messages": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description COM-02 : fil de messages d'un dossier, filtré par le périmètre des dossiers. */
+        get: operations["gestion_communication_messages_list"];
+        put?: never;
+        /** @description COM-02 : fil de messages d'un dossier, filtré par le périmètre des dossiers. */
+        post: operations["gestion_communication_messages_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gestion/communication/messages/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description COM-02 : fil de messages d'un dossier, filtré par le périmètre des dossiers. */
+        get: operations["gestion_communication_messages_retrieve"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gestion/communication/messages/non-lus": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Dossiers ayant des messages d'usagers non lus (tableau de bord, COM-02). */
+        get: operations["gestion_communication_messages_non_lus_retrieve"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gestion/communication/modeles": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * @description ADM-04 : les modèles livrés se modifient (texte, activation) mais ne se créent ni ne se suppriment :
+         *     chaque code est appelé par une règle de gestion.
+         */
+        get: operations["gestion_communication_modeles_list"];
+        put?: never;
+        /**
+         * @description ADM-04 : les modèles livrés se modifient (texte, activation) mais ne se créent ni ne se suppriment :
+         *     chaque code est appelé par une règle de gestion.
+         */
+        post: operations["gestion_communication_modeles_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gestion/communication/modeles/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * @description ADM-04 : les modèles livrés se modifient (texte, activation) mais ne se créent ni ne se suppriment :
+         *     chaque code est appelé par une règle de gestion.
+         */
+        get: operations["gestion_communication_modeles_retrieve"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /**
+         * @description ADM-04 : les modèles livrés se modifient (texte, activation) mais ne se créent ni ne se suppriment :
+         *     chaque code est appelé par une règle de gestion.
+         */
+        patch: operations["gestion_communication_modeles_partial_update"];
+        trace?: never;
+    };
+    "/api/gestion/communication/modeles/{id}/apercu": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description Rendu avec des valeurs d'exemple, pour relire un modèle avant de l'enregistrer. */
+        post: operations["gestion_communication_modeles_apercu_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gestion/documents/documents": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description DOC-02 à DOC-07, SIG-01 à SIG-05 : documents d'un dossier, génération, signature, avenants. */
+        get: operations["gestion_documents_documents_list"];
+        put?: never;
+        /** @description DOC-02 à DOC-07, SIG-01 à SIG-05 : documents d'un dossier, génération, signature, avenants. */
+        post: operations["gestion_documents_documents_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gestion/documents/documents/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description DOC-02 à DOC-07, SIG-01 à SIG-05 : documents d'un dossier, génération, signature, avenants. */
+        get: operations["gestion_documents_documents_retrieve"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gestion/documents/documents/{id}/annuler": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description DOC-02 à DOC-07, SIG-01 à SIG-05 : documents d'un dossier, génération, signature, avenants. */
+        post: operations["gestion_documents_documents_annuler_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gestion/documents/documents/{id}/annuler-signature": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description DOC-02 à DOC-07, SIG-01 à SIG-05 : documents d'un dossier, génération, signature, avenants. */
+        post: operations["gestion_documents_documents_annuler_signature_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gestion/documents/documents/{id}/avenant": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description DOC-02 à DOC-07, SIG-01 à SIG-05 : documents d'un dossier, génération, signature, avenants. */
+        post: operations["gestion_documents_documents_avenant_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gestion/documents/documents/{id}/envoyer-signature": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description DOC-02 à DOC-07, SIG-01 à SIG-05 : documents d'un dossier, génération, signature, avenants. */
+        post: operations["gestion_documents_documents_envoyer_signature_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gestion/documents/documents/{id}/fichier": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Exemplaire de référence : le PDF signé s'il existe, sinon le PDF généré. */
+        get: operations["gestion_documents_documents_fichier_retrieve"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gestion/documents/documents/{id}/original": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description DOC-02 à DOC-07, SIG-01 à SIG-05 : documents d'un dossier, génération, signature, avenants. */
+        get: operations["gestion_documents_documents_original_retrieve"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gestion/documents/documents/{id}/preuve": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description DOC-02 à DOC-07, SIG-01 à SIG-05 : documents d'un dossier, génération, signature, avenants. */
+        get: operations["gestion_documents_documents_preuve_retrieve"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gestion/documents/documents/{id}/scan-signe": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description DOC-02 à DOC-07, SIG-01 à SIG-05 : documents d'un dossier, génération, signature, avenants. */
+        post: operations["gestion_documents_documents_scan_signe_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gestion/documents/documents/generer": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description DOC-02 à DOC-07, SIG-01 à SIG-05 : documents d'un dossier, génération, signature, avenants. */
+        post: operations["gestion_documents_documents_generer_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gestion/documents/lots": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description DOC-06 : génération en lot en tâche de fond, avec progression et rapport d'erreurs. */
+        get: operations["gestion_documents_lots_list"];
+        put?: never;
+        /** @description DOC-06 : génération en lot en tâche de fond, avec progression et rapport d'erreurs. */
+        post: operations["gestion_documents_lots_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gestion/documents/lots/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description DOC-06 : génération en lot en tâche de fond, avec progression et rapport d'erreurs. */
+        get: operations["gestion_documents_lots_retrieve"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gestion/documents/modeles": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description DOC-01, ADM-04 : modèles livrés, versions déposées (.docx éditables dans Word). */
+        get: operations["gestion_documents_modeles_list"];
+        put?: never;
+        /** @description DOC-01, ADM-04 : modèles livrés, versions déposées (.docx éditables dans Word). */
+        post: operations["gestion_documents_modeles_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gestion/documents/modeles/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description DOC-01, ADM-04 : modèles livrés, versions déposées (.docx éditables dans Word). */
+        get: operations["gestion_documents_modeles_retrieve"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** @description DOC-01, ADM-04 : modèles livrés, versions déposées (.docx éditables dans Word). */
+        patch: operations["gestion_documents_modeles_partial_update"];
+        trace?: never;
+    };
+    "/api/gestion/documents/modeles/{id}/activer-version": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description DOC-01, ADM-04 : modèles livrés, versions déposées (.docx éditables dans Word). */
+        post: operations["gestion_documents_modeles_activer_version_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gestion/documents/modeles/{id}/deposer-version": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description DOC-01, ADM-04 : modèles livrés, versions déposées (.docx éditables dans Word). */
+        post: operations["gestion_documents_modeles_deposer_version_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gestion/documents/modeles/{id}/versions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description DOC-01, ADM-04 : modèles livrés, versions déposées (.docx éditables dans Word). */
+        get: operations["gestion_documents_modeles_versions_list"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gestion/documents/modeles/{id}/versions/{version}/fichier": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description DOC-01, ADM-04 : modèles livrés, versions déposées (.docx éditables dans Word). */
+        get: operations["gestion_documents_modeles_versions_fichier_retrieve"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/gestion/moi": {
         parameters: {
             query?: never;
@@ -1481,6 +1994,126 @@ export interface paths {
         patch: operations["gestion_reservations_vues_partial_update"];
         trace?: never;
     };
+    "/api/gestion/usagers/comptes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description `chemin_site` : chemin ORM vers le site de l'objet (None = objet transversal). */
+        get: operations["gestion_usagers_comptes_list"];
+        put?: never;
+        /** @description `chemin_site` : chemin ORM vers le site de l'objet (None = objet transversal). */
+        post: operations["gestion_usagers_comptes_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gestion/usagers/comptes/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description `chemin_site` : chemin ORM vers le site de l'objet (None = objet transversal). */
+        get: operations["gestion_usagers_comptes_retrieve"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gestion/usagers/comptes/{id}/reactiver": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description `chemin_site` : chemin ORM vers le site de l'objet (None = objet transversal). */
+        post: operations["gestion_usagers_comptes_reactiver_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gestion/usagers/comptes/{id}/refuser": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description `chemin_site` : chemin ORM vers le site de l'objet (None = objet transversal). */
+        post: operations["gestion_usagers_comptes_refuser_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gestion/usagers/comptes/{id}/suspendre": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description `chemin_site` : chemin ORM vers le site de l'objet (None = objet transversal). */
+        post: operations["gestion_usagers_comptes_suspendre_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gestion/usagers/comptes/{id}/valider": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description `chemin_site` : chemin ORM vers le site de l'objet (None = objet transversal). */
+        post: operations["gestion_usagers_comptes_valider_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gestion/usagers/comptes/inviter": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description Un agent invite un contact déjà connu au guichet à créer son compte (lien de 7 jours). */
+        post: operations["gestion_usagers_comptes_inviter_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/gestion/usagers/contacts": {
         parameters: {
             query?: never;
@@ -1715,6 +2348,40 @@ export interface paths {
         patch: operations["gestion_usagers_usagers_partial_update"];
         trace?: never;
     };
+    "/api/gestion/usagers/usagers/{id}/anonymiser": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description USR-06 : droit à l'effacement ou durée échue ; les pièces comptables restent conservées. */
+        post: operations["gestion_usagers_usagers_anonymiser_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gestion/usagers/usagers/{id}/export": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description USR-06 : réponse à une demande d'accès (export complet, journalisé). */
+        get: operations["gestion_usagers_usagers_export_retrieve"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/gestion/usagers/usagers/{id}/historique": {
         parameters: {
             query?: never;
@@ -1887,6 +2554,66 @@ export interface components {
             /** @description Vide : tous les sites. */
             sites?: number[];
         };
+        /**
+         * @description * `courriel` - Courriel
+         *     * `sms` - SMS
+         *     * `portail` - Portail
+         * @enum {string}
+         */
+        CanalEnum: "courriel" | "sms" | "portail";
+        Circuit: {
+            readonly id: number;
+            mode?: components["schemas"]["CircuitModeEnum"];
+            statut?: components["schemas"]["CircuitStatutEnum"];
+            /** Format: date-time */
+            readonly envoye_le: string;
+            /** Format: date-time */
+            expire_le?: string | null;
+            /** Format: date-time */
+            relance_le?: string | null;
+            /** Format: date-time */
+            termine_le?: string | null;
+            /**
+             * Format: date-time
+             * @description Soumission supprimée côté DocuSeal (SIG-03).
+             */
+            purge_le?: string | null;
+            erreur?: string;
+            readonly signataires: components["schemas"]["Signataire"][];
+        };
+        /**
+         * @description * `docuseal` - Signature électronique (DocuSeal)
+         *     * `manuel` - Signature manuscrite (scan déposé)
+         * @enum {string}
+         */
+        CircuitModeEnum: "docuseal" | "manuel";
+        CircuitRequest: {
+            mode?: components["schemas"]["CircuitModeEnum"];
+            statut?: components["schemas"]["CircuitStatutEnum"];
+            /** Format: date-time */
+            expire_le?: string | null;
+            /** Format: date-time */
+            relance_le?: string | null;
+            /** Format: date-time */
+            termine_le?: string | null;
+            /**
+             * Format: date-time
+             * @description Soumission supprimée côté DocuSeal (SIG-03).
+             */
+            purge_le?: string | null;
+            erreur?: string;
+        };
+        /**
+         * @description * `preparation` - Dépôt en cours auprès du service de signature
+         *     * `envoye` - Envoyé
+         *     * `signe` - Signé
+         *     * `expire` - Expiré
+         *     * `annule` - Annulé
+         *     * `refuse` - Refusé par un signataire
+         *     * `erreur` - Erreur d'envoi
+         * @enum {string}
+         */
+        CircuitStatutEnum: "preparation" | "envoye" | "signe" | "expire" | "annule" | "refuse" | "erreur";
         CodeTotpRequest: {
             code: string;
         };
@@ -1896,6 +2623,40 @@ export interface components {
          * @enum {string}
          */
         ColorationEnum: "statut" | "type_usager";
+        Compte: {
+            readonly id: number;
+            /**
+             * Identifiant (adresse électronique)
+             * Format: email
+             */
+            readonly identifiant: string;
+            readonly contact: number;
+            readonly contact_nom: string;
+            readonly telephone: string;
+            readonly statut: components["schemas"]["CompteStatutEnum"];
+            /** Format: date-time */
+            readonly courriel_confirme_le: string | null;
+            /** Format: date-time */
+            readonly valide_le: string | null;
+            readonly motif_suspension: string;
+            readonly totp_actif: boolean;
+            /** Format: date-time */
+            readonly derniere_connexion: string | null;
+            /** Format: date-time */
+            readonly cree_le: string;
+            readonly structures: {
+                [key: string]: unknown;
+            }[];
+        };
+        /**
+         * @description * `a_confirmer` - Courriel à confirmer
+         *     * `a_valider` - En attente de validation par la Ville
+         *     * `actif` - Actif
+         *     * `suspendu` - Suspendu
+         *     * `ferme` - Fermé
+         * @enum {string}
+         */
+        CompteStatutEnum: "a_confirmer" | "a_valider" | "actif" | "suspendu" | "ferme";
         /**
          * @description * `pieces` - pieces
          *     * `convention` - convention
@@ -1997,14 +2758,43 @@ export interface components {
             /** @default 0 */
             ordre: number;
         };
+        DepotVersionRequest: {
+            /** Format: binary */
+            fichier: string;
+            /** @default  */
+            commentaire: string;
+        };
         Document: {
             readonly id: number;
-            espace: number;
-            nature?: components["schemas"]["DocumentNatureEnum"];
-            titre: string;
-            /** @description Téléchargeable depuis le portail. */
-            public?: boolean;
-            readonly nom_fichier: string;
+            readonly numero: string;
+            readonly modele: number;
+            readonly modele_libelle: string;
+            readonly version_numero: number;
+            readonly nature: components["schemas"]["NatureA83Enum"];
+            readonly titre: string;
+            readonly dossier: number | null;
+            /** @default  */
+            readonly dossier_numero: string;
+            readonly usager: number | null;
+            /** @default  */
+            readonly usager_nom: string;
+            /** @description Document modifié (avenant). */
+            readonly parent: number | null;
+            /** @default  */
+            readonly parent_numero: string;
+            readonly sha256: string;
+            readonly statut: components["schemas"]["DocumentStatutEnum"];
+            /** Format: date-time */
+            readonly signe_le: string | null;
+            /** @description Signataires ou agent ayant constaté. */
+            readonly signe_par: string;
+            readonly signature_requise: boolean;
+            readonly visible_portail: boolean;
+            readonly motif_annulation: string;
+            readonly cree_par: string;
+            /** Format: date-time */
+            readonly cree_le: string;
+            readonly circuits: components["schemas"]["Circuit"][];
         };
         /**
          * @description * `reglement` - Règlement intérieur
@@ -2014,6 +2804,15 @@ export interface components {
          * @enum {string}
          */
         DocumentNatureEnum: "reglement" | "plan" | "securite" | "autre";
+        /**
+         * @description * `genere` - Généré
+         *     * `en_signature` - En signature
+         *     * `signe` - Signé électroniquement
+         *     * `signe_manuellement` - Signé manuellement
+         *     * `annule` - Annulé
+         * @enum {string}
+         */
+        DocumentStatutEnum: "genere" | "en_signature" | "signe" | "signe_manuellement" | "annule";
         Dossier: {
             readonly id: number;
             readonly numero: string;
@@ -2054,6 +2853,27 @@ export interface components {
             uri: string;
             qr_svg: string;
             graine: string;
+        };
+        EnvoiGroupeRequest: {
+            titre: string;
+            texte: string;
+            usagers?: number[];
+            espace?: number;
+            /** Format: date-time */
+            debut?: string;
+            /** Format: date-time */
+            fin?: string;
+            /** @default false */
+            sms: boolean;
+        };
+        /**
+         * @description * `docuseal` - docuseal
+         *     * `manuel` - manuel
+         * @enum {string}
+         */
+        EnvoiSignatureModeEnum: "docuseal" | "manuel";
+        EnvoiSignatureRequest: {
+            mode?: components["schemas"]["EnvoiSignatureModeEnum"];
         };
         Espace: {
             readonly id: number;
@@ -2170,6 +2990,10 @@ export interface components {
             fin: string;
             motif: string;
         };
+        GenerationRequest: {
+            modele: string;
+            dossier: number;
+        };
         GroupeAD: {
             readonly id: number;
             /** DN du groupe */
@@ -2247,6 +3071,9 @@ export interface components {
             /** @description Plage valable aussi pendant les vacances scolaires. */
             pendant_vacances?: boolean;
         };
+        InvitationRequest: {
+            contact: number;
+        };
         JetonEnrolementRequest: {
             jeton: string;
         };
@@ -2308,16 +3135,102 @@ export interface components {
             usager: number;
             contact?: number | null;
         };
+        Lot: {
+            readonly id: number;
+            modele_code: string;
+            libelle: string;
+            envoyer_signature?: boolean;
+            readonly statut: components["schemas"]["LotStatutEnum"];
+            readonly total: number;
+            readonly faits: number;
+            readonly erreurs: unknown;
+            /** Format: date-time */
+            readonly cree_le: string;
+            /** Format: date-time */
+            readonly termine_le: string | null;
+        };
+        LotRequest: {
+            modele_code: string;
+            libelle: string;
+            dossiers: number[];
+            envoyer_signature?: boolean;
+        };
         /**
-         * @description * `jour` - Jour
-         *     * `semaine` - Semaine
-         *     * `mois` - Mois
-         *     * `chronologie` - Chronologie par espace
-         *     * `multi_sites` - Occupation multi-sites
-         *     * `liste` - Liste
+         * @description * `en_attente` - En attente
+         *     * `en_cours` - En cours
+         *     * `termine` - Terminé
+         *     * `echec` - En échec
          * @enum {string}
          */
-        ModeEnum: "jour" | "semaine" | "mois" | "chronologie" | "multi_sites" | "liste";
+        LotStatutEnum: "en_attente" | "en_cours" | "termine" | "echec";
+        Message: {
+            readonly id: number;
+            dossier: number;
+            readonly auteur: string;
+            readonly de_la_ville: boolean;
+            corps: string;
+            /** Format: date-time */
+            readonly cree_le: string;
+            /** Format: date-time */
+            readonly lu_par_ville_le: string | null;
+            /** Format: date-time */
+            readonly lu_par_usager_le: string | null;
+        };
+        MessageRequest: {
+            dossier: number;
+            corps: string;
+        };
+        ModeleDocument: {
+            readonly id: number;
+            readonly code: string;
+            libelle: string;
+            readonly nature: components["schemas"]["NatureA83Enum"];
+            description?: string;
+            signature_requise?: boolean;
+            /** @description Rôles des signataires dans l'ordre : « usager », « elu », « agent ». */
+            signataires?: unknown;
+            actif?: boolean;
+            /** @description Version utilisée. */
+            readonly version_active: number | null;
+            readonly version_active_numero: number;
+            readonly variables: string[];
+        };
+        ModeleDocumentRequest: {
+            libelle: string;
+            description?: string;
+            signature_requise?: boolean;
+            /** @description Rôles des signataires dans l'ordre : « usager », « elu », « agent ». */
+            signataires?: unknown;
+            actif?: boolean;
+        };
+        ModeleMessage: {
+            readonly id: number;
+            readonly code: string;
+            libelle: string;
+            sujet: string;
+            /** @description Texte du message ; variables entre doubles accolades. */
+            corps: string;
+            /**
+             * Texte du SMS
+             * @description Vide : pas de SMS pour ce message (COM-05).
+             */
+            sms?: string;
+            actif?: boolean;
+            /** Format: date-time */
+            readonly modifie_le: string;
+        };
+        ModeleMessageRequest: {
+            libelle: string;
+            sujet: string;
+            /** @description Texte du message ; variables entre doubles accolades. */
+            corps: string;
+            /**
+             * Texte du SMS
+             * @description Vide : pas de SMS pour ce message (COM-05).
+             */
+            sms?: string;
+            actif?: boolean;
+        };
         ModificationSerieRequest: {
             espace?: number;
             /** Format: time */
@@ -2341,9 +3254,57 @@ export interface components {
             double_authentification_validee: boolean;
             habilitations: components["schemas"]["HabilitationMoi"][];
         };
+        MotifRequest: {
+            motif: string;
+        };
         MotifUsagerRequest: {
             motif: string;
         };
+        /**
+         * @description * `convention` - Convention d'occupation
+         *     * `contrat_location` - Contrat de location
+         *     * `avenant` - Avenant
+         *     * `devis` - Devis
+         *     * `facture` - Facture
+         *     * `avoir` - Avoir
+         *     * `etat_des_lieux` - État des lieux
+         *     * `attribution` - Courrier d'attribution de créneaux
+         *     * `refus` - Courrier de refus motivé
+         *     * `attestation_valorisation` - Attestation de valorisation des avantages en nature
+         *     * `fermeture` - Avis de fermeture exceptionnelle
+         * @enum {string}
+         */
+        NatureA83Enum: "convention" | "contrat_location" | "avenant" | "devis" | "facture" | "avoir" | "etat_des_lieux" | "attribution" | "refus" | "attestation_valorisation" | "fermeture";
+        Notification: {
+            readonly id: number;
+            readonly canal: components["schemas"]["CanalEnum"];
+            readonly modele: number | null;
+            /** @default  */
+            readonly modele_libelle: string;
+            readonly destinataire: string;
+            readonly sujet: string;
+            /** @description Texte conservé ; les liens à usage unique y sont masqués. */
+            readonly corps: string;
+            readonly objet_type: string;
+            readonly objet_id: string;
+            /** @description Identifiant d'un envoi groupé. */
+            readonly groupe: string;
+            readonly statut: components["schemas"]["NotificationStatutEnum"];
+            readonly tentatives: number;
+            readonly erreur: string;
+            /** Format: date-time */
+            readonly cree_le: string;
+            /** Format: date-time */
+            readonly envoyee_le: string | null;
+        };
+        /**
+         * @description * `a_envoyer` - À envoyer
+         *     * `envoyee` - Envoyée
+         *     * `echec` - Échec
+         *     * `ignoree` - Ignorée (préférences)
+         * @enum {string}
+         */
+        NotificationStatutEnum: "a_envoyer" | "envoyee" | "echec" | "ignoree";
         NouvelleReservationRequest: {
             espace: number;
             /** Format: date */
@@ -2458,6 +3419,21 @@ export interface components {
              */
             previous?: string | null;
             results: components["schemas"]["Campagne"][];
+        };
+        PaginatedCompteList: {
+            /** @example 123 */
+            count: number;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?page=4
+             */
+            next?: string | null;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?page=2
+             */
+            previous?: string | null;
+            results: components["schemas"]["Compte"][];
         };
         PaginatedContactList: {
             /** @example 123 */
@@ -2608,6 +3584,51 @@ export interface components {
              */
             previous?: string | null;
             results: components["schemas"]["ListeAttente"][];
+        };
+        PaginatedLotList: {
+            /** @example 123 */
+            count: number;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?page=4
+             */
+            next?: string | null;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?page=2
+             */
+            previous?: string | null;
+            results: components["schemas"]["Lot"][];
+        };
+        PaginatedMessageList: {
+            /** @example 123 */
+            count: number;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?page=4
+             */
+            next?: string | null;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?page=2
+             */
+            previous?: string | null;
+            results: components["schemas"]["Message"][];
+        };
+        PaginatedNotificationList: {
+            /** @example 123 */
+            count: number;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?page=4
+             */
+            next?: string | null;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?page=2
+             */
+            previous?: string | null;
+            results: components["schemas"]["Notification"][];
         };
         PaginatedOccurrenceList: {
             /** @example 123 */
@@ -2894,6 +3915,26 @@ export interface components {
             /** @description Plage valable aussi pendant les vacances scolaires. */
             pendant_vacances?: boolean;
         };
+        PatchedModeleDocumentRequest: {
+            libelle?: string;
+            description?: string;
+            signature_requise?: boolean;
+            /** @description Rôles des signataires dans l'ordre : « usager », « elu », « agent ». */
+            signataires?: unknown;
+            actif?: boolean;
+        };
+        PatchedModeleMessageRequest: {
+            libelle?: string;
+            sujet?: string;
+            /** @description Texte du message ; variables entre doubles accolades. */
+            corps?: string;
+            /**
+             * Texte du SMS
+             * @description Vide : pas de SMS pour ce message (COM-05).
+             */
+            sms?: string;
+            actif?: boolean;
+        };
         PatchedModificationRequest: {
             valeurs?: {
                 [key: string]: unknown;
@@ -3020,7 +4061,7 @@ export interface components {
         };
         PatchedVueEnregistreeRequest: {
             nom?: string;
-            mode?: components["schemas"]["ModeEnum"];
+            mode?: components["schemas"]["VueEnregistreeModeEnum"];
             filtres?: unknown;
             coloration?: components["schemas"]["ColorationEnum"];
             par_defaut?: boolean;
@@ -3238,6 +4279,10 @@ export interface components {
              */
             cloturee?: boolean;
         };
+        ScanRequest: {
+            /** Format: binary */
+            fichier: string;
+        };
         SeancePlanning: {
             id: number;
             reservation: number;
@@ -3255,6 +4300,26 @@ export interface components {
             fin: string;
             statut: string;
             signalement: string;
+        };
+        Signataire: {
+            ordre: number;
+            role: string;
+            nom: string;
+            /** Format: email */
+            courriel: string;
+            statut: string;
+            /** Format: date-time */
+            signe_le: string | null;
+        };
+        SignataireRequest: {
+            ordre: number;
+            role: string;
+            nom: string;
+            /** Format: email */
+            courriel: string;
+            statut: string;
+            /** Format: date-time */
+            signe_le: string | null;
         };
         Site: {
             readonly id: number;
@@ -3502,6 +4567,9 @@ export interface components {
          * @enum {string}
          */
         UtilisateurSourceEnum: "ad" | "local";
+        ValidationRequest: {
+            usager_existant?: number | null;
+        };
         Verification: {
             entrees_verifiees: number;
             integre: boolean;
@@ -3514,17 +4582,37 @@ export interface components {
             /** Format: date */
             valide_jusqu_au?: string | null;
         };
+        Version: {
+            readonly id: number;
+            numero: number;
+            readonly nom_fichier: string;
+            readonly sha256: string;
+            commentaire?: string;
+            deposee_par?: string;
+            /** Format: date-time */
+            readonly deposee_le: string;
+        };
         VueEnregistree: {
             readonly id: number;
             nom: string;
-            mode?: components["schemas"]["ModeEnum"];
+            mode?: components["schemas"]["VueEnregistreeModeEnum"];
             filtres?: unknown;
             coloration?: components["schemas"]["ColorationEnum"];
             par_defaut?: boolean;
         };
+        /**
+         * @description * `jour` - Jour
+         *     * `semaine` - Semaine
+         *     * `mois` - Mois
+         *     * `chronologie` - Chronologie par espace
+         *     * `multi_sites` - Occupation multi-sites
+         *     * `liste` - Liste
+         * @enum {string}
+         */
+        VueEnregistreeModeEnum: "jour" | "semaine" | "mois" | "chronologie" | "multi_sites" | "liste";
         VueEnregistreeRequest: {
             nom: string;
-            mode?: components["schemas"]["ModeEnum"];
+            mode?: components["schemas"]["VueEnregistreeModeEnum"];
             filtres?: unknown;
             coloration?: components["schemas"]["ColorationEnum"];
             par_defaut?: boolean;
@@ -4529,6 +5617,934 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["EtapeConnexion"];
+                };
+            };
+        };
+    };
+    gestion_communication_envois_list: {
+        parameters: {
+            query?: {
+                /**
+                 * @description * `courriel` - Courriel
+                 *     * `sms` - SMS
+                 *     * `portail` - Portail
+                 */
+                canal?: "courriel" | "portail" | "sms";
+                depuis?: string;
+                groupe?: string;
+                modele?: number;
+                objet_id?: string;
+                objet_type?: string;
+                /** @description Un numéro de page de l'ensemble des résultats. */
+                page?: number;
+                recherche?: string;
+                /**
+                 * @description * `a_envoyer` - À envoyer
+                 *     * `envoyee` - Envoyée
+                 *     * `echec` - Échec
+                 *     * `ignoree` - Ignorée (préférences)
+                 */
+                statut?: "a_envoyer" | "echec" | "envoyee" | "ignoree";
+                /** @description Nombre de résultats à retourner par page. */
+                taille?: number;
+                usager?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PaginatedNotificationList"];
+                };
+            };
+        };
+    };
+    gestion_communication_envois_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Notification"];
+                };
+            };
+        };
+    };
+    gestion_communication_envois_groupes_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["EnvoiGroupeRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["EnvoiGroupeRequest"];
+                "multipart/form-data": components["schemas"]["EnvoiGroupeRequest"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
+    gestion_communication_envois_retrieve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) notification. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Notification"];
+                };
+            };
+        };
+    };
+    gestion_communication_envois_renvoyer_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) notification. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Notification"];
+                };
+            };
+        };
+    };
+    gestion_communication_messages_list: {
+        parameters: {
+            query?: {
+                dossier?: number;
+                /** @description Un numéro de page de l'ensemble des résultats. */
+                page?: number;
+                /** @description Nombre de résultats à retourner par page. */
+                taille?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PaginatedMessageList"];
+                };
+            };
+        };
+    };
+    gestion_communication_messages_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MessageRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["MessageRequest"];
+                "multipart/form-data": components["schemas"]["MessageRequest"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Message"];
+                };
+            };
+        };
+    };
+    gestion_communication_messages_retrieve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) message. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Message"];
+                };
+            };
+        };
+    };
+    gestion_communication_messages_non_lus_retrieve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
+    gestion_communication_modeles_list: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ModeleMessage"][];
+                };
+            };
+        };
+    };
+    gestion_communication_modeles_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ModeleMessageRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["ModeleMessageRequest"];
+                "multipart/form-data": components["schemas"]["ModeleMessageRequest"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ModeleMessage"];
+                };
+            };
+        };
+    };
+    gestion_communication_modeles_retrieve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) modele message. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ModeleMessage"];
+                };
+            };
+        };
+    };
+    gestion_communication_modeles_partial_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) modele message. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["PatchedModeleMessageRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["PatchedModeleMessageRequest"];
+                "multipart/form-data": components["schemas"]["PatchedModeleMessageRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ModeleMessage"];
+                };
+            };
+        };
+    };
+    gestion_communication_modeles_apercu_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) modele message. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
+    gestion_documents_documents_list: {
+        parameters: {
+            query?: {
+                dossier?: number;
+                modele?: number;
+                /**
+                 * @description * `convention` - Convention d'occupation
+                 *     * `contrat_location` - Contrat de location
+                 *     * `avenant` - Avenant
+                 *     * `devis` - Devis
+                 *     * `facture` - Facture
+                 *     * `avoir` - Avoir
+                 *     * `etat_des_lieux` - État des lieux
+                 *     * `attribution` - Courrier d'attribution de créneaux
+                 *     * `refus` - Courrier de refus motivé
+                 *     * `attestation_valorisation` - Attestation de valorisation des avantages en nature
+                 *     * `fermeture` - Avis de fermeture exceptionnelle
+                 */
+                nature?: "attestation_valorisation" | "attribution" | "avenant" | "avoir" | "contrat_location" | "convention" | "devis" | "etat_des_lieux" | "facture" | "fermeture" | "refus";
+                /** @description Un numéro de page de l'ensemble des résultats. */
+                page?: number;
+                /**
+                 * @description * `genere` - Généré
+                 *     * `en_signature` - En signature
+                 *     * `signe` - Signé électroniquement
+                 *     * `signe_manuellement` - Signé manuellement
+                 *     * `annule` - Annulé
+                 */
+                statut?: "annule" | "en_signature" | "genere" | "signe" | "signe_manuellement";
+                /** @description Nombre de résultats à retourner par page. */
+                taille?: number;
+                usager?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PaginatedDocumentList"];
+                };
+            };
+        };
+    };
+    gestion_documents_documents_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Document"];
+                };
+            };
+        };
+    };
+    gestion_documents_documents_retrieve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) document. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Document"];
+                };
+            };
+        };
+    };
+    gestion_documents_documents_annuler_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) document. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MotifRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["MotifRequest"];
+                "multipart/form-data": components["schemas"]["MotifRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Document"];
+                };
+            };
+        };
+    };
+    gestion_documents_documents_annuler_signature_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) document. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MotifRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["MotifRequest"];
+                "multipart/form-data": components["schemas"]["MotifRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Document"];
+                };
+            };
+        };
+    };
+    gestion_documents_documents_avenant_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) document. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MotifRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["MotifRequest"];
+                "multipart/form-data": components["schemas"]["MotifRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Document"];
+                };
+            };
+        };
+    };
+    gestion_documents_documents_envoyer_signature_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) document. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["EnvoiSignatureRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["EnvoiSignatureRequest"];
+                "multipart/form-data": components["schemas"]["EnvoiSignatureRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Document"];
+                };
+            };
+        };
+    };
+    gestion_documents_documents_fichier_retrieve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) document. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/pdf": string;
+                };
+            };
+        };
+    };
+    gestion_documents_documents_original_retrieve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) document. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/pdf": string;
+                };
+            };
+        };
+    };
+    gestion_documents_documents_preuve_retrieve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) document. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/pdf": string;
+                };
+            };
+        };
+    };
+    gestion_documents_documents_scan_signe_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) document. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "multipart/form-data": components["schemas"]["ScanRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Document"];
+                };
+            };
+        };
+    };
+    gestion_documents_documents_generer_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GenerationRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["GenerationRequest"];
+                "multipart/form-data": components["schemas"]["GenerationRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Document"];
+                };
+            };
+        };
+    };
+    gestion_documents_lots_list: {
+        parameters: {
+            query?: {
+                /** @description Un numéro de page de l'ensemble des résultats. */
+                page?: number;
+                /** @description Nombre de résultats à retourner par page. */
+                taille?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PaginatedLotList"];
+                };
+            };
+        };
+    };
+    gestion_documents_lots_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["LotRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["LotRequest"];
+                "multipart/form-data": components["schemas"]["LotRequest"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Lot"];
+                };
+            };
+        };
+    };
+    gestion_documents_lots_retrieve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) lot generation. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Lot"];
+                };
+            };
+        };
+    };
+    gestion_documents_modeles_list: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ModeleDocument"][];
+                };
+            };
+        };
+    };
+    gestion_documents_modeles_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ModeleDocumentRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["ModeleDocumentRequest"];
+                "multipart/form-data": components["schemas"]["ModeleDocumentRequest"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ModeleDocument"];
+                };
+            };
+        };
+    };
+    gestion_documents_modeles_retrieve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) modele document. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ModeleDocument"];
+                };
+            };
+        };
+    };
+    gestion_documents_modeles_partial_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) modele document. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["PatchedModeleDocumentRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["PatchedModeleDocumentRequest"];
+                "multipart/form-data": components["schemas"]["PatchedModeleDocumentRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ModeleDocument"];
+                };
+            };
+        };
+    };
+    gestion_documents_modeles_activer_version_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) modele document. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": {
+                    version?: number;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ModeleDocument"];
+                };
+            };
+        };
+    };
+    gestion_documents_modeles_deposer_version_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) modele document. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "multipart/form-data": components["schemas"]["DepotVersionRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Version"];
+                };
+            };
+        };
+    };
+    gestion_documents_modeles_versions_list: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) modele document. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Version"][];
+                };
+            };
+        };
+    };
+    gestion_documents_modeles_versions_fichier_retrieve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) modele document. */
+                id: number;
+                version: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/octet-stream": string;
                 };
             };
         };
@@ -7476,6 +9492,211 @@ export interface operations {
             };
         };
     };
+    gestion_usagers_comptes_list: {
+        parameters: {
+            query?: {
+                /** @description Un numéro de page de l'ensemble des résultats. */
+                page?: number;
+                recherche?: string;
+                /**
+                 * @description * `a_confirmer` - Courriel à confirmer
+                 *     * `a_valider` - En attente de validation par la Ville
+                 *     * `actif` - Actif
+                 *     * `suspendu` - Suspendu
+                 *     * `ferme` - Fermé
+                 */
+                statut?: "a_confirmer" | "a_valider" | "actif" | "ferme" | "suspendu";
+                /** @description Nombre de résultats à retourner par page. */
+                taille?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PaginatedCompteList"];
+                };
+            };
+        };
+    };
+    gestion_usagers_comptes_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Compte"];
+                };
+            };
+        };
+    };
+    gestion_usagers_comptes_retrieve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) compte du portail. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Compte"];
+                };
+            };
+        };
+    };
+    gestion_usagers_comptes_reactiver_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) compte du portail. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Compte"];
+                };
+            };
+        };
+    };
+    gestion_usagers_comptes_refuser_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) compte du portail. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MotifRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["MotifRequest"];
+                "multipart/form-data": components["schemas"]["MotifRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Compte"];
+                };
+            };
+        };
+    };
+    gestion_usagers_comptes_suspendre_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) compte du portail. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MotifRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["MotifRequest"];
+                "multipart/form-data": components["schemas"]["MotifRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Compte"];
+                };
+            };
+        };
+    };
+    gestion_usagers_comptes_valider_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) compte du portail. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["ValidationRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["ValidationRequest"];
+                "multipart/form-data": components["schemas"]["ValidationRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Compte"];
+                };
+            };
+        };
+    };
+    gestion_usagers_comptes_inviter_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["InvitationRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["InvitationRequest"];
+                "multipart/form-data": components["schemas"]["InvitationRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Compte"];
+                };
+            };
+        };
+    };
     gestion_usagers_contacts_list: {
         parameters: {
             query?: {
@@ -8141,6 +10362,56 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["Usager"];
+                };
+            };
+        };
+    };
+    gestion_usagers_usagers_anonymiser_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) usager. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MotifUsagerRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["MotifUsagerRequest"];
+                "multipart/form-data": components["schemas"]["MotifUsagerRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Usager"];
+                };
+            };
+        };
+    };
+    gestion_usagers_usagers_export_retrieve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) usager. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string;
                 };
             };
         };

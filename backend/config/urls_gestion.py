@@ -14,8 +14,11 @@ routeur.register("audit/journal", VueJournalAudit, basename="journal-audit")
 gestion = [
     path("", include("apps.habilitations.api.urls")),
     path("", include("apps.referentiel.api.urls")),
+    path("", include("apps.comptes.urls")),
     path("", include("apps.usagers.api.urls")),
     path("", include("apps.reservations.api.urls")),
+    path("", include("apps.communication.api.urls")),
+    path("", include("apps.documents.api.urls")),
     path("parametres", VueParametres.as_view(), name="parametres"),
     *routeur.urls,
 ]

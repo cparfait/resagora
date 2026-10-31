@@ -172,7 +172,7 @@ def test_ref07_espace_partageable_dans_la_limite_de_sa_capacite():
         valider_systeme(reserver(piste, date(2026, 11, 10), "19:00", "20:00"))
 
 
-@pytest.mark.django_db(transaction=True, serialized_rollback=True)
+@pytest.mark.django_db(transaction=True)
 def test_rg01_deux_validations_simultanees_une_seule_reussit():
     espace = EspaceFabrique()
     a = reserver(espace, date(2026, 11, 10), "18:00", "20:00")
