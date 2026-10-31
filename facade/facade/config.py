@@ -52,4 +52,18 @@ class Configuration:
     nombre_proxies: int = field(default_factory=lambda: _entier("NOMBRE_PROXIES", 1))
     # Recette automatisée uniquement : multiplie les seuils de débit (SEC-06) ; 1 en production.
     facteur_debit: int = field(default_factory=lambda: max(1, int(os.environ.get("FACTEUR_DEBIT", "1"))))
+    # « recette » autorise les réglages de test ci-dessus ; toute autre valeur vaut production.
+    environnement: str = field(default_factory=lambda: os.environ.get("ENVIRONNEMENT", "production"))
     delai_api_s: float = field(default_factory=lambda: float(os.environ.get("DELAI_API_SECONDES", "15")))
+
+
+def controler_production(config: Configuration) -> None:
+    """Refuse de démarrer avec un réglage de recette hors recette (seuils de débit élargis, filtre PayFiP levé)."""
+    if config.environnement == "recette":
+        return
+    if config.facteur_debit > 1:
+        raise RuntimeError("FACTEUR_DEBIT > 1 n'est permis qu'en recette (ENVIRONNEMENT=recette).")
+    if config.payfip_sans_filtre_ip:
+        raise RuntimeError("PAYFIP_SANS_FILTRE_IP=1 n'est permis qu'en recette (ENVIRONNEMENT=recette).")
+    if not config.cookies_securises:
+        raise RuntimeError("COOKIES_SECURISES=0 n'est permis qu'en recette (ENVIRONNEMENT=recette).")

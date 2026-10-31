@@ -4,7 +4,7 @@ import { Cadre } from "./Cadre";
 import { Demande } from "./espace/Demande";
 import { FicheDossier, MesDossiers, TableauDeBord } from "./espace/Dossiers";
 import { Campagnes, MaStructure, MonCompte } from "./espace/Profil";
-import { Confirmation, Connexion, Inscription, Invitation, MotDePasseOublie, Reinitialisation } from "./pages/Comptes";
+import { Confirmation, ConfirmationNouvelleAdresse, Connexion, Inscription, Invitation, MotDePasseOublie, Reinitialisation } from "./pages/Comptes";
 import { Accueil, Catalogue, DisponibilitesPage, FicheEquipement } from "./pages/Publiques";
 import { Accessibilite, DonneesPersonnelles, MentionsLegales, PageIntrouvable, PlanDuSite } from "./pages/Reglementaires";
 import { useSession } from "./session";
@@ -29,6 +29,7 @@ export function Routage() {
         <Route path="/connexion" element={<Connexion />} />
         <Route path="/inscription" element={<Inscription />} />
         <Route path="/confirmation" element={<Confirmation />} />
+        <Route path="/confirmer-adresse" element={<ConfirmationNouvelleAdresse />} />
         <Route path="/mot-de-passe-oublie" element={<MotDePasseOublie />} />
         <Route path="/reinitialisation" element={<Reinitialisation />} />
         <Route path="/invitation" element={<Invitation />} />

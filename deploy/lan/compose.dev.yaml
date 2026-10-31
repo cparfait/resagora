@@ -3,6 +3,8 @@
 # L'API de gestion n'est jamais sur le réseau de liaison avec la DMZ : seule api-portail l'est.
 # DocuSeal (DMZ) est joint par le réseau « liaison_signature », sans la façade.
 x-simulateurs: &simulateurs
+  # Seule cette valeur autorise les adresses de simulateurs et les seuils élargis (`verifier_deploiement`).
+  ENVIRONNEMENT: recette
   # Recette sur un seul hôte : DocuSeal et l'opérateur SMS sont remplacés par les simulateurs (deploy/dev).
   DOCUSEAL_URL: http://simulateurs:8090
   DOCUSEAL_URL_PUBLIQUE: http://localhost:53010
@@ -18,6 +20,8 @@ x-simulateurs: &simulateurs
   BACKOFFICE_URL: https://localhost
 
 services:
+  migrations:
+    environment: { <<: *simulateurs, POSTGRES_USER: equipements }
   api:
     environment: { <<: *simulateurs, CANAL: gestion, POSTGRES_USER: equipements_app, FORWARDED_ALLOW_IPS: 10.231.20.250 }
     networks:

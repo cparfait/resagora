@@ -35,6 +35,7 @@ interface DocumentDossier {
   version_numero: number;
   statut: string;
   signature_requise: boolean;
+  visible_portail: boolean;
   parent_numero: string;
   signe_le: string | null;
   cree_le: string;
@@ -44,14 +45,19 @@ interface Modele {
   id: number;
   code: string;
   libelle: string;
+  nature: string;
   actif: boolean;
 }
+
+/** Natures générées depuis une séance ou une fermeture, pas depuis le dossier. */
+const NATURES_HORS_DOSSIER = new Set(["etat_des_lieux", "fermeture", "attestation_valorisation"]);
 
 const TONS: Record<string, "neutre" | "info" | "succes" | "attention" | "danger"> = {
   genere: "info",
   en_signature: "attention",
   signe: "succes",
   signe_manuellement: "succes",
+  scan_a_controler: "attention",
   annule: "neutre",
 };
 const LIBELLES: Record<string, string> = {
@@ -59,6 +65,7 @@ const LIBELLES: Record<string, string> = {
   en_signature: "En signature",
   signe: "Signé électroniquement",
   signe_manuellement: "Signé manuellement",
+  scan_a_controler: "Scan signé à contrôler",
   annule: "Annulé",
 };
 const STATUTS_CIRCUIT: Record<string, string> = {
@@ -71,7 +78,7 @@ const STATUTS_CIRCUIT: Record<string, string> = {
   erreur: "erreur d'envoi",
 };
 
-type Action = { type: "avenant" | "annuler" | "annuler_signature"; document: DocumentDossier } | { type: "scan"; document: DocumentDossier } | null;
+type Action = { type: "avenant" | "annuler" | "annuler_signature" | "controle"; document: DocumentDossier } | { type: "scan"; document: DocumentDossier } | null;
 
 export function DocumentsDossier({ dossier }: { dossier: number }) {
   const { peut } = useSession();
@@ -110,6 +117,8 @@ export function DocumentsDossier({ dossier }: { dossier: number }) {
       const formulaire = new FormData();
       formulaire.append("fichier", scan);
       operation.mutate({ url: `${base}/scan-signe`, corps: formulaire });
+    } else if (action.type === "controle") {
+      operation.mutate({ url: `${base}/controler-scan`, corps: { accepter: false, motif } });
     } else {
       const verbe = { avenant: "avenant", annuler: "annuler", annuler_signature: "annuler-signature" }[action.type];
       operation.mutate({ url: `${base}/${verbe}`, corps: { motif } });
@@ -129,7 +138,7 @@ export function DocumentsDossier({ dossier }: { dossier: number }) {
         >
           <ChampSelection
             libelle="Modèle à générer"
-            options={modeles.data.filter((m) => m.actif).map((m) => ({ valeur: m.code, libelle: m.libelle }))}
+            options={modeles.data.filter((m) => m.actif && !NATURES_HORS_DOSSIER.has(m.nature)).map((m) => ({ valeur: m.code, libelle: m.libelle }))}
             value={modele}
             onChange={(e) => setModele(e.target.value)}
           />
@@ -191,9 +200,28 @@ export function DocumentsDossier({ dossier }: { dossier: number }) {
                   Déposer le scan signé
                 </Bouton>
               ) : null}
+              {peut("envoyer_signature") && d.statut === "scan_a_controler" ? (
+                <>
+                  <Bouton variante="lien" onClick={() => void telecharger(`/api/gestion/documents/documents/${d.id}/scan`, `${d.numero}-scan.pdf`)}>
+                    Voir le scan déposé<span className="visuellement-masque"> : {d.numero}</span>
+                  </Bouton>
+                  <Bouton variante="lien" onClick={() => operation.mutate({ url: `/api/gestion/documents/documents/${d.id}/controler-scan`, corps: { accepter: true } })}>
+                    Constater la signature<span className="visuellement-masque"> : {d.numero}</span>
+                  </Bouton>
+                  <Bouton variante="lien" onClick={() => setAction({ type: "controle", document: d })}>
+                    Refuser le scan<span className="visuellement-masque"> : {d.numero}</span>
+                  </Bouton>
+                </>
+              ) : null}
               {peut("envoyer_signature") && d.statut === "en_signature" ? (
                 <Bouton variante="lien" onClick={() => setAction({ type: "annuler_signature", document: d })}>
                   Annuler la signature
+                </Bouton>
+              ) : null}
+              {peut("generer_document") && d.statut !== "annule" ? (
+                <Bouton variante="lien" onClick={() => operation.mutate({ url: `/api/gestion/documents/documents/${d.id}/visibilite`, corps: { visible_portail: !d.visible_portail } })}>
+                  {d.visible_portail ? "Retirer du portail" : "Publier sur le portail"}
+                  <span className="visuellement-masque"> : {d.numero}</span>
                 </Bouton>
               ) : null}
               {peut("generer_document") && ["signe", "signe_manuellement"].includes(d.statut) ? (
@@ -219,7 +247,9 @@ export function DocumentsDossier({ dossier }: { dossier: number }) {
               ? "Produire un avenant"
               : action?.type === "annuler_signature"
                 ? "Annuler la signature en cours"
-                : "Annuler le document"
+                : action?.type === "controle"
+                  ? "Refuser le scan déposé par l'usager"
+                  : "Annuler le document"
         }
         onFermer={() => setAction(null)}
       >
@@ -242,7 +272,7 @@ export function DocumentsDossier({ dossier }: { dossier: number }) {
               />
             ) : (
               <ChampZone
-                libelle={action.type === "avenant" ? "Objet de l'avenant (repris dans le document)" : "Motif"}
+                libelle={action.type === "avenant" ? "Objet de l'avenant (repris dans le document)" : action.type === "controle" ? "Motif communiqué à l'usager" : "Motif"}
                 obligatoire
                 value={motif}
                 onChange={(e) => setMotif(e.target.value)}
@@ -253,7 +283,7 @@ export function DocumentsDossier({ dossier }: { dossier: number }) {
               <Bouton variante="secondaire" onClick={() => setAction(null)}>
                 Retour
               </Bouton>
-              <Bouton type="submit" variante={action.type === "annuler" || action.type === "annuler_signature" ? "danger" : "principal"} enCours={operation.isPending}>
+              <Bouton type="submit" variante={["annuler", "annuler_signature", "controle"].includes(action.type) ? "danger" : "principal"} enCours={operation.isPending}>
                 Valider
               </Bouton>
             </div>

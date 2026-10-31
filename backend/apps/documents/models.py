@@ -111,6 +111,7 @@ class Document(models.Model):
         ("en_signature", "En signature"),
         ("signe", "Signé électroniquement"),
         ("signe_manuellement", "Signé manuellement"),
+        ("scan_a_controler", "Scan signé à contrôler"),
         ("annule", "Annulé"),
     ]
     numero = models.CharField(max_length=20, unique=True)
@@ -131,6 +132,9 @@ class Document(models.Model):
     statut = models.CharField(max_length=20, choices=STATUTS, default="genere")
     fichier_signe = models.ForeignKey("noyau.Fichier", null=True, blank=True, on_delete=models.PROTECT, related_name="+")
     preuve = models.ForeignKey("noyau.Fichier", null=True, blank=True, on_delete=models.PROTECT, related_name="+")
+    scan_depose = models.ForeignKey(
+        "noyau.Fichier", null=True, blank=True, on_delete=models.PROTECT, related_name="+", help_text="SIG-05 : scan à contrôler."
+    )
     signe_le = models.DateTimeField(null=True, blank=True)
     signe_par = models.CharField(max_length=250, blank=True, default="", help_text="Signataires ou agent ayant constaté.")
     visible_portail = models.BooleanField(default=True)
@@ -203,6 +207,7 @@ class Signataire(models.Model):
     identifiant_externe = models.CharField(max_length=64, blank=True, default="")
     lien_chiffre = models.TextField(blank=True, default="", help_text="Lien personnel de signature, chiffré.")
     statut = models.CharField(max_length=12, choices=STATUTS, default="en_attente")
+    invite_le = models.DateTimeField(null=True, blank=True, help_text="SIG-01 : invitation envoyée à son tour.")
     signe_le = models.DateTimeField(null=True, blank=True)
 
     class Meta:

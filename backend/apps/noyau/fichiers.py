@@ -19,7 +19,7 @@ from urllib.parse import quote
 from django.conf import settings
 from django.http import FileResponse
 
-from .exceptions import ErreurValidation
+from .exceptions import ErreurMetier, ErreurValidation
 from .models import Fichier
 
 TYPES = {
@@ -134,7 +134,12 @@ def enregistrer_genere(nom: str, contenu: bytes, type_mime: str, *, depose_par: 
 
 
 def lire(fichier: Fichier) -> bytes:
-    contenu = (Path(settings.MEDIA_ROOT) / fichier.chemin).read_bytes()
+    try:
+        contenu = (Path(settings.MEDIA_ROOT) / fichier.chemin).read_bytes()
+    except FileNotFoundError as erreur:
+        raise ErreurMetier(
+            "Ce fichier n'est plus disponible : il a été supprimé au terme de sa durée de conservation.", code="fichier_purge"
+        ) from erreur
     if hashlib.sha256(contenu).hexdigest() != fichier.sha256:
         raise ErreurValidation("Le fichier stocké a été altéré : téléchargement refusé.", code="fichier_altere")
     return contenu

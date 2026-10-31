@@ -12,3 +12,4 @@ if not CLE_CHIFFREMENT or len(CLE_CHIFFREMENT) < 32 or len(set(CLE_CHIFFREMENT))
     raise RuntimeError("Le secret cle_chiffrement est absent ou trop faible (32 caractères aléatoires minimum).")
 
 ENVIRONNEMENT = os.environ.get("ENVIRONNEMENT", "prod")
+RECETTE = ENVIRONNEMENT == "recette"

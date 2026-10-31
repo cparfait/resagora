@@ -25,7 +25,7 @@ from starlette.requests import Request
 from starlette.responses import JSONResponse, Response
 from starlette.routing import Route as RouteStarlette
 
-from .config import Configuration
+from .config import Configuration, controler_production
 from .fichiers import AnalyseurClamAV, FichierRefuse, Quarantaine
 from .routes import DEBITS, Nature, Route, trouver
 from .sessions import GestionnaireSessions, Magasin, MagasinValkey
@@ -359,7 +359,9 @@ class Facade:
 
 
 def creer_application(config: Configuration | None = None, **dependances: Any) -> Starlette:
-    facade = Facade(config or Configuration(), **dependances)
+    config = config or Configuration()
+    controler_production(config)
+    facade = Facade(config, **dependances)
     methodes = ["GET", "POST", "PUT", "PATCH", "DELETE", "HEAD", "OPTIONS", "TRACE", "CONNECT"]
     application = Starlette(
         routes=[

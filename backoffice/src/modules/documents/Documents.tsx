@@ -206,6 +206,14 @@ export function LotsDocuments() {
     },
     onError: (e) => annoncer(e instanceof ErreurApi ? e.message : "Lancement impossible.", "erreur"),
   });
+  const relancer = useMutation({
+    mutationFn: (l: Lot) => requete<Lot>("POST", `/api/gestion/documents/lots/${l.id}/relancer`),
+    onSuccess: async (l) => {
+      annoncer(`Lot « ${l.libelle} » relancé : les dossiers déjà traités ne le sont pas une seconde fois.`);
+      await client.invalidateQueries({ queryKey: ["lots"] });
+    },
+    onError: (e) => annoncer(e instanceof ErreurApi ? e.message : "Relance impossible.", "erreur"),
+  });
   const STATUTS: Record<string, string> = { en_attente: "En attente", en_cours: "En cours", termine: "Terminé", echec: "En échec" };
   return (
     <Page titre="Génération en lot" description="Produire en une fois les conventions (ou tout autre modèle) des dossiers attribués d'une campagne, et les envoyer en signature.">
@@ -243,6 +251,13 @@ export function LotsDocuments() {
           lignes={lots.data.results}
           cleLigne={(l) => l.id}
           messageVide="Aucun lot lancé."
+          actions={(l) =>
+            peut("generer_document") && (l.statut === "echec" || l.erreurs.length > 0) ? (
+              <Bouton variante="lien" onClick={() => relancer.mutate(l)} enCours={relancer.isPending}>
+                Relancer<span className="visuellement-masque"> le lot {l.libelle}</span>
+              </Bouton>
+            ) : null
+          }
           colonnes={[
             { cle: "libelle", titre: "Lot", rendu: (l) => `${l.libelle} (${l.modele_code})` },
             { cle: "date", titre: "Lancé le", rendu: (l) => dateHeure(l.cree_le), valeurTri: (l) => l.cree_le },

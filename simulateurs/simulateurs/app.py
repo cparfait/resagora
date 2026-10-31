@@ -442,7 +442,11 @@ PAGE = (
 
 
 def creer_application() -> Starlette:
+    """Les simulateurs n'existent qu'en recette : sans `SIMULATEUR_RECETTE=1`, ils refusent de démarrer."""
     from .payfip import ROUTES_PAYFIP
+
+    if os.environ.get("SIMULATEUR_RECETTE") != "1":
+        raise RuntimeError("Simulateurs de recette : SIMULATEUR_RECETTE=1 requis (jamais en production).")
 
     return Starlette(
         routes=[

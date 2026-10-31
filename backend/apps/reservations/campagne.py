@@ -222,6 +222,7 @@ def attribuer(campagne: Campagne, decisions: dict[int, dict[str, str]], *, acteu
             services._changer_statut(reservation, "validee", acteur, valide_par=acteur, valide_le=timezone.now())
             for occurrence in reservation.occurrences.filter(statut="validee"):
                 services.poser_verrous(occurrence)
+            services.declencher("validation", reservation)
             recap[reservation.dossier.usager_id]["attribues"].append(texte)
             bilan["attribuees"] += 1
         else:

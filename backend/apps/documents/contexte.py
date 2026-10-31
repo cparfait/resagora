@@ -15,7 +15,7 @@ from django.utils import timezone
 from django.utils.formats import date_format
 
 from apps.noyau.parametres import parametre
-from apps.reservations.models import STATUTS_ACTIFS, Dossier, Occurrence
+from apps.reservations.models import Dossier, Occurrence
 from apps.reservations.recurrence import PARIS
 
 Contexte = dict[str, Any]
@@ -78,6 +78,27 @@ def contexte_usager(usager: Any) -> Contexte:
     }
 
 
+STATUTS_ENGAGES = ("option", "validee", "confirmee")
+
+
+def empreinte_reservation(reservation: Any) -> str:
+    """Ce qu'engage une convention (DOC-05) : espace, période, horaires et récurrence de la réservation."""
+    return "|".join(
+        str(v)
+        for v in (
+            reservation.pk,
+            reservation.espace_id,
+            reservation.date_debut.isoformat(),
+            reservation.date_fin.isoformat(),
+            reservation.heure_debut.strftime("%H:%M"),
+            reservation.heure_fin.strftime("%H:%M"),
+            reservation.recurrence,
+            int(reservation.exclure_vacances),
+            int(reservation.exclure_feries),
+        )
+    )
+
+
 def contexte_reservation(reservation: Any) -> Contexte:
     espace = reservation.espace
     seances = reservation.occurrences.exclude(statut__in=["annulee", "refusee"]).order_by("debut")
@@ -126,7 +147,9 @@ def contexte_reservation(reservation: Any) -> Contexte:
     ],
 )
 def contexte_dossier(dossier: Dossier) -> Contexte:
-    reservations = dossier.reservations.select_related("espace__batiment__site").filter(statut__in=STATUTS_ACTIFS)
+    reservations = list(
+        dossier.reservations.select_related("espace__batiment__site").filter(statut__in=STATUTS_ENGAGES).order_by("date_debut")
+    )
     type_reservation = dossier.type_reservation
     conditions = [
         libelle
@@ -153,6 +176,9 @@ def contexte_dossier(dossier: Dossier) -> Contexte:
         "conditions": conditions,
         "saison": dossier.saison.nom if dossier.saison is not None else "",
         "avenant": {"numero_origine": "", "motif": ""},
+        "montants": {"total": "", "acompte": ""},
+        "caution": {"montant": ""},
+        "couverture": [empreinte_reservation(r) for r in reservations],
     }
 
 
@@ -187,9 +213,14 @@ def contexte_fermeture(element: tuple[Any, Any]) -> Contexte:
     lies: set[int] = set()
     for espace in fermeture.espaces_concernes():
         lies |= espace.ids_lies()
-    seances = Occurrence.objects.filter(
-        espace_id__in=lies, debut__lt=fermeture.fin, fin__gt=fermeture.debut, reservation__dossier__usager=usager
-    ).select_related("espace")
+    seances = (
+        Occurrence.objects.filter(
+            espace_id__in=lies, debut__lt=fermeture.fin, fin__gt=fermeture.debut, reservation__dossier__usager=usager
+        )
+        .exclude(statut__in=["annulee", "refusee"])
+        .select_related("espace")
+        .order_by("debut")
+    )
     lieu = fermeture.espace.nom if fermeture.espace_id else fermeture.site.nom if fermeture.site_id else ""
     return {
         **base(),

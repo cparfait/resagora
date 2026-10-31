@@ -7,11 +7,13 @@ Toutes les transitions passent par ce module : contrôle des droits (rôle × p�
 from __future__ import annotations
 
 import logging
+import uuid
 from collections.abc import Iterable, Mapping
 from dataclasses import dataclass, field
 from datetime import date, datetime, time, timedelta
 from typing import Any
 
+from django.conf import settings
 from django.db import IntegrityError, transaction
 from django.db.backends.postgresql.psycopg_any import DateTimeTZRange
 from django.db.models import Q, QuerySet
@@ -45,6 +47,15 @@ from .recurrence import PARIS, generer_plages, valider_regle
 
 journal = logging.getLogger(__name__)
 SYSTEME = "système"
+# Points d'extension des autres modules (finances : caution attendue, frais d'annulation tardive).
+CROCHETS: dict[str, list[Any]] = {"validation": [], "annulation_tardive": []}
+
+
+def declencher(evenement: str, objet: Any) -> None:
+    for crochet in CROCHETS[evenement]:
+        crochet(objet)
+
+
 TRANSITIONS = {
     "demande": {"en_instruction", "option", "validee", "refusee", "annulee"},
     "en_instruction": {"option", "validee", "refusee", "annulee"},
@@ -664,6 +675,7 @@ def valider(reservation: Reservation, *, acteur: Any) -> Reservation:
             occurrence.signalement = signalement
             occurrence.save(update_fields=["signalement"])
         poser_verrous(occurrence, feuilles[occurrence.espace_id])
+    declencher("validation", reservation)
     manques = conditions.conditions_manquantes(reservation)
     notifier(
         "reservation_validee",
@@ -707,9 +719,35 @@ def confirmer(reservation: Reservation, *, acteur: Any) -> Reservation:
     return reservation
 
 
+STATUTS_ACCORDES = frozenset({"validee", "confirmee"})
+
+
 def est_tardive(occurrence: Occurrence, instant: datetime | None = None) -> bool:
+    """RG-08 : seule une séance accordée par la Ville (validée ou confirmée) donne lieu à une annulation tardive ;
+    retirer une demande pas encore instruite ou une option n'est jamais tardif."""
+    if occurrence.statut not in STATUTS_ACCORDES:
+        return False
     instant = instant or timezone.now()
     return occurrence.debut - instant < timedelta(hours=int(parametre("annulation.delai_tardif_heures")))
+
+
+def _prevenir_service(dossier: Any, occurrences: list[Occurrence], acteur: Any) -> None:
+    """Une annulation faite par l'usager depuis le portail est signalée au service (planning, gardiens, frais)."""
+    tardives = [o for o in occurrences if o.annulation_tardive]
+    notifier(
+        "annulation_usager",
+        {
+            "dossier": dossier,
+            "usager": dossier.usager,
+            "auteur": str(acteur),
+            "seances": "\n".join(f"- {o.espace.nom}, {_texte_date(o.debut)}" for o in occurrences[:50]),
+            "tardives": ", ".join(_texte_date(o.debut) for o in tardives[:50]),
+            "delai": parametre("annulation.delai_tardif_heures"),
+            "lien": f"{settings.BACKOFFICE_URL}/reservations/dossiers/{dossier.pk}",
+        },
+        courriels=[str(parametre("portail.service_courriel"))],
+        objet=dossier,
+    )
 
 
 def _annuler_occurrence(
@@ -732,6 +770,8 @@ def _annuler_occurrence(
         acteur=acteur,
     )
     proposer_liste_attente(occurrence)
+    if tardive:
+        declencher("annulation_tardive", occurrence)
     if notifier_usager and not par_usager:
         notifier(
             "occurrence_annulee",
@@ -755,7 +795,10 @@ def annuler_occurrence(occurrence: Occurrence, *, acteur: Any, motif: str, par_u
         raise ErreurMetier("Cette séance ne peut plus être annulée.", code="transition_interdite")
     if not motif.strip():
         raise ErreurValidation("Indiquez le motif de l'annulation.", code="motif_requis")
-    return _annuler_occurrence(occurrence, motif.strip(), par_usager, acteur)
+    occurrence = _annuler_occurrence(occurrence, motif.strip(), par_usager, acteur)
+    if par_usager:
+        _prevenir_service(occurrence.reservation.dossier, [occurrence], acteur)
+    return occurrence
 
 
 @transaction.atomic
@@ -766,16 +809,20 @@ def annuler(reservation: Reservation, *, acteur: Any, motif: str, par_usager: bo
     _verifier_transition(reservation, "annulee")
     if not motif.strip():
         raise ErreurValidation("Indiquez le motif de l'annulation.", code="motif_requis")
-    for occurrence in reservation.occurrences.filter(debut__gte=timezone.now()).exclude(
-        statut__in=["annulee", "realisee", "cloturee"]
-    ):
+    annulees = [
         _annuler_occurrence(occurrence, motif.strip(), par_usager, acteur, notifier_usager=False)
+        for occurrence in reservation.occurrences.filter(debut__gte=timezone.now())
+        .exclude(statut__in=["annulee", "realisee", "cloturee"])
+        .select_related("espace")
+    ]
     reservation.statut = "annulee"
     reservation.motif_annulation = motif.strip()
     reservation.annulee_le = timezone.now()
     reservation.annulee_par_usager = par_usager
     reservation.save()
     journaliser("annuler_reservation", reservation, apres={"motif": motif, "par_usager": par_usager}, acteur=acteur)
+    if par_usager and annulees:
+        _prevenir_service(reservation.dossier, annulees, acteur)
     if not par_usager:
         notifier(
             "occurrence_annulee",
@@ -1031,6 +1078,48 @@ def modifier_suivantes(occurrence: Occurrence, *, acteur: Any, **changements: An
     return suite
 
 
+# --- Rappels de séance (COM-04) ------------------------------------------------------------------
+
+
+def rappeler_seances(maintenant: datetime | None = None) -> int:
+    """Rappel la veille aux contacts qui l'ont demandé (préférence « rappels ») ; une seule fois par séance."""
+    from apps.communication.models import Notification, PreferenceNotification
+
+    maintenant = maintenant or timezone.now()
+    demain = _jour_local(maintenant) + timedelta(days=1)
+    debut = datetime.combine(demain, time.min, tzinfo=PARIS)
+    seances = Occurrence.objects.filter(
+        debut__gte=debut, debut__lt=debut + timedelta(days=1), statut__in=["validee", "confirmee"]
+    ).select_related("espace", "reservation__dossier__usager")
+    nombre = 0
+    for occurrence in seances:
+        usager = occurrence.reservation.dossier.usager
+        contacts = [
+            p.contact
+            for p in PreferenceNotification.objects.filter(rappels=True, contact__rattachements__usager=usager).select_related(
+                "contact"
+            )
+        ]
+        deja = set(
+            Notification.objects.filter(
+                modele__code="rappel_seance", objet_type="reservations.occurrence", objet_id=str(occurrence.pk)
+            ).values_list("contact_id", flat=True)
+        )
+        a_prevenir = [c for c in contacts if c.pk not in deja]
+        if not a_prevenir:
+            continue
+        local = timezone.localtime(occurrence.debut, PARIS)
+        notifier(
+            "rappel_seance",
+            {"espace": occurrence.espace.nom, "jour": date_format(local, "l j F"), "heure": local.strftime("%H h %M")},
+            contacts=a_prevenir,
+            usager=usager,
+            objet=occurrence,
+        )
+        nombre += len(a_prevenir)
+    return nombre
+
+
 # --- Options (RG-07) ----------------------------------------------------------------------------
 
 
@@ -1179,6 +1268,7 @@ def enregistrer_fermeture(fermeture: Fermeture, *, acteur: Any) -> list[Occurren
         occurrence.save(update_fields=["signalement"])
         par_usager.setdefault(occurrence.reservation.dossier.usager_id, []).append(occurrence)
     lieu = fermeture.espace.nom if fermeture.espace else fermeture.site.nom if fermeture.site else ""
+    groupe = uuid.uuid4().hex  # COM-03 : les avis d'une même fermeture se suivent comme un envoi groupé
     for occurrences in par_usager.values():
         usager = occurrences[0].reservation.dossier.usager
         notifier(
@@ -1192,8 +1282,11 @@ def enregistrer_fermeture(fermeture: Fermeture, *, acteur: Any) -> list[Occurren
             },
             usager=usager,
             objet=fermeture,
+            groupe=groupe,
         )
-    journaliser("enregistrer_fermeture", fermeture, apres={"occurrences_touchees": len(touchees)}, acteur=acteur)
+    journaliser(
+        "enregistrer_fermeture", fermeture, apres={"occurrences_touchees": len(touchees), "groupe": groupe}, acteur=acteur
+    )
     return touchees
 
 

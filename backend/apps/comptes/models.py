@@ -83,12 +83,14 @@ class JetonUnique(models.Model):
         ("invitation", "Invitation d'un contact à créer son compte"),
         ("reinitialisation", "Réinitialisation du mot de passe"),
         ("defi_totp", "Défi de double authentification"),
+        ("changement_courriel", "Confirmation d'une nouvelle adresse électronique"),
     ]
     compte = models.ForeignKey(CompteUsager, on_delete=models.CASCADE, related_name="jetons_uniques")
     nature = models.CharField(max_length=20, choices=NATURES)
     empreinte = models.CharField(max_length=64, unique=True)
     expire_le = models.DateTimeField()
     utilise_le = models.DateTimeField(null=True, blank=True)
+    donnee = models.CharField(max_length=254, blank=True, default="", help_text="Nouvelle adresse à confirmer.")
     cree_le = models.DateTimeField(auto_now_add=True)
 
     class Meta:

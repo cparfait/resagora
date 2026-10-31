@@ -18,6 +18,8 @@ MIGRATIONS_DE_REFERENCE = [
     ("apps.reservations.migrations.0004_types_ouverts_au_portail", "appliquer"),
     ("apps.communication.migrations.0002_modeles_initiaux", "creer"),
     ("apps.communication.migrations.0004_modeles_lot2", "creer"),
+    ("apps.communication.migrations.0005_modeles_lot3", "creer"),
+    ("apps.communication.migrations.0006_modeles_corrections_lot2", "creer"),
     ("apps.documents.migrations.0002_modeles_initiaux", "creer"),
 ]
 

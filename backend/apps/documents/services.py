@@ -12,7 +12,8 @@ from django.db import transaction
 from django.db.models import QuerySet
 from django.utils import timezone
 from docxtpl import DocxTemplate
-from jinja2 import TemplateError
+from jinja2 import StrictUndefined, TemplateError
+from jinja2.sandbox import SandboxedEnvironment
 
 from apps.audit.services import journaliser
 from apps.communication.services import notifier
@@ -41,6 +42,8 @@ from .models import (
 
 journal = logging.getLogger(__name__)
 TYPE_DOCX = "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+NATURES_ENGAGEMENT = ("convention", "contrat_location", "avenant")
+STATUTS_EN_COURS_SIGNATURE = ("en_signature", "scan_a_controler")
 
 
 def _acteur(acteur: Any) -> str:
@@ -50,12 +53,18 @@ def _acteur(acteur: Any) -> str:
 # --- Modèles et versions (DOC-01) -------------------------------------------------------------------
 
 
+def environnement_jinja() -> SandboxedEnvironment:
+    """Bac à sable Jinja : un modèle .docx ne peut ni appeler de méthode interne ni lire d'attribut privé
+    (SEC : pas d'exécution de code par un modèle déposé) ; une variable inconnue est une erreur (DOC-01)."""
+    return SandboxedEnvironment(autoescape=True, undefined=StrictUndefined)
+
+
 def rendre_docx(modele_docx: bytes, contexte: dict[str, Any]) -> bytes:
     """Fusion docxtpl (syntaxe Jinja) ; une erreur de modèle est rapportée lisiblement à l'administrateur."""
     try:
         gabarit = DocxTemplate(io.BytesIO(modele_docx))
-        gabarit.render(contexte, autoescape=True)
-    except (TemplateError, KeyError, ValueError) as erreur:
+        gabarit.render(contexte, jinja_env=environnement_jinja(), autoescape=True)
+    except (TemplateError, KeyError, ValueError, AttributeError, TypeError) as erreur:
         raise ErreurValidation(f"Le modèle contient une erreur de champ de fusion : {erreur}", code="modele_invalide") from erreur
     sortie = io.BytesIO()
     gabarit.save(sortie)
@@ -192,7 +201,20 @@ def generer(
         raise ErreurMetier(f"Le modèle « {modele.libelle} » n'a pas de version active.", code="modele_inactif")
     liens = _rattachements(objet)
     if controle_droits and isinstance(acteur, Utilisateur):
-        exiger(acteur, "generer_document", liens.get("dossier") or modele)
+        cible = liens.get("dossier") or (objet[0] if isinstance(objet, tuple) else None) or modele
+        exiger(acteur, "generer_document", cible)
+    if modele.nature in {"convention", "contrat_location"} and liens.get("dossier") is not None:
+        existants = Document.objects.filter(dossier=liens["dossier"], nature=modele.nature)
+        if existants.filter(statut__in=STATUTS_SIGNES).exists():
+            raise ErreurMetier(
+                f"Un document « {modele.get_nature_display()} » signé existe déjà pour ce dossier : produisez un avenant.",
+                code="avenant_requis",
+            )
+        if existants.filter(statut__in=STATUTS_EN_COURS_SIGNATURE).exists():
+            raise ErreurMetier(
+                "Un document de même nature est en cours de signature : annulez sa signature avant d'en générer un autre.",
+                code="signature_en_cours",
+            )
     contexte = {**contextes.construire(modele.nature, objet), **(complements or {})}
     if parent is not None:
         contexte["avenant"] = {**contexte.get("avenant", {}), "numero_origine": parent.numero}
@@ -252,7 +274,7 @@ def annuler(document: Document, *, acteur: Any, motif: str) -> Document:
     """Un document non signé peut être annulé (il reste conservé, jamais supprimé)."""
     document = Document.objects.select_for_update().get(pk=document.pk)
     controler(acteur, "generer_document", document)
-    if document.signe or document.nature in NATURES_COMPTABLES:
+    if document.signe or document.nature in NATURES_COMPTABLES - {"devis"}:
         raise ErreurMetier(
             "Un document signé, une facture ou un avoir ne s'annule pas : produisez un avenant ou un avoir.",
             code="document_immuable",
@@ -261,6 +283,7 @@ def annuler(document: Document, *, acteur: Any, motif: str) -> Document:
         raise ErreurValidation("Indiquez le motif de l'annulation.", code="motif_requis")
     for circuit in document.circuits.filter(statut__in=["envoye", "preparation", "erreur"]):
         annuler_circuit(circuit, acteur=acteur, motif=motif)
+    document.refresh_from_db(fields=["statut"])
     document.statut = "annule"
     document.motif_annulation = motif.strip()[:300]
     document.save(update_fields=["statut", "motif_annulation"])
@@ -285,6 +308,11 @@ def creer_lot(
     modele: ModeleDocument, dossiers: Iterable[Any], *, acteur: Any, libelle: str, envoyer_signature: bool = False
 ) -> LotGeneration:
     exiger(acteur, "generer_document", modele)
+    if modele.nature in NATURES_PAR_OBJET:
+        raise ErreurValidation(
+            "La génération en lot porte sur des dossiers : ce modèle se génère depuis une séance ou une fermeture.",
+            code="nature_hors_lot",
+        )
     identifiants = []
     for dossier in dossiers:
         exiger(acteur, "generer_document", dossier)
@@ -300,6 +328,23 @@ def creer_lot(
         cree_par=acteur,
     )
     journaliser("creer_lot_documents", lot, apres={"modele": modele.code, "total": len(identifiants)}, acteur=acteur)
+    transaction.on_commit(lambda: _programmer_lot(lot.pk))
+    return lot
+
+
+NATURES_PAR_OBJET = {"etat_des_lieux": "seance", "fermeture": "fermeture"}
+
+
+@transaction.atomic
+def relancer_lot(lot: LotGeneration, *, acteur: Any) -> LotGeneration:
+    """DOC-06 : un lot en échec ou interrompu se relance ; les dossiers déjà traités ne le sont pas deux fois."""
+    exiger(acteur, "generer_document", lot.modele)
+    lot = LotGeneration.objects.select_for_update().get(pk=lot.pk)
+    if lot.statut == "en_cours" and lot.cree_le > timezone.now() - timedelta(hours=1):
+        raise ErreurMetier("Ce lot est en cours de traitement.", code="lot_en_cours")
+    lot.statut, lot.erreurs, lot.termine_le = "en_attente", [], None
+    lot.save(update_fields=["statut", "erreurs", "termine_le"])
+    journaliser("relancer_lot_documents", lot, acteur=acteur)
     transaction.on_commit(lambda: _programmer_lot(lot.pk))
     return lot
 
@@ -333,6 +378,14 @@ def executer_lot(lot: LotGeneration) -> LotGeneration:
             faits += 1
         except ErreurMetier as erreur:
             erreurs.append({"dossier": dossier.numero if dossier else str(identifiant), "erreur": erreur.message})
+        except Exception as erreur:
+            journal.exception("Génération en lot %s : échec inattendu pour le dossier %s", lot.pk, identifiant)
+            erreurs.append(
+                {
+                    "dossier": dossier.numero if dossier else str(identifiant),
+                    "erreur": f"Erreur inattendue ({type(erreur).__name__}).",
+                }
+            )
         LotGeneration.objects.filter(pk=lot.pk).update(faits=faits, erreurs=erreurs)
     statut = "termine" if faits else "echec"
     LotGeneration.objects.filter(pk=lot.pk).update(statut=statut, faits=faits, erreurs=erreurs, termine_le=timezone.now())
@@ -343,8 +396,9 @@ def executer_lot(lot: LotGeneration) -> LotGeneration:
 # --- Signature (SIG-01 à SIG-05) ------------------------------------------------------------------------
 
 
-def signataires_par_defaut(document: Document) -> list[dict[str, Any]]:
-    """Ordre du modèle : représentant de l'usager habilité à signer, puis l'élu délégataire de la Ville."""
+def signataires_par_defaut(document: Document, acteur: Any = None) -> list[dict[str, Any]]:
+    """Ordre du modèle : représentant de l'usager habilité à signer, l'élu délégataire de la Ville, ou l'agent
+    qui envoie le document (état des lieux signé par le gardien ou l'agent présent)."""
     liste: list[dict[str, Any]] = []
     for role in document.modele.signataires or ["usager", "elu"]:
         if role == "usager":
@@ -357,15 +411,22 @@ def signataires_par_defaut(document: Document) -> list[dict[str, Any]]:
                     code="signataire_absent",
                 )
             liste.append({"role": "usager", "nom": str(lien.contact), "courriel": lien.contact.courriel, "contact": lien.contact})
-        elif role in {"elu", "agent"}:
+        elif role == "elu":
             liste.append(
                 {
-                    "role": role,
+                    "role": "elu",
                     "nom": str(parametre("signature.elu_nom")),
                     "courriel": str(parametre("signature.elu_courriel")),
                     "contact": None,
                 }
             )
+        elif role == "agent":
+            if not isinstance(acteur, Utilisateur) or not acteur.email:
+                raise ErreurValidation(
+                    "Ce document est signé par l'agent qui l'envoie : renseignez votre adresse électronique dans l'annuaire.",
+                    code="signataire_absent",
+                )
+            liste.append({"role": "agent", "nom": str(acteur), "courriel": acteur.email, "contact": None})
     return liste
 
 
@@ -378,10 +439,12 @@ def envoyer_en_signature(
     document = Document.objects.select_for_update(of=("self",)).select_related("modele", "usager", "fichier").get(pk=document.pk)
     if controle_droits:
         controler(acteur, "envoyer_signature", document)
+    if not document.modele.signature_requise:
+        raise ErreurMetier("Ce modèle de document ne prévoit pas de signature.", code="signature_non_prevue")
     if document.statut != "genere":
         raise ErreurMetier(f"Un document « {document.get_statut_display()} » ne part pas en signature.", code="statut_document")
     mode = mode or settings.SIGNATURE_MODE
-    signataires = signataires_par_defaut(document)
+    signataires = signataires_par_defaut(document, acteur)
     expire = timezone.now() + timedelta(days=int(parametre("signature.expiration_jours")))
     circuit = CircuitSignature.objects.create(document=document, mode=mode, expire_le=expire, envoye_par=_acteur(acteur))
     for rang, s in enumerate(signataires):
@@ -400,7 +463,10 @@ def envoyer_en_signature(
         circuit.statut = "envoye"
         if document.usager_id:
             notifier(
-                "document_disponible", {"document": document, "dossier": document.dossier}, usager=document.usager, objet=document
+                "signature_manuelle_demandee",
+                {"document": document, "dossier": document.dossier, "expire_le": contextes.instant_lisible(expire)},
+                usager=document.usager,
+                objet=document,
             )
     return circuit
 
@@ -409,6 +475,55 @@ def _programmer_depot(identifiant: int) -> None:
     from .tasks import deposer_signature
 
     deposer_signature.delay(identifiant)
+
+
+def _lien_sur(lien: str) -> str:
+    """Un lien de signature ne pointe que vers le service de signature publié (pas de redirection ouverte)."""
+    from django.conf import settings
+
+    prefixe = f"{settings.DOCUSEAL_URL_PUBLIQUE.rstrip('/')}/s/"
+    if not lien.startswith(prefixe) or any(c in lien[len(prefixe) :] for c in "/?#@\\"):
+        journal.warning("Lien de signature inattendu ignoré (préfixe attendu %s)", prefixe)
+        return ""
+    return lien
+
+
+def inviter_signataire(circuit: CircuitSignature, signataire: Signataire, *, relance: bool = False) -> bool:
+    """SIG-01 : chaque signataire est prévenu à son tour — le contact sur le portail, l'élu ou l'agent par un
+    courriel portant son lien personnel (masqué au journal des envois)."""
+    document = circuit.document
+    contexte = {
+        "document": document,
+        "dossier": document.dossier,
+        "expire_le": contextes.instant_lisible(circuit.expire_le),
+        "signataire": signataire.nom,
+    }
+    if signataire.contact is not None:
+        notifier(
+            "signature_relance" if relance else "signature_demandee",
+            contexte,
+            contacts=[signataire.contact],
+            usager=document.usager,
+            objet=document,
+        )
+    elif circuit.mode == "docuseal" and signataire.lien_chiffre and signataire.courriel:
+        notifier(
+            "signature_relance_externe" if relance else "signature_demandee_externe",
+            contexte,
+            courriels=[signataire.courriel],
+            objet=document,
+            secrets={"lien": dechiffrer(signataire.lien_chiffre)},
+        )
+    else:
+        return False
+    Signataire.objects.filter(pk=signataire.pk).update(invite_le=timezone.now())
+    return True
+
+
+def _inviter_suivant(circuit: CircuitSignature) -> None:
+    suivant = circuit.signataires.exclude(statut="signe").order_by("ordre").first()
+    if suivant is not None and suivant.invite_le is None and suivant.statut != "refuse":
+        inviter_signataire(circuit, suivant)
 
 
 def deposer_aupres_de_docuseal(circuit: CircuitSignature, client: ClientDocuSeal | None = None) -> CircuitSignature:
@@ -426,18 +541,11 @@ def deposer_aupres_de_docuseal(circuit: CircuitSignature, client: ClientDocuSeal
         circuit.soumission, circuit.statut, circuit.erreur = etat.identifiant, "envoye", ""
         circuit.save(update_fields=["soumission", "statut", "erreur"])
         for signataire, distant in zip(circuit.signataires.order_by("ordre"), etat.signataires, strict=False):
+            lien = _lien_sur(distant.lien) if distant.lien else ""
             signataire.identifiant_externe = distant.identifiant
-            signataire.lien_chiffre = chiffrer(distant.lien) if distant.lien else ""
+            signataire.lien_chiffre = chiffrer(lien) if lien else ""
             signataire.save(update_fields=["identifiant_externe", "lien_chiffre"])
-        premier = circuit.signataires.order_by("ordre").first()
-        if premier is not None and premier.contact is not None:
-            notifier(
-                "signature_demandee",
-                {"document": document, "dossier": document.dossier, "expire_le": contextes.instant_lisible(circuit.expire_le)},
-                contacts=[premier.contact],
-                usager=document.usager,
-                objet=document,
-            )
+        _inviter_suivant(circuit)
         journaliser("deposer_signature", document, apres={"soumission": etat.identifiant}, acteur="système")
     return circuit
 
@@ -470,12 +578,29 @@ STATUTS_SIGNATAIRE = {
 }
 
 
+def _cloturer_sans_signature(circuit: CircuitSignature, document: Document, statut: str, acteur: str) -> None:
+    """Signature expirée ou refusée : le document redevient « généré » et l'usager est prévenu."""
+    circuit.statut, circuit.termine_le = statut, timezone.now()
+    circuit.save(update_fields=["statut", "termine_le"])
+    document.statut = "genere"
+    document.save(update_fields=["statut"])
+    journaliser(f"signature_{statut}", document, acteur=acteur)
+    if document.usager_id:
+        refus = circuit.signataires.filter(statut="refuse").first()
+        notifier(
+            "signature_refusee" if statut == "refuse" else "signature_expiree",
+            {"document": document, "dossier": document.dossier, "refuse_par": refus.get_role_display() if refus else ""},
+            usager=document.usager,
+            objet=document,
+        )
+
+
 @transaction.atomic
 def synchroniser(circuit: CircuitSignature, client: ClientDocuSeal | None = None) -> CircuitSignature:
     """SIG-02, SIG-03 : l'état est relu auprès de DocuSeal (jamais déduit du seul webhook), puis appliqué.
 
-    Signature complète : PDF signé et journal de preuve rapatriés (contrôle antivirus), document
-    « signé », soumission purgée côté DocuSeal. Idempotent.
+    Un signataire qui a signé fait inviter le suivant (SIG-01). Signature complète : PDF signé et journal de
+    preuve rapatriés (contrôle antivirus), document « signé », soumission purgée côté DocuSeal. Idempotent.
     """
     circuit = CircuitSignature.objects.select_for_update(of=("self",)).select_related("document").get(pk=circuit.pk)
     if circuit.statut != "envoye" or circuit.mode != "docuseal":
@@ -517,18 +642,11 @@ def synchroniser(circuit: CircuitSignature, client: ClientDocuSeal | None = None
             notifier(
                 "signature_terminee", {"document": document, "dossier": document.dossier}, usager=document.usager, objet=document
             )
-    elif etat.statut in {"expired", "declined"}:
-        circuit.statut = "expire" if etat.statut == "expired" else "refuse"
-        circuit.termine_le = timezone.now()
-        circuit.save(update_fields=["statut", "termine_le"])
-        document.statut = "genere"
-        document.save(update_fields=["statut"])
-        journaliser(f"signature_{circuit.statut}", document, acteur="DocuSeal")
+    elif etat.statut in {"expired", "declined"} or circuit.signataires.filter(statut="refuse").exists():
+        _cloturer_sans_signature(circuit, document, "refuse" if etat.statut != "expired" else "expire", "DocuSeal")
         _purger(circuit, client)
-        if document.usager_id:
-            notifier(
-                "signature_expiree", {"document": document, "dossier": document.dossier}, usager=document.usager, objet=document
-            )
+    else:
+        _inviter_suivant(circuit)
     return circuit
 
 
@@ -571,7 +689,9 @@ def annuler_circuit(circuit: CircuitSignature, *, acteur: Any, motif: str) -> Ci
         raise ErreurMetier("Cette signature n'est plus en cours.", code="statut_signature")
     circuit.statut, circuit.termine_le, circuit.erreur = "annule", timezone.now(), motif[:300]
     circuit.save(update_fields=["statut", "termine_le", "erreur"])
-    Document.objects.filter(pk=circuit.document_id, statut="en_signature").update(statut="genere")
+    Document.objects.filter(pk=circuit.document_id, statut__in=STATUTS_EN_COURS_SIGNATURE).update(
+        statut="genere", scan_depose=None
+    )
     journaliser("annuler_signature", circuit.document, apres={"motif": motif}, acteur=acteur)
     transaction.on_commit(_programmer_purges)
     return circuit
@@ -584,12 +704,13 @@ def _programmer_purges() -> None:
 
 
 def relancer_signatures(maintenant: Any = None) -> int:
-    """SIG-04 : relance automatique `signature.relance_jours_avant` jours avant l'échéance (une fois)."""
+    """SIG-04 : relance automatique `signature.relance_jours_avant` jours avant l'échéance (une fois), pour un
+    circuit encore valable ; le signataire attendu est relancé par le même canal que son invitation."""
     maintenant = maintenant or timezone.now()
     limite = maintenant + timedelta(days=int(parametre("signature.relance_jours_avant")))
     nombre = 0
     for circuit in CircuitSignature.objects.filter(
-        statut="envoye", relance_le__isnull=True, expire_le__lte=limite
+        statut="envoye", relance_le__isnull=True, expire_le__lte=limite, expire_le__gt=maintenant
     ).select_related("document"):
         with transaction.atomic():
             attendu = circuit.signataires.exclude(statut="signe").order_by("ordre").first()
@@ -600,19 +721,36 @@ def relancer_signatures(maintenant: Any = None) -> int:
                     ClientDocuSeal().relancer(attendu.identifiant_externe)
                 except ErreurMetier as erreur:
                     journal.warning("Relance DocuSeal impossible (%s) : %s", circuit.pk, erreur.message)
-            if attendu.contact is not None:
-                notifier(
-                    "signature_relance",
-                    {
-                        "document": circuit.document,
-                        "dossier": circuit.document.dossier,
-                        "expire_le": contextes.instant_lisible(circuit.expire_le),
-                    },
-                    contacts=[attendu.contact],
-                    usager=circuit.document.usager,
-                    objet=circuit.document,
-                )
+            if circuit.mode == "manuel":
+                if circuit.document.usager_id:
+                    notifier(
+                        "signature_manuelle_demandee",
+                        {
+                            "document": circuit.document,
+                            "dossier": circuit.document.dossier,
+                            "expire_le": contextes.instant_lisible(circuit.expire_le),
+                        },
+                        usager=circuit.document.usager,
+                        objet=circuit.document,
+                    )
+            else:
+                inviter_signataire(circuit, attendu, relance=True)
             CircuitSignature.objects.filter(pk=circuit.pk).update(relance_le=maintenant)
+            nombre += 1
+    return nombre
+
+
+def expirer_circuits_manuels(maintenant: Any = None) -> int:
+    """Un circuit manuel dont l'échéance est passée sans scan constaté expire comme un circuit électronique."""
+    maintenant = maintenant or timezone.now()
+    nombre = 0
+    for candidat in CircuitSignature.objects.filter(mode="manuel", statut="envoye", expire_le__lte=maintenant):
+        with transaction.atomic():
+            circuit = CircuitSignature.objects.select_for_update(of=("self",)).get(pk=candidat.pk)
+            document = Document.objects.select_for_update().get(pk=circuit.document_id)
+            if circuit.statut != "envoye" or document.statut == "scan_a_controler":
+                continue
+            _cloturer_sans_signature(circuit, document, "expire", "système")
             nombre += 1
     return nombre
 
@@ -630,28 +768,96 @@ def synchroniser_en_cours() -> int:
         statut__in=["signe", "expire", "refuse", "annule"], purge_le__isnull=True, mode="docuseal"
     ).exclude(soumission=""):
         _purger(circuit, ClientDocuSeal())
+    expirer_circuits_manuels()
     return nombre
+
+
+# --- Signature manuscrite (SIG-05) -------------------------------------------------------------------------
+
+
+def _constater(document: Document, scan: Any, *, acteur: Any, depose_par: str) -> Document:
+    """Le constat d'un agent fait d'un scan l'exemplaire signé : circuits en cours clos, signataire tracé."""
+    for circuit in document.circuits.filter(statut__in=["envoye", "preparation", "erreur"]):
+        electronique = circuit.mode == "docuseal"
+        circuit.statut = "annule" if electronique else "signe"
+        circuit.termine_le = timezone.now()
+        circuit.erreur = "Remplacée par une signature manuscrite constatée" if electronique else ""
+        circuit.save(update_fields=["statut", "termine_le", "erreur"])
+    transaction.on_commit(_programmer_purges)
+    document.statut, document.fichier_signe, document.scan_depose = "signe_manuellement", scan, None
+    document.signe_le = timezone.now()
+    document.signe_par = f"Signature manuscrite déposée par {depose_par}, constatée par {_acteur(acteur)}"[:250]
+    document.save(update_fields=["statut", "fichier_signe", "scan_depose", "signe_le", "signe_par"])
+    return document
 
 
 @transaction.atomic
 def deposer_scan_signe(
     document: Document, nom: str, contenu: bytes, *, acteur: Any, portail: bool = False, **controle: str
 ) -> Document:
-    """SIG-05 : circuit manuel — scan du document signé déposé par l'agent ou l'usager."""
-    document = Document.objects.select_for_update().get(pk=document.pk)
+    """SIG-05 : circuit manuel. Déposé par un agent, le scan vaut constat ; déposé par l'usager depuis le
+    portail, il attend le contrôle d'un agent avant de valoir signature (RG-06 ne compte que les constats)."""
+    document = Document.objects.select_for_update().select_related("modele").get(pk=document.pk)
     if not portail:
         controler(acteur, "envoyer_signature", document)
     if document.statut not in {"genere", "en_signature"} or not document.modele.signature_requise:
         raise ErreurMetier("Ce document n'attend pas de signature.", code="statut_document")
+    if portail:
+        if document.circuits.filter(mode="docuseal", statut__in=["envoye", "preparation"]).exists():
+            raise ErreurMetier(
+                "Ce document est en cours de signature électronique : signez-le en ligne.", code="signature_electronique"
+            )
+        if not document.circuits.filter(mode="manuel", statut="envoye").exists():
+            raise ErreurMetier("Ce document n'attend pas de signature manuscrite.", code="statut_document")
     scan = fichiers.enregistrer(nom, contenu, types_autorises=("application/pdf",), depose_par=_acteur(acteur), **controle)
-    for circuit in document.circuits.filter(statut__in=["envoye", "preparation", "erreur"]):
-        circuit.statut, circuit.termine_le = "signe", timezone.now()
-        circuit.save(update_fields=["statut", "termine_le"])
-    transaction.on_commit(_programmer_purges)
-    document.statut, document.fichier_signe = "signe_manuellement", scan
-    document.signe_le, document.signe_par = timezone.now(), _acteur(acteur)
-    document.save(update_fields=["statut", "fichier_signe", "signe_le", "signe_par"])
-    journaliser("deposer_scan_signe", document, apres={"sha256": scan.sha256, "portail": portail}, acteur=acteur)
+    if not portail:
+        _constater(document, scan, acteur=acteur, depose_par=_acteur(acteur))
+        journaliser("deposer_scan_signe", document, apres={"sha256": scan.sha256, "portail": False}, acteur=acteur)
+        return document
+    document.statut, document.scan_depose = "scan_a_controler", scan
+    document.save(update_fields=["statut", "scan_depose"])
+    journaliser("deposer_scan_signe", document, apres={"sha256": scan.sha256, "portail": True}, acteur=acteur)
+    from django.conf import settings
+
+    notifier(
+        "scan_a_controler",
+        {
+            "document": document,
+            "dossier": document.dossier,
+            "depose_par": _acteur(acteur),
+            "lien": f"{settings.BACKOFFICE_URL}/reservations/dossiers/{document.dossier_id}" if document.dossier_id else "",
+        },
+        courriels=[str(parametre("portail.service_courriel"))],
+        objet=document,
+    )
+    return document
+
+
+@transaction.atomic
+def controler_scan(document: Document, *, acteur: Any, accepter: bool, motif: str = "") -> Document:
+    """SIG-05 : l'agent vérifie le scan déposé par l'usager (document complet, signatures des deux parties)."""
+    document = Document.objects.select_for_update(of=("self",)).select_related("scan_depose").get(pk=document.pk)
+    controler(acteur, "envoyer_signature", document)
+    if document.statut != "scan_a_controler" or document.scan_depose is None:
+        raise ErreurMetier("Aucun scan à contrôler pour ce document.", code="statut_document")
+    if accepter:
+        depose_par = document.scan_depose.depose_par or "l'usager"
+        _constater(document, document.scan_depose, acteur=acteur, depose_par=depose_par)
+        journaliser("constater_scan_signe", document, apres={"accepte": True}, acteur=acteur)
+        return document
+    if len(motif.strip()) < 5:
+        raise ErreurValidation("Indiquez à l'usager pourquoi le scan est refusé.", code="motif_requis")
+    manuel = document.circuits.filter(mode="manuel", statut="envoye").exists()
+    document.statut, document.scan_depose = ("en_signature" if manuel else "genere"), None
+    document.save(update_fields=["statut", "scan_depose"])
+    journaliser("constater_scan_signe", document, apres={"accepte": False, "motif": motif.strip()}, acteur=acteur)
+    if document.usager_id:
+        notifier(
+            "scan_refuse",
+            {"document": document, "dossier": document.dossier, "motif": motif.strip()},
+            usager=document.usager,
+            objet=document,
+        )
     return document
 
 
@@ -659,14 +865,19 @@ def deposer_scan_signe(
 
 
 def convention_manquante(reservation: Any) -> str | None:
-    signee = Document.objects.filter(
-        dossier_id=reservation.dossier_id, nature__in=["convention", "contrat_location"], statut__in=STATUTS_SIGNES
-    ).exists()
-    if signee:
+    """RG-06, DOC-05 : la réservation doit être couverte, dans son état actuel (espace, dates, horaires,
+    récurrence), par une convention, un contrat ou un avenant signé. Un créneau modifié après la signature
+    exige un avenant ; seuls les constats comptent (un scan déposé par l'usager attend son contrôle)."""
+    documents = Document.objects.filter(dossier_id=reservation.dossier_id, nature__in=NATURES_ENGAGEMENT).exclude(statut="annule")
+    empreinte = contextes.empreinte_reservation(reservation)
+    signes = list(documents.filter(statut__in=STATUTS_SIGNES).only("contexte", "nature"))
+    if any(empreinte in (d.contexte.get("couverture") or []) for d in signes):
         return None
-    en_cours = Document.objects.filter(
-        dossier_id=reservation.dossier_id, nature__in=["convention", "contrat_location"], statut="en_signature"
-    )
+    en_cours = documents.filter(statut__in=STATUTS_EN_COURS_SIGNATURE)
+    if signes:
+        if en_cours.filter(nature="avenant").exists():
+            return "avenant en cours de signature"
+        return "faire signer un avenant : le créneau a changé depuis la signature de la convention"
     return "convention en cours de signature" if en_cours.exists() else "faire signer la convention ou le contrat"
 
 

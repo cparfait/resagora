@@ -15,6 +15,7 @@ JETON = "jeton-de-recette"
 
 @pytest.fixture
 def client(monkeypatch):
+    monkeypatch.setenv("SIMULATEUR_RECETTE", "1")
     monkeypatch.setenv("SIMULATEUR_SMS_JETON", JETON)
     monkeypatch.setenv("SIMULATEUR_DOCUSEAL_JETON", JETON)
     monkeypatch.setenv("SIMULATEUR_PAYFIP_NUMCLI", "012345")
@@ -106,3 +107,9 @@ def test_tar07_payfip_creation_paiement_et_detail(client):
     assert "<resultrans>P</resultrans>" in detail.text and "<montant>12550</montant>" in detail.text
     inconnu = client.post("/payfip/services/securite", content=creation.request.content.decode().replace("012345", "999999"))
     assert inconnu.status_code == 500 and "P1" in inconnu.text
+
+
+def test_refuse_de_demarrer_hors_recette(monkeypatch):
+    monkeypatch.delenv("SIMULATEUR_RECETTE", raising=False)
+    with pytest.raises(RuntimeError, match="SIMULATEUR_RECETTE"):
+        creer_application()

@@ -15,6 +15,7 @@ import re
 from dataclasses import dataclass
 
 import httpx
+from django.conf import settings
 
 from apps.noyau.secrets import secret
 
@@ -64,11 +65,12 @@ def envoyer_sms(numero: str, texte: str, reference: str, transport: httpx.BaseTr
         champs["texte"]: texte[:320],
         champs["reference"]: reference,
     }
+    url = os.environ["SMS_URL"]
+    if not url.startswith("https://") and not settings.RECETTE:
+        raise SmsIndisponible("SMS_URL doit être une adresse HTTPS : le jeton de l'opérateur ne circule pas en clair.")
     try:
         with httpx.Client(timeout=15, transport=transport) as client:
-            reponse = client.post(
-                os.environ["SMS_URL"], json=corps, headers={"Authorization": f"Bearer {secret('sms_jeton', defaut='')}"}
-            )
+            reponse = client.post(url, json=corps, headers={"Authorization": f"Bearer {secret('sms_jeton', defaut='')}"})
     except httpx.HTTPError as erreur:
         raise SmsIndisponible(f"Opérateur SMS injoignable : {type(erreur).__name__}") from erreur
     if reponse.status_code >= 500 or reponse.status_code == 429:

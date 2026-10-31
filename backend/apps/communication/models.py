@@ -110,12 +110,20 @@ class PreferenceNotification(models.Model):
     contact = models.OneToOneField("usagers.Contact", on_delete=models.CASCADE, related_name="preferences")
     sms = models.BooleanField("recevoir aussi les SMS (rappels, fermetures)", default=False)
     telephone_sms = models.CharField(max_length=20, blank=True, default="")
+    telephone_verifie = models.CharField(
+        max_length=20, blank=True, default="", help_text="Numéro confirmé par le code reçu par SMS : seul destinataire possible."
+    )
     rappels = models.BooleanField("rappel la veille des séances", default=False)
     informations = models.BooleanField("informations générales de la Ville", default=True)
     modifie_le = models.DateTimeField(auto_now=True)
 
     def __str__(self) -> str:
         return f"Préférences de {self.contact}"
+
+    @property
+    def sms_possible(self) -> bool:
+        """COM-05 : accord du contact et numéro vérifié par un code (personne ne reçoit de SMS sans l'avoir confirmé)."""
+        return self.sms and bool(self.telephone_sms) and self.telephone_sms == self.telephone_verifie
 
     def sites_concernes(self) -> None:
         return None

@@ -21,3 +21,8 @@ def tache_anonymiser_inactifs() -> int:
 @shared_task(name="apps.usagers.tasks.purger_pieces_expirees")
 def tache_purger_pieces_expirees() -> int:
     return rgpd.purger_pieces_expirees()
+
+
+@shared_task(name="apps.usagers.tasks.purger_archives_echues")
+def tache_purger_archives_echues() -> int:
+    return rgpd.purger_archives_echues()

@@ -67,15 +67,27 @@ Exigences : POR-01 à POR-06, POR-08 à POR-10, SEC-04, SEC-07, COM-01 à COM-05
 
 | Étape | Contenu | Exigences | État |
 | --- | --- | --- | --- |
-| 2.1 | Comptes usagers : inscription, confirmation, validation par la Ville, connexion sans énumération, verrouillage progressif, TOTP, réinitialisation, invitation de contacts | POR-01, SEC-04 | en cours |
-| 2.2 | API portail : compte, structures, contacts, pièces (quarantaine DMZ + ClamAV), disponibilités anonymisées, catalogue, demandes en quatre étapes avec brouillon, suivi, annulation, campagnes, notifications | POR-02 à POR-06, SEC-07 | à faire |
-| 2.3 | Messagerie par dossier, notifications groupées, journal des envois, préférences, SMS par adaptateur + simulateur, modèles de messages éditables | COM-01 à COM-05, POR-08, ADM-04 | à faire |
-| 2.4 | Documents : modèles .docx versionnés, catalogue DOC-02, contexte typé, PDF/A-2b par Gotenberg, SHA-256, génération en lot, avenants, téléchargement contrôlé, immuabilité | DOC-01 à DOC-07, RG-13 | à faire |
-| 2.5 | Signature : client DocuSeal (signataires ordonnés, expiration, relances, annulation, PDF signé + preuve, purge), webhooks via la façade revérifiés, circuit manuel, condition RG-06 « convention » | SIG-01 à SIG-05, POR-10 | à faire |
-| 2.6 | RGPD : durées de conservation, anonymisation, export des données | USR-06 | à faire |
-| 2.7 | Back-office : comptes à valider, messagerie, documents et signature, génération en lot, modèles, journal des envois, RGPD | ADM-04, COM-02, DOC-06 | à faire |
-| 2.8 | Portail public React RGAA 4.1.2 : catalogue, disponibilités, compte, demandes, dossiers, documents, signature, messagerie, déclaration d'accessibilité | POR-01 à POR-10 | à faire |
-| 2.9 | Déploiement (portail DMZ, Gotenberg, DocuSeal, simulateurs), e2e + axe sur toutes les pages, revues, critère de sortie | POR-09 | à faire |
+| 2.1 | Comptes usagers : inscription, confirmation, validation par la Ville, connexion sans énumération, verrouillage progressif, TOTP, réinitialisation, invitation de contacts, changement d'adresse | POR-01, SEC-04 | fait |
+| 2.2 | API portail : compte, structures, contacts, pièces (quarantaine DMZ + ClamAV), disponibilités anonymisées, catalogue, demandes en quatre étapes avec brouillon, suivi, annulation, campagnes, notifications | POR-02 à POR-06, SEC-07 | fait |
+| 2.3 | Messagerie par dossier, notifications groupées, journal des envois, préférences, SMS par adaptateur + simulateur, modèles de messages éditables | COM-01 à COM-05, POR-08, ADM-04 | fait |
+| 2.4 | Documents : modèles .docx versionnés, catalogue DOC-02, contexte typé, PDF/A-2b par Gotenberg, SHA-256, génération en lot, avenants, téléchargement contrôlé, immuabilité | DOC-01 à DOC-07, RG-13 | fait |
+| 2.5 | Signature : client DocuSeal (signataires ordonnés, expiration, relances, annulation, PDF signé + preuve, purge), webhooks via la façade revérifiés, circuit manuel, condition RG-06 « convention » | SIG-01 à SIG-05, POR-10 | fait |
+| 2.6 | RGPD : durées de conservation, anonymisation, export des données | USR-06 | fait |
+| 2.7 | Back-office : comptes à valider, messagerie, documents et signature, génération en lot, modèles, journal des envois, RGPD | ADM-04, COM-02, DOC-06 | fait |
+| 2.8 | Portail public React RGAA 4.1.2 : catalogue, disponibilités, compte, demandes, dossiers, documents, signature, messagerie, déclaration d'accessibilité | POR-01 à POR-10 | fait |
+| 2.9 | Déploiement (portail DMZ, Gotenberg, DocuSeal, simulateurs), e2e + axe sur toutes les pages, revues (3 bloquants et 18 majeurs corrigés, D-034 à D-038, ADR 0006), critère de sortie | POR-09 | fait |
+
+Critère de sortie (reconstitué) :
+- [x] un usager s'inscrit, confirme son adresse, est validé par la Ville, dépose une demande en quatre étapes et la suit ;
+- [x] pièces déposées par la DMZ (quarantaine, ClamAV, type réel), refus EICAR tracé ;
+- [x] messagerie par dossier, notifications éditables, journal des envois, SMS vers un numéro vérifié ;
+- [x] convention générée en PDF/A-2b, signée dans l'ordre (usager puis élu invité à son tour), PDF signé et preuve rapatriés, purge DocuSeal ;
+- [x] documents signés immuables en base (RG-13), avenant exigé quand le créneau change ;
+- [x] RGPD : export, anonymisation, archives purgées au terme de leur durée (ADR 0006) ;
+- [x] portail sans violation axe sur toutes les pages parcourues, navigation clavier ; accès d'un autre usager refusé partout ;
+- [x] revues sécurité et métier traitées.
+
+**Lot 2 terminé le 2026-10-31.**
 
 ## Journal
 
@@ -84,3 +96,4 @@ Exigences : POR-01 à POR-06, POR-08 à POR-10, SEC-04, SEC-07, COM-01 à COM-05
 - 2026-10-31 — Lot 0 : 61+ tests API, 19 tests façade, 21 tests front, 4 e2e (axe sans violation) ; pile LAN + DMZ en conteneurs, chaîne mTLS vérifiée.
 - 2026-10-31 — Lot 1 : 173 tests API, 28 tests front, 3 e2e lot 1 (axe sans violation) ; jeu de démonstration chargé (3 sites, 40 espaces, 63 créneaux annuels, locations) ; matrice lots 0–1 complète (49 exigences).
 - 2026-10-31 — Revues lot 1 : campagnes « tous sites » réservées à la ville entière, conditions RG-06 refusées par défaut avec constat manuel tracé, transitions de clôture et d'attribution contrôlées, grammaire RRULE bornée, fermetures et saisons closes contrôlées par l'API, historique des séances conservé, verrous recalculés quand la hiérarchie change, paramètres validés par schéma. 207 tests API (hors intégration), 28 tests front, 7 e2e.
+- 2026-10-31 — Revues lot 2 : élu invité à son tour, scan de l'usager contrôlé par un agent, avenant exigé quand le créneau change, modèles fusionnés en bac à sable strict, verrous TOTP et mot de passe, invitations sans énumération ni reprise de compte, signalements neutres sur le portail, archives RGPD (ADR 0006), garde-fous de recette, ClamAV et DocuSeal sans root.

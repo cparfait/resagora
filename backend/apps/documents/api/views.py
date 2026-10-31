@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from django.db.models import Q, QuerySet
+from django.db.models import QuerySet
 from django.http import FileResponse
 from drf_spectacular.utils import extend_schema
 from rest_framework import serializers, status
@@ -20,7 +20,9 @@ from apps.habilitations.services import peut, sites_autorises
 from apps.noyau import fichiers
 from apps.noyau.api import VuePerimetre
 from apps.noyau.exceptions import ErreurMetier, ErreurValidation
-from apps.reservations.models import Dossier
+from apps.referentiel.models import Fermeture
+from apps.reservations.models import Dossier, Occurrence
+from apps.usagers.models import Usager
 
 from .. import services
 from ..contexte import VARIABLES
@@ -204,8 +206,41 @@ class DocumentSerializer(serializers.ModelSerializer):
 
 
 class GenerationSerializer(serializers.Serializer):
+    """L'objet dépend de la nature du modèle : un dossier, une séance (état des lieux) ou une fermeture et un usager
+    (avis de fermeture)."""
+
     modele = serializers.SlugRelatedField(slug_field="code", queryset=ModeleDocument.objects.filter(actif=True))
-    dossier = serializers.PrimaryKeyRelatedField(queryset=Dossier.objects.all())
+    dossier = serializers.PrimaryKeyRelatedField(queryset=Dossier.objects.all(), required=False)
+    seance = serializers.PrimaryKeyRelatedField(
+        queryset=Occurrence.objects.select_related("reservation__dossier"), required=False
+    )
+    fermeture = serializers.PrimaryKeyRelatedField(queryset=Fermeture.objects.all(), required=False)
+    usager = serializers.PrimaryKeyRelatedField(queryset=Usager.objects.all(), required=False)
+
+    def validate(self, donnees: dict[str, Any]) -> dict[str, Any]:
+        attendu = services.NATURES_PAR_OBJET.get(donnees["modele"].nature, "dossier")
+        if attendu == "seance":
+            if "seance" not in donnees:
+                raise serializers.ValidationError({"seance": "Indiquez la séance de l'état des lieux."})
+            donnees["objet"] = donnees["seance"]
+        elif attendu == "fermeture":
+            if "fermeture" not in donnees or "usager" not in donnees:
+                raise serializers.ValidationError({"fermeture": "Indiquez la fermeture et l'usager prévenu."})
+            donnees["objet"] = (donnees["fermeture"], donnees["usager"])
+        else:
+            if "dossier" not in donnees:
+                raise serializers.ValidationError({"dossier": "Indiquez le dossier."})
+            donnees["objet"] = donnees["dossier"]
+        return donnees
+
+
+class VisibiliteSerializer(serializers.Serializer):
+    visible_portail = serializers.BooleanField()
+
+
+class ControleScanSerializer(serializers.Serializer):
+    accepter = serializers.BooleanField()
+    motif = serializers.CharField(max_length=300, required=False, allow_blank=True, default="")
 
 
 class MotifSerializer(serializers.Serializer):
@@ -230,7 +265,9 @@ def _documents_lisibles(request: Request, action_requise: str) -> QuerySet[Docum
     sites = sites_autorises(agent, action_requise)
     if sites is None:
         return qs
-    return qs.filter(Q(dossier__reservations__espace__batiment__site__in=sites) | Q(dossier__isnull=True)).distinct()
+    # Un document sans dossier (avis de fermeture, attestation annuelle) concerne l'usager sur tous les sites :
+    # il n'est lisible qu'avec un périmètre « tous sites » (RG-14).
+    return qs.filter(dossier__reservations__espace__batiment__site__in=sites).distinct()
 
 
 class VueDocuments(VuePerimetre):
@@ -251,6 +288,9 @@ class VueDocuments(VuePerimetre):
         "envoyer_signature": "envoyer_signature",
         "annuler_signature": "envoyer_signature",
         "scan_signe": "envoyer_signature",
+        "controler_scan": "envoyer_signature",
+        "visibilite": "generer_document",
+        "scan": "lire_document",
     }
     http_method_names = ["get", "post", "head", "options"]
     filterset_fields = ["dossier", "nature", "statut", "usager", "modele"]
@@ -283,7 +323,7 @@ class VueDocuments(VuePerimetre):
         entree = GenerationSerializer(data=request.data)
         entree.is_valid(raise_exception=True)
         document = services.generer(
-            entree.validated_data["modele"], entree.validated_data["dossier"], acteur=agent_courant(request)
+            entree.validated_data["modele"], entree.validated_data["objet"], acteur=agent_courant(request)
         )
         return self._repondre(document, status.HTTP_201_CREATED)
 
@@ -292,6 +332,10 @@ class VueDocuments(VuePerimetre):
         fichier = getattr(document, attribut)
         if fichier is None:
             raise ErreurMetier("Ce fichier n'existe pas pour ce document.", code="fichier_absent")
+        if attribut == "fichier" and fichier.sha256 != document.sha256:
+            raise ErreurMetier(
+                "Le fichier ne correspond plus à l'empreinte du document : téléchargement refusé.", code="fichier_altere"
+            )
         journaliser("telecharger_document", document, apres={"fichier": attribut}, acteur=agent_courant(request))
         return fichiers.reponse_telechargement(fichier)
 
@@ -363,6 +407,32 @@ class VueDocuments(VuePerimetre):
         )
         return self._repondre(document)
 
+    @extend_schema(request=VisibiliteSerializer, responses=DocumentSerializer)
+    @action(detail=True, methods=["post"])
+    def visibilite(self, request: Request, pk: str | None = None) -> Response:
+        """DOC-07 : un document peut être retiré du portail (ou y être remis) ; il reste dans le dossier."""
+        entree = VisibiliteSerializer(data=request.data)
+        entree.is_valid(raise_exception=True)
+        document = self._document()
+        services.controler(agent_courant(request), "generer_document", document)
+        Document.objects.filter(pk=document.pk).update(visible_portail=entree.validated_data["visible_portail"])
+        journaliser("visibilite_document", document, apres=entree.validated_data, acteur=agent_courant(request))
+        return self._repondre(document)
+
+    @extend_schema(responses={(200, "application/pdf"): bytes})
+    @action(detail=True, methods=["get"])
+    def scan(self, request: Request, pk: str | None = None) -> FileResponse:
+        """SIG-05 : scan déposé par l'usager, à contrôler."""
+        return self._telecharger(request, "scan_depose")
+
+    @extend_schema(request=ControleScanSerializer, responses=DocumentSerializer)
+    @action(detail=True, methods=["post"], url_path="controler-scan")
+    def controler_scan(self, request: Request, pk: str | None = None) -> Response:
+        entree = ControleScanSerializer(data=request.data)
+        entree.is_valid(raise_exception=True)
+        document = services.controler_scan(self._document(), acteur=agent_courant(request), **entree.validated_data)
+        return self._repondre(document)
+
 
 class LotSerializer(serializers.ModelSerializer):
     modele_code = serializers.SlugRelatedField(
@@ -405,3 +475,10 @@ class VueLots(VuePerimetre):
             libelle=d["libelle"],
             envoyer_signature=d.get("envoyer_signature", False),
         )
+
+    @extend_schema(request=None, responses=LotSerializer)
+    @action(detail=True, methods=["post"])
+    def relancer(self, request: Request, pk: str | None = None) -> Response:
+        """DOC-06 : relance d'un lot en échec ou interrompu (les dossiers déjà traités sont ignorés)."""
+        lot = services.relancer_lot(self.get_object(), acteur=agent_courant(request))
+        return Response(LotSerializer(lot).data)

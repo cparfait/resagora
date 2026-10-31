@@ -97,6 +97,26 @@ DEFINITIONS: list[DefinitionParametre] = [
         "USR-06 : les pièces comptables restent conservées selon les règles de la comptabilité publique.",
     ),
     DefinitionParametre(
+        "rgpd.conservation_annees_documents",
+        "Durée d'utilité administrative des documents, par nature (années)",
+        {
+            "convention": 5,
+            "contrat_location": 5,
+            "avenant": 5,
+            "devis": 2,
+            "facture": 10,
+            "avoir": 10,
+            "etat_des_lieux": 5,
+            "attribution": 2,
+            "refus": 2,
+            "fermeture": 1,
+            "attestation_valorisation": 10,
+            "autres": 10,
+        },
+        "Usagers",
+        "ADR 0006 : au terme, les documents d'un usager anonymisé perdent contexte et fichiers.",
+    ),
+    DefinitionParametre(
         "rgpd.conservation_mois_pieces_expirees", "Suppression des pièces justificatives expirées (mois)", 12, "Usagers", "USR-06"
     ),
     # Portail
@@ -187,6 +207,61 @@ DEFINITIONS: list[DefinitionParametre] = [
     ),
     # Finances
     DefinitionParametre("factures.echeance_jours", "Échéance de paiement des factures (jours)", 30, "Finances", "TAR-10"),
+    DefinitionParametre(
+        "devis.validite_jours", "Durée de validité d'un devis (jours)", 30, "Finances", "TAR-04", bornes=(1, 365)
+    ),
+    DefinitionParametre(
+        "comptable.titulaire",
+        "Titulaire du compte du comptable public (factures)",
+        "Trésorerie municipale — comptable public de la Ville",
+        "Finances",
+        "TAR-12 : communiqué par le comptable public.",
+    ),
+    DefinitionParametre("comptable.iban", "IBAN du comptable public", "FR76 0000 0000 0000 0000 0000 000", "Finances", "TAR-12"),
+    DefinitionParametre("comptable.bic", "BIC du comptable public", "TRPUFRP1", "Finances", "TAR-12"),
+    DefinitionParametre("ciril.format", "Format de l'export des titres vers Ciril (csv, xlsx, xml)", "csv", "Finances", "TAR-06"),
+    DefinitionParametre(
+        "ciril.colonnes",
+        "Colonnes de l'export des titres (en-tête et champ)",
+        [
+            {"entete": "Exercice", "champ": "exercice"},
+            {"entete": "Référence facture", "champ": "numero_facture"},
+            {"entete": "Nature", "champ": "nature"},
+            {"entete": "Date d'émission", "champ": "date_emission"},
+            {"entete": "Débiteur", "champ": "debiteur_nom"},
+            {"entete": "SIRET", "champ": "debiteur_siret"},
+            {"entete": "Adresse", "champ": "debiteur_adresse"},
+            {"entete": "Code postal", "champ": "debiteur_code_postal"},
+            {"entete": "Commune", "champ": "debiteur_commune"},
+            {"entete": "Objet", "champ": "objet"},
+            {"entete": "Imputation", "champ": "imputation"},
+            {"entete": "Code produit", "champ": "code_produit"},
+            {"entete": "Montant", "champ": "montant"},
+            {"entete": "Échéance", "champ": "echeance"},
+            {"entete": "Facture d'origine", "champ": "facture_origine"},
+        ],
+        "Finances",
+        "TAR-06 : à aligner sur le format d'import défini avec Ciril GROUP.",
+    ),
+    DefinitionParametre("ciril.csv_separateur", "Séparateur du fichier CSV", ";", "Finances", "TAR-06"),
+    DefinitionParametre("ciril.csv_encodage", "Encodage du fichier CSV (utf-8, cp1252)", "cp1252", "Finances", "TAR-06"),
+    DefinitionParametre("ciril.xml_racine", "Élément racine de l'export XML", "titres", "Finances", "TAR-06"),
+    DefinitionParametre("ciril.xml_element", "Élément de chaque titre (XML)", "titre", "Finances", "TAR-06"),
+    DefinitionParametre("ciril.imputation", "Imputation budgétaire des recettes", "70-7083", "Finances", "TAR-06"),
+    DefinitionParametre("ciril.code_produit", "Code produit Ciril", "LOCSAL", "Finances", "TAR-06"),
+    DefinitionParametre(
+        "ciril.import_colonnes",
+        "Colonnes de l'état des titres soldés importé de Ciril",
+        {
+            "titre": "N° titre",
+            "facture": "Référence",
+            "montant": "Montant encaissé",
+            "date": "Date encaissement",
+            "reference": "Référence paiement",
+        },
+        "Finances",
+        "TAR-13 : en-têtes du fichier exporté par Ciril.",
+    ),
     DefinitionParametre("acomptes.taux", "Taux d'acompte exigé pour les locations (dix-millièmes)", 3000, "Finances", "TAR-09"),
     DefinitionParametre(
         "caution.seuil_double_validation_centimes",
@@ -295,12 +370,31 @@ def _verifier_specifique(cle: str, valeur: Any) -> str | None:
             return "Paliers {heures_avant ≥ 0, taux de 0 à 10000} attendus."
         if not any(p["heures_avant"] == 0 for p in valeur):
             return "Le barème doit comporter un palier à 0 heure."
+    elif cle == "rgpd.conservation_annees_documents":
+        if "autres" not in valeur or not all(
+            isinstance(v, int) and not isinstance(v, bool) and 1 <= v <= 100 for v in valeur.values()
+        ):
+            return "Durées en années (1 à 100) par nature de document, dont « autres »."
     elif cle == "personnel.nuit":
         if not all(isinstance(valeur.get(k), str) and HEURE.match(valeur[k]) for k in ("debut", "fin")):
             return "« debut » et « fin » au format HH:MM."
     elif cle == "valorisation.date_depot_attestations":
         if not re.fullmatch(r"(0[1-9]|[12]\d|3[01])-(0[1-9]|1[0-2])", valeur):
             return "Format JJ-MM attendu."
+    elif cle == "ciril.colonnes":
+        from apps.finances.ciril.export import CHAMPS
+
+        if not valeur or not all(
+            isinstance(c, dict) and isinstance(c.get("entete"), str) and c.get("champ") in CHAMPS for c in valeur
+        ):
+            return "Liste de colonnes {entete, champ} attendue ; champs disponibles : " + ", ".join(sorted(CHAMPS)) + "."
+    elif cle == "ciril.import_colonnes":
+        attendus = {"titre", "facture", "montant", "date", "reference"}
+        if set(valeur) - attendus or not {"montant", "date"} <= set(valeur) or not ({"titre", "facture"} & set(valeur)):
+            return "Clés : montant, date et titre ou facture (reference facultative)."
+    elif cle == "ciril.format":
+        if valeur not in {"csv", "xlsx", "xml"}:
+            return "Format : csv, xlsx ou xml."
     elif cle == "accessibilite.etat":
         if valeur not in {"non conforme", "partiellement conforme", "totalement conforme"}:
             return "État : non conforme, partiellement conforme ou totalement conforme."

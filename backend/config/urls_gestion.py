@@ -19,6 +19,7 @@ gestion = [
     path("", include("apps.reservations.api.urls")),
     path("", include("apps.communication.api.urls")),
     path("", include("apps.documents.api.urls")),
+    path("", include("apps.finances.api.urls")),
     path("parametres", VueParametres.as_view(), name="parametres"),
     *routeur.urls,
 ]

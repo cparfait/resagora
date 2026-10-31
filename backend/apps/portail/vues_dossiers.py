@@ -179,7 +179,8 @@ def _seance(o: Occurrence, maintenant: datetime) -> dict[str, Any]:
         "annulable": o.statut in ANNULABLES and o.debut > maintenant,
         "annulation_tardive_si_annulee": o.statut in ANNULABLES and services.est_tardive(o, maintenant),
         "annulation_tardive": o.annulation_tardive,
-        "signalement": o.signalement,
+        # Le signalement interne peut citer un autre usager (conflit) : jamais exposé tel quel (POR-02).
+        "signalement": "Séance à revoir par le service des équipements, qui vous contactera." if o.signalement else "",
     }
 
 
@@ -365,18 +366,42 @@ def envoyer_demande(dossier: Dossier, contact: Contact) -> Dossier:
         raise ErreurValidation("Ajoutez au moins un créneau (étape 1).", code="creneau_requis")
     if not dossier.objet.strip() or dossier.objet == "Demande en cours de saisie":
         raise ErreurValidation("Indiquez l'objet de la demande (étape 2).", code="objet_requis")
+    # Contrôles du guichet rejoués à l'envoi : la structure ou le type ont pu changer depuis le brouillon.
+    if dossier.usager.statut != "valide":
+        raise ErreurMetier(
+            "Votre structure n'est plus en mesure de déposer une demande : contactez le service des équipements.",
+            code="usager_non_valide",
+        )
+    sites = None
+    saison = None
     if dossier.campagne is not None:
-        services._verifier_campagne(dossier.campagne, contact, dossier.saison)
+        saison = services._verifier_campagne(dossier.campagne, contact, dossier.saison)
+        sites = dossier.campagne.sites_concernes()
+        types = dossier.type_reservation.types_usager
+        if types and dossier.usager.type not in types:
+            raise ErreurValidation("Cette campagne n'est pas ouverte à votre type de structure.", code="type_non_propose")
+    else:
+        _type_autorise(dossier.type_reservation_id, dossier.usager, None)
     erreurs = []
     for rang, brut in enumerate(dossier.brouillon_creneaux, start=1):
         creneau = _lire_creneau(brut)
+        espace = _espace_public(creneau["espace"])
+        if sites is not None and espace.batiment.site_id not in sites:
+            erreurs.append(f"Créneau {rang} : {espace.nom} n'est pas proposé dans cette campagne.")
+            continue
+        if saison is not None and not saison.debut <= creneau["date_debut"] <= creneau["date_fin"] <= saison.fin:
+            erreurs.append(
+                f"Créneau {rang} : les dates doivent être comprises dans la saison {saison.nom} "
+                f"(du {saison.debut:%d/%m/%Y} au {saison.fin:%d/%m/%Y})."
+            )
+            continue
         try:
             with transaction.atomic():
                 services.ajouter_reservation(
                     dossier,
                     acteur=contact,
                     portail=True,
-                    espace=_espace_public(creneau["espace"]),
+                    espace=espace,
                     date_debut=creneau["date_debut"],
                     date_fin=creneau["date_fin"],
                     heure_debut=creneau["heure_debut"],
@@ -385,7 +410,13 @@ def envoyer_demande(dossier: Dossier, contact: Contact) -> Dossier:
                     exclure_vacances=creneau.get("exclure_vacances", True),
                 )
         except ErreurMetier as erreur:
-            erreurs.append(f"Créneau {rang} : {erreur.message}")
+            texte = (
+                "le calendrier des vacances scolaires de cette période n'est pas encore publié par la Ville ; choisissez "
+                "d'autres dates ou contactez le service des équipements."
+                if erreur.code == "calendrier_absent"
+                else erreur.message
+            )
+            erreurs.append(f"Créneau {rang} : {texte}")
     if erreurs:
         raise ErreurValidation(" ".join(erreurs), code="creneaux_invalides", details={"erreurs": erreurs})
     dossier.brouillon = False

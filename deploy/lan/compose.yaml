@@ -111,9 +111,7 @@ services:
       - api_portail.crt
       - api_portail.key
       - ac_facade.crt
-      - docuseal_api_jeton
-      - payfip_secret
-      - smtp_mot_de_passe
+    # Moindre privilège : api-portail ne joint ni DocuSeal, ni le serveur de messagerie (D-030).
     command: ["gunicorn", "config.wsgi", "--bind", "0.0.0.0:8443", "--control-socket", "/tmp/gunicorn.ctl", "--workers", "3",
               "--timeout", "60", "--certfile", "/run/secrets/api_portail.crt", "--keyfile", "/run/secrets/api_portail.key",
               "--ca-certs", "/run/secrets/ac_facade.crt", "--cert-reqs", "2"]
@@ -166,18 +164,33 @@ services:
     mem_limit: 2g
     networks: [lan_app]
 
-  clamav:
+  preparer-clamav:
+    # Tâche ponctuelle : le volume des signatures est attribué à l'utilisateur clamav (capacités CHOWN et lecture).
     <<: *journaux
     image: clamav/clamav:1.5.4-debian13-slim@sha256:cce3e1a43ae2bb40e11335c52c0e1e98273b12fa3d587e617f63a6907cc4b70b
+    user: "0:0"
+    entrypoint: ["chown", "-R", "1000:1000", "/var/lib/clamav"]
     cap_drop: [ALL]
-    # Démarrage en root le temps de préparer le volume des signatures, puis passage à l'utilisateur clamav.
-    cap_add: [CHOWN, SETUID, SETGID, DAC_OVERRIDE, FOWNER]
+    cap_add: [CHOWN, DAC_READ_SEARCH]
     security_opt: ["no-new-privileges:true"]
-    mem_limit: 3g
+    read_only: true
+    network_mode: none
     volumes: [clamav-lan:/var/lib/clamav]
+    restart: "no"
+
+  clamav:
+    <<: *durci
+    image: clamav/clamav:1.5.4-debian13-slim@sha256:cce3e1a43ae2bb40e11335c52c0e1e98273b12fa3d587e617f63a6907cc4b70b
+    # Sans root ni capacité, système de fichiers en lecture seule (revue sécurité du lot 2, M11).
+    user: "1000:1000"
+    entrypoint: ["sh", "/etc/clamav-ville/demarrer.sh"]
+    healthcheck: { test: ["CMD-SHELL", "clamdcheck.sh"], interval: 60s, start_period: 360s }
+    mem_limit: 3g
+    pids_limit: 128
+    volumes: [clamav-lan:/var/lib/clamav, ../clamav:/etc/clamav-ville:ro]
     # lan_app pour l'analyse, sortie_lan pour les mises à jour des signatures (freshclam) par le proxy de la Ville.
     networks: [lan_app, sortie_lan]
-    restart: unless-stopped
+    depends_on: { preparer-clamav: { condition: service_completed_successfully } }
 
 networks:
   lan_app:

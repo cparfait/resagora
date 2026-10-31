@@ -25,7 +25,7 @@ from typing import Any
 import pyotp
 from django.conf import settings
 from django.contrib.auth import password_validation
-from django.contrib.auth.hashers import check_password, make_password
+from django.contrib.auth.hashers import check_password, is_password_usable, make_password
 from django.core.cache import cache
 from django.core.exceptions import ValidationError
 from django.db import transaction
@@ -151,12 +151,28 @@ def _nouveau_jeton() -> str:
     return secrets.token_urlsafe(32)
 
 
-def emettre_jeton_unique(compte: CompteUsager, nature: str, duree: timedelta) -> str:
+def emettre_jeton_unique(compte: CompteUsager, nature: str, duree: timedelta, *, donnee: str = "") -> str:
     """Invalide les jetons précédents de même nature et en émet un nouveau (valeur renvoyée une seule fois)."""
     JetonUnique.objects.filter(compte=compte, nature=nature, utilise_le__isnull=True).update(utilise_le=timezone.now())
     valeur = _nouveau_jeton()
-    JetonUnique.objects.create(compte=compte, nature=nature, empreinte=empreinte_hmac(valeur), expire_le=timezone.now() + duree)
+    JetonUnique.objects.create(
+        compte=compte, nature=nature, empreinte=empreinte_hmac(valeur), expire_le=timezone.now() + duree, donnee=donnee
+    )
     return valeur
+
+
+def consommer_jeton(valeur: str, nature: str) -> JetonUnique:
+    jeton = (
+        JetonUnique.objects.select_for_update()
+        .select_related("compte__contact")
+        .filter(empreinte=empreinte_hmac(valeur or ""), nature=nature)
+        .first()
+    )
+    if jeton is None or jeton.utilise_le is not None or jeton.expire_le <= timezone.now():
+        raise ErreurValidation("Ce lien n'est plus valable. Faites une nouvelle demande.", code="lien_invalide")
+    jeton.utilise_le = timezone.now()
+    jeton.save(update_fields=["utilise_le"])
+    return jeton
 
 
 def consommer_jeton_unique(valeur: str, nature: str) -> CompteUsager:
@@ -270,7 +286,8 @@ class Resultat:
 
 
 def _lien(chemin: str, jeton: str) -> str:
-    return f"{settings.PORTAIL_URL.rstrip('/')}/{chemin}?jeton={jeton}"
+    """Le jeton voyage dans le fragment de l'adresse : il n'est jamais transmis aux serveurs (journaux d'accès)."""
+    return f"{settings.PORTAIL_URL.rstrip('/')}/{chemin}#jeton={jeton}"
 
 
 @transaction.atomic
@@ -294,6 +311,7 @@ def inscrire(
     verifier_politique(mot_de_passe, identifiant=identifiant, prenom=contact.get("prenom", ""), nom=contact.get("nom", ""))
     existant = CompteUsager.objects.filter(identifiant=identifiant).select_related("contact").first()
     if existant is not None:
+        make_password(mot_de_passe)  # même coût que la création d'un compte : pas d'énumération par le temps de réponse
         notifier(
             "compte_deja_existant",
             {"lien": f"{settings.PORTAIL_URL.rstrip('/')}/mot-de-passe-oublie"},
@@ -410,6 +428,8 @@ def refuser_compte(compte: CompteUsager, *, acteur: Any, motif: str) -> CompteUs
 @transaction.atomic
 def suspendre_compte(compte: CompteUsager, *, acteur: Any, motif: str) -> CompteUsager:
     exiger(acteur, "valider_compte_usager")
+    if compte.statut != "actif":
+        raise ErreurMetier("Seul un compte actif peut être suspendu.", code="statut_compte")
     compte.statut = "suspendu"
     compte.motif_suspension = motif[:250]
     compte.save(update_fields=["statut", "motif_suspension"])
@@ -431,15 +451,34 @@ def reactiver_compte(compte: CompteUsager, *, acteur: Any) -> CompteUsager:
 
 
 @transaction.atomic
-def inviter_contact(contact: Contact, *, invite_par: Any) -> CompteUsager:
-    """Un contact ajouté par un usager (ou par un agent) reçoit un lien pour choisir son mot de passe."""
+def inviter_contact(contact: Contact, *, invite_par: Any, structure: Any = None) -> CompteUsager | None:
+    """Un contact ajouté par un usager (ou par un agent) reçoit un lien pour choisir son mot de passe.
+
+    Sans énumération (SEC-04) : si l'adresse a déjà un compte, la réponse ne change pas et seul le titulaire
+    est prévenu. Un compte déjà ouvert n'est jamais réinvité : son titulaire passe par « mot de passe oublié »
+    (une réinvitation remplacerait son mot de passe).
+    """
     identifiant = normaliser_identifiant(contact.courriel)
-    if CompteUsager.objects.filter(identifiant=identifiant).exclude(contact=contact).exists():
-        raise ErreurMetier("Une autre personne utilise déjà cette adresse sur le portail.", code="identifiant_pris")
-    compte, _ = CompteUsager.objects.get_or_create(
-        contact=contact,
-        defaults={"identifiant": identifiant, "mot_de_passe": make_password(None), "statut": "a_confirmer"},
-    )
+    existant = CompteUsager.objects.filter(identifiant=identifiant).exclude(contact=contact).select_related("contact").first()
+    if existant is not None:
+        notifier(
+            "contact_deja_inscrit",
+            {"invite_par": str(invite_par), "structure": str(structure or "")},
+            contacts=[existant.contact],
+        )
+        journaliser("inviter_contact_portail", contact, apres={"compte_existant": True}, acteur=invite_par)
+        return None
+    compte = CompteUsager.objects.filter(contact=contact).first()
+    if compte is not None and (
+        compte.statut in {"actif", "suspendu", "a_valider", "ferme"} or is_password_usable(compte.mot_de_passe)
+    ):
+        raise ErreurMetier(
+            "Ce contact a déjà un compte sur le portail : il peut utiliser « Mot de passe oublié ».", code="compte_existant"
+        )
+    if compte is None:
+        compte = CompteUsager.objects.create(
+            contact=contact, identifiant=identifiant, mot_de_passe=make_password(None), statut="a_confirmer"
+        )
     jeton = emettre_jeton_unique(compte, "invitation", DUREE_INVITATION)
     notifier(
         "contact_invitation", {"invite_par": str(invite_par)}, contacts=[contact], secrets={"lien": _lien("invitation", jeton)}
@@ -459,6 +498,7 @@ def accepter_invitation(jeton: str, mot_de_passe: str) -> Resultat:
     valide = Usager.objects.filter(rattachements__contact=compte.contact, statut="valide").exists()
     compte.statut = "actif" if valide else "a_valider"
     compte.save()
+    fermer_sessions(compte)
     journaliser("accepter_invitation_portail", compte, acteur=compte.contact)
     return Resultat("Votre compte est créé. Vous pouvez vous connecter.", {})
 
@@ -501,10 +541,11 @@ def connecter(identifiant: str, mot_de_passe: str) -> dict[str, Any]:
         )
     if compte.statut != "actif":
         raise CompteInactif("Votre compte n'est pas actif. Contactez le service des équipements.", code="compte_inactif")
-    _reussite(identifiant, compte)
     if compte.totp_actif:
+        # Les compteurs d'échecs ne repartent à zéro qu'après le code de double authentification (SEC-04).
         defi = emettre_jeton_unique(compte, "defi_totp", DUREE_DEFI_TOTP)
         return {"etape": "totp", "defi": defi}
+    _reussite(identifiant, compte)
     journaliser("connexion_portail", compte, acteur=compte.contact)
     return _reponse_session(compte)
 
@@ -548,6 +589,7 @@ def _code_valide(compte: CompteUsager, graine: str, code: str) -> bool:
 @transaction.atomic
 def demander_reinitialisation(identifiant: str) -> Resultat:
     compte = CompteUsager.objects.select_related("contact").filter(identifiant=normaliser_identifiant(identifiant)).first()
+    check_password("", HASH_FACTICE)  # même coût pour une adresse connue ou inconnue
     if compte is not None and compte.statut in {"actif", "a_valider", "a_confirmer"}:
         jeton = emettre_jeton_unique(
             compte, "reinitialisation", timedelta(minutes=int(parametre("portail.reinitialisation_minutes")))
@@ -559,8 +601,6 @@ def demander_reinitialisation(identifiant: str) -> Resultat:
             secrets={"lien": _lien("reinitialisation", jeton)},
         )
         journaliser("demander_reinitialisation_portail", compte, acteur=compte.contact)
-    else:
-        check_password("", HASH_FACTICE)
     return Resultat(MESSAGE_ENVOI, {})
 
 
@@ -578,18 +618,25 @@ def reinitialiser(jeton: str, mot_de_passe: str) -> Resultat:
     return Resultat("Votre mot de passe est modifié. Vous pouvez vous connecter.", {})
 
 
-@transaction.atomic
-def changer_mot_de_passe(compte: CompteUsager, actuel: str, nouveau: str, *, jeton: JetonPortail | None = None) -> None:
-    if not check_password(actuel, compte.mot_de_passe):
+def verifier_mot_de_passe_actuel(compte: CompteUsager, mot_de_passe: str, message: str) -> None:
+    """Hors transaction : l'échec est compté et le verrou progressif s'applique comme à la connexion (SEC-04)."""
+    _refus_verrou(compte.identifiant)
+    if not check_password(mot_de_passe, compte.mot_de_passe):
         _enregistrer_echec(compte.identifiant, compte)
-        raise ErreurValidation("Le mot de passe actuel est incorrect.", code="mot_de_passe_actuel")
+        _refus_verrou(compte.identifiant)
+        raise ErreurValidation(message, code="mot_de_passe_actuel")
+
+
+def changer_mot_de_passe(compte: CompteUsager, actuel: str, nouveau: str, *, jeton: JetonPortail | None = None) -> None:
+    verifier_mot_de_passe_actuel(compte, actuel, "Le mot de passe actuel est incorrect.")
     verifier_politique(nouveau, identifiant=compte.identifiant, prenom=compte.contact.prenom, nom=compte.contact.nom)
-    compte.mot_de_passe = make_password(nouveau)
-    compte.mot_de_passe_modifie_le = timezone.now()
-    compte.save(update_fields=["mot_de_passe", "mot_de_passe_modifie_le"])
-    fermer_sessions(compte, sauf=jeton)
-    journaliser("changer_mot_de_passe_portail", compte, acteur=compte.contact)
-    notifier("mot_de_passe_modifie", {}, contacts=[compte.contact])
+    with transaction.atomic():
+        compte.mot_de_passe = make_password(nouveau)
+        compte.mot_de_passe_modifie_le = timezone.now()
+        compte.save(update_fields=["mot_de_passe", "mot_de_passe_modifie_le"])
+        fermer_sessions(compte, sauf=jeton)
+        journaliser("changer_mot_de_passe_portail", compte, acteur=compte.contact)
+        notifier("mot_de_passe_modifie", {}, contacts=[compte.contact])
 
 
 # --- Double authentification ----------------------------------------------------------------------
@@ -605,27 +652,80 @@ def commencer_totp(compte: CompteUsager) -> dict[str, str]:
     return {"uri": uri, "qr_svg": qr_svg(uri), "cle": graine}
 
 
-@transaction.atomic
-def activer_totp(compte: CompteUsager, code: str) -> None:
+def activer_totp(compte: CompteUsager, code: str, mot_de_passe: str) -> None:
+    """Activation confirmée par le mot de passe : une session volée ne suffit pas à enrôler un téléphone."""
+    verifier_mot_de_passe_actuel(compte, mot_de_passe, "Le mot de passe est incorrect.")
     if not compte.totp_en_attente_chiffre:
         raise ErreurValidation("Commencez par afficher le code QR.", code="totp_non_commence")
     graine = dechiffrer(compte.totp_en_attente_chiffre)
     if not _code_valide(compte, graine, code):
         raise ErreurValidation("Code incorrect. Vérifiez l'heure de votre téléphone et réessayez.", code="code_invalide")
-    compte.totp_secret_chiffre = chiffrer(graine)
-    compte.totp_en_attente_chiffre = ""
-    compte.totp_actif = True
-    compte.save(update_fields=["totp_secret_chiffre", "totp_en_attente_chiffre", "totp_actif"])
-    journaliser("activer_totp_portail", compte, acteur=compte.contact)
+    with transaction.atomic():
+        compte.totp_secret_chiffre = chiffrer(graine)
+        compte.totp_en_attente_chiffre = ""
+        compte.totp_actif = True
+        compte.save(update_fields=["totp_secret_chiffre", "totp_en_attente_chiffre", "totp_actif"])
+        journaliser("activer_totp_portail", compte, acteur=compte.contact)
+        notifier("totp_active", {}, contacts=[compte.contact])
+
+
+def desactiver_totp(compte: CompteUsager, mot_de_passe: str) -> None:
+    verifier_mot_de_passe_actuel(compte, mot_de_passe, "Le mot de passe est incorrect.")
+    with transaction.atomic():
+        compte.totp_actif = False
+        compte.totp_secret_chiffre = ""
+        compte.save(update_fields=["totp_actif", "totp_secret_chiffre"])
+        journaliser("desactiver_totp_portail", compte, acteur=compte.contact)
+        notifier("totp_desactive", {}, contacts=[compte.contact])
+
+
+# --- Changement d'adresse électronique ------------------------------------------------------------------
+
+
+def demander_changement_courriel(compte: CompteUsager, nouveau: str, mot_de_passe: str) -> Resultat:
+    """La nouvelle adresse est confirmée par un lien qui lui est envoyé ; l'ancienne est prévenue du changement.
+
+    Réponse identique si l'adresse est déjà utilisée (son titulaire est alors prévenu) : pas d'énumération.
+    """
+    verifier_mot_de_passe_actuel(compte, mot_de_passe, "Le mot de passe est incorrect.")
+    adresse = normaliser_identifiant(nouveau)
+    if adresse == compte.identifiant:
+        raise ErreurValidation("C'est déjà l'adresse de votre compte.", code="adresse_identique")
+    with transaction.atomic():
+        existant = CompteUsager.objects.filter(identifiant=adresse).select_related("contact").first()
+        if existant is not None:
+            notifier(
+                "compte_deja_existant",
+                {"lien": f"{settings.PORTAIL_URL.rstrip('/')}/mot-de-passe-oublie"},
+                contacts=[existant.contact],
+            )
+        else:
+            jeton = emettre_jeton_unique(compte, "changement_courriel", timedelta(hours=24), donnee=adresse)
+            notifier(
+                "courriel_changement_confirmation",
+                {"contact": compte.contact, "nouvelle": adresse},
+                courriels=[adresse],
+                secrets={"lien": _lien("confirmer-adresse", jeton)},
+            )
+        journaliser("demander_changement_courriel_portail", compte, acteur=compte.contact)
+    return Resultat("Un lien de confirmation vient d'être envoyé à la nouvelle adresse. Il est valable 24 heures.", {})
 
 
 @transaction.atomic
-def desactiver_totp(compte: CompteUsager, mot_de_passe: str) -> None:
-    if not check_password(mot_de_passe, compte.mot_de_passe):
-        _enregistrer_echec(compte.identifiant, compte)
-        raise ErreurValidation("Le mot de passe est incorrect.", code="mot_de_passe_actuel")
-    compte.totp_actif = False
-    compte.totp_secret_chiffre = ""
-    compte.save(update_fields=["totp_actif", "totp_secret_chiffre"])
-    journaliser("desactiver_totp_portail", compte, acteur=compte.contact)
-    notifier("totp_desactive", {}, contacts=[compte.contact])
+def confirmer_changement_courriel(valeur: str) -> Resultat:
+    jeton = consommer_jeton(valeur, "changement_courriel")
+    compte = jeton.compte
+    if CompteUsager.objects.filter(identifiant=jeton.donnee).exclude(pk=compte.pk).exists():
+        raise ErreurValidation("Ce lien n'est plus valable. Faites une nouvelle demande.", code="lien_invalide")
+    ancienne = compte.contact.courriel
+    compte.identifiant = jeton.donnee
+    compte.save(update_fields=["identifiant"])
+    contact = compte.contact
+    contact.courriel = jeton.donnee
+    contact.save(update_fields=["courriel"])
+    fermer_sessions(compte)
+    journaliser(
+        "changer_courriel_portail", compte, avant={"courriel": ancienne}, apres={"courriel": jeton.donnee}, acteur=contact
+    )
+    notifier("courriel_contact_modifie", {"contact": contact, "nouvelle": jeton.donnee}, courriels=[ancienne])
+    return Resultat("Votre nouvelle adresse est confirmée. Connectez-vous avec cette adresse.", {})

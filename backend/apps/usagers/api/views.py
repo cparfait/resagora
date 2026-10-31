@@ -100,6 +100,17 @@ class ContactSerializer(serializers.ModelSerializer):
         model = Contact
         fields = ["id", "civilite", "prenom", "nom", "courriel", "telephone", "rattachements"]
 
+    def validate_courriel(self, valeur: str) -> str:
+        """L'adresse d'un contact qui a un compte sur le portail est son identifiant : seul le titulaire la change
+        depuis son espace (une modification par un agent permettrait de détourner le compte)."""
+        instance = self.instance if isinstance(self.instance, Contact) else None
+        compte = getattr(instance, "compte", None)
+        if instance is not None and compte is not None and valeur.strip().lower() != instance.courriel.strip().lower():
+            raise serializers.ValidationError(
+                "Ce contact a un compte sur le portail : il modifie lui-même son adresse depuis son espace."
+            )
+        return valeur
+
 
 class TypePieceSerializer(serializers.ModelSerializer):
     class Meta:

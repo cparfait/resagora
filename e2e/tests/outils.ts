@@ -15,21 +15,23 @@ export function jetonSimulateur(): string {
   return readFileSync(resolve(import.meta.dirname, "../../deploy/dev/secrets/simulateur_docuseal_api_jeton"), "utf8").trim();
 }
 
-/** Dernier lien reçu par courriel par `destinataire` (Mailpit), par exemple « /confirmation?jeton=… ». */
-export async function lienRecu(page: Page, destinataire: string, chemin: string): Promise<string> {
+/** Dernier lien reçu par courriel par `destinataire` (Mailpit), par exemple « /confirmation#jeton=… ». */
+export async function lienRecu(page: Page, destinataire: string, chemin: string, motif?: string): Promise<string> {
   for (let essai = 0; essai < 40; essai++) {
     const liste = (await (await page.request.get(`${MAILPIT}/api/v1/search?query=${encodeURIComponent(`to:"${destinataire}"`)}`)).json()) as {
       messages: { ID: string }[];
     };
     for (const message of liste.messages ?? []) {
       const detail = (await (await page.request.get(`${MAILPIT}/api/v1/message/${message.ID}`)).json()) as { Text: string };
-      const trouve = new RegExp(String.raw`https?://\S+/${chemin}\?jeton=[\w-]+`).exec(detail.Text);
+      const trouve = new RegExp(motif ?? String.raw`https?://\S+/${chemin}#jeton=[\w-]+`).exec(detail.Text);
       if (trouve) return trouve[0];
     }
     await page.waitForTimeout(500);
   }
   throw new Error(`Aucun lien « ${chemin} » reçu par ${destinataire}`);
 }
+/** Signataire de la Ville (paramètre signature.elu_courriel, valeur livrée). */
+export const ELU_COURRIEL = process.env.ELU_COURRIEL ?? "elu.sports@chatillon.test";
 export const MOBILE = process.env.MOBILE_URL ?? "https://gardiens.chatillon.local";
 
 /** Mot de passe des comptes fictifs, généré par `make secrets` (deploy/dev/secrets, ignoré par Git). */

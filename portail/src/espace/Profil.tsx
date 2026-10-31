@@ -27,6 +27,8 @@ export function MonCompte() {
   const [motsDePasse, setMotsDePasse] = useState({ actuel: "", nouveau: "", confirmation: "" });
   const [totp, setTotp] = useState<{ qr_svg?: string; cle?: string; code: string; mot_de_passe: string } | null>(null);
   const [prefs, setPrefs] = useState<Preferences | null>(null);
+  const [codeSms, setCodeSms] = useState("");
+  const [adresse, setAdresse] = useState({ nouveau: "", mot_de_passe: "" });
   const valeursProfil = profil ?? (compte.data ? { prenom: compte.data.prenom, nom: compte.data.nom, telephone: compte.data.telephone } : null);
   const valeursPrefs = prefs ?? preferences.data ?? null;
 
@@ -56,7 +58,7 @@ export function MonCompte() {
     onError: erreur,
   });
   const activerTotp = useMutation({
-    mutationFn: () => requete<{ message: string }>("POST", "/api/portail/compte/totp", { code: totp?.code }),
+    mutationFn: () => requete<{ message: string }>("POST", "/api/portail/compte/totp", { code: totp?.code, mot_de_passe: totp?.mot_de_passe }),
     onSuccess: async (r) => {
       succes(r.message);
       setTotp(null);
@@ -75,10 +77,27 @@ export function MonCompte() {
   });
   const enregistrerPrefs = useMutation({
     mutationFn: () => requete<Preferences>("PATCH", "/api/portail/compte/preferences", valeursPrefs),
-    onSuccess: async () => {
-      succes("Vos préférences sont enregistrées.");
+    onSuccess: async (r) => {
+      succes(r.sms && !r.telephone_confirme ? "Vos préférences sont enregistrées. Saisissez le code reçu par SMS pour confirmer votre numéro." : "Vos préférences sont enregistrées.");
       setPrefs(null);
       await client.invalidateQueries({ queryKey: ["preferences"] });
+    },
+    onError: erreur,
+  });
+  const confirmerTelephone = useMutation({
+    mutationFn: (renvoyer: boolean) => requete<Preferences>("POST", "/api/portail/compte/preferences/telephone", renvoyer ? { renvoyer: true } : { code: codeSms }),
+    onSuccess: async (r, renvoyer) => {
+      succes(renvoyer ? "Un nouveau code vous a été envoyé par SMS." : r.telephone_confirme ? "Votre numéro est confirmé : vous recevrez les SMS." : "Code enregistré.");
+      setCodeSms("");
+      await client.invalidateQueries({ queryKey: ["preferences"] });
+    },
+    onError: erreur,
+  });
+  const changerAdresse = useMutation({
+    mutationFn: () => requete<{ message: string }>("POST", "/api/portail/compte/courriel", adresse),
+    onSuccess: (r) => {
+      succes(r.message);
+      setAdresse({ nouveau: "", mot_de_passe: "" });
     },
     onError: erreur,
   });
@@ -110,6 +129,22 @@ export function MonCompte() {
             </Bouton>
           </form>
         ) : null}
+      </section>
+      <section aria-labelledby="titre-adresse" className="carte">
+        <h2 id="titre-adresse">Adresse électronique</h2>
+        <p>Votre adresse actuelle est {c.courriel}. La nouvelle adresse sera confirmée par un lien qui lui est envoyé ; l'ancienne sera prévenue.</p>
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            changerAdresse.mutate();
+          }}
+        >
+          <Champ libelle="Nouvelle adresse électronique" type="email" obligatoire autoComplete="email" value={adresse.nouveau} onChange={(e) => setAdresse({ ...adresse, nouveau: e.target.value })} />
+          <Champ libelle="Mot de passe" type="password" obligatoire autoComplete="current-password" value={adresse.mot_de_passe} onChange={(e) => setAdresse({ ...adresse, mot_de_passe: e.target.value })} />
+          <Bouton type="submit" variante="secondaire" enCours={changerAdresse.isPending}>
+            Changer d'adresse
+          </Bouton>
+        </form>
       </section>
       <section aria-labelledby="titre-mot-de-passe" className="carte">
         <h2 id="titre-mot-de-passe">Mot de passe</h2>
@@ -149,6 +184,7 @@ export function MonCompte() {
             <p>Scannez ce code avec votre application, ou saisissez la clé : {totp.cle}</p>
             {totp.qr_svg ? <img className="qr" src={`data:image/svg+xml;charset=utf-8,${encodeURIComponent(totp.qr_svg)}`} alt="Code QR à scanner avec l'application d'authentification" width={200} height={200} /> : null}
             <Champ libelle="Code affiché par l'application" inputMode="numeric" autoComplete="one-time-code" maxLength={6} obligatoire value={totp.code} onChange={(e) => setTotp({ ...totp, code: e.target.value })} />
+            <Champ libelle="Mot de passe (pour confirmer)" type="password" autoComplete="current-password" obligatoire value={totp.mot_de_passe} onChange={(e) => setTotp({ ...totp, mot_de_passe: e.target.value })} />
             <Bouton type="submit" enCours={activerTotp.isPending}>
               Confirmer l'activation
             </Bouton>
@@ -180,12 +216,34 @@ export function MonCompte() {
           >
             <Case libelle="Recevoir aussi certains messages par SMS (rappels, fermetures)" checked={valeursPrefs.sms} onChange={(e) => setPrefs({ ...valeursPrefs, sms: e.target.checked })} />
             {valeursPrefs.sms ? <Champ libelle="Téléphone mobile" type="tel" autoComplete="tel" aide="Numéro commençant par 06 ou 07." value={valeursPrefs.telephone_sms} onChange={(e) => setPrefs({ ...valeursPrefs, telephone_sms: e.target.value })} /> : null}
+            {valeursPrefs.sms && preferences.data?.telephone_sms && !preferences.data.telephone_confirme ? (
+              <p className="aide">Numéro {preferences.data.telephone_sms} non confirmé : aucun SMS ne vous est envoyé tant que vous n'avez pas saisi le code reçu.</p>
+            ) : null}
             <Case libelle="Rappel la veille de chaque séance" checked={valeursPrefs.rappels} onChange={(e) => setPrefs({ ...valeursPrefs, rappels: e.target.checked })} />
             <Case libelle="Informations générales de la Ville sur les équipements" checked={valeursPrefs.informations} onChange={(e) => setPrefs({ ...valeursPrefs, informations: e.target.checked })} />
             <Bouton type="submit" enCours={enregistrerPrefs.isPending}>
               Enregistrer mes préférences
             </Bouton>
           </form>
+          {preferences.data?.sms && preferences.data.telephone_sms && !preferences.data.telephone_confirme ? (
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                confirmerTelephone.mutate(false);
+              }}
+            >
+              <h3>Confirmer votre numéro de mobile</h3>
+              <Champ libelle="Code reçu par SMS" inputMode="numeric" autoComplete="one-time-code" maxLength={6} obligatoire aide="Code à 6 chiffres, valable 15 minutes." value={codeSms} onChange={(e) => setCodeSms(e.target.value)} />
+              <div className="actions">
+                <Bouton type="submit" enCours={confirmerTelephone.isPending}>
+                  Confirmer le numéro
+                </Bouton>
+                <Bouton variante="lien" onClick={() => confirmerTelephone.mutate(true)}>
+                  Recevoir un nouveau code
+                </Bouton>
+              </div>
+            </form>
+          ) : null}
         </section>
       ) : null}
       <section aria-labelledby="titre-donnees" className="carte">
@@ -230,6 +288,22 @@ export function MaStructure() {
     onSuccess: async () => {
       succes("Contact ajouté ; il reçoit une invitation pour créer son compte.");
       setContact({ prenom: "", nom: "", courriel: "", telephone: "", role: "referent", peut_signer: false });
+      await rafraichir();
+    },
+    onError: erreur,
+  });
+  const modifierContact = useMutation({
+    mutationFn: (c: { id: number; role?: string; peut_signer?: boolean }) => requete("PATCH", `/api/portail/usagers/${id}/contacts/${c.id}`, c),
+    onSuccess: async () => {
+      succes("Contact modifié.");
+      await rafraichir();
+    },
+    onError: erreur,
+  });
+  const retirerContact = useMutation({
+    mutationFn: (c: ContactStructure) => requete("DELETE", `/api/portail/usagers/${id}/contacts/${c.id}`),
+    onSuccess: async () => {
+      succes("Contact retiré de la structure.");
       await rafraichir();
     },
     onError: erreur,
@@ -346,8 +420,27 @@ export function MaStructure() {
             <li key={c.id}>
               {c.prenom} {c.nom} — {c.role}
               {c.principal ? " (contact principal)" : ""}
-              {c.peut_signer ? ", habilité(e) à signer" : ""} — {c.courriel}
-              {c.compte ? "" : " — sans compte sur le portail"}
+              {c.peut_signer ? ", habilité(e) à signer" : ""}
+              {c.courriel ? ` — ${c.courriel}` : ""}
+              {c.courriel !== undefined && !c.compte ? " — sans compte sur le portail" : ""}
+              {s.principal && !c.principal ? (
+                <span className="actions">
+                  <Bouton variante="lien" onClick={() => modifierContact.mutate({ id: c.id, peut_signer: !c.peut_signer })}>
+                    {c.peut_signer ? "Retirer l'habilitation à signer" : "Habiliter à signer"}
+                    <span className="visuellement-masque">
+                      {" "}
+                      : {c.prenom} {c.nom}
+                    </span>
+                  </Bouton>
+                  <Bouton variante="lien" onClick={() => retirerContact.mutate(c)}>
+                    Retirer de la structure
+                    <span className="visuellement-masque">
+                      {" "}
+                      : {c.prenom} {c.nom}
+                    </span>
+                  </Bouton>
+                </span>
+              ) : null}
             </li>
           ))}
         </ul>

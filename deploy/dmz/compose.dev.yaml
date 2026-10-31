@@ -9,6 +9,8 @@ services:
     networks: [dmz_front, dmz_back, liaison]
     environment:
       FORWARDED_ALLOW_IPS: 10.231.10.250
+      # Seule cette valeur autorise les réglages de test ci-dessous (la façade refuse sinon de démarrer).
+      ENVIRONNEMENT: recette
       PAYFIP_SANS_FILTRE_IP: "1"
       # Sur le poste de recette, le portail est servi sur le port 9443 (en-tête Origin contrôlé par la façade).
       ORIGINE_PORTAIL: https://equipements.chatillon.test:9443

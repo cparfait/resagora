@@ -59,17 +59,32 @@ services:
     secrets: [valkey_mot_de_passe]
     networks: [dmz_back]
 
-  clamav:
+  preparer-volumes:
+    # Tâche ponctuelle : volumes des signatures (clamav) et de DocuSeal (docuseal) attribués à leurs utilisateurs.
     <<: *journaux
     image: clamav/clamav:1.5.4-debian13-slim@sha256:cce3e1a43ae2bb40e11335c52c0e1e98273b12fa3d587e617f63a6907cc4b70b
+    user: "0:0"
+    entrypoint: ["sh", "-c", "chown -R 1000:1000 /var/lib/clamav && chown -R 2000:2000 /data"]
     cap_drop: [ALL]
-    # Démarrage en root le temps de préparer le volume des signatures, puis passage à l'utilisateur clamav.
-    cap_add: [CHOWN, SETUID, SETGID, DAC_OVERRIDE, FOWNER]
+    cap_add: [CHOWN, DAC_READ_SEARCH]
     security_opt: ["no-new-privileges:true"]
+    read_only: true
+    network_mode: none
+    volumes: [clamav-dmz:/var/lib/clamav, docuseal:/data]
+    restart: "no"
+
+  clamav:
+    <<: *durci
+    image: clamav/clamav:1.5.4-debian13-slim@sha256:cce3e1a43ae2bb40e11335c52c0e1e98273b12fa3d587e617f63a6907cc4b70b
+    # Analyse des fichiers venus d'Internet : sans root ni capacité, lecture seule, processus limités (M11).
+    user: "1000:1000"
+    entrypoint: ["sh", "/etc/clamav-ville/demarrer.sh"]
+    healthcheck: { test: ["CMD-SHELL", "clamdcheck.sh"], interval: 60s, start_period: 360s }
     mem_limit: 3g
-    volumes: [clamav-dmz:/var/lib/clamav]
+    pids_limit: 128
+    volumes: [clamav-dmz:/var/lib/clamav, ../clamav:/etc/clamav-ville:ro]
     networks: [dmz_back, sortie_dmz]
-    restart: unless-stopped
+    depends_on: { preparer-volumes: { condition: service_completed_successfully } }
 
   docuseal:
     <<: *journaux
@@ -77,14 +92,16 @@ services:
     environment:
       HOST: ${DOCUSEAL_HOTE:-signature.chatillon.test}
       FORCE_SSL: "true"
+    # Utilisateur « docuseal » de l'image, sans capacité (M11) ; le volume lui est attribué par preparer-volumes.
+    user: "2000:2000"
     read_only: true
     tmpfs: [/tmp, /app/tmp]
     cap_drop: [ALL]
-    cap_add: [CHOWN, SETUID, SETGID, DAC_OVERRIDE, FOWNER]
     security_opt: ["no-new-privileges:true"]
     pids_limit: 256
     mem_limit: 1g
     volumes: [docuseal:/data]
+    depends_on: { preparer-volumes: { condition: service_completed_successfully } }
     # Joignable par le proxy (pages de signature) et par le LAN (dépôt / récupération) ; jamais par la façade.
     networks: [dmz_signature]
     restart: unless-stopped

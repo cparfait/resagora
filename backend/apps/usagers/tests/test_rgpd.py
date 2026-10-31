@@ -42,7 +42,10 @@ def test_usr06_anonymisation_d_un_usager_inactif_apres_la_duree_parametree():
         Message.objects.create(
             dossier=inactif.dossiers.first(), auteur_contact=compte.contact, corps="Mon numéro : 06 00 00 00 00"
         )
+    # 36 mois sans activité, et 60 mois depuis la fin du dernier dossier (rgpd.conservation_mois_dossiers_clos).
     with freeze_time("2026-11-01"):
+        assert rgpd.anonymiser_inactifs() == 0
+    with freeze_time("2027-03-01"):
         actif = usager_avec_contact()
         assert rgpd.anonymiser_inactifs() == 1
     inactif.refresh_from_db()

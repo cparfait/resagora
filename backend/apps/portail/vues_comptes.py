@@ -5,6 +5,7 @@ from __future__ import annotations
 import json
 from typing import Any
 
+from django.db import transaction
 from django.http import HttpResponse
 from django.utils import timezone
 from drf_spectacular.utils import extend_schema
@@ -13,6 +14,7 @@ from rest_framework.request import Request
 from rest_framework.response import Response
 
 from apps.communication.models import PreferenceNotification
+from apps.communication.services import confirmer_telephone, demander_verification_telephone
 from apps.communication.sms import normaliser_mobile
 from apps.comptes import services
 from apps.comptes.models import JetonPortail
@@ -141,6 +143,16 @@ class VueConfirmation(VuePublique):
         return message(services.confirmer_courriel(entree.validated_data["jeton"]).message)
 
 
+class VueConfirmationNouvelleAdresse(VuePublique):
+    throttle_scope = "inscription"
+
+    @extend_schema(request=JetonSerializer, responses={200: dict})
+    def post(self, request: Request) -> Response:
+        entree = JetonSerializer(data=request.data)
+        entree.is_valid(raise_exception=True)
+        return message(services.confirmer_changement_courriel(entree.validated_data["jeton"]).message)
+
+
 class VueInvitation(VuePublique):
     throttle_scope = "reinitialisation"
 
@@ -250,11 +262,34 @@ class VueMotDePasse(VueContact):
         return message("Votre mot de passe est modifié. Vos autres sessions ont été fermées.")
 
 
+class ChangementCourrielSerializer(serializers.Serializer):
+    nouveau = serializers.EmailField(max_length=254)
+    mot_de_passe = serializers.CharField(max_length=256, trim_whitespace=False)
+
+
+class VueCourrielCompte(VueContact):
+    """Changement d'adresse : confirmé par la nouvelle adresse, signalé à l'ancienne."""
+
+    throttle_scope = "connexion"
+
+    @extend_schema(request=ChangementCourrielSerializer, responses={200: dict})
+    def post(self, request: Request) -> Response:
+        entree = ChangementCourrielSerializer(data=request.data)
+        entree.is_valid(raise_exception=True)
+        d = entree.validated_data
+        return message(services.demander_changement_courriel(compte_courant(request), d["nouveau"], d["mot_de_passe"]).message)
+
+
 class CodeSerializer(serializers.Serializer):
     code = serializers.CharField(max_length=10)
 
 
 class MotDePasseSerializer(serializers.Serializer):
+    mot_de_passe = serializers.CharField(max_length=256, trim_whitespace=False)
+
+
+class ActivationTotpSerializer(serializers.Serializer):
+    code = serializers.CharField(max_length=10)
     mot_de_passe = serializers.CharField(max_length=256, trim_whitespace=False)
 
 
@@ -268,11 +303,11 @@ class VueTotpCompte(VueContact):
             return Response({"actif": True})
         return Response({"actif": False, **services.commencer_totp(compte)})
 
-    @extend_schema(request=CodeSerializer, responses={200: dict})
+    @extend_schema(request=ActivationTotpSerializer, responses={200: dict})
     def post(self, request: Request) -> Response:
-        entree = CodeSerializer(data=request.data)
+        entree = ActivationTotpSerializer(data=request.data)
         entree.is_valid(raise_exception=True)
-        services.activer_totp(compte_courant(request), entree.validated_data["code"])
+        services.activer_totp(compte_courant(request), entree.validated_data["code"], entree.validated_data["mot_de_passe"])
         return message("La double authentification est activée.")
 
     @extend_schema(request=MotDePasseSerializer, responses={200: dict})
@@ -284,9 +319,17 @@ class VueTotpCompte(VueContact):
 
 
 class PreferencesSerializer(serializers.ModelSerializer):
+    telephone_confirme = serializers.SerializerMethodField()
+
     class Meta:
         model = PreferenceNotification
-        fields = ["sms", "telephone_sms", "rappels", "informations"]
+        fields = ["sms", "telephone_sms", "telephone_confirme", "rappels", "informations"]
+
+    def get_telephone_confirme(self, preferences: PreferenceNotification) -> bool:
+        return bool(preferences.telephone_sms) and preferences.telephone_sms == preferences.telephone_verifie
+
+    def validate_telephone_sms(self, valeur: str) -> str:
+        return (normaliser_mobile(valeur) or valeur) if valeur else ""
 
     def validate(self, donnees: dict[str, Any]) -> dict[str, Any]:
         sms = donnees.get("sms", getattr(self.instance, "sms", False))
@@ -311,8 +354,34 @@ class VuePreferences(VueContact):
         preferences, _ = PreferenceNotification.objects.get_or_create(contact=compte_courant(request).contact)
         entree = PreferencesSerializer(preferences, data=request.data, partial=True)
         entree.is_valid(raise_exception=True)
-        entree.save()
-        return Response(entree.data)
+        with transaction.atomic():
+            preferences = entree.save()
+            if preferences.sms and preferences.telephone_sms != preferences.telephone_verifie:
+                demander_verification_telephone(preferences, preferences.telephone_sms)
+        return Response(PreferencesSerializer(preferences).data)
+
+
+class CodeTelephoneSerializer(serializers.Serializer):
+    code = serializers.CharField(max_length=10)
+
+
+class VueVerificationTelephone(VueContact):
+    """COM-05 : confirmation du numéro de mobile par le code reçu ; « renvoyer » en demande un nouveau."""
+
+    throttle_scope = "connexion"
+
+    @extend_schema(request=CodeTelephoneSerializer, responses={200: PreferencesSerializer})
+    def post(self, request: Request) -> Response:
+        preferences, _ = PreferenceNotification.objects.get_or_create(contact=compte_courant(request).contact)
+        if isinstance(request.data, dict) and request.data.get("renvoyer") is True:
+            if not preferences.telephone_sms:
+                raise ErreurValidation("Indiquez d'abord un numéro de mobile.", code="mobile_invalide")
+            demander_verification_telephone(preferences, preferences.telephone_sms)
+            return Response(PreferencesSerializer(preferences).data)
+        entree = CodeTelephoneSerializer(data=request.data)
+        entree.is_valid(raise_exception=True)
+        confirmer_telephone(preferences, entree.validated_data["code"])
+        return Response(PreferencesSerializer(preferences).data)
 
 
 class VueExportCompte(VueContact):

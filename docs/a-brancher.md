@@ -97,7 +97,7 @@ Production : conteneur `docuseal` de la DMZ (image épinglée), pages de signatu
 
 | Paramètre | Où | À fournir | Comment tester |
 | --- | --- | --- | --- |
-| `DOCUSEAL_URL` | `deploy/lan/parametres.env` | Adresse de DocuSeal vue du LAN (par le proxy, 443) | Back-office → dossier → document → « Signature électronique » : le circuit passe à « en attente de signature » |
+| `DOCUSEAL_URL` | `deploy/lan/parametres.env` | **Obligatoire** : adresse HTTPS de DocuSeal vue du LAN (par le proxy, 443) ; `verifier_deploiement` refuse une adresse HTTP ou un simulateur | Back-office → dossier → document → « Signature électronique » : le circuit passe à « en attente de signature » |
 | `DOCUSEAL_URL_PUBLIQUE` | idem | Nom public des pages de signature (ex. `https://signature.chatillon.fr`) | Le lien « Signer en ligne » du portail ouvre cette adresse |
 | Secret `docuseal_api_jeton` | `deploy/lan/secrets/` | Jeton d'API créé dans DocuSeal (Paramètres → API) par l'administrateur, compte de service dédié | Même test ; un jeton faux donne « Le service de signature a refusé la demande » |
 | Webhook DocuSeal | Interface d'administration de DocuSeal (LAN uniquement) | URL `https://<portail>/api/portail/webhooks/docuseal`, en-tête `X-Docuseal-Secret` = secret `docuseal_webhook_secret` (DMZ), événements `form.*` et `submission.*` | Signer un document : il passe « Signé électroniquement » dans la minute (sinon la synchronisation planifiée le rattrape en 15 min) |
@@ -110,14 +110,14 @@ Production : conteneur `docuseal` de la DMZ (image épinglée), pages de signatu
 | Paramètre | Où | À fournir | Comment tester |
 | --- | --- | --- | --- |
 | `GOTENBERG_URL` | `deploy/lan/parametres.env` | Aucun (conteneur interne `gotenberg`) | Générer une convention : un PDF/A-2b est rattaché au dossier |
-| `CLAMAV_HOTE`, `CLAMAV_PORT` | LAN et DMZ | Aucun (conteneurs internes) ; sortie vers `database.clamav.net` par le proxy de la Ville pour les mises à jour | Déposer le fichier de test EICAR sur le portail : refus « contrôle antivirus » et ligne « Fichier infecté rejeté » dans le journal de la façade |
+| `CLAMAV_HOTE`, `CLAMAV_PORT` | LAN et DMZ | Aucun (conteneurs internes) ; sortie vers `database.clamav.net` par le proxy de la Ville pour les mises à jour : décommenter `HTTPProxyServer` et `HTTPProxyPort` dans `deploy/clamav/freshclam.conf` | Déposer le fichier de test EICAR sur le portail : refus « contrôle antivirus » et ligne « Fichier infecté rejeté » dans le journal de la façade |
 
 ## 8. SMS — COM-05
 
 | Paramètre | Où | À fournir | Comment tester |
 | --- | --- | --- | --- |
 | `SMS_ADAPTATEUR` | `deploy/lan/parametres.env` | `desactive` (défaut) ou `http` | Une préférence « SMS » cochée sur le portail produit une ligne SMS dans le journal des envois |
-| `SMS_URL`, secret `sms_jeton` | idem + `deploy/lan/secrets/sms_jeton` | Adresse de l'API de l'opérateur retenu et jeton | Envoi groupé avec SMS : le SMS apparaît chez l'opérateur (en recette : http://localhost:53010/sms) |
+| `SMS_URL`, secret `sms_jeton` | idem + `deploy/lan/secrets/sms_jeton` | Adresse **HTTPS** de l'API de l'opérateur retenu et jeton (les contacts confirment leur numéro par un code, D-037) | Envoi groupé avec SMS : le SMS apparaît chez l'opérateur (en recette : http://localhost:53010/sms) |
 | `SMS_EXPEDITEUR`, `SMS_CHAMPS` | idem | Nom d'expéditeur (11 caractères) ; correspondance des champs si l'opérateur n'utilise pas `destinataire`, `expediteur`, `texte`, `reference` | — |
 
 ## 9. Portail public — POR-01 à POR-10
@@ -129,5 +129,6 @@ Production : conteneur `docuseal` de la DMZ (image épinglée), pages de signatu
 | Déclaration d'accessibilité | Paramètres `accessibilite.*` | État de conformité, date et organisme d'audit, contenus non accessibles, contact | Page « Accessibilité » du portail |
 | Service à prévenir | Paramètre `portail.service_courriel` | Boîte du service des équipements (comptes à valider, messages des usagers) | Inscription d'un compte de test : courriel « Nouveau compte du portail à valider » |
 | `FACTEUR_DEBIT`, `DEBIT_*` | Jamais en production | Laisser les valeurs par défaut (D-032) | — |
+| `ENVIRONNEMENT` | LAN et DMZ | `prod` (valeur par défaut) ; `recette` seulement sur un serveur de recette (D-038) | Avec un seuil modifié, la façade refuse de démarrer et `verifier_deploiement` échoue |
 
 ## 10. Ciril, PayFiP, accès mobile — complétés aux lots concernés

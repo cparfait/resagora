@@ -53,6 +53,8 @@ services:
     build: { context: ../.., dockerfile: deploy/images/simulateurs.Dockerfile }
     ports: ["127.0.0.1:53010:8090"]
     environment:
+      # Garde-fou : le simulateur refuse de démarrer sans ce réglage (jamais en production).
+      SIMULATEUR_RECETTE: "1"
       SIMULATEUR_URL_PUBLIQUE: http://localhost:53010
       SIMULATEUR_SMS_JETON_FICHIER: /run/secrets/simulateur_sms_jeton
       SIMULATEUR_DOCUSEAL_JETON_FICHIER: /run/secrets/simulateur_docuseal_api_jeton

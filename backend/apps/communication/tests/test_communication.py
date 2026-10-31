@@ -156,7 +156,9 @@ def test_com05_sms_par_l_adaptateur_http(monkeypatch, django_capture_on_commit_c
     )
     usager = usager_avec_contact()
     contact = usager.rattachements.first().contact
-    PreferenceNotification.objects.create(contact=contact, sms=True, telephone_sms="06 12 34 56 78")
+    PreferenceNotification.objects.create(
+        contact=contact, sms=True, telephone_sms="06 12 34 56 78", telephone_verifie="06 12 34 56 78"
+    )
     espace = EspaceFabrique()
     valider_systeme(reserver(espace, date(2026, 11, 10), "18:00", "20:00", usager=usager))
     from datetime import datetime
@@ -201,3 +203,18 @@ def test_adm04_modele_de_message_modifiable_et_apercu(client_agent):
         .status_code
         == 403
     )
+
+
+def test_com04_rappel_la_veille_aux_seuls_contacts_qui_l_ont_demande(django_capture_on_commit_callbacks):
+    usager = usager_avec_contact()
+    contact = usager.rattachements.first().contact
+    PreferenceNotification.objects.create(contact=contact, rappels=True)
+    sans_rappel = usager_avec_contact()
+    espace = EspaceFabrique(nom="Gymnase des rappels")
+    valider_systeme(reserver(espace, date(2026, 11, 10), "18:00", "20:00", usager=usager))
+    valider_systeme(reserver(espace, date(2026, 11, 10), "20:00", "22:00", usager=sans_rappel))
+    with freeze_time("2026-11-09 17:00"), django_capture_on_commit_callbacks(execute=True):
+        assert reservations.rappeler_seances() == 1
+        assert reservations.rappeler_seances() == 0
+    rappels = [m for m in mail.outbox if "Rappel" in m.subject]
+    assert len(rappels) == 1 and rappels[0].to == [contact.courriel] and "Gymnase des rappels" in rappels[0].subject

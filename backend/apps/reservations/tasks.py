@@ -15,3 +15,8 @@ def traiter_options() -> dict[str, int]:
 def marquer_realisees() -> int:
     """Séances passées validées ou confirmées → réalisées (quotidienne)."""
     return services.marquer_realisees()
+
+
+@shared_task(name="apps.reservations.tasks.rappeler_seances")
+def rappeler_seances() -> int:
+    return services.rappeler_seances()

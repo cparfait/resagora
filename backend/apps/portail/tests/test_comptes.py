@@ -37,7 +37,7 @@ INSCRIPTION = {
 
 
 def _lien(corps: str, chemin: str) -> str:
-    trouve = re.search(rf"/{chemin}\?jeton=([\w-]+)", corps)
+    trouve = re.search(rf"/{chemin}#jeton=([\w-]+)", corps)
     assert trouve, corps
     return trouve.group(1)
 
@@ -204,7 +204,12 @@ def test_sec04_double_authentification_proposee_et_exigee(client_api):
     enrolement = client.get("/api/portail/compte/totp").json()
     assert enrolement["actif"] is False and "<svg" in enrolement["qr_svg"]
     graine = dechiffrer(CompteUsager.objects.get(pk=compte.pk).totp_en_attente_chiffre)
-    assert client.post("/api/portail/compte/totp", {"code": pyotp.TOTP(graine).now()}, format="json").status_code == 200
+    assert (
+        client.post(
+            "/api/portail/compte/totp", {"code": pyotp.TOTP(graine).now(), "mot_de_passe": MOT_DE_PASSE}, format="json"
+        ).status_code
+        == 200
+    )
     etape = client_api.post(
         "/api/portail/auth/connexion", {"identifiant": compte.identifiant, "mot_de_passe": MOT_DE_PASSE}, format="json"
     ).json()

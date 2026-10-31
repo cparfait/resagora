@@ -4,7 +4,7 @@
  * (POR-04), suivi et messagerie (POR-05, POR-08), pièces et antivirus (POR-06, SEC-07), signature (POR-10, SIG-01).
  */
 import { expect, test, type Page } from "@playwright/test";
-import { BACKOFFICE, PORTAIL, SIMULATEURS, connecterAgent, jetonSimulateur, lienRecu, sansViolationAxe } from "./outils";
+import { BACKOFFICE, ELU_COURRIEL, PORTAIL, connecterAgent, lienRecu, sansViolationAxe } from "./outils";
 
 const suffixe = Date.now().toString(36);
 const COURRIEL = `e2e-${suffixe}@exemple.test`;
@@ -196,12 +196,9 @@ test.describe.serial("Lot 2 — parcours d'une association", () => {
     await page.getByRole("button", { name: "Signer le document" }).click();
     await expect(page.getByText("Votre signature est enregistrée.")).toBeVisible();
 
-    const soumissions = (await (await page.request.get(`${SIMULATEURS}/api/submissions`, { headers: { "X-Auth-Token": jetonSimulateur() } })).json()) as {
-      submitters: { slug: string; role: string; status: string }[];
-    }[];
-    const elu = soumissions.flatMap((s) => s.submitters).find((s) => s.role === "elu" && s.status !== "completed");
-    expect(elu).toBeDefined();
-    await page.goto(`${SIMULATEURS}/s/${elu?.slug}`);
+    // SIG-01 : dès que l'usager a signé, l'élu reçoit par courriel son lien personnel (aucune lecture du simulateur).
+    const lienElu = await lienRecu(page, ELU_COURRIEL, "s", String.raw`https?://\S+/s/[\w-]+`);
+    await page.goto(lienElu);
     await page.getByLabel(/je le signe/).check();
     await page.getByRole("button", { name: "Signer le document" }).click();
 

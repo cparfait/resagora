@@ -229,3 +229,143 @@ MODELES_LOT2: dict[str, tuple[str, str, str, str]] = {
         "",
     ),
 }
+
+
+# Lot 3 — finances et cautions : (libellé, sujet, corps, texte SMS éventuel).
+MODELES_LOT3: dict[str, tuple[str, str, str, str]] = {
+    "facture_emise": (
+        "Facture émise",
+        "Facture {{ piece.numero }} — {{ dossier.numero }}",
+        "Bonjour {{ contact.prenom }},\n\nLa facture {{ piece.numero }} relative à votre dossier {{ dossier.numero }} est "
+        "disponible sur le portail. Montant à régler : {{ montant }}, avant le {{ piece.echeance }}.\nUn titre de recettes "
+        "vous sera adressé par le comptable public ; réglez par virement en indiquant la référence {{ piece.reference_virement }}."
+        + SIGNATURE,
+        "",
+    ),
+    "devis_emis": (
+        "Devis disponible",
+        "Votre devis {{ piece.numero }} est disponible",
+        "Bonjour {{ contact.prenom }},\n\nLe devis {{ piece.numero }} pour votre dossier {{ dossier.numero }} est disponible "
+        "sur le portail ({{ montant }}). Il est valable jusqu'au {{ piece.validite }} ; vous pouvez l'accepter en ligne."
+        + SIGNATURE,
+        "",
+    ),
+    "caution_restituee": (
+        "Caution restituée",
+        "Restitution de votre caution — {{ dossier.numero }}",
+        "Bonjour {{ contact.prenom }},\n\nL'état des lieux de sortie est conforme : votre caution de {{ montant }} vous est "
+        "restituée." + SIGNATURE,
+        "",
+    ),
+    "caution_retenue": (
+        "Retenue sur caution",
+        "Retenue sur votre caution — {{ dossier.numero }}",
+        "Bonjour {{ contact.prenom }},\n\nÀ la suite de l'état des lieux de sortie, une retenue de {{ montant_retenu }} est "
+        "appliquée sur votre caution (montant restitué : {{ montant_restitue }}).\nMotif : {{ motif }}\n\nLes photos du constat "
+        "sont à votre disposition auprès du service. Vous pouvez contester cette retenue en répondant à ce message." + SIGNATURE,
+        "",
+    ),
+}
+
+
+# Corrections du lot 2 (revues) : invitation de chaque signataire, signature manuscrite contrôlée, annulations,
+# invitations sans énumération, double authentification, vérification du numéro de SMS.
+MODELES_SIGNATURE_ET_COMPTES: dict[str, tuple[str, str, str, str]] = {
+    "signature_demandee_externe": (
+        "Signature demandée (élu ou agent)",
+        "Document à signer : {{ document.titre }}",
+        "Bonjour,\n\nLe document « {{ document.titre }} » (dossier {{ dossier.numero }}) attend votre signature avant le "
+        "{{ expire_le }}. Les signataires précédents ont signé.\n\nSigner : {{ lien }}\n\nCe lien vous est personnel."
+        + SIGNATURE,
+        "",
+    ),
+    "signature_relance_externe": (
+        "Relance de signature (élu ou agent)",
+        "Rappel : document à signer avant le {{ expire_le }}",
+        "Bonjour,\n\nLe document « {{ document.titre }} » (dossier {{ dossier.numero }}) attend toujours votre signature. "
+        "Il expire le {{ expire_le }}.\n\nSigner : {{ lien }}" + SIGNATURE,
+        "",
+    ),
+    "signature_refusee": (
+        "Signature refusée",
+        "Le document {{ document.titre }} n'a pas été signé",
+        "Bonjour {{ contact.prenom }},\n\nLa signature du document « {{ document.titre }} » a été refusée"
+        "{% if refuse_par %} ({{ refuse_par }}){% endif %}. Le service des équipements va vous recontacter." + SIGNATURE,
+        "",
+    ),
+    "signature_manuelle_demandee": (
+        "Signature manuscrite demandée",
+        "Document à signer et à renvoyer : {{ document.titre }}",
+        "Bonjour {{ contact.prenom }},\n\nLe document « {{ document.titre }} » (dossier {{ dossier.numero }}) est à imprimer, "
+        "signer et déposer en PDF sur le portail avant le {{ expire_le }} : {{ portail_url }}/dossiers/{{ dossier.pk }}\n"
+        "Le service vérifiera le document avant de le contresigner." + SIGNATURE,
+        "",
+    ),
+    "scan_a_controler": (
+        "Scan signé à contrôler (service)",
+        "Scan signé déposé : {{ document.titre }}",
+        "{{ depose_par }} a déposé l'exemplaire signé du document « {{ document.titre }} » (dossier {{ dossier.numero }}).\n"
+        "Vérifiez qu'il est complet et signé avant de le constater : {{ lien }}",
+        "",
+    ),
+    "scan_refuse": (
+        "Scan signé refusé",
+        "Votre document signé {{ document.titre }} n'a pas pu être accepté",
+        "Bonjour {{ contact.prenom }},\n\nLe document signé que vous avez déposé (« {{ document.titre }} ») n'a pas pu être "
+        "accepté.\nMotif : {{ motif }}\n\nMerci de déposer un nouvel exemplaire sur le portail : {{ portail_url }}/dossiers/"
+        "{{ dossier.pk }}" + SIGNATURE,
+        "",
+    ),
+    "annulation_usager": (
+        "Annulation par un usager (service)",
+        "Annulation par {{ usager.nom }} — dossier {{ dossier.numero }}",
+        "{{ auteur }} a annulé depuis le portail :\n{{ seances }}\n{% if tardives %}\nAnnulation tardive (moins de "
+        "{{ delai }} heures avant) pour : {{ tardives }}{% endif %}\n\nDossier : {{ lien }}",
+        "",
+    ),
+    "contact_deja_inscrit": (
+        "Ajout comme contact d'une structure (compte existant)",
+        "Vous avez été ajouté comme contact de {{ structure }}",
+        "Bonjour {{ contact.prenom }},\n\n{{ invite_par }} vous a ajouté comme contact de « {{ structure }} » sur le portail "
+        "des équipements. Votre compte existant n'est pas modifié. Pour représenter cette structure depuis votre compte, "
+        "demandez au service des équipements de rattacher votre compte à la structure.\n\nSi vous ne connaissez pas cette "
+        "structure, ignorez ce message." + SIGNATURE,
+        "",
+    ),
+    "totp_active": (
+        "Double authentification activée",
+        "La double authentification de votre compte est activée",
+        "Bonjour {{ contact.prenom }},\n\nLa double authentification de votre compte vient d'être activée. Si vous n'êtes pas "
+        "à l'origine de cette action, contactez immédiatement le service des équipements." + SIGNATURE,
+        "",
+    ),
+    "telephone_sms_code": (
+        "Vérification du numéro de SMS",
+        "Code de vérification",
+        "Code de vérification : {{ code }}",
+        "Ville de Châtillon : votre code de vérification est {{ code }} (valable 15 minutes).",
+    ),
+    "courriel_changement_confirmation": (
+        "Confirmation d'une nouvelle adresse",
+        "Confirmez votre nouvelle adresse pour le portail des équipements",
+        "Bonjour {{ contact.prenom }},\n\nPour utiliser désormais cette adresse ({{ nouvelle }}) sur le portail des "
+        "équipements, ouvrez ce lien (valable 24 heures, une seule fois) :\n{{ lien }}\n\nSi vous n'êtes pas à l'origine de "
+        "cette demande, ignorez ce message." + SIGNATURE,
+        "",
+    ),
+    "courriel_contact_modifie": (
+        "Adresse d'un contact modifiée",
+        "L'adresse de votre compte sur le portail a été modifiée",
+        "Bonjour {{ contact.prenom }},\n\nL'adresse électronique associée à votre compte vient d'être remplacée par "
+        "{{ nouvelle }}. Si vous n'êtes pas à l'origine de cette demande, contactez immédiatement le service des "
+        "équipements." + SIGNATURE,
+        "",
+    ),
+}
+
+# COM-05 : textes SMS des messages de service courts (fermetures, annulations).
+SMS_COMPLEMENTS: dict[str, str] = {
+    "fermeture_exceptionnelle": "Ville de Châtillon : {{ lieu }} fermé du {{ debut }} au {{ fin }}. Détails par courriel.",
+    "occurrence_annulee": "Ville de Châtillon : séance du {{ date }} ({{ espace }}) annulée. Détails par courriel.",
+    "priorite_municipale": "Ville de Châtillon : votre créneau du {{ date }} ({{ espace }}) est modifié. Détails par courriel.",
+}

@@ -181,7 +181,7 @@ function Documents({ dossier }: { dossier: number }) {
       return requete<DocumentPortail>("POST", `/api/portail/dossiers/${dossier}/documents/${scan?.document.id}/scan-signe`, formulaire);
     },
     onSuccess: async () => {
-      setAnnonce("Document signé déposé. Merci.");
+      setAnnonce("Document signé déposé : le service le vérifie, puis le contresigne.");
       setScan(null);
       await client.invalidateQueries({ queryKey: ["documents", dossier] });
     },
@@ -317,6 +317,7 @@ export function FicheDossier() {
     return null;
   }
   const annulable = (d.reservations ?? []).some((r) => ["demande", "en_instruction", "option", "validee", "confirmee"].includes(r.statut));
+  const tardives = (d.reservations ?? []).flatMap((r) => r.seances).filter((s) => s.annulation_tardive_si_annulee);
   return (
     <>
       <TitrePage titre={`Dossier ${d.numero}`}>
@@ -384,6 +385,12 @@ export function FicheDossier() {
             {annulation.seance ? <p>Séance du {dateHeure(annulation.seance.debut)}.</p> : <p>Toutes les séances à venir de ce dossier seront annulées.</p>}
             {annulation.seance?.annulation_tardive_si_annulee ? (
               <Alerte ton="attention">Cette séance est proche : l'annulation sera considérée comme tardive et peut donner lieu à des frais.</Alerte>
+            ) : null}
+            {!annulation.seance && tardives.length ? (
+              <Alerte ton="attention">
+                {tardives.length === 1 ? "Une séance est proche" : `${tardives.length} séances sont proches`} : leur annulation sera considérée comme tardive et peut donner lieu à des frais
+                ({tardives.map((s) => dateHeure(s.debut)).join(", ")}).
+              </Alerte>
             ) : null}
             <Champ libelle="Motif de l'annulation" obligatoire value={annulation.motif} onChange={(e) => setAnnulation({ ...annulation, motif: e.target.value })} />
             <div className="actions">

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+from dataclasses import replace
 from pathlib import Path
 
 import httpx
@@ -175,9 +176,8 @@ def test_sec06_limitation_de_debit_connexion(config, api):
 
 def test_sec06_facteur_de_debit_de_recette(config, api):
     """FACTEUR_DEBIT élargit les seuils pour les parcours automatisés (1 par défaut en production)."""
-    from dataclasses import replace
 
-    c = client(replace(config, facteur_debit=2), api)
+    c = client(replace(config, facteur_debit=2, environnement="recette"), api)
     csrf = c.get("/api/portail/session").json()["csrf"]
     codes = [
         c.post(
@@ -391,3 +391,10 @@ def test_sec04_nouvelle_connexion_detruit_l_ancienne_session(config, api):
     connecter(c)
     facade = c.app.state.facade
     assert facade.sessions.lire(ancien) is None
+
+
+@pytest.mark.parametrize("reglage", [{"facteur_debit": 50}, {"payfip_sans_filtre_ip": True}, {"cookies_securises": False}])
+def test_reglages_de_recette_refuses_en_production(config, reglage):
+    """Revue sécurité du lot 2 (M9) : un réglage de recette arrivé en production empêche le démarrage."""
+    with pytest.raises(RuntimeError, match="recette"):
+        creer_application(replace(config, environnement="production", **reglage))

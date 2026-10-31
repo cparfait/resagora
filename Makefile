@@ -63,9 +63,11 @@ test-front:
 test-integration: ## Tests contre les conteneurs de test (annuaire, Mailpit, Gotenberg, ClamAV, DocuSeal, simulateurs)
 	cd backend && $(BACK_PY) -m pytest -m integration
 
+e2e: export PLAYWRIGHT_BROWSERS_PATH := $(CURDIR)/.playwright
 e2e:
 	npm run e2e --workspace e2e
 
+a11y: export PLAYWRIGHT_BROWSERS_PATH := $(CURDIR)/.playwright
 a11y:
 	npm run a11y --workspace e2e
 

@@ -98,6 +98,7 @@ export interface Compte {
 export interface Preferences {
   sms: boolean;
   telephone_sms: string;
+  telephone_confirme?: boolean;
   rappels: boolean;
   informations: boolean;
 }
@@ -106,12 +107,14 @@ export interface ContactStructure {
   id: number;
   prenom: string;
   nom: string;
-  courriel: string;
-  telephone: string;
+  /** Coordonnées visibles du seul contact principal (et de soi-même). */
+  courriel?: string;
+  telephone?: string;
   role: string;
+  role_code: string;
   principal: boolean;
   peut_signer: boolean;
-  compte: string | null;
+  compte?: string | null;
 }
 
 export interface Piece {

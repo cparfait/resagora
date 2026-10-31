@@ -287,9 +287,18 @@ export function Inscription() {
   );
 }
 
+/** Le jeton des liens reçus par courriel est dans le fragment (#jeton=…) : il n'est jamais envoyé aux
+ * serveurs ni écrit dans leurs journaux ; il est retiré de la barre d'adresse dès sa lecture. */
+function useJeton(): string {
+  const [jeton] = useState(() => new URLSearchParams(window.location.hash.replace(/^#/, "")).get("jeton") ?? "");
+  useEffect(() => {
+    if (window.location.hash) window.history.replaceState(null, "", window.location.pathname);
+  }, []);
+  return jeton;
+}
+
 function ActionParJeton({ titre, url, succes }: { titre: string; url: string; succes: string }) {
-  const [parametres] = useSearchParams();
-  const jeton = parametres.get("jeton") ?? "";
+  const jeton = useJeton();
   const [resultat, setResultat] = useState<{ ton: "succes" | "erreur"; message: string } | null>(null);
   const envoye = useRef(false);
   useEffect(() => {
@@ -320,6 +329,10 @@ function ActionParJeton({ titre, url, succes }: { titre: string; url: string; su
 
 export function Confirmation() {
   return <ActionParJeton titre="Confirmation de votre adresse" url="/api/portail/auth/confirmation-courriel" succes="Vous recevrez un courriel dès que la Ville aura validé votre compte." />;
+}
+
+export function ConfirmationNouvelleAdresse() {
+  return <ActionParJeton titre="Confirmation de votre nouvelle adresse" url="/api/portail/auth/confirmation-nouvelle-adresse" succes="Vos sessions ouvertes ont été fermées par sécurité." />;
 }
 
 export function MotDePasseOublie() {
@@ -360,8 +373,7 @@ export function MotDePasseOublie() {
 }
 
 function NouveauMotDePasse({ titre, url, bouton }: { titre: string; url: string; bouton: string }) {
-  const [parametres] = useSearchParams();
-  const jeton = parametres.get("jeton") ?? "";
+  const jeton = useJeton();
   const [motDePasse, setMotDePasse] = useState("");
   const [confirmation, setConfirmation] = useState("");
   const [message, setMessage] = useState<string | null>(null);

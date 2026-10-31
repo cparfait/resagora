@@ -120,24 +120,29 @@ class VueContactsUsager(VueContact):
 
     @extend_schema(responses={200: dict})
     def get(self, request: Request, pk: int) -> Response:
+        """Le contact principal voit les coordonnées des autres contacts ; les autres, leur nom et leur rôle."""
         contact = contact_courant(request)
         usager = usager_autorise(contact, pk)
-        return Response(
-            [
-                {
-                    "id": r.contact_id,
-                    "prenom": r.contact.prenom,
-                    "nom": r.contact.nom,
+        principal = rattachement(contact, usager).principal
+        liste = []
+        for r in usager.rattachements.select_related("contact").exclude(contact__anonymise_le__isnull=False):
+            fiche: dict[str, Any] = {
+                "id": r.contact_id,
+                "prenom": r.contact.prenom,
+                "nom": r.contact.nom,
+                "role": r.get_role_display(),
+                "role_code": r.role,
+                "principal": r.principal,
+                "peut_signer": r.peut_signer,
+            }
+            if principal or r.contact_id == contact.pk:
+                fiche |= {
                     "courriel": r.contact.courriel,
                     "telephone": r.contact.telephone,
-                    "role": r.get_role_display(),
-                    "principal": r.principal,
-                    "peut_signer": r.peut_signer,
                     "compte": getattr(getattr(r.contact, "compte", None), "statut", None),
                 }
-                for r in usager.rattachements.select_related("contact").exclude(contact__anonymise_le__isnull=False)
-            ]
-        )
+            liste.append(fiche)
+        return Response(liste)
 
     @extend_schema(request=NouveauContactSerializer, responses={201: dict})
     def post(self, request: Request, pk: int) -> Response:
@@ -157,8 +162,65 @@ class VueContactsUsager(VueContact):
             Rattachement.objects.create(usager=usager, contact=nouveau, role=d["role"], peut_signer=d["peut_signer"])
             journaliser("ajouter_contact_portail", nouveau, apres={"usager": usager.pk, "role": d["role"]}, acteur=contact)
             if d["inviter"]:
-                inviter_contact(nouveau, invite_par=contact)
+                # Réponse identique que l'adresse ait déjà un compte ou non (SEC-04).
+                inviter_contact(nouveau, invite_par=contact, structure=usager)
         return Response({"id": nouveau.pk, "message": "Contact ajouté."}, status=status.HTTP_201_CREATED)
+
+
+class ModificationContactSerializer(serializers.Serializer):
+    role = serializers.ChoiceField(choices=ROLES_CONTACT, required=False)
+    peut_signer = serializers.BooleanField(required=False)
+    telephone = serializers.CharField(max_length=20, required=False, allow_blank=True)
+
+
+class VueContactUsager(VueContact):
+    """POR-01 : le contact principal modifie le rôle d'un contact ou le retire de la structure (pas lui-même)."""
+
+    def _lien(self, request: Request, pk: int, contact_id: int) -> tuple[Contact, Usager, Rattachement]:
+        contact = contact_courant(request)
+        usager = usager_autorise(contact, pk, valide=True)
+        _exiger_principal(contact, usager)
+        lien = usager.rattachements.select_related("contact").filter(contact_id=contact_id).first()
+        if lien is None:
+            raise Introuvable()
+        if lien.contact_id == contact.pk:
+            raise AccesRefuse("Vous ne pouvez pas modifier votre propre rattachement.", code="soi_meme")
+        return contact, usager, lien
+
+    @extend_schema(request=ModificationContactSerializer, responses={200: dict})
+    def patch(self, request: Request, pk: int, contact_id: int) -> Response:
+        contact, _usager, lien = self._lien(request, pk, contact_id)
+        entree = ModificationContactSerializer(data=request.data)
+        entree.is_valid(raise_exception=True)
+        d = entree.validated_data
+        with transaction.atomic():
+            avant = {"role": lien.role, "peut_signer": lien.peut_signer, "telephone": lien.contact.telephone}
+            if "role" in d:
+                lien.role = d["role"]
+            if "peut_signer" in d:
+                lien.peut_signer = d["peut_signer"]
+            lien.save(update_fields=["role", "peut_signer"])
+            if "telephone" in d:
+                lien.contact.telephone = d["telephone"]
+                lien.contact.save(update_fields=["telephone"])
+            journaliser(
+                "modifier_contact_portail",
+                lien.contact,
+                avant=avant,
+                apres={"role": lien.role, "peut_signer": lien.peut_signer, "telephone": lien.contact.telephone},
+                acteur=contact,
+            )
+        return Response({"id": lien.contact_id, "message": "Contact modifié."})
+
+    @extend_schema(responses={204: None})
+    def delete(self, request: Request, pk: int, contact_id: int) -> Response:
+        contact, usager, lien = self._lien(request, pk, contact_id)
+        if lien.principal:
+            raise AccesRefuse("Le contact principal ne peut pas être retiré.", code="contact_principal")
+        with transaction.atomic():
+            journaliser("retirer_contact_portail", lien.contact, apres={"usager": usager.pk}, acteur=contact)
+            lien.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 def representation_piece(piece: PieceJustificative) -> dict[str, Any]:

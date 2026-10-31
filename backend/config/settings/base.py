@@ -7,6 +7,7 @@ from datetime import timedelta
 from pathlib import Path
 from typing import Any
 
+from celery.schedules import crontab
 from django.utils.csp import CSP
 
 from apps.noyau.secrets import booleen, entier, liste, secret
@@ -43,6 +44,7 @@ INSTALLED_APPS = [
     "apps.comptes",
     "apps.reservations",
     "apps.documents",
+    "apps.finances",
     "apps.portail",
 ]
 
@@ -141,6 +143,19 @@ SECURE_CSP = {
 }
 PERMISSIONS_POLICY = "camera=(), microphone=(), geolocation=(), payment=(), usb=()"
 
+# « recette » (poste ou serveur de recette), « dev », « test » : seuls environnements où les adresses de
+# simulateurs et les seuils de débit élargis sont admis (`verifier_deploiement`, adaptateur SMS).
+ENVIRONNEMENT = os.environ.get("ENVIRONNEMENT", "prod")
+RECETTE = ENVIRONNEMENT in {"dev", "test", "recette"}
+DEBITS_PAR_DEFAUT = {
+    "connexion": "10/min",
+    "inscription": "5/hour",
+    "reinitialisation": "5/hour",
+    "depot": "30/hour",
+    "televersement": "60/hour",
+    "public": "120/min",
+}
+
 REST_FRAMEWORK: dict[str, Any] = {
     "DEFAULT_AUTHENTICATION_CLASSES": ["apps.habilitations.authentification.SessionAgentAuthentication"],
     "DEFAULT_PERMISSION_CLASSES": ["apps.habilitations.permissions.ActionPermission"],
@@ -148,14 +163,7 @@ REST_FRAMEWORK: dict[str, Any] = {
     "DEFAULT_FILTER_BACKENDS": ["django_filters.rest_framework.DjangoFilterBackend"],
     "DEFAULT_PAGINATION_CLASS": "apps.noyau.pagination.Pagination",
     "DEFAULT_THROTTLE_CLASSES": ["apps.noyau.debit.LimiteDebit"],
-    "DEFAULT_THROTTLE_RATES": {
-        "connexion": os.environ.get("DEBIT_CONNEXION", "10/min"),
-        "inscription": os.environ.get("DEBIT_INSCRIPTION", "5/hour"),
-        "reinitialisation": os.environ.get("DEBIT_REINITIALISATION", "5/hour"),
-        "depot": os.environ.get("DEBIT_DEPOT", "30/hour"),
-        "televersement": os.environ.get("DEBIT_TELEVERSEMENT", "60/hour"),
-        "public": os.environ.get("DEBIT_PUBLIC", "120/min"),
-    },
+    "DEFAULT_THROTTLE_RATES": {cle: os.environ.get(f"DEBIT_{cle.upper()}", defaut) for cle, defaut in DEBITS_PAR_DEFAUT.items()},
     "NUM_PROXIES": entier("NOMBRE_PROXIES", 1),
     "EXCEPTION_HANDLER": "apps.noyau.exceptions.gestionnaire_exceptions",
     "UNAUTHENTICATED_USER": None,
@@ -231,7 +239,8 @@ BACKOFFICE_URL = os.environ.get("BACKOFFICE_URL", "https://equipements.chatillon
 GOTENBERG_URL = os.environ.get("GOTENBERG_URL", "http://gotenberg:3000")
 GOTENBERG_DELAI_SECONDES = entier("GOTENBERG_DELAI_SECONDES", 120)
 SIGNATURE_MODE = os.environ.get("SIGNATURE_MODE", "docuseal")  # docuseal | manuel
-DOCUSEAL_URL = os.environ.get("DOCUSEAL_URL", "http://docuseal:3000")
+# Adresse interne de l'API DocuSeal (DMZ), jointe par le worker en HTTPS : à renseigner (docs/a-brancher.md).
+DOCUSEAL_URL = os.environ.get("DOCUSEAL_URL", "")
 DOCUSEAL_URL_PUBLIQUE = os.environ.get("DOCUSEAL_URL_PUBLIQUE", "https://signature.chatillon.test")
 DOCUSEAL_JETON = secret("docuseal_api_jeton", defaut="")
 DOCUSEAL_VERIFIER_TLS = booleen("DOCUSEAL_VERIFIER_TLS", True)
@@ -259,6 +268,8 @@ CELERY_BEAT_SCHEDULE: dict[str, dict[str, object]] = {
     "relancer-pieces": {"task": "apps.usagers.tasks.relancer_pieces", "schedule": timedelta(hours=24)},
     "anonymiser-inactifs": {"task": "apps.usagers.tasks.anonymiser_inactifs", "schedule": timedelta(days=7)},
     "purger-pieces-expirees": {"task": "apps.usagers.tasks.purger_pieces_expirees", "schedule": timedelta(days=7)},
+    "purger-archives-echues": {"task": "apps.usagers.tasks.purger_archives_echues", "schedule": timedelta(days=30)},
+    "rappeler-seances": {"task": "apps.reservations.tasks.rappeler_seances", "schedule": crontab(hour=17, minute=0)},
     "synchroniser-signatures": {"task": "apps.documents.tasks.synchroniser_signatures", "schedule": timedelta(minutes=15)},
     "relancer-signatures": {"task": "apps.documents.tasks.relancer_signatures", "schedule": timedelta(hours=6)},
 }

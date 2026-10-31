@@ -49,6 +49,10 @@ class ClientDocuSeal:
         self.transport = transport
 
     def _client(self) -> httpx.Client:
+        if not self.base:
+            raise ErreurMetier(
+                "Le service de signature électronique n'est pas configuré (DOCUSEAL_URL).", code="docuseal_non_configure"
+            )
         return httpx.Client(
             base_url=self.base,
             timeout=30,

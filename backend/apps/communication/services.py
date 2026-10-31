@@ -9,6 +9,7 @@ demandé reçoit aussi un SMS pour les modèles qui en prévoient un (préféren
 
 from __future__ import annotations
 
+import hmac
 import logging
 import re
 import uuid
@@ -21,7 +22,8 @@ from django.db import models, transaction
 from django.template import Context, Engine
 from django.utils import timezone
 
-from apps.noyau.chiffrement import chiffrer, dechiffrer
+from apps.noyau.chiffrement import chiffrer, dechiffrer, empreinte_hmac
+from apps.noyau.exceptions import ErreurValidation
 
 from .models import ModeleMessage, Notification
 from .sms import envoyer_sms
@@ -128,7 +130,7 @@ def notifier(
             continue
         local = {**base, "contact": _fiche(contact)}
         creees.append(creer(contact.courriel, local, contact=contact, usager=usager))
-        if sms and modele.sms and preferences is not None and preferences.sms and preferences.telephone_sms:
+        if sms and modele.sms and preferences is not None and preferences.sms_possible:
             creees.append(
                 Notification.objects.create(
                     modele=modele,
@@ -169,7 +171,8 @@ def _programmer(identifiants: list[int]) -> None:
 def _transmettre(notification: Notification) -> str:
     """Remet le message au serveur SMTP ou à l'opérateur SMS ; renvoie un motif si l'envoi est ignoré."""
     if notification.canal == "sms":
-        resultat = envoyer_sms(notification.destinataire, notification.corps, reference=f"N{notification.pk}")
+        texte = dechiffrer(notification.corps_secret) if notification.corps_secret else notification.corps
+        resultat = envoyer_sms(notification.destinataire, texte, reference=f"N{notification.pk}")
         return "" if resultat.envoye else resultat.motif
     corps = dechiffrer(notification.corps_secret) if notification.corps_secret else notification.corps
     EmailMessage(
@@ -202,3 +205,54 @@ def envoyer(notification: Notification) -> bool:
     if echec is not None:
         raise echec
     return True
+
+
+DUREE_CODE_SMS = 15 * 60
+
+
+def demander_verification_telephone(preferences: Any, numero: str) -> None:
+    """COM-05 : un code à 6 chiffres part au numéro indiqué ; il faut le saisir pour recevoir des SMS (3 envois par heure)."""
+    import secrets as aleatoire
+
+    from django.core.cache import cache
+
+    cle = f"portail-sms-envois:{preferences.contact_id}"
+    cache.add(cle, 0, timeout=3600)
+    if cache.incr(cle) > 3:
+        raise ErreurValidation("Trop de codes demandés. Réessayez dans une heure.", code="trop_de_codes")
+    code = f"{aleatoire.randbelow(10**6):06d}"
+    cache.set(
+        f"portail-sms-code:{preferences.contact_id}",
+        {"empreinte": empreinte_hmac(code), "numero": numero, "essais": 0},
+        DUREE_CODE_SMS,
+    )
+    modele = ModeleMessage.objects.get(code="telephone_sms_code")
+    notification = Notification.objects.create(
+        modele=modele,
+        canal="sms",
+        destinataire=numero,
+        contact=preferences.contact,
+        sujet=modele.sujet,
+        corps=rendre(modele.sms, {"code": "[code masqué]"})[:320],
+        corps_secret=chiffrer(rendre(modele.sms, {"code": code})[:320]),
+    )
+    transaction.on_commit(lambda: _programmer([notification.pk]))
+
+
+def confirmer_telephone(preferences: Any, code: str) -> None:
+    from django.core.cache import cache
+
+    cle = f"portail-sms-code:{preferences.contact_id}"
+    attendu = cache.get(cle)
+    if not attendu or attendu["numero"] != preferences.telephone_sms:
+        raise ErreurValidation("Aucun code en cours pour ce numéro : demandez-en un nouveau.", code="code_expire")
+    if attendu["essais"] >= 5:
+        cache.delete(cle)
+        raise ErreurValidation("Trop d'essais : demandez un nouveau code.", code="code_expire")
+    if not hmac.compare_digest(attendu["empreinte"], empreinte_hmac((code or "").strip())):
+        attendu["essais"] += 1
+        cache.set(cle, attendu, DUREE_CODE_SMS)
+        raise ErreurValidation("Code incorrect.", code="code_invalide")
+    cache.delete(cle)
+    preferences.telephone_verifie = preferences.telephone_sms
+    preferences.save(update_fields=["telephone_verifie", "modifie_le"])

@@ -18,7 +18,7 @@ from apps.documents.models import Document
 from apps.noyau import fichiers
 from apps.noyau.exceptions import ErreurValidation
 
-from .authentification import Introuvable, contact_courant
+from .authentification import Introuvable, contact_courant, usager_autorise
 from .securite import VueContact, VuePublique
 from .vues_dossiers import dossier_autorise
 
@@ -26,6 +26,7 @@ from .vues_dossiers import dossier_autorise
 def representation_document(document: Document, contact: Any) -> dict[str, Any]:
     circuit = document.circuits.filter(statut="envoye").first()
     attendu = circuit.signataires.exclude(statut="signe").order_by("ordre").first() if circuit is not None else None
+    signataire = document.usager is not None and document.usager.rattachements.filter(contact=contact, peut_signer=True).exists()
     return {
         "id": document.pk,
         "numero": document.numero,
@@ -37,7 +38,7 @@ def representation_document(document: Document, contact: Any) -> dict[str, Any]:
         "signe_le": document.signe_le,
         "taille": document.fichier_courant.taille,  # type: ignore[attr-defined]
         "a_signer_en_ligne": bool(circuit and circuit.mode == "docuseal" and attendu and attendu.contact_id == contact.pk),
-        "scan_attendu": document.statut in {"genere", "en_signature"} and document.modele.signature_requise,
+        "scan_attendu": bool(signataire and circuit and circuit.mode == "manuel" and document.statut == "en_signature"),
         "echeance_signature": circuit.expire_le if circuit is not None else None,
     }
 
@@ -54,6 +55,37 @@ def _document(request: Request, pk: int, document: int) -> tuple[Any, Document]:
     if trouve is None:
         raise Introuvable()
     return contact, trouve
+
+
+class VueDocumentsUsager(VueContact):
+    """POR-05 : documents rattachés à la structure sans dossier (avis de fermeture, attestation annuelle)."""
+
+    @extend_schema(responses={200: dict})
+    def get(self, request: Request, pk: int) -> Response:
+        contact = contact_courant(request)
+        usager = usager_autorise(contact, pk)
+        visibles = (
+            Document.objects.select_related("modele", "usager")
+            .filter(usager=usager, dossier__isnull=True, visible_portail=True)
+            .exclude(statut="annule")
+        )
+        return Response([representation_document(d, contact) for d in visibles.order_by("-cree_le")])
+
+
+class VueFichierDocumentUsager(VueContact):
+    @extend_schema(responses={(200, "application/pdf"): bytes})
+    def get(self, request: Request, pk: int, document: int) -> FileResponse:
+        contact = contact_courant(request)
+        usager = usager_autorise(contact, pk)
+        trouve = (
+            Document.objects.filter(pk=document, usager=usager, dossier__isnull=True, visible_portail=True)
+            .exclude(statut="annule")
+            .first()
+        )
+        if trouve is None:
+            raise Introuvable()
+        journaliser("telecharger_document_portail", trouve, acteur=contact)
+        return fichiers.reponse_telechargement(trouve.fichier_signe or trouve.fichier)
 
 
 class VueDocumentsDossier(VueContact):

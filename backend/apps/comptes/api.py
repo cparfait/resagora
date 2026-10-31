@@ -151,4 +151,7 @@ class VueComptes(VuePerimetre):
         """Un agent invite un contact déjà connu au guichet à créer son compte (lien de 7 jours)."""
         entree = InvitationSerializer(data=request.data)
         entree.is_valid(raise_exception=True)
-        return self._repondre(services.inviter_contact(entree.validated_data["contact"], invite_par=agent_courant(request)))
+        compte = services.inviter_contact(entree.validated_data["contact"], invite_par=agent_courant(request))
+        if compte is None:
+            return Response({"message": "Cette adresse a déjà un compte sur le portail : son titulaire a été prévenu."})
+        return self._repondre(compte)
