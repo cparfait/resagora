@@ -50,4 +50,6 @@ class Configuration:
         default_factory=lambda: os.environ.get("ENTETE_CERTIFICAT_APPAREIL", "X-Forwarded-Tls-Client-Cert-Info")
     )
     nombre_proxies: int = field(default_factory=lambda: _entier("NOMBRE_PROXIES", 1))
+    # Recette automatisée uniquement : multiplie les seuils de débit (SEC-06) ; 1 en production.
+    facteur_debit: int = field(default_factory=lambda: max(1, int(os.environ.get("FACTEUR_DEBIT", "1"))))
     delai_api_s: float = field(default_factory=lambda: float(os.environ.get("DELAI_API_SECONDES", "15")))

@@ -19,6 +19,8 @@ export default defineConfig({
     timezoneId: "Europe/Paris",
     trace: "retain-on-failure",
     screenshot: "only-on-failure",
+    // Recette sur un poste : les noms publics du portail et de la signature pointent vers le proxy DMZ local.
+    launchOptions: { args: ["--host-resolver-rules=MAP equipements.chatillon.test 127.0.0.1, MAP signature.chatillon.test 127.0.0.1"] },
   },
   projects: [{ name: "chromium", use: { ...devices["Desktop Chrome"] } }],
 });

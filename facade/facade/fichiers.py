@@ -92,9 +92,8 @@ class Quarantaine:
             raise FichierRefuse("Le fichier est vide.", "fichier_vide")
         if len(contenu) > self.taille_max:
             raise FichierRefuse(f"Le fichier dépasse {self.taille_max // (1024 * 1024)} Mo.", "fichier_trop_gros")
-        type_mime = type_reel(contenu[:16])
-        if type_mime is None or extension not in TYPES_AUTORISES[type_mime][0]:
-            raise FichierRefuse("Format non accepté : seuls les fichiers PDF, JPEG et PNG sont acceptés.", "format_refuse")
+        # L'antivirus passe avant le contrôle du type : un fichier malveillant est toujours identifié et tracé
+        # comme tel (SEC-07, scénario EICAR), quel que soit le format annoncé.
         self.dossier.mkdir(parents=True, exist_ok=True)
         chemin = self.dossier / secrets.token_hex(16)
         try:
@@ -113,4 +112,8 @@ class Quarantaine:
                 raise FichierRefuse("Le fichier a été refusé par le contrôle antivirus.", "fichier_infecte")
         finally:
             chemin.unlink(missing_ok=True)
+        type_mime = type_reel(contenu[:16])
+        if type_mime is None or extension not in TYPES_AUTORISES[type_mime][0]:
+            journal.info("Fichier refusé : format non accepté (extension %s)", extension or "absente")
+            raise FichierRefuse("Format non accepté : seuls les fichiers PDF, JPEG et PNG sont acceptés.", "format_refuse")
         return FichierControle(nom_affiche, type_mime, len(contenu), hashlib.sha256(contenu).hexdigest(), contenu)

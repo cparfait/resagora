@@ -12,6 +12,8 @@ services:
       PAYFIP_SANS_FILTRE_IP: "1"
       # Sur le poste de recette, le portail est servi sur le port 9443 (en-tête Origin contrôlé par la façade).
       ORIGINE_PORTAIL: https://equipements.chatillon.test:9443
+      # Parcours automatisés répétés depuis une seule adresse : seuils de débit élargis (1 en production).
+      FACTEUR_DEBIT: "50"
   docuseal:
     networks: [dmz_signature, liaison_signature]
 

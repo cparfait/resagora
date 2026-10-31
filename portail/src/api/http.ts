@@ -63,7 +63,15 @@ async function erreurDepuis(reponse: Response): Promise<ErreurApi> {
   return new ErreurApi(reponse.status, typeof corps.code === "string" ? corps.code : "erreur", message, champs, (corps.details as Record<string, unknown>) ?? {});
 }
 
+async function assurerCsrf(): Promise<void> {
+  // Première écriture avant que l'état de session soit connu (lien de confirmation ouvert directement) :
+  // la façade pose alors le cookie de double soumission et renvoie le jeton.
+  const reponse = await fetch("/api/portail/session", { credentials: "same-origin", headers: { Accept: "application/json" } });
+  if (reponse.ok) jetonCsrf = ((await reponse.json()) as { csrf?: string }).csrf ?? "";
+}
+
 export async function requete<T>(methode: string, url: string, corps?: unknown, signal?: AbortSignal): Promise<T> {
+  if (!METHODES_SURES.has(methode) && !jetonCsrf) await assurerCsrf();
   const entetes: Record<string, string> = { Accept: "application/json" };
   const formulaire = corps instanceof FormData;
   if (corps !== undefined && !formulaire) entetes["Content-Type"] = "application/json";

@@ -90,4 +90,44 @@ L'API sort vers Internet par le réseau `sortie_lan` (proxy de la Ville) ; à d�
 | `URL_JOURS_FERIES` | `https://calendrier.api.gouv.fr/jours-feries/metropole/{annee}.json` | Même import : les jours fériés apparaissent (sinon calcul local, signalé dans le journal) |
 | `HTTPS_PROXY` | absent | Proxy de sortie de la Ville si l'API ne joint pas directement Internet |
 
-## 6. Ciril, PayFiP, DocuSeal, ClamAV, Gotenberg, accès mobile — complétés aux lots concernés
+## 6. Signature électronique (DocuSeal) — SIG-01 à SIG-05
+
+Recette : simulateur `simulateurs` (deploy/dev, http://localhost:53010) qui reproduit l'API et les webhooks de DocuSeal 3.x.
+Production : conteneur `docuseal` de la DMZ (image épinglée), pages de signature publiées seules (D-019).
+
+| Paramètre | Où | À fournir | Comment tester |
+| --- | --- | --- | --- |
+| `DOCUSEAL_URL` | `deploy/lan/parametres.env` | Adresse de DocuSeal vue du LAN (par le proxy, 443) | Back-office → dossier → document → « Signature électronique » : le circuit passe à « en attente de signature » |
+| `DOCUSEAL_URL_PUBLIQUE` | idem | Nom public des pages de signature (ex. `https://signature.chatillon.fr`) | Le lien « Signer en ligne » du portail ouvre cette adresse |
+| Secret `docuseal_api_jeton` | `deploy/lan/secrets/` | Jeton d'API créé dans DocuSeal (Paramètres → API) par l'administrateur, compte de service dédié | Même test ; un jeton faux donne « Le service de signature a refusé la demande » |
+| Webhook DocuSeal | Interface d'administration de DocuSeal (LAN uniquement) | URL `https://<portail>/api/portail/webhooks/docuseal`, en-tête `X-Docuseal-Secret` = secret `docuseal_webhook_secret` (DMZ), événements `form.*` et `submission.*` | Signer un document : il passe « Signé électroniquement » dans la minute (sinon la synchronisation planifiée le rattrape en 15 min) |
+| `DOCUSEAL_HOTE` | `deploy/dmz` (variable d'environnement) | Nom public de DocuSeal | Page `/s/<jeton>` servie par le proxy DMZ |
+| `SIGNATURE_MODE` | `deploy/lan/parametres.env` | `docuseal` (défaut) ou `manuel` si DocuSeal n'est pas encore disponible | Le bouton « Signature papier » reste toujours disponible |
+| Signataire de la Ville | Paramètres `signature.elu_nom`, `signature.elu_qualite`, `signature.elu_courriel` | Élu ou agent délégataire, adresse de signature | Le second signataire reçoit le lien après l'usager |
+
+## 7. Conversion PDF (Gotenberg) et antivirus (ClamAV) — DOC-04, SEC-07
+
+| Paramètre | Où | À fournir | Comment tester |
+| --- | --- | --- | --- |
+| `GOTENBERG_URL` | `deploy/lan/parametres.env` | Aucun (conteneur interne `gotenberg`) | Générer une convention : un PDF/A-2b est rattaché au dossier |
+| `CLAMAV_HOTE`, `CLAMAV_PORT` | LAN et DMZ | Aucun (conteneurs internes) ; sortie vers `database.clamav.net` par le proxy de la Ville pour les mises à jour | Déposer le fichier de test EICAR sur le portail : refus « contrôle antivirus » et ligne « Fichier infecté rejeté » dans le journal de la façade |
+
+## 8. SMS — COM-05
+
+| Paramètre | Où | À fournir | Comment tester |
+| --- | --- | --- | --- |
+| `SMS_ADAPTATEUR` | `deploy/lan/parametres.env` | `desactive` (défaut) ou `http` | Une préférence « SMS » cochée sur le portail produit une ligne SMS dans le journal des envois |
+| `SMS_URL`, secret `sms_jeton` | idem + `deploy/lan/secrets/sms_jeton` | Adresse de l'API de l'opérateur retenu et jeton | Envoi groupé avec SMS : le SMS apparaît chez l'opérateur (en recette : http://localhost:53010/sms) |
+| `SMS_EXPEDITEUR`, `SMS_CHAMPS` | idem | Nom d'expéditeur (11 caractères) ; correspondance des champs si l'opérateur n'utilise pas `destinataire`, `expediteur`, `texte`, `reference` | — |
+
+## 9. Portail public — POR-01 à POR-10
+
+| Paramètre | Où | À fournir | Comment tester |
+| --- | --- | --- | --- |
+| `ORIGINE_PORTAIL` | `deploy/dmz/parametres.env` | Adresse publique exacte du portail (contrôle de l'en-tête Origin) | Une connexion depuis une autre origine est refusée (403) |
+| `PORTAIL_URL` | `deploy/lan/parametres.env` | Même adresse (liens des courriels) | Lien de confirmation reçu par courriel |
+| Déclaration d'accessibilité | Paramètres `accessibilite.*` | État de conformité, date et organisme d'audit, contenus non accessibles, contact | Page « Accessibilité » du portail |
+| Service à prévenir | Paramètre `portail.service_courriel` | Boîte du service des équipements (comptes à valider, messages des usagers) | Inscription d'un compte de test : courriel « Nouveau compte du portail à valider » |
+| `FACTEUR_DEBIT`, `DEBIT_*` | Jamais en production | Laisser les valeurs par défaut (D-032) | — |
+
+## 10. Ciril, PayFiP, accès mobile — complétés aux lots concernés

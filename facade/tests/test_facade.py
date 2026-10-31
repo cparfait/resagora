@@ -173,6 +173,24 @@ def test_sec06_limitation_de_debit_connexion(config, api):
     assert codes[:10] == [400] * 10 and codes[10:] == [429, 429]
 
 
+def test_sec06_facteur_de_debit_de_recette(config, api):
+    """FACTEUR_DEBIT élargit les seuils pour les parcours automatisés (1 par défaut en production)."""
+    from dataclasses import replace
+
+    c = client(replace(config, facteur_debit=2), api)
+    csrf = c.get("/api/portail/session").json()["csrf"]
+    codes = [
+        c.post(
+            "/api/portail/auth/connexion",
+            json={"identifiant": "a", "mot_de_passe": "faux"},
+            headers={"X-CSRF-Token": csrf, "Origin": ORIGINE},
+        ).status_code
+        for _ in range(21)
+    ]
+    assert codes[:20] == [400] * 20 and codes[20] == 429
+    assert Configuration().facteur_debit == 1
+
+
 def test_sec06_corps_trop_volumineux(config, api):
     c = client(config, api)
     csrf = connecter(c)
@@ -219,6 +237,9 @@ def test_sec07_fichier_infecte_rejete(config, api):
     reponse = televerser(c, csrf, "virus.pdf", b"%PDF-1.4 " + EICAR)
     assert reponse.status_code == 422 and reponse.json()["code"] == "fichier_infecte"
     assert len(api.requetes) == nombre
+    # Le fichier de test EICAR brut (sans en-tête PDF) est identifié comme infecté, pas seulement « format refusé ».
+    brut = televerser(c, csrf, "attestation.pdf", EICAR)
+    assert brut.status_code == 422 and brut.json()["code"] == "fichier_infecte"
 
 
 def test_sec07_fichier_trop_gros(config, api):

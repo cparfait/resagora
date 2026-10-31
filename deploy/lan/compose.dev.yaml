@@ -9,6 +9,12 @@ x-simulateurs: &simulateurs
   SMS_ADAPTATEUR: http
   SMS_URL: http://simulateurs:8090/sms/messages
   PORTAIL_URL: https://equipements.chatillon.test:9443
+  # Parcours automatisés répétés depuis une seule adresse : seuils élargis (valeurs par défaut en production).
+  DEBIT_CONNEXION: 500/min
+  DEBIT_INSCRIPTION: 250/hour
+  DEBIT_REINITIALISATION: 250/hour
+  DEBIT_DEPOT: 1500/hour
+  DEBIT_TELEVERSEMENT: 3000/hour
   BACKOFFICE_URL: https://localhost
 
 services:

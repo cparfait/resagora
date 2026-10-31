@@ -6,7 +6,30 @@ import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 
 export const BACKOFFICE = process.env.BACKOFFICE_URL ?? "https://localhost";
-export const PORTAIL = process.env.PORTAIL_URL ?? "https://equipements.chatillon.test:8443";
+export const PORTAIL = process.env.PORTAIL_URL ?? "https://equipements.chatillon.test:9443";
+export const MAILPIT = process.env.MAILPIT_URL ?? "http://127.0.0.1:58025";
+export const SIMULATEURS = process.env.SIMULATEURS_URL ?? "http://127.0.0.1:53010";
+
+/** Jeton d'API partagé avec le simulateur DocuSeal de recette (deploy/dev/secrets, ignoré par Git). */
+export function jetonSimulateur(): string {
+  return readFileSync(resolve(import.meta.dirname, "../../deploy/dev/secrets/simulateur_docuseal_api_jeton"), "utf8").trim();
+}
+
+/** Dernier lien reçu par courriel par `destinataire` (Mailpit), par exemple « /confirmation?jeton=… ». */
+export async function lienRecu(page: Page, destinataire: string, chemin: string): Promise<string> {
+  for (let essai = 0; essai < 40; essai++) {
+    const liste = (await (await page.request.get(`${MAILPIT}/api/v1/search?query=${encodeURIComponent(`to:"${destinataire}"`)}`)).json()) as {
+      messages: { ID: string }[];
+    };
+    for (const message of liste.messages ?? []) {
+      const detail = (await (await page.request.get(`${MAILPIT}/api/v1/message/${message.ID}`)).json()) as { Text: string };
+      const trouve = new RegExp(String.raw`https?://\S+/${chemin}\?jeton=[\w-]+`).exec(detail.Text);
+      if (trouve) return trouve[0];
+    }
+    await page.waitForTimeout(500);
+  }
+  throw new Error(`Aucun lien « ${chemin} » reçu par ${destinataire}`);
+}
 export const MOBILE = process.env.MOBILE_URL ?? "https://gardiens.chatillon.local";
 
 /** Mot de passe des comptes fictifs, généré par `make secrets` (deploy/dev/secrets, ignoré par Git). */

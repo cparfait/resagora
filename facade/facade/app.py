@@ -109,6 +109,7 @@ class Facade:
 
     def debit_depasse(self, route: Route, adresse: str) -> bool:
         maximum, fenetre = DEBITS[route.debit]
+        maximum *= self.config.facteur_debit
         return self.magasin.incrementer(f"debit:{route.debit}:{self.cle_debit(adresse)}", fenetre) > maximum
 
     def cookie(self, reponse: Response, nom: str, valeur: str, duree: int, http_only: bool = True) -> None:
