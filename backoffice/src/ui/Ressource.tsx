@@ -5,6 +5,7 @@
  */
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState, type FormEvent, type ReactNode } from "react";
+import { useSearchParams } from "react-router";
 import { construireChemin, ErreurApi, requete, type ErreursChamps, type Page as PageApi } from "../api/http";
 import { useSession } from "../auth/session";
 import { Bouton } from "./Bouton";
@@ -175,7 +176,11 @@ export function EcranRessource<T extends Objet>(p: Proprietes<T>) {
   const client = useQueryClient();
   const { annoncer } = useNotifications();
   const [page, setPage] = useState(1);
-  const [filtres, setFiltres] = useState<Record<string, string>>({});
+  // DSH-06 : un compteur du tableau de bord ouvre la liste déjà filtrée (paramètres de l'adresse).
+  const [parametresUrl] = useSearchParams();
+  const [filtres, setFiltres] = useState<Record<string, string>>(() =>
+    Object.fromEntries((p.filtres ?? []).flatMap((f) => (parametresUrl.get(f.nom) ? [[f.nom, parametresUrl.get(f.nom) ?? ""]] : []))),
+  );
   const [edition, setEdition] = useState<Partial<T> | null>(null);
   const [valeurs, setValeurs] = useState<Record<string, unknown>>({});
   const [erreurs, setErreurs] = useState<ErreursChamps>({});

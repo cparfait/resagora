@@ -62,7 +62,7 @@ def valider_regle(regle: str) -> str:
         raise _refus("fréquence quotidienne, hebdomadaire ou mensuelle attendue.")
     intervalle = parties.get("INTERVAL", "1")
     maximum = 6 if frequence == "MONTHLY" else 52
-    if not intervalle.isdigit() or not 1 <= int(intervalle) <= maximum:
+    if not intervalle.isdecimal() or not 1 <= int(intervalle) <= maximum:
         raise _refus(f"intervalle entre 1 et {maximum}.")
     if "BYDAY" in parties:
         jours = parties["BYDAY"].split(",")
@@ -84,7 +84,7 @@ def valider_regle(regle: str) -> str:
         raise _refus("UNTIL et COUNT ne peuvent pas être combinés.")
     if "UNTIL" in parties and not re.fullmatch(r"\d{8}(T\d{6}Z?)?", parties["UNTIL"]):
         raise _refus("date de fin UNTIL (AAAAMMJJ).")
-    if "COUNT" in parties and (not parties["COUNT"].isdigit() or not 1 <= int(parties["COUNT"]) <= MAX_OCCURRENCES):
+    if "COUNT" in parties and (not parties["COUNT"].isdecimal() or not 1 <= int(parties["COUNT"]) <= MAX_OCCURRENCES):
         raise _refus(f"nombre de séances COUNT entre 1 et {MAX_OCCURRENCES}.")
     if "WKST" in parties and parties["WKST"] not in {"MO", "SU"}:
         raise _refus("WKST=MO ou WKST=SU.")

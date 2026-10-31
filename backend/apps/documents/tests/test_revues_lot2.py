@@ -170,7 +170,9 @@ def test_doc02_chaque_modele_genere_avec_des_objets_reels(dossier):  # noqa: F81
         motif="Travaux de peinture",
     )
     objets = {"fermeture": (fermeture, dossier.usager), "etat_des_lieux": reservation.occurrences.order_by("debut").first()}
-    comptables = {"devis", "facture", "avoir"}  # fusionnées avec de vraies pièces dans les tests des finances
+    # Fusionnés avec de vrais objets dans leurs propres tests : pièces comptables (finances), attestation
+    # (test_val04_attestation_fusionnee_en_mode_strict, valorisation).
+    comptables = {"devis", "facture", "avoir", "attestation_valorisation"}
     verifies = []
     for modele in ModeleDocument.objects.filter(actif=True).select_related("version_active__fichier"):
         if modele.nature not in FOURNISSEURS or modele.nature in comptables:

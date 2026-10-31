@@ -246,7 +246,7 @@ class ApercuSerializer(serializers.Serializer):
 
 
 def _cles_entieres(valeur: dict[str, Any]) -> dict[str, Any]:
-    if any(not str(k).isdigit() or len(str(k)) > 12 for k in valeur):
+    if any(not str(k).isdecimal() or len(str(k)) > 12 for k in valeur):
         raise serializers.ValidationError("Les clés doivent être des identifiants numériques.")
     return valeur
 

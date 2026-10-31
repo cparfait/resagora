@@ -21,7 +21,7 @@ def valeur_sure(valeur: object) -> object:
         return "" if valeur is None else str(valeur)
     if isinstance(valeur, (int, float)):
         return valeur
-    return cellule_sure(valeur)
+    return cellule_sure(texte_xml(valeur))
 
 
 def texte_xml(valeur: object) -> str:

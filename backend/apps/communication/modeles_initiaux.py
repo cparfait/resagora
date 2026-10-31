@@ -453,3 +453,22 @@ MODELES_LOT5: dict[str, tuple[str, str, str, str]] = {
         "",
     ),
 }
+
+
+# Lot 6 — pilotage : attestation de valorisation sur le portail (VAL-04), planning programmé (IMP-04).
+MODELES_LOT6: dict[str, tuple[str, str, str, str]] = {
+    "attestation_valorisation_disponible": (
+        "Attestation de valorisation disponible",
+        "Votre attestation de valorisation {{ exercice }} est disponible",
+        "Bonjour {{ contact.prenom }},\n\nL'attestation des avantages en nature accordés par la Ville à {{ usager }} pour "
+        "l'exercice {{ exercice }} ({{ montant }}) est disponible dans votre espace, rubrique « Attestations ». Elle vous permet "
+        "de valoriser ces contributions dans vos comptes (comptes 86 et 87)." + SIGNATURE,
+        "",
+    ),
+    "planning_hebdomadaire": (
+        "Planning de la semaine (envoi programmé)",
+        "{{ cible }} — semaine du {{ semaine }}",
+        "Bonjour,\n\nVeuillez trouver ci-joint le planning de la semaine du {{ semaine }} : {{ cible }}.\nLa version en ligne fait foi.",
+        "",
+    ),
+}

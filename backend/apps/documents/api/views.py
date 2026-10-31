@@ -124,7 +124,7 @@ class VueModelesDocuments(VuePerimetre):
     def activer_version(self, request: Request, pk: str | None = None) -> Response:
         modele = self.get_object()
         identifiant = str(request.data.get("version", "")) if isinstance(request.data, dict) else ""
-        version = modele.versions.filter(pk=identifiant).first() if identifiant.isdigit() else None
+        version = modele.versions.filter(pk=identifiant).first() if identifiant.isdecimal() else None
         if version is None:
             raise ErreurValidation("Version inconnue pour ce modèle.", code="version_inconnue")
         return Response(ModeleDocumentSerializer(services.activer_version(version, acteur=agent_courant(request))).data)
@@ -308,7 +308,7 @@ class VueDocuments(VuePerimetre):
         """Lecture dans le périmètre de l'agent, puis contrôle de l'action sur l'objet (service)."""
         identifiant = str(self.kwargs.get("pk", ""))
         document = (
-            _documents_lisibles(self.request, "lire_document").filter(pk=identifiant).first() if identifiant.isdigit() else None
+            _documents_lisibles(self.request, "lire_document").filter(pk=identifiant).first() if identifiant.isdecimal() else None
         )
         if document is None:
             raise NotFound()

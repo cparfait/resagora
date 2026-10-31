@@ -50,5 +50,16 @@ def test_jeu_de_demonstration_complet_et_coherent(monkeypatch, modeles_documents
     assert Stock.objects.filter(materiel__code="table-pliante").count() == 2
     assert ReservationMateriel.objects.filter(manquants=2).exists() and Panne.objects.filter(statut="ouverte").exists()
     assert materiel.controles_en_retard(Stock.objects.select_related("materiel"))
+    # Lot 6 : exercice valorisé, subventions en numéraire, attestation déposée, envoi programmé du planning.
+    from apps.pilotage.models import EnvoiProgramme
+    from apps.valorisation import services as valorisation
+    from apps.valorisation.models import Exercice, SubventionNumeraire, Valorisation
+
+    exercice = Exercice.objects.get()
+    assert SubventionNumeraire.objects.filter(exercice=exercice).count() == 3
+    assert Valorisation.objects.filter(exercice=exercice, actuelle=True, total__gt=0).count() > 10
+    assert not Valorisation.objects.filter(document__isnull=False).exists(), "pas d'attestation avant la clôture"
+    assert any("convention" in ligne["alertes"] for ligne in valorisation.synthese(exercice))
+    assert EnvoiProgramme.objects.filter(prochain_envoi_le__isnull=False).count() == 1
     with pytest.raises(CommandError):
         call_command("charger_demo")

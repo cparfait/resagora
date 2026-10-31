@@ -129,6 +129,12 @@ export function PlanDuSite() {
                 <Link to="/espace/campagnes">Créneaux de la saison</Link>
               </li>
               <li>
+                <Link to="/espace/factures">Mes factures</Link>
+              </li>
+              <li>
+                <Link to="/espace/attestations">Attestations de valorisation</Link>
+              </li>
+              <li>
                 <Link to="/espace/compte">Mon compte</Link>
               </li>
             </ul>

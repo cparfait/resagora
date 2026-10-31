@@ -317,6 +317,28 @@ DEFINITIONS: list[DefinitionParametre] = [
     DefinitionParametre(
         "valorisation.date_depot_attestations", "Date limite de dépôt des attestations (JJ-MM)", "31-03", "Valorisation", "VAL-04"
     ),
+    DefinitionParametre(
+        "valorisation.cout_horaire_personnel_centimes",
+        "Coût horaire chargé du personnel dédié (centimes)",
+        3200,
+        "Valorisation",
+        "VAL-02 : gardiennage valorisé au coût chargé d'une heure d'agent (0 = non valorisé).",
+    ),
+    DefinitionParametre(
+        "pilotage.domaines_destinataires",
+        "Domaines de messagerie autorisés pour l'envoi programmé des plannings",
+        ["chatillon92.fr"],
+        "Statistiques",
+        "IMP-04 : le planning (noms des occupants) ne part que vers des adresses professionnelles de ces domaines.",
+    ),
+    # Statistiques
+    DefinitionParametre(
+        "statistiques.ouverture_defaut",
+        "Ouverture par défaut d'un espace sans horaires déclarés",
+        {"debut": "08:00", "fin": "22:00"},
+        "Statistiques",
+        "STA-01 : base du taux d'occupation quand l'espace n'a pas d'horaires d'ouverture.",
+    ),
 ]
 
 PAR_CLE = {d.cle: d for d in DEFINITIONS}
@@ -336,13 +358,24 @@ BORNES = {
     "portail.reinitialisation_minutes": (5, 120),
     "portail.confirmation_heures": (1, 168),
     "acomptes.taux": (0, 10_000),
+    "valorisation.cout_horaire_personnel_centimes": (0, 50_000),
+    "valorisation.seuil_convention_centimes": (100_000, 100_000_000),
+    "valorisation.seuil_compte_rendu_centimes": (100_000, 1_000_000_000),
     "signature.expiration_jours": (1, 90),
     "signature.relance_jours_avant": (0, 30),
 }
 
 
 PARAMETRES_FINANCIERS = frozenset(
-    {"comptable.titulaire", "comptable.iban", "comptable.bic", "caution.seuil_double_validation_centimes", "acomptes.taux"}
+    {
+        "comptable.titulaire",
+        "comptable.iban",
+        "comptable.bic",
+        "caution.seuil_double_validation_centimes",
+        "acomptes.taux",
+        "valorisation.seuil_convention_centimes",
+        "valorisation.seuil_compte_rendu_centimes",
+    }
 )
 
 
@@ -409,6 +442,20 @@ def _verifier_specifique(cle: str, valeur: Any) -> str | None:
     elif cle == "personnel.nuit":
         if not all(isinstance(valeur.get(k), str) and HEURE.match(valeur[k]) for k in ("debut", "fin")):
             return "« debut » et « fin » au format HH:MM."
+    elif cle == "pilotage.domaines_destinataires":
+        if (
+            not isinstance(valeur, list)
+            or not valeur
+            or len(valeur) > 20
+            or not all(isinstance(d, str) and re.fullmatch(r"([a-z0-9-]+\.)+[a-z]{2,}", d) for d in valeur)
+        ):
+            return "Liste de 1 à 20 domaines en minuscules (ex. chatillon92.fr)."
+    elif cle == "statistiques.ouverture_defaut":
+        if (
+            not all(isinstance(valeur.get(k), str) and HEURE.match(valeur[k]) for k in ("debut", "fin"))
+            or valeur["fin"] <= valeur["debut"]
+        ):
+            return "« debut » et « fin » au format HH:MM, la fin après le début."
     elif cle == "valorisation.date_depot_attestations":
         if not re.fullmatch(r"(0[1-9]|[12]\d|3[01])-(0[1-9]|1[0-2])", valeur):
             return "Format JJ-MM attendu."

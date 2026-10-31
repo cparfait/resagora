@@ -185,6 +185,21 @@ def jours_exclus(saison: Saison, vacances: bool = True, feries: bool = True) -> 
     return jours
 
 
+def jours_particuliers(du: date, au: date) -> tuple[set[date], set[date]]:
+    """(fériés, jours de vacances) de la période, en deux requêtes : pour les calculs sur de longues périodes."""
+    feries: set[date] = set()
+    vacances: set[date] = set()
+    for annee in range(du.year, au.year + 1):
+        feries |= {j for j in feries_calcules(annee) if du <= j <= au}
+    for periode in PeriodeCalendrier.objects.filter(nature__in=["ferie", "vacances"], debut__lte=au, fin__gte=du):
+        cible = feries if periode.nature == "ferie" else vacances
+        jour = max(periode.debut, du)
+        while jour <= min(periode.fin, au):
+            cible.add(jour)
+            jour += timedelta(days=1)
+    return feries, vacances
+
+
 def est_vacances(jour: date) -> bool:
     return PeriodeCalendrier.objects.filter(nature="vacances", debut__lte=jour, fin__gte=jour).exists()
 

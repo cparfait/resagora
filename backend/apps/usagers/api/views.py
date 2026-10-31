@@ -82,13 +82,13 @@ class UsagerSerializer(serializers.ModelSerializer):
 
     def validate_siret(self, valeur: str) -> str:
         valeur = valeur.replace(" ", "")
-        if valeur and (len(valeur) != 14 or not valeur.isdigit()):
+        if valeur and (len(valeur) != 14 or not valeur.isdecimal()):
             raise serializers.ValidationError("Le SIRET comporte 14 chiffres.")
         return valeur
 
     def validate_rna(self, valeur: str) -> str:
         valeur = valeur.strip().upper()
-        if valeur and not (len(valeur) == 10 and valeur[0] == "W" and valeur[1:].isdigit()):
+        if valeur and not (len(valeur) == 10 and valeur[0] == "W" and valeur[1:].isdecimal()):
             raise serializers.ValidationError("Le numéro RNA a la forme W123456789.")
         return valeur
 

@@ -95,6 +95,7 @@ def notifier(
     groupe: str = "",
     secrets: dict[str, str] | None = None,
     sms: bool = True,
+    piece_jointe: Any = None,
 ) -> list[Notification]:
     """Crée une notification par destinataire et programme l'envoi après validation de la transaction."""
     modele = ModeleMessage.objects.filter(code=code_modele, actif=True).first()
@@ -109,6 +110,7 @@ def notifier(
         "objet_id": str(objet.pk) if objet is not None else "",
         "groupe": groupe,
     }
+    jointe = {"piece_jointe": piece_jointe} if piece_jointe is not None else {}
 
     def creer(destinataire: str, contexte_local: dict[str, Any], **champs: Any) -> Notification:
         return Notification.objects.create(
@@ -118,6 +120,7 @@ def notifier(
             corps=rendre(modele.corps, {**contexte_local, **masques}),
             corps_secret=chiffrer(rendre(modele.corps, {**contexte_local, **(secrets or {})})) if secrets else "",
             **lien_objet,
+            **jointe,
             **champs,
         )
 
@@ -175,9 +178,15 @@ def _transmettre(notification: Notification) -> str:
         resultat = envoyer_sms(notification.destinataire, texte, reference=f"N{notification.pk}")
         return "" if resultat.envoye else resultat.motif
     corps = dechiffrer(notification.corps_secret) if notification.corps_secret else notification.corps
-    EmailMessage(
+    message = EmailMessage(
         subject=notification.sujet, body=corps, from_email=settings.DEFAULT_FROM_EMAIL, to=[notification.destinataire]
-    ).send(fail_silently=False)
+    )
+    if notification.piece_jointe_id and notification.piece_jointe is not None:
+        from apps.noyau import fichiers
+
+        jointe = notification.piece_jointe
+        message.attach(jointe.nom_origine, fichiers.lire(jointe), jointe.type_mime)
+    message.send(fail_silently=False)
     return ""
 
 

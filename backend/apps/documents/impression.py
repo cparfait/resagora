@@ -22,6 +22,7 @@ from docx.shared import Cm, Pt, RGBColor
 
 from apps.documents import gotenberg
 from apps.noyau.exceptions import ErreurValidation
+from apps.noyau.tableur import texte_xml
 
 FORMATS = {"A4": (Cm(21.0), Cm(29.7)), "A3": (Cm(29.7), Cm(42.0))}
 NOIR = RGBColor(0, 0, 0)
@@ -54,14 +55,14 @@ def _tableau(document: object, entetes: list[str], lignes: list[list[str]]) -> N
     _repeter_entete(table.rows[0])
     for cellule, texte in zip(table.rows[0].cells, entetes, strict=True):
         cellule.text = ""
-        execution = cellule.paragraphs[0].add_run(texte)
+        execution = cellule.paragraphs[0].add_run(texte_xml(texte))
         execution.bold = True
         execution.font.size = Pt(9)
     for valeurs in lignes:
         cellules = table.add_row().cells
         for cellule, texte in zip(cellules, valeurs, strict=True):
             cellule.text = ""
-            execution = cellule.paragraphs[0].add_run(texte)
+            execution = cellule.paragraphs[0].add_run(texte_xml(texte))
             execution.font.size = Pt(9)
             execution.font.color.rgb = NOIR
 
@@ -71,6 +72,7 @@ def construire_docx(edition: Edition, maintenant: datetime | None = None) -> byt
         raise ErreurValidation("Format d'impression : A4 ou A3.", code="format_invalide")
     maintenant = timezone.localtime(maintenant or timezone.now())
     document = DocumentWord()
+    edition.titre, edition.sous_titre = texte_xml(edition.titre), texte_xml(edition.sous_titre)
     document.core_properties.title = edition.titre
     document.core_properties.language = "fr-FR"
     section = document.sections[0]
@@ -97,7 +99,7 @@ def construire_docx(edition: Edition, maintenant: datetime | None = None) -> byt
         bloc.add_run(f"  Version en ligne : {edition.lien}").font.size = Pt(8)
     if edition.groupes:
         for intitule, lignes in edition.groupes:
-            document.add_heading(intitule, level=2)
+            document.add_heading(texte_xml(intitule), level=2)
             if lignes:
                 _tableau(document, edition.entetes, lignes)
             else:

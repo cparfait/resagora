@@ -19,6 +19,11 @@ export const GROUPES = ["Pilotage", "Réservations", "Usagers", "Documents et é
 
 export const MODULES: Module[] = [
   { chemin: "/", libelle: "Accueil", groupe: "Pilotage", action: "lire_referentiel", composant: charger(() => import("../modules/accueil/Accueil")) },
+  { chemin: "/pilotage/statistiques", libelle: "Statistiques", groupe: "Pilotage", action: "lire_statistiques", composant: charger(() => import("../modules/pilotage/Pilotage").then((m) => ({ default: m.Statistiques }))) },
+  { chemin: "/pilotage/direction", libelle: "Tableau de bord de la direction", groupe: "Pilotage", action: "lire_tableau_direction", composant: charger(() => import("../modules/pilotage/Pilotage").then((m) => ({ default: m.Direction }))) },
+  { chemin: "/pilotage/valorisation", libelle: "Valorisation des avantages en nature", groupe: "Pilotage", action: "lire_valorisation", composant: charger(() => import("../modules/pilotage/Valorisation").then((m) => ({ default: m.Valorisation }))) },
+  { chemin: "/pilotage/methodes-valorisation", libelle: "Méthodes de valorisation", groupe: "Pilotage", action: "lire_valorisation", composant: charger(() => import("../modules/pilotage/Valorisation").then((m) => ({ default: m.MethodesValorisation }))) },
+  { chemin: "/pilotage/editions", libelle: "Éditions du planning", groupe: "Pilotage", action: "lire_reservation", composant: charger(() => import("../modules/pilotage/Valorisation").then((m) => ({ default: m.Editions }))) },
   { chemin: "/reservations/planning", libelle: "Planning", groupe: "Réservations", action: "lire_reservation", composant: charger(() => import("../modules/reservations/Planning")) },
   { chemin: "/reservations/dossiers", libelle: "Dossiers", groupe: "Réservations", action: "lire_reservation", composant: charger(() => import("../modules/reservations/Dossiers")) },
   { chemin: "/reservations/dossiers/:id", libelle: "Dossier", groupe: "Réservations", action: "lire_reservation", composant: charger(() => import("../modules/reservations/Dossier")), masque: true },
@@ -32,6 +37,7 @@ export const MODULES: Module[] = [
   { chemin: "/echanges/information", libelle: "Information groupée", groupe: "Documents et échanges", action: "notifier_groupe", composant: charger(() => import("../modules/echanges/Echanges").then((m) => ({ default: m.EnvoiGroupe }))) },
   { chemin: "/echanges/journal", libelle: "Journal des envois", groupe: "Documents et échanges", action: "lire_message", composant: charger(() => import("../modules/echanges/Echanges").then((m) => ({ default: m.JournalEnvois }))) },
   { chemin: "/documents/modeles", libelle: "Modèles de documents", groupe: "Documents et échanges", action: "lire_document", composant: charger(() => import("../modules/documents/Documents").then((m) => ({ default: m.ModelesDocuments }))) },
+  { chemin: "/documents/a-controler", libelle: "Documents signés à contrôler", groupe: "Documents et échanges", action: "lire_document", composant: charger(() => import("../modules/documents/Documents").then((m) => ({ default: m.DocumentsAControler }))) },
   { chemin: "/documents/lots", libelle: "Génération en lot", groupe: "Documents et échanges", action: "generer_document", composant: charger(() => import("../modules/documents/Documents").then((m) => ({ default: m.LotsDocuments }))) },
   { chemin: "/echanges/modeles", libelle: "Modèles de messages", groupe: "Documents et échanges", action: "lire_message", composant: charger(() => import("../modules/echanges/Echanges").then((m) => ({ default: m.ModelesMessages }))) },
   { chemin: "/finances/pieces", libelle: "Devis et factures", groupe: "Finances", action: "lire_finances", composant: charger(() => import("../modules/finances/Pieces").then((m) => ({ default: m.PiecesComptables }))) },

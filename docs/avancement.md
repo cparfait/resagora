@@ -165,6 +165,36 @@ Critère de sortie (reconstitué) :
 
 **Lot 5 terminé le 2026-10-31.**
 
+## Lot 6 — Pilotage
+
+Exigences : VAL-01 à VAL-08, STA-01 à STA-05, DSH-01 à DSH-06, IMP-01, IMP-03, IMP-04, RG-12.
+
+| Étape | Contenu | Exigences | État |
+| --- | --- | --- | --- |
+| 6.1 | Valorisation : exercices, méthodes par famille, calcul par bénéficiaire (devis, tarif voté, frais d'annulation, avoirs, espace partagé, matériel prêt par prêt, personnel dédié), versions, simulation | VAL-01 à VAL-03, VAL-07, RG-12 | fait |
+| 6.2 | Subventions en numéraire importées (format strict, confirmation), synthèse et alertes de seuil, annexe du compte administratif | VAL-05, VAL-06 | fait |
+| 6.3 | Clôture qui recalcule et fige (paramètres par exercice, déclencheurs), recalcul tracé, attestation signée par l'élu puis déposée sur le portail | VAL-04, VAL-08 | fait |
+| 6.4 | Statistiques d'occupation (saisons, sous-espaces, UTC), répartition, recettes, personnel, exports tableur neutralisés ; tableau de la direction | STA-01 à STA-05, DSH-04 | fait |
+| 6.5 | Tableau de bord « à traiter » et alertes, compteurs qui ouvrent leur liste filtrée, périmètre de l'agent ; écran des documents à contrôler | DSH-01 à DSH-03, DSH-05, DSH-06 | fait |
+| 6.6 | Plannings imprimés (A4/A3, QR code, sous-espaces), feuille de salle, envoi programmé (domaines, responsable, minimisation, échecs isolés) | IMP-01, IMP-03, IMP-04 | fait |
+| 6.7 | Back-office (tableau de bord, statistiques, direction, valorisation, méthodes, éditions), portail (attestations), démonstration, e2e et axe, revues (4 bloquants et 19 majeurs corrigés, D-061 à D-068, ADR 0007) | — | fait |
+
+Critère de sortie (reconstitué) :
+- [x] changer de méthode entre deux exercices ne modifie pas l'exercice clos (R6-01) ;
+- [x] espace partagé entre deux associations valorisé à parts égales de l'écart (R6-02) ;
+- [x] une annulation hors délai reste valorisée, frais déduits ; une annulation dans les délais ne l'est pas (R6-03, R6-51) ;
+- [x] l'association télécharge son attestation signée sur le portail (R6-04) ;
+- [x] l'annexe du compte administratif s'exporte, sans particulier ni école (R6-05) ;
+- [x] une association au-delà de 23 000 € (nature + numéraire importé) déclenche l'alerte de convention (R6-06) ;
+- [x] simulation au 30 juin sans enregistrement (R6-07) ;
+- [x] exercice clos : recalcul refusé hors procédure tracée, base protégée (R6-08) ;
+- [x] taux d'occupation, répartition, recettes et gratuités, exports tableur, indicateurs de personnel (R6-21 à R6-25) ;
+- [x] tableau de bord : demandes, besoins non couverts, alertes, direction, périmètre, compteurs cliquables (R6-31 à R6-36) ;
+- [x] planning hebdomadaire imprimé, feuille de salle, envoi programmé (R6-41, R6-43, R6-44) ;
+- [x] droits rôle × périmètre testés (autorisé et refusé) ; e2e et axe sans violation ; revues traitées.
+
+**Lot 6 terminé le 2026-10-31.**
+
 ## Journal
 
 - 2026-10-31 — Démarrage. Cahier des charges absent (D-001), référentiel reconstitué.
@@ -177,3 +207,4 @@ Critère de sortie (reconstitué) :
 - 2026-10-31 — Lot 4 : personnel (besoins, trames, règles, absences, compteurs, iCal, planning PDF), API mobile options A et B, PWA hors ligne chiffrée ; 14 tests mobile, parcours e2e en mode avion.
 - 2026-10-31 — Revues lot 4 : moteur de besoins (jour de rattachement, séances réalisées, vacations existantes), contrôles des trames et des horaires, compteurs au prorata et astreintes à part, saisies terrain bornées, cautions bloquées par des dégâts intermédiaires, appareils à autoriser, connexion sans oracle, code de déverrouillage local (PBKDF2 600 000), photos mobiles en quarantaine DMZ (option B). Types Node épinglés pour le typage des parcours e2e.
 - 2026-10-31 — Lot 5 et revues : prêts séance par séance qui suivent les séances (déplacement, annulation, refus), facturation et avoirs par séance, caution bloquée par les manquants, consommables cumulés, équipement fixe limité à son espace, prix fixés par l'ordonnateur, pannes réservées aux rôles habilités. Amorçage des données de référence complété (cause des pertes de données sur base de test réutilisée).
+- 2026-10-31 — Lot 6 : valorisation, statistiques, tableaux de bord et éditions ; revues sécurité (1 bloquant, 6 majeurs) et métier (3 bloquants, 13 majeurs) corrigées : montant payé avec frais et avoirs, prix du devis, clôture qui recalcule, exercice clos protégé en base, attestation signée par l'élu, envois programmés limités aux domaines de la Ville, taux d'occupation par saisons et sous-espaces, recettes après avoirs, compteurs alignés sur leurs listes.

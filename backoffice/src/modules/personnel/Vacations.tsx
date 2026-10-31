@@ -2,6 +2,7 @@
  * affectation guidée par les règles de temps de travail (forçage motivé et tracé), annulation, planning imprimé. */
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
+import { useSearchParams } from "react-router";
 import { construireChemin, ErreurApi, requete, telecharger, type Page as PageApi } from "../../api/http";
 import { useSession } from "../../auth/session";
 import { Badge } from "../../ui/Badge";
@@ -154,7 +155,11 @@ export default function Vacations() {
   const { annoncer } = useNotifications();
   const lecture = peut("lire_personnel");
   const sites = useOptions("sites", "/api/gestion/referentiel/sites", (s) => String(s.nom), lecture);
-  const [site, setSite] = useState("");
+  const [parametres] = useSearchParams();
+  // DSH-02, DSH-06 : depuis le tableau de bord, les besoins non couverts des N prochains jours (comme le compteur).
+  const horizon = Number(parametres.get("besoins_jours") ?? 0);
+  const [maintenant] = useState(() => new Date());
+  const [site, setSite] = useState(() => parametres.get("site") ?? "");
   const [semaine, setSemaine] = useState(() => debutSemaine(new Date()));
   const [action, setAction] = useState<Action>(null);
   const [saisie, setSaisie] = useState({ motif: "", debut: "", fin: "", type: "normale", site: "" });
@@ -167,7 +172,16 @@ export default function Vacations() {
   });
   const besoins = useQuery({
     queryKey: ["besoins", filtres],
-    queryFn: async () => (await requete<PageApi<Besoin>>("GET", construireChemin("/api/gestion/personnel/besoins", { ...filtres, statut: "a_couvrir" }))).results,
+    queryFn: async () =>
+      (
+        await requete<PageApi<Besoin>>(
+          "GET",
+          construireChemin(
+            "/api/gestion/personnel/besoins",
+            horizon > 0 ? { site: site || undefined, statut: "a_couvrir", debut__gte: maintenant.toISOString(), debut__lt: ajouterJours(maintenant, horizon).toISOString(), taille: 500 } : { ...filtres, statut: "a_couvrir" },
+          ),
+        )
+      ).results,
     enabled: lecture,
   });
   const operation = useMutation({
@@ -236,7 +250,9 @@ export default function Vacations() {
       <h2>Semaine du {jourLong(semaine)}</h2>
       {besoins.data && besoins.data.length > 0 ? (
         <section aria-labelledby="titre-besoins" className="encart encart--alerte">
-          <h3 id="titre-besoins">Besoins non couverts ({besoins.data.length})</h3>
+          <h3 id="titre-besoins">
+            Besoins non couverts{horizon > 0 ? ` des ${horizon} prochains jours` : " de la semaine"} ({besoins.data.length})
+          </h3>
           <ul>
             {besoins.data.map((b) => (
               <li key={b.id}>

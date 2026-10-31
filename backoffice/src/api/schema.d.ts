@@ -1777,6 +1777,23 @@ export interface paths {
         patch: operations["gestion_materiel_catalogue_partial_update"];
         trace?: never;
     };
+    "/api/gestion/materiel/catalogue/{id}/tarif": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description Valeur de référence et prestation facturée, fixées par l'ordonnateur (séparation des tâches, ADR 0005). */
+        post: operations["gestion_materiel_catalogue_tarif_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/gestion/materiel/controles": {
         parameters: {
             query?: never;
@@ -1907,7 +1924,7 @@ export interface paths {
         /** @description MAT-02, MAT-03 : prêts rattachés aux dossiers (site du matériel dans le périmètre). */
         get: operations["gestion_materiel_prets_list"];
         put?: never;
-        /** @description MAT-02, MAT-03 : prêts rattachés aux dossiers (site du matériel dans le périmètre). */
+        /** @description Un prêt par séance à venir de la réservation choisie, ou pour une séance, ou sur une période du dossier. */
         post: operations["gestion_materiel_prets_create"];
         delete?: never;
         options?: never;
@@ -1943,6 +1960,23 @@ export interface paths {
         put?: never;
         /** @description MAT-02, MAT-03 : prêts rattachés aux dossiers (site du matériel dans le périmètre). */
         post: operations["gestion_materiel_prets_refuser_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gestion/materiel/prets/{id}/regler-manquants": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description Décision du service sur les manquants (retenue proposée, prise en charge) : débloque la caution. */
+        post: operations["gestion_materiel_prets_regler_manquants_create"];
         delete?: never;
         options?: never;
         head?: never;
@@ -2868,6 +2902,179 @@ export interface paths {
         };
         /** @description IMP-02 : planning PDF d'un agent ou d'un site (noir et blanc, date d'édition, QR code). */
         get: operations["gestion_personnel_vacations_planning_pdf_retrieve"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gestion/pilotage/a-traiter": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description DSH-01 à DSH-03 : compteurs du jour et alertes, chacun avec le lien de sa liste filtrée (DSH-06). */
+        get: operations["gestion_pilotage_a_traiter_retrieve"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gestion/pilotage/direction": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description DSH-04 : indicateurs annuels de la direction comparés à l'année précédente, tendance mensuelle. */
+        get: operations["gestion_pilotage_direction_retrieve"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gestion/pilotage/envois-planning": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description IMP-04 : envois hebdomadaires programmés du planning. */
+        get: operations["gestion_pilotage_envois_planning_list"];
+        put?: never;
+        /** @description IMP-04 : envois hebdomadaires programmés du planning. */
+        post: operations["gestion_pilotage_envois_planning_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gestion/pilotage/envois-planning/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description IMP-04 : envois hebdomadaires programmés du planning. */
+        get: operations["gestion_pilotage_envois_planning_retrieve"];
+        put?: never;
+        post?: never;
+        /** @description IMP-04 : envois hebdomadaires programmés du planning. */
+        delete: operations["gestion_pilotage_envois_planning_destroy"];
+        options?: never;
+        head?: never;
+        /** @description IMP-04 : envois hebdomadaires programmés du planning. */
+        patch: operations["gestion_pilotage_envois_planning_partial_update"];
+        trace?: never;
+    };
+    "/api/gestion/pilotage/feuille-de-salle.pdf": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description IMP-03 : feuille de la semaine à afficher en salle, avec QR code vers la page de l'équipement. */
+        get: operations["gestion_pilotage_feuille_de_salle.pdf_retrieve"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gestion/pilotage/planning.pdf": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description IMP-01 : planning d'un espace ou d'un site, A4 ou A3. */
+        get: operations["gestion_pilotage_planning.pdf_retrieve"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gestion/pilotage/statistiques/occupation": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description STA-01 : taux d'occupation par espace et par site sur la période. */
+        get: operations["gestion_pilotage_statistiques_occupation_retrieve"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gestion/pilotage/statistiques/personnel": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description STA-05 : heures planifiées, réalisées, supplémentaires, de nuit, dimanches et fériés, astreintes. */
+        get: operations["gestion_pilotage_statistiques_personnel_retrieve"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gestion/pilotage/statistiques/recettes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description STA-03 : recettes, gratuités et réductions, concours en nature valorisés. */
+        get: operations["gestion_pilotage_statistiques_recettes_retrieve"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gestion/pilotage/statistiques/repartition": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description STA-02 : heures par type d'usager, activité et famille d'espaces. */
+        get: operations["gestion_pilotage_statistiques_repartition_retrieve"];
         put?: never;
         post?: never;
         delete?: never;
@@ -4423,6 +4630,284 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/gestion/valorisation/exercices": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description VAL-02, VAL-05 à VAL-08 : exercices, calcul, clôture, synthèse avec alertes de seuil, annexe, simulation. */
+        get: operations["gestion_valorisation_exercices_list"];
+        put?: never;
+        /** @description VAL-02, VAL-05 à VAL-08 : exercices, calcul, clôture, synthèse avec alertes de seuil, annexe, simulation. */
+        post: operations["gestion_valorisation_exercices_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gestion/valorisation/exercices/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description VAL-02, VAL-05 à VAL-08 : exercices, calcul, clôture, synthèse avec alertes de seuil, annexe, simulation. */
+        get: operations["gestion_valorisation_exercices_retrieve"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** @description VAL-02, VAL-05 à VAL-08 : exercices, calcul, clôture, synthèse avec alertes de seuil, annexe, simulation. */
+        patch: operations["gestion_valorisation_exercices_partial_update"];
+        trace?: never;
+    };
+    "/api/gestion/valorisation/exercices/{id}/annexe": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description VAL-05 : état annexé au compte administratif (tableur). */
+        get: operations["gestion_valorisation_exercices_annexe_retrieve"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gestion/valorisation/exercices/{id}/calculer": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description Calcul d'un bénéficiaire (nouvelle version), ou de tous ; refusé sur un exercice clos (VAL-08). */
+        post: operations["gestion_valorisation_exercices_calculer_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gestion/valorisation/exercices/{id}/cloturer": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description VAL-02, VAL-05 à VAL-08 : exercices, calcul, clôture, synthèse avec alertes de seuil, annexe, simulation. */
+        post: operations["gestion_valorisation_exercices_cloturer_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gestion/valorisation/exercices/{id}/simulation": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description VAL-07 : simulation en cours d'année (rien n'est enregistré). */
+        get: operations["gestion_valorisation_exercices_simulation_retrieve"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gestion/valorisation/exercices/{id}/subventions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description VAL-06 : import des subventions en numéraire (CSV issu du logiciel financier). */
+        post: operations["gestion_valorisation_exercices_subventions_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gestion/valorisation/exercices/{id}/synthese": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description VAL-05, VAL-06 : par bénéficiaire, concours en nature et en numéraire, alertes de seuil. */
+        get: operations["gestion_valorisation_exercices_synthese_retrieve"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gestion/valorisation/methodes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description VAL-01 : méthode par famille d'espaces et par exercice. */
+        get: operations["gestion_valorisation_methodes_list"];
+        put?: never;
+        /** @description VAL-01 : méthode par famille d'espaces et par exercice. */
+        post: operations["gestion_valorisation_methodes_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gestion/valorisation/methodes/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description VAL-01 : méthode par famille d'espaces et par exercice. */
+        get: operations["gestion_valorisation_methodes_retrieve"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** @description VAL-01 : méthode par famille d'espaces et par exercice. */
+        patch: operations["gestion_valorisation_methodes_partial_update"];
+        trace?: never;
+    };
+    "/api/gestion/valorisation/subventions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description VAL-06 : subventions en numéraire (importées ou saisies). */
+        get: operations["gestion_valorisation_subventions_list"];
+        put?: never;
+        /** @description VAL-06 : subventions en numéraire (importées ou saisies). */
+        post: operations["gestion_valorisation_subventions_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gestion/valorisation/subventions/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description VAL-06 : subventions en numéraire (importées ou saisies). */
+        get: operations["gestion_valorisation_subventions_retrieve"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gestion/valorisation/valorisations": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description VAL-02, VAL-04, VAL-08 : versions calculées, détail des lignes, attestation, recalcul après clôture. */
+        get: operations["gestion_valorisation_valorisations_list"];
+        put?: never;
+        /** @description VAL-02, VAL-04, VAL-08 : versions calculées, détail des lignes, attestation, recalcul après clôture. */
+        post: operations["gestion_valorisation_valorisations_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gestion/valorisation/valorisations/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description VAL-02, VAL-04, VAL-08 : versions calculées, détail des lignes, attestation, recalcul après clôture. */
+        get: operations["gestion_valorisation_valorisations_retrieve"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gestion/valorisation/valorisations/{id}/attestation": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description VAL-04 : attestation PDF/A de la version actuelle, déposée sur le portail de l'association. */
+        post: operations["gestion_valorisation_valorisations_attestation_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gestion/valorisation/valorisations/{id}/recalculer": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description VAL-08 : procédure tracée de recalcul d'un exercice clos (motif obligatoire). */
+        post: operations["gestion_valorisation_valorisations_recalculer_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/mobile/auth/connexion": {
         parameters: {
             query?: never;
@@ -5001,16 +5486,8 @@ export interface components {
             /** @default  */
             motif: string;
         };
-        /**
-         * @description * `attribuer` - attribuer
-         *     * `refuser` - refuser
-         * @enum {string}
-         */
-        DecisionEnum: "attribuer" | "refuser";
         DecisionRequest: {
-            decision: components["schemas"]["DecisionEnum"];
-            /** @default  */
-            motif: string;
+            decision: string;
         };
         DefiMobileRequest: {
             defi: string;
@@ -5172,6 +5649,23 @@ export interface components {
             /** @default  */
             motif: string;
         };
+        Envoi: {
+            readonly id: number;
+            libelle: string;
+            site?: number | null;
+            espace?: number | null;
+            readonly cible: string;
+            destinataires?: string[];
+            jour_semaine?: components["schemas"]["JourSemaineEnum"];
+            /** Format: time */
+            heure?: string;
+            format_papier?: components["schemas"]["FormatPapierEnum"];
+            actif?: boolean;
+            /** Format: date-time */
+            readonly prochain_envoi_le: string | null;
+            /** Format: date-time */
+            readonly dernier_envoi_le: string | null;
+        };
         EnvoiGroupeRequest: {
             titre: string;
             texte: string;
@@ -5183,6 +5677,19 @@ export interface components {
             fin?: string;
             /** @default false */
             sms: boolean;
+        };
+        EnvoiRequest: {
+            libelle: string;
+            site?: number | null;
+            espace?: number | null;
+            destinataires?: string[];
+            /** @description Une adresse par ligne (saisie du formulaire). */
+            destinataires_texte?: string;
+            jour_semaine?: components["schemas"]["JourSemaineEnum"];
+            /** Format: time */
+            heure?: string;
+            format_papier?: components["schemas"]["FormatPapierEnum"];
+            actif?: boolean;
         };
         /**
          * @description * `docuseal` - docuseal
@@ -5292,6 +5799,32 @@ export interface components {
          * @enum {string}
          */
         EtatDesLieuxConstatEnum: "conforme" | "degats";
+        Exercice: {
+            readonly id: number;
+            annee: number;
+            readonly statut: components["schemas"]["ExerciceStatutEnum"];
+            /**
+             * Format: date
+             * @description Date avant laquelle les attestations sont déposées sur le portail (VAL-04).
+             */
+            date_limite_attestations?: string | null;
+            /** Format: date-time */
+            readonly cloture_le: string | null;
+        };
+        ExerciceRequest: {
+            annee: number;
+            /**
+             * Format: date
+             * @description Date avant laquelle les attestations sont déposées sur le portail (VAL-04).
+             */
+            date_limite_attestations?: string | null;
+        };
+        /**
+         * @description * `ouvert` - Ouvert
+         *     * `cloture` - Clôturé
+         * @enum {string}
+         */
+        ExerciceStatutEnum: "ouvert" | "cloture";
         /**
          * @description * `csv` - csv
          *     * `xlsx` - xlsx
@@ -5337,6 +5870,12 @@ export interface components {
             fin: string;
             motif: string;
         };
+        /**
+         * @description * `A4` - A4
+         *     * `A3` - A3
+         * @enum {string}
+         */
+        FormatPapierEnum: "A4" | "A3";
         /**
          * @description L'objet dépend de la nature du modèle : un dossier, une séance (état des lieux) ou une fermeture et un usager
          *     (avis de fermeture).
@@ -5802,9 +6341,9 @@ export interface components {
             description?: string;
             unite?: string;
             /** Valeur de référence d'une journée de prêt (centimes) */
-            valeur_journaliere_centimes?: number;
+            readonly valeur_journaliere_centimes: number;
             /** @description Code de la prestation facturée (grille tarifaire), vide si gratuit. */
-            prestation_code?: string;
+            readonly prestation_code: string;
             reservable?: boolean;
             /** Proposé aux usagers sur le portail */
             propose_portail?: boolean;
@@ -5830,10 +6369,6 @@ export interface components {
             nature?: components["schemas"]["MaterielNatureEnum"];
             description?: string;
             unite?: string;
-            /** Valeur de référence d'une journée de prêt (centimes) */
-            valeur_journaliere_centimes?: number;
-            /** @description Code de la prestation facturée (grille tarifaire), vide si gratuit. */
-            prestation_code?: string;
             reservable?: boolean;
             /** Proposé aux usagers sur le portail */
             propose_portail?: boolean;
@@ -5862,6 +6397,39 @@ export interface components {
         MessageRequest: {
             dossier: number;
             corps: string;
+        };
+        Methode: {
+            readonly id: number;
+            exercice: number;
+            famille: number;
+            readonly famille_libelle: string;
+            methode?: components["schemas"]["MethodeEnum"];
+            /** @description Coût de revient d'une heure. */
+            cout_horaire_centimes?: number | null;
+            /** @description Valeur locative annuelle du m². */
+            loyer_m2_annuel_centimes?: number | null;
+            /** @description Heures d'ouverture annuelles servant à ramener la valeur locative à l'heure. */
+            heures_annuelles_reference?: number;
+            deliberation_reference?: string;
+        };
+        /**
+         * @description * `tarif_reference` - Tarif de référence voté
+         *     * `cout_revient` - Coût de revient horaire
+         *     * `valeur_locative` - Valeur locative
+         * @enum {string}
+         */
+        MethodeEnum: "tarif_reference" | "cout_revient" | "valeur_locative";
+        MethodeRequest: {
+            exercice: number;
+            famille: number;
+            methode?: components["schemas"]["MethodeEnum"];
+            /** @description Coût de revient d'une heure. */
+            cout_horaire_centimes?: number | null;
+            /** @description Valeur locative annuelle du m². */
+            loyer_m2_annuel_centimes?: number | null;
+            /** @description Heures d'ouverture annuelles servant à ramener la valeur locative à l'heure. */
+            heures_annuelles_reference?: number;
+            deliberation_reference?: string;
         };
         ModeleDocument: {
             readonly id: number;
@@ -6292,6 +6860,21 @@ export interface components {
             previous?: string | null;
             results: components["schemas"]["Dossier"][];
         };
+        PaginatedEnvoiList: {
+            /** @example 123 */
+            count: number;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?page=4
+             */
+            next?: string | null;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?page=2
+             */
+            previous?: string | null;
+            results: components["schemas"]["Envoi"][];
+        };
         PaginatedEspaceList: {
             /** @example 123 */
             count: number;
@@ -6321,6 +6904,21 @@ export interface components {
              */
             previous?: string | null;
             results: components["schemas"]["EtatDesLieux"][];
+        };
+        PaginatedExerciceList: {
+            /** @example 123 */
+            count: number;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?page=4
+             */
+            next?: string | null;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?page=2
+             */
+            previous?: string | null;
+            results: components["schemas"]["Exercice"][];
         };
         PaginatedFamilleEspaceList: {
             /** @example 123 */
@@ -6561,6 +7159,21 @@ export interface components {
              */
             previous?: string | null;
             results: components["schemas"]["Message"][];
+        };
+        PaginatedMethodeList: {
+            /** @example 123 */
+            count: number;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?page=4
+             */
+            next?: string | null;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?page=2
+             */
+            previous?: string | null;
+            results: components["schemas"]["Methode"][];
         };
         PaginatedMouvementStockList: {
             /** @example 123 */
@@ -6832,6 +7445,21 @@ export interface components {
             previous?: string | null;
             results: components["schemas"]["StockMateriel"][];
         };
+        PaginatedSubventionList: {
+            /** @example 123 */
+            count: number;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?page=4
+             */
+            next?: string | null;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?page=2
+             */
+            previous?: string | null;
+            results: components["schemas"]["Subvention"][];
+        };
         PaginatedTarifList: {
             /** @example 123 */
             count: number;
@@ -6906,6 +7534,21 @@ export interface components {
              */
             previous?: string | null;
             results: components["schemas"]["Vacation"][];
+        };
+        PaginatedValorisationList: {
+            /** @example 123 */
+            count: number;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?page=4
+             */
+            next?: string | null;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?page=2
+             */
+            previous?: string | null;
+            results: components["schemas"]["Valorisation"][];
         };
         PanneMateriel: {
             readonly id: number;
@@ -7013,6 +7656,19 @@ export interface components {
             campagne?: number | null;
             observations?: string;
         };
+        PatchedEnvoiRequest: {
+            libelle?: string;
+            site?: number | null;
+            espace?: number | null;
+            destinataires?: string[];
+            /** @description Une adresse par ligne (saisie du formulaire). */
+            destinataires_texte?: string;
+            jour_semaine?: components["schemas"]["JourSemaineEnum"];
+            /** Format: time */
+            heure?: string;
+            format_papier?: components["schemas"]["FormatPapierEnum"];
+            actif?: boolean;
+        };
         PatchedEspaceRequest: {
             code?: string;
             nom?: string;
@@ -7044,6 +7700,14 @@ export interface components {
             /** Réservable depuis le portail */
             reservable_portail?: boolean;
             actif?: boolean;
+        };
+        PatchedExerciceRequest: {
+            annee?: number;
+            /**
+             * Format: date
+             * @description Date avant laquelle les attestations sont déposées sur le portail (VAL-04).
+             */
+            date_limite_attestations?: string | null;
         };
         PatchedFamilleEspaceRequest: {
             code?: string;
@@ -7149,10 +7813,6 @@ export interface components {
             nature?: components["schemas"]["MaterielNatureEnum"];
             description?: string;
             unite?: string;
-            /** Valeur de référence d'une journée de prêt (centimes) */
-            valeur_journaliere_centimes?: number;
-            /** @description Code de la prestation facturée (grille tarifaire), vide si gratuit. */
-            prestation_code?: string;
             reservable?: boolean;
             /** Proposé aux usagers sur le portail */
             propose_portail?: boolean;
@@ -7164,6 +7824,18 @@ export interface components {
             /** @description Consommables : alerte sous ce stock. */
             seuil_alerte?: number | null;
             actif?: boolean;
+        };
+        PatchedMethodeRequest: {
+            exercice?: number;
+            famille?: number;
+            methode?: components["schemas"]["MethodeEnum"];
+            /** @description Coût de revient d'une heure. */
+            cout_horaire_centimes?: number | null;
+            /** @description Valeur locative annuelle du m². */
+            loyer_m2_annuel_centimes?: number | null;
+            /** @description Heures d'ouverture annuelles servant à ramener la valeur locative à l'heure. */
+            heures_annuelles_reference?: number;
+            deliberation_reference?: string;
         };
         PatchedModeleDocumentRequest: {
             libelle?: string;
@@ -7575,6 +8247,8 @@ export interface components {
             readonly dossier_numero: string;
             readonly usager_nom: string;
             reservation?: number | null;
+            /** @description Séance du prêt : le matériel suit ses horaires, son annulation et sa facturation. */
+            occurrence?: number | null;
             stock: number;
             readonly materiel_libelle: string;
             readonly unite: string;
@@ -7588,6 +8262,8 @@ export interface components {
             readonly quantite_sortie: number | null;
             readonly quantite_rendue: number | null;
             readonly manquants: number;
+            /** @description Le service a statué sur les manquants (retenue proposée ou prise en charge) : la caution peut être restituée. */
+            readonly manquants_regles: boolean;
             readonly origine: components["schemas"]["PretOrigineEnum"];
             commentaire?: string;
             /** @description Motif d'un refus ou d'une annulation. */
@@ -7605,6 +8281,8 @@ export interface components {
         PretRequest: {
             dossier: number;
             reservation?: number | null;
+            /** @description Séance du prêt : le matériel suit ses horaires, son annulation et sa facturation. */
+            occurrence?: number | null;
             stock: number;
             quantite: number;
             /** Format: date-time */
@@ -7759,6 +8437,11 @@ export interface components {
             quantite: number;
             /** @default  */
             observations: string;
+            /**
+             * @description Faux : retour partiel, le prêt reste sorti.
+             * @default true
+             */
+            solde: boolean;
         };
         Role: {
             readonly id: number;
@@ -8018,6 +8701,28 @@ export interface components {
             readonly dernier_controle: string | null;
             readonly echeance_controle: string | null;
         };
+        Subvention: {
+            readonly id: number;
+            exercice: number;
+            usager: number;
+            readonly usager_nom: string;
+            /** Format: int64 */
+            montant_centimes: number;
+            objet?: string;
+            deliberation_reference?: string;
+            /** @description Ligne du fichier importé. */
+            readonly reference_import: string;
+            /** Format: date-time */
+            readonly importe_le: string;
+        };
+        SubventionRequest: {
+            exercice: number;
+            usager: number;
+            /** Format: int64 */
+            montant_centimes: number;
+            objet?: string;
+            deliberation_reference?: string;
+        };
         Tarif: {
             readonly id: number;
             grille: number;
@@ -8034,6 +8739,12 @@ export interface components {
             prix_centimes: number;
             /** @description CAU-01 : caution exigée (0 : aucune). */
             caution_centimes?: number;
+        };
+        TarifMaterielRequest: {
+            /** Valeur de référence d'une journée de prêt (centimes) */
+            valeur_journaliere_centimes?: number;
+            /** @description Code de la prestation facturée (grille tarifaire), vide si gratuit. */
+            prestation_code?: string;
         };
         TarifRequest: {
             grille: number;
@@ -8322,6 +9033,38 @@ export interface components {
             accepter: boolean;
             /** @default  */
             commentaire: string;
+        };
+        Valorisation: {
+            readonly id: number;
+            readonly exercice: number;
+            readonly annee: number;
+            readonly usager: number;
+            readonly usager_nom: string;
+            readonly usager_type: string;
+            /** @default 1 */
+            readonly version: number;
+            /** @default true */
+            readonly actuelle: boolean;
+            readonly figee: boolean;
+            readonly minutes: number;
+            readonly montant_espaces: number;
+            readonly montant_materiel: number;
+            readonly montant_personnel: number;
+            readonly total: number;
+            /** Format: date-time */
+            readonly calcule_le: string;
+            readonly calcule_par: string;
+            readonly motif_recalcul: string;
+            /** @description Attestation. */
+            readonly document: number | null;
+            /**
+             * Format: date-time
+             * @description Attestation mise à disposition sur le portail.
+             */
+            readonly deposee_le: string | null;
+            readonly lignes: {
+                [key: string]: unknown;
+            }[];
         };
         Verification: {
             entrees_verifiees: number;
@@ -12185,6 +12928,34 @@ export interface operations {
             };
         };
     };
+    gestion_materiel_catalogue_tarif_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) matériel. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["TarifMaterielRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["TarifMaterielRequest"];
+                "multipart/form-data": components["schemas"]["TarifMaterielRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Materiel"];
+                };
+            };
+        };
+    };
     gestion_materiel_controles_list: {
         parameters: {
             query?: {
@@ -12451,7 +13222,28 @@ export interface operations {
     };
     gestion_materiel_prets_create: {
         parameters: {
-            query?: never;
+            query?: {
+                debut__gte?: string;
+                debut__lt?: string;
+                dossier?: number;
+                /** @description Un numéro de page de l'ensemble des résultats. */
+                page?: number;
+                /**
+                 * @description * `demandee` - Demandée
+                 *     * `validee` - Validée
+                 *     * `sortie` - Sortie (remise à l'usager)
+                 *     * `rendue` - Rendue
+                 *     * `refusee` - Refusée
+                 *     * `annulee` - Annulée
+                 */
+                statut?: "annulee" | "demandee" | "refusee" | "rendue" | "sortie" | "validee";
+                /** @description Les valeurs multiples doivent être séparées par des virgules. */
+                statut__in?: string[];
+                stock__materiel?: number;
+                stock__site?: number;
+                /** @description Nombre de résultats à retourner par page. */
+                taille?: number;
+            };
             header?: never;
             path?: never;
             cookie?: never;
@@ -12469,7 +13261,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["Pret"];
+                    "application/json": components["schemas"]["PaginatedPretList"];
                 };
             };
         };
@@ -12511,6 +13303,34 @@ export interface operations {
                 "application/json": components["schemas"]["MotifPretRequest"];
                 "application/x-www-form-urlencoded": components["schemas"]["MotifPretRequest"];
                 "multipart/form-data": components["schemas"]["MotifPretRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Pret"];
+                };
+            };
+        };
+    };
+    gestion_materiel_prets_regler_manquants_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) reservation materiel. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DecisionRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["DecisionRequest"];
+                "multipart/form-data": components["schemas"]["DecisionRequest"];
             };
         };
         responses: {
@@ -14566,6 +15386,325 @@ export interface operations {
                 };
                 content: {
                     "application/pdf": string;
+                };
+            };
+        };
+    };
+    gestion_pilotage_a_traiter_retrieve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
+    gestion_pilotage_direction_retrieve: {
+        parameters: {
+            query?: {
+                annee?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
+    gestion_pilotage_envois_planning_list: {
+        parameters: {
+            query?: {
+                /** @description Un numéro de page de l'ensemble des résultats. */
+                page?: number;
+                /** @description Nombre de résultats à retourner par page. */
+                taille?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PaginatedEnvoiList"];
+                };
+            };
+        };
+    };
+    gestion_pilotage_envois_planning_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["EnvoiRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["EnvoiRequest"];
+                "multipart/form-data": components["schemas"]["EnvoiRequest"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Envoi"];
+                };
+            };
+        };
+    };
+    gestion_pilotage_envois_planning_retrieve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) envoi programme. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Envoi"];
+                };
+            };
+        };
+    };
+    gestion_pilotage_envois_planning_destroy: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) envoi programme. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No response body */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    gestion_pilotage_envois_planning_partial_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) envoi programme. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["PatchedEnvoiRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["PatchedEnvoiRequest"];
+                "multipart/form-data": components["schemas"]["PatchedEnvoiRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Envoi"];
+                };
+            };
+        };
+    };
+    "gestion_pilotage_feuille_de_salle.pdf_retrieve": {
+        parameters: {
+            query?: {
+                espace?: number;
+                jour?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/pdf": string;
+                };
+            };
+        };
+    };
+    "gestion_pilotage_planning.pdf_retrieve": {
+        parameters: {
+            query?: {
+                au?: string;
+                du?: string;
+                espace?: string;
+                papier?: string;
+                site?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/pdf": string;
+                };
+            };
+        };
+    };
+    gestion_pilotage_statistiques_occupation_retrieve: {
+        parameters: {
+            query?: {
+                au?: string;
+                du?: string;
+                espace?: string;
+                export?: string;
+                site?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
+    gestion_pilotage_statistiques_personnel_retrieve: {
+        parameters: {
+            query?: {
+                au?: string;
+                du?: string;
+                espace?: string;
+                export?: string;
+                site?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
+    gestion_pilotage_statistiques_recettes_retrieve: {
+        parameters: {
+            query?: {
+                au?: string;
+                du?: string;
+                espace?: string;
+                export?: string;
+                site?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
+    gestion_pilotage_statistiques_repartition_retrieve: {
+        parameters: {
+            query?: {
+                au?: string;
+                du?: string;
+                espace?: string;
+                export?: string;
+                site?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
                 };
             };
         };
@@ -18510,6 +19649,553 @@ export interface operations {
                     "application/json": {
                         [key: string]: unknown;
                     };
+                };
+            };
+        };
+    };
+    gestion_valorisation_exercices_list: {
+        parameters: {
+            query?: {
+                /** @description Un numéro de page de l'ensemble des résultats. */
+                page?: number;
+                /** @description Nombre de résultats à retourner par page. */
+                taille?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PaginatedExerciceList"];
+                };
+            };
+        };
+    };
+    gestion_valorisation_exercices_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ExerciceRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["ExerciceRequest"];
+                "multipart/form-data": components["schemas"]["ExerciceRequest"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Exercice"];
+                };
+            };
+        };
+    };
+    gestion_valorisation_exercices_retrieve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) exercice. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Exercice"];
+                };
+            };
+        };
+    };
+    gestion_valorisation_exercices_partial_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) exercice. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["PatchedExerciceRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["PatchedExerciceRequest"];
+                "multipart/form-data": components["schemas"]["PatchedExerciceRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Exercice"];
+                };
+            };
+        };
+    };
+    gestion_valorisation_exercices_annexe_retrieve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) exercice. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "text/csv": string;
+                };
+            };
+        };
+    };
+    gestion_valorisation_exercices_calculer_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) exercice. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": {
+                    usager?: number;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
+    gestion_valorisation_exercices_cloturer_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) exercice. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Exercice"];
+                };
+            };
+        };
+    };
+    gestion_valorisation_exercices_simulation_retrieve: {
+        parameters: {
+            query?: {
+                jusqu_au?: string;
+                usager?: number;
+            };
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) exercice. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
+    gestion_valorisation_exercices_subventions_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) exercice. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "multipart/form-data": {
+                    /** Format: binary */
+                    fichier?: string;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
+    gestion_valorisation_exercices_synthese_retrieve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) exercice. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
+    gestion_valorisation_methodes_list: {
+        parameters: {
+            query?: {
+                exercice?: number;
+                famille?: number;
+                /** @description Un numéro de page de l'ensemble des résultats. */
+                page?: number;
+                /** @description Nombre de résultats à retourner par page. */
+                taille?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PaginatedMethodeList"];
+                };
+            };
+        };
+    };
+    gestion_valorisation_methodes_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MethodeRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["MethodeRequest"];
+                "multipart/form-data": components["schemas"]["MethodeRequest"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Methode"];
+                };
+            };
+        };
+    };
+    gestion_valorisation_methodes_retrieve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) methode valorisation. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Methode"];
+                };
+            };
+        };
+    };
+    gestion_valorisation_methodes_partial_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) methode valorisation. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["PatchedMethodeRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["PatchedMethodeRequest"];
+                "multipart/form-data": components["schemas"]["PatchedMethodeRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Methode"];
+                };
+            };
+        };
+    };
+    gestion_valorisation_subventions_list: {
+        parameters: {
+            query?: {
+                exercice?: number;
+                /** @description Un numéro de page de l'ensemble des résultats. */
+                page?: number;
+                /** @description Nombre de résultats à retourner par page. */
+                taille?: number;
+                usager?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PaginatedSubventionList"];
+                };
+            };
+        };
+    };
+    gestion_valorisation_subventions_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SubventionRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["SubventionRequest"];
+                "multipart/form-data": components["schemas"]["SubventionRequest"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Subvention"];
+                };
+            };
+        };
+    };
+    gestion_valorisation_subventions_retrieve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) subvention numeraire. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Subvention"];
+                };
+            };
+        };
+    };
+    gestion_valorisation_valorisations_list: {
+        parameters: {
+            query?: {
+                actuelle?: boolean;
+                exercice?: number;
+                /** @description Un numéro de page de l'ensemble des résultats. */
+                page?: number;
+                /** @description Nombre de résultats à retourner par page. */
+                taille?: number;
+                usager?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PaginatedValorisationList"];
+                };
+            };
+        };
+    };
+    gestion_valorisation_valorisations_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Valorisation"];
+                };
+            };
+        };
+    };
+    gestion_valorisation_valorisations_retrieve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) valorisation. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Valorisation"];
+                };
+            };
+        };
+    };
+    gestion_valorisation_valorisations_attestation_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) valorisation. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Valorisation"];
+                };
+            };
+        };
+    };
+    gestion_valorisation_valorisations_recalculer_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) valorisation. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": {
+                    motif?: string;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Valorisation"];
                 };
             };
         };

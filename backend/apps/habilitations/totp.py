@@ -45,7 +45,7 @@ def _code_deja_utilise(utilisateur: Utilisateur, code: str) -> bool:
 
 def verifier_code(graine: str, code: str) -> bool:
     code = (code or "").strip().replace(" ", "")
-    return code.isdigit() and len(code) == 6 and pyotp.TOTP(graine).verify(code, valid_window=FENETRE_TOLERANCE)
+    return code.isdecimal() and len(code) == 6 and pyotp.TOTP(graine).verify(code, valid_window=FENETRE_TOLERANCE)
 
 
 def secondes_verrou(utilisateur: Utilisateur) -> int:

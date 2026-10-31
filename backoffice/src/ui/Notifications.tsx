@@ -1,5 +1,6 @@
 /** Messages de confirmation et d'erreur annoncés aux lecteurs d'écran (aria-live). */
-import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from "react";
+import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
+import { definirSignalementTelechargement } from "../api/http";
 
 interface Message {
   id: number;
@@ -25,6 +26,7 @@ export function NotificationsProvider({ children }: { children: ReactNode }) {
     [retirer],
   );
   const valeur = useMemo(() => ({ annoncer }), [annoncer]);
+  useEffect(() => definirSignalementTelechargement((message) => annoncer(message, "erreur")), [annoncer]);
   return (
     <ContexteNotifications.Provider value={valeur}>
       {children}

@@ -41,7 +41,8 @@ export default function Dossiers() {
       )}
       filtres={[
         { nom: "recherche", libelle: "Numéro, objet ou usager" },
-        { nom: "statut", libelle: "Statut", options: Object.entries(STATUTS).map(([valeur, s]) => ({ valeur, libelle: s.libelle })) },
+        { nom: "statut", libelle: "Statut", options: [{ valeur: "demande,en_instruction", libelle: "À instruire (demandes et instruction)" }, ...Object.entries(STATUTS).map(([valeur, s]) => ({ valeur, libelle: s.libelle }))] },
+        { nom: "options_expirant_heures", libelle: "Options expirant sous", options: [{ valeur: "48", libelle: "48 heures" }, { valeur: "168", libelle: "7 jours" }] },
         { nom: "type_reservation", libelle: "Type", options: types },
         { nom: "site", libelle: "Site", options: sites },
       ]}

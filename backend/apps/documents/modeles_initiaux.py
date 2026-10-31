@@ -304,10 +304,13 @@ def attestation_valorisation() -> bytes:
     r.titre("Attestation de valorisation des avantages en nature — exercice {{ exercice }}")
     r.texte(
         "{{ ville.nom }} atteste avoir mis gratuitement ou à tarif réduit à la disposition de {{ usager.nom }} "
-        "({{ usager.rna }}) les équipements suivants au cours de l'exercice {{ exercice }} :"
+        "({{ usager.rna }}) les équipements suivants au cours de l'exercice {{ exercice }}, en application de "
+        "l'article L. 2125-1 du code général de la propriété des personnes publiques (occupation gratuite ou à "
+        "tarif réduit au profit d'une association à but non lucratif concourant à la satisfaction d'un intérêt "
+        "général) :"
     )
     r.tableau(
-        ["Équipement", "Heures", "Tarif de référence", "Montant payé", "Valorisation"],
+        ["Équipement", "Heures", "Valeur de référence", "Montant payé", "Valorisation"],
         "lignes",
         "l",
         ["{{ l.espace }}", "{{ l.heures }}", "{{ l.tarif_reference }}", "{{ l.paye }}", "{{ l.valorisation }}"],
@@ -317,9 +320,9 @@ def attestation_valorisation() -> bytes:
         "Cette valorisation constitue une subvention en nature à faire figurer dans les comptes de l'association "
         "(comptes 86 et 87) et, le cas échéant, dans le compte rendu financier prévu par la loi du 12 avril 2000."
     )
-    r.texte("Méthode : {{ methode }}")
+    r.texte("Méthode de valorisation : {{ methode }}")
     r.texte("Fait à Châtillon, le {{ date_edition }}.", droite=True)
-    r.texte("{{ ville.signataire_nom }}\n{{ ville.signataire_qualite }}", droite=True)
+    r.texte("Pour le Maire et par délégation,\n{{ ville.signataire_nom }}\n{{ ville.signataire_qualite }}", droite=True)
     return r.octets()
 
 
@@ -386,8 +389,8 @@ MODELES_INITIAUX: list[ModeleInitial] = [
         "attestation-valorisation",
         "Attestation de valorisation",
         "attestation_valorisation",
-        False,
-        (),
+        True,
+        ("elu",),
         "Avantages en nature annuels d'une association (VAL-04).",
         attestation_valorisation,
     ),

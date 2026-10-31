@@ -78,7 +78,7 @@ class ValidateurFamilles:
             [
                 any(c.islower() for c in password),
                 any(c.isupper() for c in password),
-                any(c.isdigit() for c in password),
+                any(c.isdecimal() for c in password),
                 any(not c.isalnum() for c in password),
             ]
         )
@@ -578,7 +578,7 @@ def valider_defi_totp(defi: str, code: str) -> dict[str, Any]:
 
 def _code_valide(compte: CompteUsager, graine: str, code: str) -> bool:
     code = (code or "").strip().replace(" ", "")
-    if not (code.isdigit() and len(code) == 6 and pyotp.TOTP(graine).verify(code, valid_window=1)):
+    if not (code.isdecimal() and len(code) == 6 and pyotp.TOTP(graine).verify(code, valid_window=1)):
         return False
     return bool(cache.add(f"portail-totp-utilise:{compte.pk}:{code}", True, timeout=120))
 

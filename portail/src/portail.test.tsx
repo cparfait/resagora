@@ -78,4 +78,18 @@ describe("Portail", () => {
     afficher("/espace/dossiers");
     expect(await screen.findByRole("heading", { level: 1, name: "Se connecter" })).toBeInTheDocument();
   });
+
+  it("VAL-04 l'association retrouve son attestation annuelle dans un tableau titré, téléchargeable", async () => {
+    reponses({
+      "/api/portail/session": { connecte: true, csrf: "jeton", expire_dans: 1800, contact: { id: 1, prenom: "Camille", nom: "Martin", totp: false } },
+      "/api/portail/accessibilite": DECLARATION,
+      "/api/portail/attestations": [{ id: 4, exercice: 2025, usager: 2, usager_nom: "Basket club", montant: 1234500, montant_texte: "12 345,00 €", deposee_le: "2026-01-20T09:00:00Z", numero: "ATT-2025-0004" }],
+    });
+    afficher("/espace/attestations");
+    expect(await screen.findByRole("heading", { level: 1, name: "Attestations de valorisation" })).toBeInTheDocument();
+    const tableau = await screen.findByRole("table", { name: "Attestations déposées par la Ville" });
+    expect(within(tableau).getByRole("rowheader", { name: "2025" })).toBeInTheDocument();
+    expect(within(tableau).getByText("12 345,00 €")).toBeInTheDocument();
+    expect(within(tableau).getByRole("button", { name: /attestation 2025.*Basket club.*PDF/ })).toBeInTheDocument();
+  });
 });

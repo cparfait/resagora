@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import io
 import logging
-from collections.abc import Iterable
+from collections.abc import Callable, Iterable
 from datetime import timedelta
 from typing import Any
 
@@ -44,6 +44,14 @@ journal = logging.getLogger(__name__)
 TYPE_DOCX = "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
 NATURES_ENGAGEMENT = ("convention", "contrat_location", "avenant")
 STATUTS_EN_COURS_SIGNATURE = ("en_signature", "scan_a_controler")
+#: Suites d'une signature complète (électronique ou manuscrite constatée), branchées par les autres applications
+#: (ex. dépôt de l'attestation de valorisation sur le portail) ; appelées dans la transaction de la signature.
+APRES_SIGNATURE: list[Callable[[Document], None]] = []
+
+
+def _apres_signature(document: Document) -> None:
+    for suite in APRES_SIGNATURE:
+        suite(document)
 
 
 def _acteur(acteur: Any) -> str:
@@ -461,7 +469,8 @@ def envoyer_en_signature(
     else:
         CircuitSignature.objects.filter(pk=circuit.pk).update(statut="envoye")
         circuit.statut = "envoye"
-        if document.usager_id:
+        # L'usager n'est prévenu que s'il signe (une attestation n'est signée que par l'élu).
+        if document.usager_id and any(s["role"] == "usager" for s in signataires):
             notifier(
                 "signature_manuelle_demandee",
                 {"document": document, "dossier": document.dossier, "expire_le": contextes.instant_lisible(expire)},
@@ -637,6 +646,7 @@ def synchroniser(circuit: CircuitSignature, client: ClientDocuSeal | None = None
         circuit.statut, circuit.termine_le = "signe", timezone.now()
         circuit.save(update_fields=["statut", "termine_le"])
         journaliser("document_signe", document, apres={"sha256_signe": signe.sha256}, acteur="DocuSeal")
+        _apres_signature(document)
         _purger(circuit, client)
         if document.usager_id:
             notifier(
@@ -668,7 +678,7 @@ def traiter_webhook(corps: dict[str, Any]) -> CircuitSignature | None:
         raise ErreurValidation("Notification de signature illisible.", code="webhook_invalide")
     soumission = donnees.get("submission", {}).get("id") if isinstance(donnees.get("submission"), dict) else None
     identifiant = str(soumission or donnees.get("submission_id") or donnees.get("id") or "")
-    if not identifiant.isdigit():
+    if not identifiant.isdecimal():
         raise ErreurValidation("Notification de signature sans soumission.", code="webhook_invalide")
     circuit = CircuitSignature.objects.filter(soumission=identifiant, mode="docuseal").first()
     if circuit is None:
@@ -788,6 +798,7 @@ def _constater(document: Document, scan: Any, *, acteur: Any, depose_par: str) -
     document.signe_le = timezone.now()
     document.signe_par = f"Signature manuscrite déposée par {depose_par}, constatée par {_acteur(acteur)}"[:250]
     document.save(update_fields=["statut", "fichier_signe", "scan_depose", "signe_le", "signe_par"])
+    _apres_signature(document)
     return document
 
 

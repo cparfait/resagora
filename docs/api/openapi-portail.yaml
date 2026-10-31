@@ -147,6 +147,42 @@ paths:
                 type: object
                 additionalProperties: {}
           description: ''
+  /api/portail/attestations:
+    get:
+      operationId: portail_attestations_retrieve
+      description: Base des vues réservées à un contact connecté (jeton de session
+        relayé par la façade).
+      tags:
+      - portail
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+  /api/portail/attestations/{id}/fichier:
+    get:
+      operationId: portail_attestations_fichier_retrieve
+      description: 'Téléchargement contrôlé : l''attestation d''une autre structure
+        renvoie 404.'
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - portail
+      responses:
+        '200':
+          content:
+            application/pdf:
+              schema:
+                type: string
+                format: binary
+          description: ''
   /api/portail/auth/confirmation-courriel:
     post:
       operationId: portail_auth_confirmation_courriel_create
@@ -499,7 +535,12 @@ paths:
       - portail
       responses:
         '200':
-          description: No response body
+          content:
+            application/pdf:
+              schema:
+                type: string
+                format: binary
+          description: ''
   /api/portail/catalogue/espaces/{id}/photos/{photo}:
     get:
       operationId: portail_catalogue_espaces_photos_retrieve
@@ -519,7 +560,12 @@ paths:
       - portail
       responses:
         '200':
-          description: No response body
+          content:
+            image/jpeg:
+              schema:
+                type: string
+                format: binary
+          description: ''
   /api/portail/catalogue/familles:
     get:
       operationId: portail_catalogue_familles_list

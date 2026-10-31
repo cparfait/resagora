@@ -45,7 +45,7 @@ class VueDisponibilites(VuePublique):
 
         p = request.query_params
         identifiant = p.get("espace", "")
-        espace = espaces_publics().filter(pk=int(identifiant)).first() if identifiant.isdigit() else None
+        espace = espaces_publics().filter(pk=int(identifiant)).first() if identifiant.isdecimal() else None
         if espace is None:
             raise ErreurValidation("Choisissez un espace du catalogue.", code="espace_invalide")
         try:

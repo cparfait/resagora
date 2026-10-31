@@ -69,7 +69,7 @@ class Introuvable(ErreurMetier):
 
 
 def usager_autorise(contact: Contact, identifiant: Any, *, valide: bool = False) -> Usager:
-    usager = usagers_du_contact(contact).filter(pk=identifiant).first() if str(identifiant).isdigit() else None
+    usager = usagers_du_contact(contact).filter(pk=identifiant).first() if str(identifiant).isdecimal() else None
     if usager is None:
         raise Introuvable()
     if valide and usager.statut != "valide":

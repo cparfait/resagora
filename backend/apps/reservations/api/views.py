@@ -59,13 +59,27 @@ class VueTypesReservation(VuePerimetre):
 
 
 class FiltreDossiers(django_filters.FilterSet):
+    """`statut` accepte une liste séparée par des virgules ; `options_expirant_heures` : dossiers dont une option
+    expire dans ce délai (compteurs du tableau de bord, DSH-06)."""
+
     recherche = django_filters.CharFilter(method="filtrer_recherche")
-    statut = django_filters.CharFilter(field_name="reservations__statut")
+    statut = django_filters.CharFilter(method="filtrer_statut")
+    options_expirant_heures = django_filters.NumberFilter(method="filtrer_options")
     site = django_filters.NumberFilter(field_name="reservations__espace__batiment__site")
 
     class Meta:
         model = Dossier
         fields = ["usager", "type_reservation", "saison", "campagne", "origine"]
+
+    def filtrer_statut(self, qs: QuerySet[Dossier], nom: str, valeur: str) -> QuerySet[Dossier]:
+        statuts = [v.strip() for v in valeur.split(",") if v.strip()][:10]
+        return qs.filter(reservations__statut__in=statuts).distinct() if statuts else qs
+
+    def filtrer_options(self, qs: QuerySet[Dossier], nom: str, valeur: Any) -> QuerySet[Dossier]:
+        heures = max(1, min(int(valeur), 24 * 31))
+        return qs.filter(
+            reservations__statut="option", reservations__option_expire_le__lt=timezone.now() + timedelta(hours=heures)
+        ).distinct()
 
     def filtrer_recherche(self, qs: QuerySet[Dossier], nom: str, valeur: str) -> QuerySet[Dossier]:
         valeur = valeur.strip()[:80]
@@ -385,7 +399,7 @@ class VuePlanning(APIView):
         ):
             valeur = p.get(parametre, "")
             if valeur:
-                if not valeur.isdigit():
+                if not valeur.isdecimal():
                     raise ErreurValidation(f"Filtre « {parametre} » invalide.", code="filtre_invalide")
                 qs = qs.filter(**{chemin: int(valeur)})
         if p.get("statut"):
@@ -441,7 +455,7 @@ class VuePlanningIcal(APIView):
         p = request.query_params
         espace = (
             Espace.objects.select_related("batiment__site").filter(pk=int(p["espace"])).first()
-            if p.get("espace", "").isdigit()
+            if p.get("espace", "").isdecimal()
             else None
         )
         if espace is None:

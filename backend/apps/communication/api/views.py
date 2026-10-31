@@ -200,7 +200,7 @@ class VueMessages(VuePerimetre):
     def list(self, request: Request, *args: Any, **kwargs: Any) -> Response:
         reponse = super().list(request, *args, **kwargs)
         dossier = request.query_params.get("dossier", "")
-        if dossier.isdigit():
+        if dossier.isdecimal():
             self.get_queryset().filter(
                 dossier_id=int(dossier), auteur_contact__isnull=False, lu_par_ville_le__isnull=True
             ).update(lu_par_ville_le=timezone.now())

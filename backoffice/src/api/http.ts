@@ -97,9 +97,26 @@ export async function requete<T>(methode: string, chemin: string, corps?: unknow
 }
 
 /** Téléchargement d'un fichier (export, PDF) via un lien temporaire. */
+let signalerEchec: (message: string) => void = () => undefined;
+
+/** Branché par le fournisseur de notifications : un téléchargement refusé ou en échec est annoncé à l'agent. */
+export function definirSignalementTelechargement(rappel: (message: string) => void): void {
+  signalerEchec = rappel;
+}
+
+/** Télécharge un fichier de l'API ; en cas d'échec (droits, document absent, réseau), le message est annoncé. */
 export async function telecharger(chemin: string, nomParDefaut: string): Promise<void> {
-  const reponse = await fetch(chemin, { credentials: "same-origin" });
-  if (!reponse.ok) throw await erreurDepuisReponse(reponse);
+  let reponse: Response;
+  try {
+    reponse = await fetch(chemin, { credentials: "same-origin" });
+  } catch {
+    signalerEchec("Téléchargement impossible : vérifiez la connexion au réseau de la Ville.");
+    return;
+  }
+  if (!reponse.ok) {
+    signalerEchec((await erreurDepuisReponse(reponse)).message);
+    return;
+  }
   const disposition = reponse.headers.get("Content-Disposition") ?? "";
   const nom = /filename="?([^";]+)"?/.exec(disposition)?.[1] ?? nomParDefaut;
   const url = URL.createObjectURL(await reponse.blob());

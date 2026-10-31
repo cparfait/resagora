@@ -1,6 +1,7 @@
 /** MAT-01 à MAT-05 : catalogue, état du stock et mouvements, prêts rattachés aux dossiers, contrôles périodiques et
  * pannes. Les quantités ne changent que par des mouvements tracés ; la disponibilité est calculée par l'API. */
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useSearchParams } from "react-router";
 import { useState, type ReactNode } from "react";
 import { construireChemin, ErreurApi, requete, telecharger, type Page as PageApi } from "../../api/http";
 import { useSession } from "../../auth/session";
@@ -481,7 +482,8 @@ function TableauPrets({ prets, titre }: { prets: Pret[]; titre: string }) {
 
 export function Prets() {
   const { peut } = useSession();
-  const [statut, setStatut] = useState("demandee,validee,sortie");
+  const [parametres] = useSearchParams();
+  const [statut, setStatut] = useState(() => parametres.get("statut") ?? "demandee,validee,sortie");
   const prets = useQuery({
     queryKey: ["prets", statut],
     queryFn: async () => (await requete<PageApi<Pret>>("GET", construireChemin("/api/gestion/materiel/prets", { statut__in: statut, taille: 300 }))).results,

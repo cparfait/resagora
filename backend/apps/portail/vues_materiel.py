@@ -125,7 +125,7 @@ class VueMaterielPortail(VueContact):
 
         identifiant = request.query_params.get("espace", "")
         espace = (
-            espaces_publics().select_related("batiment").filter(pk=int(identifiant)).first() if identifiant.isdigit() else None
+            espaces_publics().select_related("batiment").filter(pk=int(identifiant)).first() if identifiant.isdecimal() else None
         )
         if espace is None:
             raise ErreurValidation("Indiquez l'équipement.", code="espace_requis")

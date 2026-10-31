@@ -50,6 +50,14 @@ class Notification(models.Model):
     objet_type = models.CharField(max_length=80, blank=True, default="")
     objet_id = models.CharField(max_length=64, blank=True, default="")
     groupe = models.CharField(max_length=64, blank=True, default="", help_text="Identifiant d'un envoi groupé.")
+    piece_jointe = models.ForeignKey(
+        "noyau.Fichier",
+        null=True,
+        blank=True,
+        on_delete=models.PROTECT,
+        related_name="+",
+        help_text="Planning programmé (IMP-04).",
+    )
     statut = models.CharField(max_length=10, choices=STATUTS, default="a_envoyer")
     tentatives = models.PositiveSmallIntegerField(default=0)
     erreur = models.CharField(max_length=300, blank=True, default="")

@@ -2,6 +2,7 @@
  * incidents, appareils mobiles, saisies reçues du terrain. Les règles (temps de travail, périmètre) sont dans l'API. */
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
+import { useSearchParams } from "react-router";
 import { construireChemin, ErreurApi, requete, telecharger, type Page as PageApi } from "../../api/http";
 import { useSession } from "../../auth/session";
 import { Badge } from "../../ui/Badge";
@@ -519,7 +520,8 @@ export function Saisies() {
   const { peut } = useSession();
   const client = useQueryClient();
   const { annoncer } = useNotifications();
-  const [statut, setStatut] = useState("conflit");
+  const [parametres] = useSearchParams();
+  const [statut, setStatut] = useState(() => parametres.get("statut") ?? "conflit");
   const saisies = useQuery({
     queryKey: ["saisies-mobiles", statut],
     queryFn: async () => (await requete<PageApi<Saisie>>("GET", construireChemin("/api/gestion/personnel/saisies", { statut, taille: 200 }))).results,

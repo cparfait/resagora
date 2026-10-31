@@ -572,13 +572,15 @@ def emettre_avoir(facture: PieceComptable, *, acteur: Any, motif: str, lignes: l
 # --- Annulations : avoir des séances facturées, frais tardifs (RG-08, TAR-08) ------------------------------
 
 
-def _base_seance(occurrence: Occurrence) -> tuple[int, int, int, str]:
-    """(référence, dû, taux de réduction, fondement) de la séance : lignes du devis accepté (RG-04) ou tarif en vigueur."""
+def base_seance(occurrence: Occurrence) -> tuple[int, int, int, str]:
+    """(référence, dû, taux de réduction, fondement) de l'occupation d'une séance : lignes d'occupation et de
+    majoration du devis accepté (RG-04), sinon tarif en vigueur. Les prestations (matériel) n'en font pas partie."""
     dossier = occurrence.reservation.dossier
     devis = devis_accepte(dossier)
     lignes: list[LigneCalculee] | list[LigneComptable]
-    if devis is not None and devis.lignes.filter(occurrence=occurrence).exists():
-        lignes = list(devis.lignes.filter(occurrence=occurrence))
+    du_devis = devis.lignes.filter(occurrence=occurrence, nature__in=["occupation", "majoration"]) if devis else None
+    if du_devis is not None and du_devis.exists():
+        lignes = list(du_devis)
     else:
         lignes = calculer_seance(
             espace=occurrence.espace,
@@ -592,17 +594,27 @@ def _base_seance(occurrence: Occurrence) -> tuple[int, int, int, str]:
     return reference, du, (lignes[0].taux_reduction if lignes else 0), (lignes[0].fondement if lignes else "")
 
 
+def _heures_avant(occurrence: Occurrence) -> int:
+    assert occurrence.annulee_le is not None
+    return max(0, int((occurrence.debut - occurrence.annulee_le).total_seconds() // 3600))
+
+
+def taux_frais_annulation(occurrence: Occurrence) -> int:
+    """Taux des frais (dix-millièmes) d'une annulation tardive selon le barème ; 0 si l'annulation n'est pas tardive."""
+    if not occurrence.annulation_tardive or occurrence.annulee_le is None:
+        return 0
+    heures_avant = _heures_avant(occurrence)
+    bareme = sorted(parametre("annulation.bareme"), key=lambda p: p["heures_avant"], reverse=True)
+    return next((int(p["taux"]) for p in bareme if heures_avant >= int(p["heures_avant"])), 0)
+
+
 def frais_annulation(occurrence: Occurrence) -> AFacturer | None:
     """RG-08, TAR-08 : frais d'une annulation tardive selon le barème (délai avant la séance → taux), calculés sur les
     prix du devis accepté ; la gratuité éventuelle et son fondement sont conservés (valorisation)."""
-    if not occurrence.annulation_tardive or occurrence.annulee_le is None:
-        return None
-    heures_avant = max(0, int((occurrence.debut - occurrence.annulee_le).total_seconds() // 3600))
-    bareme = sorted(parametre("annulation.bareme"), key=lambda p: p["heures_avant"], reverse=True)
-    taux_frais = next((int(p["taux"]) for p in bareme if heures_avant >= int(p["heures_avant"])), 0)
+    taux_frais = taux_frais_annulation(occurrence)
     if taux_frais == 0:
         return None
-    reference_seance, du_seance, taux_reduction, fondement = _base_seance(occurrence)
+    reference_seance, du_seance, taux_reduction, fondement = base_seance(occurrence)
     reference = appliquer_taux(reference_seance, taux_frais)
     du = appliquer_taux(du_seance, taux_frais)
     if du == 0 and reference == 0:
@@ -617,7 +629,7 @@ def frais_annulation(occurrence: Occurrence) -> AFacturer | None:
             "montant_reference": reference,
             "taux_reduction": taux_reduction,
             "montant_du": du,
-            "fondement": f"Barème d'annulation : annulée {heures_avant} h avant la séance"
+            "fondement": f"Barème d'annulation : annulée {_heures_avant(occurrence)} h avant la séance"
             + (f" ; {fondement}" if fondement else ""),
         },
     )

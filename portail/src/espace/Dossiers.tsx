@@ -61,6 +61,7 @@ export function TableauDeBord() {
             ) : null}
             <Link to="/espace/dossiers">Toutes mes demandes</Link>
             <Link to="/espace/campagnes">Créneaux de la saison (campagne annuelle)</Link>
+            {structures.data?.some((s) => s.type === "association") ? <Link to="/espace/attestations">Attestations de valorisation</Link> : null}
           </p>
         </section>
         <section aria-labelledby="titre-pieces">

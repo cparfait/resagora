@@ -1,6 +1,7 @@
 /** DOC-01 modèles versionnés (Word), DOC-06 génération en lot avec progression et rapport d'erreurs. */
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
+import { Link } from "react-router";
 import { construireChemin, ErreurApi, requete, telecharger, type Page as PageApi } from "../../api/http";
 import { useSession } from "../../auth/session";
 import { Badge } from "../../ui/Badge";
@@ -288,6 +289,49 @@ export function LotsDocuments() {
                 ) : (
                   "Aucune"
                 ),
+            },
+          ]}
+        />
+      ) : null}
+    </Page>
+  );
+}
+
+interface DocumentAControler {
+  id: number;
+  numero: string;
+  titre: string;
+  dossier: number | null;
+  dossier_numero: string | null;
+  usager_nom: string | null;
+  statut: string;
+}
+
+/** SIG-05, DSH-06 : scans signés déposés par les usagers, en attente du constat d'un agent (depuis le tableau de bord). */
+export function DocumentsAControler() {
+  const { peut } = useSession();
+  const documents = useQuery({
+    queryKey: ["documents-a-controler"],
+    queryFn: async () => (await requete<PageApi<DocumentAControler>>("GET", construireChemin("/api/gestion/documents/documents", { statut: "scan_a_controler", taille: 200 }))).results,
+    enabled: peut("lire_document"),
+  });
+  return (
+    <Page titre="Documents signés à contrôler" description="Exemplaires signés à la main et déposés par les usagers : le constat se fait depuis la fiche du dossier.">
+      {documents.isPending ? <Chargement /> : null}
+      {documents.isError ? <Erreur erreur={documents.error} /> : null}
+      {documents.data ? (
+        <Tableau<DocumentAControler>
+          legende="Scans en attente de contrôle"
+          lignes={documents.data}
+          cleLigne={(d) => d.id}
+          messageVide="Aucun document à contrôler."
+          colonnes={[
+            { cle: "numero", titre: "Document", rendu: (d) => `${d.numero} — ${d.titre}` },
+            { cle: "usager", titre: "Usager", rendu: (d) => d.usager_nom ?? "—" },
+            {
+              cle: "dossier",
+              titre: "Dossier",
+              rendu: (d) => (d.dossier ? <Link to={`/reservations/dossiers/${d.dossier}`}>Ouvrir le dossier {d.dossier_numero}</Link> : "—"),
             },
           ]}
         />

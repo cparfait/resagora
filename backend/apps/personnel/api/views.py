@@ -189,7 +189,7 @@ class VueBesoins(VuePerimetre):
         from apps.referentiel.models import Site
 
         donnees = request.data if isinstance(request.data, dict) else {}
-        site = Site.objects.filter(pk=int(donnees.get("site") or 0)).first() if str(donnees.get("site", "")).isdigit() else None
+        site = Site.objects.filter(pk=int(donnees.get("site") or 0)).first() if str(donnees.get("site", "")).isdecimal() else None
         try:
             du, au = date.fromisoformat(str(donnees.get("du"))), date.fromisoformat(str(donnees.get("au")))
         except ValueError as erreur:
@@ -307,8 +307,8 @@ class VueVacations(VuePerimetre):
             du, au = date.fromisoformat(p.get("du", "")), date.fromisoformat(p.get("au", ""))
         except ValueError as erreur:
             raise ErreurValidation("Dates au format AAAA-MM-JJ attendues.", code="dates_invalides") from erreur
-        agent = Agent.objects.filter(pk=int(p["agent"])).first() if p.get("agent", "").isdigit() else None
-        site = Site.objects.filter(pk=int(p["site"])).first() if p.get("site", "").isdigit() else None
+        agent = Agent.objects.filter(pk=int(p["agent"])).first() if p.get("agent", "").isdecimal() else None
+        site = Site.objects.filter(pk=int(p["site"])).first() if p.get("site", "").isdecimal() else None
         if (p.get("agent") and agent is None) or (p.get("site") and site is None):
             raise NotFound()
         pdf = services.planning_pdf(

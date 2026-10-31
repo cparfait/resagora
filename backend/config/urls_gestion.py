@@ -22,6 +22,8 @@ gestion = [
     path("", include("apps.finances.api.urls")),
     path("", include("apps.personnel.api.urls")),
     path("", include("apps.materiel.api.urls")),
+    path("", include("apps.valorisation.api")),
+    path("", include("apps.pilotage.urls")),
     path("parametres", VueParametres.as_view(), name="parametres"),
     *routeur.urls,
 ]

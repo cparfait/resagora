@@ -238,4 +238,12 @@ test.describe.serial("Lot 2 — parcours d'une association", () => {
     await expect(page.getByText(/^FR76/)).toBeVisible();
     await sansViolationAxe(page, "mes factures");
   });
+
+  test("VAL-04 @a11y la page des attestations de valorisation est accessible et explique quand l'attestation arrive", async ({ page }) => {
+    await connecterUsager(page);
+    await page.getByRole("link", { name: "Attestations de valorisation" }).click();
+    await expect(page.getByRole("heading", { level: 1, name: "Attestations de valorisation" })).toBeVisible();
+    await expect(page.getByText(/déposée ici après la clôture de l'exercice/)).toBeVisible();
+    await sansViolationAxe(page, "les attestations de valorisation");
+  });
 });

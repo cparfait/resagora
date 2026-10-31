@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from django.db.models import QuerySet
 from django.http import FileResponse, Http404
+from drf_spectacular.utils import extend_schema
 from rest_framework import generics, serializers
 from rest_framework.request import Request
 
@@ -120,7 +121,7 @@ class VueEspacesPublics(VuePublique, generics.ListAPIView):
     def get_queryset(self) -> QuerySet[Espace]:
         qs = espaces_publics()
         capacite = self.request.query_params.get("capacite_min", "")
-        if capacite.isdigit():
+        if capacite.isdecimal():
             qs = qs.filter(capacite__gte=int(capacite))
         recherche = self.request.query_params.get("recherche", "").strip()[:80]
         if recherche:
@@ -138,6 +139,7 @@ class VueEspacePublic(VuePublique, generics.RetrieveAPIView):
 class VuePhotoPublique(VuePublique):
     """Photo d'un espace publié (affichée dans la page : `inline`)."""
 
+    @extend_schema(responses={(200, "image/jpeg"): bytes})
     def get(self, request: Request, pk: int, photo: int) -> FileResponse:
         trouvee = (
             PhotoEspace.objects.filter(pk=photo, espace__in=espaces_publics().filter(pk=pk)).select_related("fichier").first()
@@ -152,6 +154,7 @@ class VuePhotoPublique(VuePublique):
 class VueDocumentPublic(VuePublique):
     """Règlement, plan ou consignes d'un espace publié (REF-08)."""
 
+    @extend_schema(responses={(200, "application/pdf"): bytes})
     def get(self, request: Request, pk: int, document: int) -> FileResponse:
         trouve = (
             DocumentEspace.objects.filter(pk=document, public=True, espace__in=espaces_publics().filter(pk=pk))

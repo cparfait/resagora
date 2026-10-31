@@ -43,7 +43,7 @@ describe("Planning du personnel", () => {
     });
     const utilisateur = userEvent.setup();
     afficher(<Vacations />);
-    expect(await screen.findByRole("heading", { name: /Besoins non couverts \(1\)/ })).toBeInTheDocument();
+    expect(await screen.findByRole("heading", { name: /Besoins non couverts de la semaine \(1\)/ })).toBeInTheDocument();
     await utilisateur.click(await screen.findByRole("button", { name: /Affecter un agent/ }));
     const dialogue = await screen.findByRole("dialog", { name: "Affecter un agent" });
     expect(within(dialogue).getByText("Plus de 48 h dans la semaine.")).toBeInTheDocument();

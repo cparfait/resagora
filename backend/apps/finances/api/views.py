@@ -395,7 +395,7 @@ class VuePieces(VuePerimetre):
 
     def _piece(self) -> PieceComptable:
         identifiant = str(self.kwargs.get("pk", ""))
-        piece = self.get_queryset().filter(pk=identifiant).first() if identifiant.isdigit() else None
+        piece = self.get_queryset().filter(pk=identifiant).first() if identifiant.isdecimal() else None
         if piece is None:
             raise NotFound()
         return piece

@@ -4414,6 +4414,40 @@ paths:
               schema:
                 $ref: '#/components/schemas/Materiel'
           description: ''
+  /api/gestion/materiel/catalogue/{id}/tarif:
+    post:
+      operationId: gestion_materiel_catalogue_tarif_create
+      description: Valeur de référence et prestation facturée, fixées par l'ordonnateur
+        (séparation des tâches, ADR 0005).
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un(une) valeur entière unique identifiant ce(cette) matériel.
+        required: true
+      tags:
+      - gestion
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TarifMaterielRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/TarifMaterielRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/TarifMaterielRequest'
+      security:
+      - sessionAgent: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Materiel'
+          description: ''
   /api/gestion/materiel/controles:
     get:
       operationId: gestion_materiel_controles_list
@@ -4796,8 +4830,70 @@ paths:
           description: ''
     post:
       operationId: gestion_materiel_prets_create
-      description: 'MAT-02, MAT-03 : prêts rattachés aux dossiers (site du matériel
-        dans le périmètre).'
+      description: Un prêt par séance à venir de la réservation choisie, ou pour une
+        séance, ou sur une période du dossier.
+      parameters:
+      - in: query
+        name: debut__gte
+        schema:
+          type: string
+          format: date-time
+      - in: query
+        name: debut__lt
+        schema:
+          type: string
+          format: date-time
+      - in: query
+        name: dossier
+        schema:
+          type: integer
+      - name: page
+        required: false
+        in: query
+        description: Un numéro de page de l'ensemble des résultats.
+        schema:
+          type: integer
+      - in: query
+        name: statut
+        schema:
+          type: string
+          enum:
+          - annulee
+          - demandee
+          - refusee
+          - rendue
+          - sortie
+          - validee
+        description: |-
+          * `demandee` - Demandée
+          * `validee` - Validée
+          * `sortie` - Sortie (remise à l'usager)
+          * `rendue` - Rendue
+          * `refusee` - Refusée
+          * `annulee` - Annulée
+      - in: query
+        name: statut__in
+        schema:
+          type: array
+          items:
+            type: string
+        description: Les valeurs multiples doivent être séparées par des virgules.
+        explode: false
+        style: form
+      - in: query
+        name: stock__materiel
+        schema:
+          type: integer
+      - in: query
+        name: stock__site
+        schema:
+          type: integer
+      - name: taille
+        required: false
+        in: query
+        description: Nombre de résultats à retourner par page.
+        schema:
+          type: integer
       tags:
       - gestion
       requestBody:
@@ -4819,7 +4915,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Pret'
+                $ref: '#/components/schemas/PaginatedPretList'
           description: ''
   /api/gestion/materiel/prets/{id}:
     get:
@@ -4871,6 +4967,42 @@ paths:
           multipart/form-data:
             schema:
               $ref: '#/components/schemas/MotifPretRequest'
+        required: true
+      security:
+      - sessionAgent: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Pret'
+          description: ''
+  /api/gestion/materiel/prets/{id}/regler-manquants:
+    post:
+      operationId: gestion_materiel_prets_regler_manquants_create
+      description: 'Décision du service sur les manquants (retenue proposée, prise
+        en charge) : débloque la caution.'
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un(une) valeur entière unique identifiant ce(cette) reservation
+          materiel.
+        required: true
+      tags:
+      - gestion
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DecisionRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/DecisionRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/DecisionRequest'
         required: true
       security:
       - sessionAgent: []
@@ -7269,6 +7401,383 @@ paths:
               schema:
                 type: string
                 format: binary
+          description: ''
+  /api/gestion/pilotage/a-traiter:
+    get:
+      operationId: gestion_pilotage_a_traiter_retrieve
+      description: 'DSH-01 à DSH-03 : compteurs du jour et alertes, chacun avec le
+        lien de sa liste filtrée (DSH-06).'
+      tags:
+      - gestion
+      security:
+      - sessionAgent: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+  /api/gestion/pilotage/direction:
+    get:
+      operationId: gestion_pilotage_direction_retrieve
+      description: 'DSH-04 : indicateurs annuels de la direction comparés à l''année
+        précédente, tendance mensuelle.'
+      parameters:
+      - in: query
+        name: annee
+        schema:
+          type: integer
+      tags:
+      - gestion
+      security:
+      - sessionAgent: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+  /api/gestion/pilotage/envois-planning:
+    get:
+      operationId: gestion_pilotage_envois_planning_list
+      description: 'IMP-04 : envois hebdomadaires programmés du planning.'
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: Un numéro de page de l'ensemble des résultats.
+        schema:
+          type: integer
+      - name: taille
+        required: false
+        in: query
+        description: Nombre de résultats à retourner par page.
+        schema:
+          type: integer
+      tags:
+      - gestion
+      security:
+      - sessionAgent: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedEnvoiList'
+          description: ''
+    post:
+      operationId: gestion_pilotage_envois_planning_create
+      description: 'IMP-04 : envois hebdomadaires programmés du planning.'
+      tags:
+      - gestion
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EnvoiRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/EnvoiRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/EnvoiRequest'
+        required: true
+      security:
+      - sessionAgent: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Envoi'
+          description: ''
+  /api/gestion/pilotage/envois-planning/{id}:
+    get:
+      operationId: gestion_pilotage_envois_planning_retrieve
+      description: 'IMP-04 : envois hebdomadaires programmés du planning.'
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un(une) valeur entière unique identifiant ce(cette) envoi programme.
+        required: true
+      tags:
+      - gestion
+      security:
+      - sessionAgent: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Envoi'
+          description: ''
+    patch:
+      operationId: gestion_pilotage_envois_planning_partial_update
+      description: 'IMP-04 : envois hebdomadaires programmés du planning.'
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un(une) valeur entière unique identifiant ce(cette) envoi programme.
+        required: true
+      tags:
+      - gestion
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedEnvoiRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedEnvoiRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedEnvoiRequest'
+      security:
+      - sessionAgent: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Envoi'
+          description: ''
+    delete:
+      operationId: gestion_pilotage_envois_planning_destroy
+      description: 'IMP-04 : envois hebdomadaires programmés du planning.'
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un(une) valeur entière unique identifiant ce(cette) envoi programme.
+        required: true
+      tags:
+      - gestion
+      security:
+      - sessionAgent: []
+      responses:
+        '204':
+          description: No response body
+  /api/gestion/pilotage/feuille-de-salle.pdf:
+    get:
+      operationId: gestion_pilotage_feuille_de_salle.pdf_retrieve
+      description: 'IMP-03 : feuille de la semaine à afficher en salle, avec QR code
+        vers la page de l''équipement.'
+      parameters:
+      - in: query
+        name: espace
+        schema:
+          type: integer
+      - in: query
+        name: jour
+        schema:
+          type: string
+      tags:
+      - gestion
+      security:
+      - sessionAgent: []
+      responses:
+        '200':
+          content:
+            application/pdf:
+              schema:
+                type: string
+                format: binary
+          description: ''
+  /api/gestion/pilotage/planning.pdf:
+    get:
+      operationId: gestion_pilotage_planning.pdf_retrieve
+      description: 'IMP-01 : planning d''un espace ou d''un site, A4 ou A3.'
+      parameters:
+      - in: query
+        name: au
+        schema:
+          type: string
+      - in: query
+        name: du
+        schema:
+          type: string
+      - in: query
+        name: espace
+        schema:
+          type: string
+      - in: query
+        name: papier
+        schema:
+          type: string
+      - in: query
+        name: site
+        schema:
+          type: string
+      tags:
+      - gestion
+      security:
+      - sessionAgent: []
+      responses:
+        '200':
+          content:
+            application/pdf:
+              schema:
+                type: string
+                format: binary
+          description: ''
+  /api/gestion/pilotage/statistiques/occupation:
+    get:
+      operationId: gestion_pilotage_statistiques_occupation_retrieve
+      description: 'STA-01 : taux d''occupation par espace et par site sur la période.'
+      parameters:
+      - in: query
+        name: au
+        schema:
+          type: string
+      - in: query
+        name: du
+        schema:
+          type: string
+      - in: query
+        name: espace
+        schema:
+          type: string
+      - in: query
+        name: export
+        schema:
+          type: string
+      - in: query
+        name: site
+        schema:
+          type: string
+      tags:
+      - gestion
+      security:
+      - sessionAgent: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+  /api/gestion/pilotage/statistiques/personnel:
+    get:
+      operationId: gestion_pilotage_statistiques_personnel_retrieve
+      description: 'STA-05 : heures planifiées, réalisées, supplémentaires, de nuit,
+        dimanches et fériés, astreintes.'
+      parameters:
+      - in: query
+        name: au
+        schema:
+          type: string
+      - in: query
+        name: du
+        schema:
+          type: string
+      - in: query
+        name: espace
+        schema:
+          type: string
+      - in: query
+        name: export
+        schema:
+          type: string
+      - in: query
+        name: site
+        schema:
+          type: string
+      tags:
+      - gestion
+      security:
+      - sessionAgent: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+  /api/gestion/pilotage/statistiques/recettes:
+    get:
+      operationId: gestion_pilotage_statistiques_recettes_retrieve
+      description: 'STA-03 : recettes, gratuités et réductions, concours en nature
+        valorisés.'
+      parameters:
+      - in: query
+        name: au
+        schema:
+          type: string
+      - in: query
+        name: du
+        schema:
+          type: string
+      - in: query
+        name: espace
+        schema:
+          type: string
+      - in: query
+        name: export
+        schema:
+          type: string
+      - in: query
+        name: site
+        schema:
+          type: string
+      tags:
+      - gestion
+      security:
+      - sessionAgent: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+  /api/gestion/pilotage/statistiques/repartition:
+    get:
+      operationId: gestion_pilotage_statistiques_repartition_retrieve
+      description: 'STA-02 : heures par type d''usager, activité et famille d''espaces.'
+      parameters:
+      - in: query
+        name: au
+        schema:
+          type: string
+      - in: query
+        name: du
+        schema:
+          type: string
+      - in: query
+        name: espace
+        schema:
+          type: string
+      - in: query
+        name: export
+        schema:
+          type: string
+      - in: query
+        name: site
+        schema:
+          type: string
+      tags:
+      - gestion
+      security:
+      - sessionAgent: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
           description: ''
   /api/gestion/referentiel/batiments:
     get:
@@ -11892,6 +12401,618 @@ paths:
                 type: object
                 additionalProperties: {}
           description: ''
+  /api/gestion/valorisation/exercices:
+    get:
+      operationId: gestion_valorisation_exercices_list
+      description: 'VAL-02, VAL-05 à VAL-08 : exercices, calcul, clôture, synthèse
+        avec alertes de seuil, annexe, simulation.'
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: Un numéro de page de l'ensemble des résultats.
+        schema:
+          type: integer
+      - name: taille
+        required: false
+        in: query
+        description: Nombre de résultats à retourner par page.
+        schema:
+          type: integer
+      tags:
+      - gestion
+      security:
+      - sessionAgent: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedExerciceList'
+          description: ''
+    post:
+      operationId: gestion_valorisation_exercices_create
+      description: 'VAL-02, VAL-05 à VAL-08 : exercices, calcul, clôture, synthèse
+        avec alertes de seuil, annexe, simulation.'
+      tags:
+      - gestion
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExerciceRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ExerciceRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ExerciceRequest'
+        required: true
+      security:
+      - sessionAgent: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Exercice'
+          description: ''
+  /api/gestion/valorisation/exercices/{id}:
+    get:
+      operationId: gestion_valorisation_exercices_retrieve
+      description: 'VAL-02, VAL-05 à VAL-08 : exercices, calcul, clôture, synthèse
+        avec alertes de seuil, annexe, simulation.'
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un(une) valeur entière unique identifiant ce(cette) exercice.
+        required: true
+      tags:
+      - gestion
+      security:
+      - sessionAgent: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Exercice'
+          description: ''
+    patch:
+      operationId: gestion_valorisation_exercices_partial_update
+      description: 'VAL-02, VAL-05 à VAL-08 : exercices, calcul, clôture, synthèse
+        avec alertes de seuil, annexe, simulation.'
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un(une) valeur entière unique identifiant ce(cette) exercice.
+        required: true
+      tags:
+      - gestion
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedExerciceRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedExerciceRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedExerciceRequest'
+      security:
+      - sessionAgent: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Exercice'
+          description: ''
+  /api/gestion/valorisation/exercices/{id}/annexe:
+    get:
+      operationId: gestion_valorisation_exercices_annexe_retrieve
+      description: 'VAL-05 : état annexé au compte administratif (tableur).'
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un(une) valeur entière unique identifiant ce(cette) exercice.
+        required: true
+      tags:
+      - gestion
+      security:
+      - sessionAgent: []
+      responses:
+        '200':
+          content:
+            text/csv:
+              schema:
+                type: string
+                format: binary
+          description: ''
+  /api/gestion/valorisation/exercices/{id}/calculer:
+    post:
+      operationId: gestion_valorisation_exercices_calculer_create
+      description: Calcul d'un bénéficiaire (nouvelle version), ou de tous ; refusé
+        sur un exercice clos (VAL-08).
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un(une) valeur entière unique identifiant ce(cette) exercice.
+        required: true
+      tags:
+      - gestion
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                usager:
+                  type: integer
+      security:
+      - sessionAgent: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+  /api/gestion/valorisation/exercices/{id}/cloturer:
+    post:
+      operationId: gestion_valorisation_exercices_cloturer_create
+      description: 'VAL-02, VAL-05 à VAL-08 : exercices, calcul, clôture, synthèse
+        avec alertes de seuil, annexe, simulation.'
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un(une) valeur entière unique identifiant ce(cette) exercice.
+        required: true
+      tags:
+      - gestion
+      security:
+      - sessionAgent: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Exercice'
+          description: ''
+  /api/gestion/valorisation/exercices/{id}/simulation:
+    get:
+      operationId: gestion_valorisation_exercices_simulation_retrieve
+      description: 'VAL-07 : simulation en cours d''année (rien n''est enregistré).'
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un(une) valeur entière unique identifiant ce(cette) exercice.
+        required: true
+      - in: query
+        name: jusqu_au
+        schema:
+          type: string
+      - in: query
+        name: usager
+        schema:
+          type: integer
+      tags:
+      - gestion
+      security:
+      - sessionAgent: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+  /api/gestion/valorisation/exercices/{id}/subventions:
+    post:
+      operationId: gestion_valorisation_exercices_subventions_create
+      description: 'VAL-06 : import des subventions en numéraire (CSV issu du logiciel
+        financier).'
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un(une) valeur entière unique identifiant ce(cette) exercice.
+        required: true
+      tags:
+      - gestion
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                fichier:
+                  type: string
+                  format: binary
+      security:
+      - sessionAgent: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+  /api/gestion/valorisation/exercices/{id}/synthese:
+    get:
+      operationId: gestion_valorisation_exercices_synthese_retrieve
+      description: 'VAL-05, VAL-06 : par bénéficiaire, concours en nature et en numéraire,
+        alertes de seuil.'
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un(une) valeur entière unique identifiant ce(cette) exercice.
+        required: true
+      tags:
+      - gestion
+      security:
+      - sessionAgent: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+  /api/gestion/valorisation/methodes:
+    get:
+      operationId: gestion_valorisation_methodes_list
+      description: 'VAL-01 : méthode par famille d''espaces et par exercice.'
+      parameters:
+      - in: query
+        name: exercice
+        schema:
+          type: integer
+      - in: query
+        name: famille
+        schema:
+          type: integer
+      - name: page
+        required: false
+        in: query
+        description: Un numéro de page de l'ensemble des résultats.
+        schema:
+          type: integer
+      - name: taille
+        required: false
+        in: query
+        description: Nombre de résultats à retourner par page.
+        schema:
+          type: integer
+      tags:
+      - gestion
+      security:
+      - sessionAgent: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedMethodeList'
+          description: ''
+    post:
+      operationId: gestion_valorisation_methodes_create
+      description: 'VAL-01 : méthode par famille d''espaces et par exercice.'
+      tags:
+      - gestion
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MethodeRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/MethodeRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/MethodeRequest'
+        required: true
+      security:
+      - sessionAgent: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Methode'
+          description: ''
+  /api/gestion/valorisation/methodes/{id}:
+    get:
+      operationId: gestion_valorisation_methodes_retrieve
+      description: 'VAL-01 : méthode par famille d''espaces et par exercice.'
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un(une) valeur entière unique identifiant ce(cette) methode valorisation.
+        required: true
+      tags:
+      - gestion
+      security:
+      - sessionAgent: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Methode'
+          description: ''
+    patch:
+      operationId: gestion_valorisation_methodes_partial_update
+      description: 'VAL-01 : méthode par famille d''espaces et par exercice.'
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un(une) valeur entière unique identifiant ce(cette) methode valorisation.
+        required: true
+      tags:
+      - gestion
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedMethodeRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedMethodeRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedMethodeRequest'
+      security:
+      - sessionAgent: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Methode'
+          description: ''
+  /api/gestion/valorisation/subventions:
+    get:
+      operationId: gestion_valorisation_subventions_list
+      description: 'VAL-06 : subventions en numéraire (importées ou saisies).'
+      parameters:
+      - in: query
+        name: exercice
+        schema:
+          type: integer
+      - name: page
+        required: false
+        in: query
+        description: Un numéro de page de l'ensemble des résultats.
+        schema:
+          type: integer
+      - name: taille
+        required: false
+        in: query
+        description: Nombre de résultats à retourner par page.
+        schema:
+          type: integer
+      - in: query
+        name: usager
+        schema:
+          type: integer
+      tags:
+      - gestion
+      security:
+      - sessionAgent: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedSubventionList'
+          description: ''
+    post:
+      operationId: gestion_valorisation_subventions_create
+      description: 'VAL-06 : subventions en numéraire (importées ou saisies).'
+      tags:
+      - gestion
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SubventionRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/SubventionRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/SubventionRequest'
+        required: true
+      security:
+      - sessionAgent: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Subvention'
+          description: ''
+  /api/gestion/valorisation/subventions/{id}:
+    get:
+      operationId: gestion_valorisation_subventions_retrieve
+      description: 'VAL-06 : subventions en numéraire (importées ou saisies).'
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un(une) valeur entière unique identifiant ce(cette) subvention
+          numeraire.
+        required: true
+      tags:
+      - gestion
+      security:
+      - sessionAgent: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Subvention'
+          description: ''
+  /api/gestion/valorisation/valorisations:
+    get:
+      operationId: gestion_valorisation_valorisations_list
+      description: 'VAL-02, VAL-04, VAL-08 : versions calculées, détail des lignes,
+        attestation, recalcul après clôture.'
+      parameters:
+      - in: query
+        name: actuelle
+        schema:
+          type: boolean
+      - in: query
+        name: exercice
+        schema:
+          type: integer
+      - name: page
+        required: false
+        in: query
+        description: Un numéro de page de l'ensemble des résultats.
+        schema:
+          type: integer
+      - name: taille
+        required: false
+        in: query
+        description: Nombre de résultats à retourner par page.
+        schema:
+          type: integer
+      - in: query
+        name: usager
+        schema:
+          type: integer
+      tags:
+      - gestion
+      security:
+      - sessionAgent: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedValorisationList'
+          description: ''
+    post:
+      operationId: gestion_valorisation_valorisations_create
+      description: 'VAL-02, VAL-04, VAL-08 : versions calculées, détail des lignes,
+        attestation, recalcul après clôture.'
+      tags:
+      - gestion
+      security:
+      - sessionAgent: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Valorisation'
+          description: ''
+  /api/gestion/valorisation/valorisations/{id}:
+    get:
+      operationId: gestion_valorisation_valorisations_retrieve
+      description: 'VAL-02, VAL-04, VAL-08 : versions calculées, détail des lignes,
+        attestation, recalcul après clôture.'
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un(une) valeur entière unique identifiant ce(cette) valorisation.
+        required: true
+      tags:
+      - gestion
+      security:
+      - sessionAgent: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Valorisation'
+          description: ''
+  /api/gestion/valorisation/valorisations/{id}/attestation:
+    post:
+      operationId: gestion_valorisation_valorisations_attestation_create
+      description: 'VAL-04 : attestation PDF/A de la version actuelle, déposée sur
+        le portail de l''association.'
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un(une) valeur entière unique identifiant ce(cette) valorisation.
+        required: true
+      tags:
+      - gestion
+      security:
+      - sessionAgent: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Valorisation'
+          description: ''
+  /api/gestion/valorisation/valorisations/{id}/recalculer:
+    post:
+      operationId: gestion_valorisation_valorisations_recalculer_create
+      description: 'VAL-08 : procédure tracée de recalcul d''un exercice clos (motif
+        obligatoire).'
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un(une) valeur entière unique identifiant ce(cette) valorisation.
+        required: true
+      tags:
+      - gestion
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                motif:
+                  type: string
+      security:
+      - sessionAgent: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Valorisation'
+          description: ''
   /api/mobile/auth/connexion:
     post:
       operationId: mobile_auth_connexion_create
@@ -13159,23 +14280,13 @@ components:
           maxLength: 300
       required:
       - accepter
-    DecisionEnum:
-      enum:
-      - attribuer
-      - refuser
-      type: string
-      description: |-
-        * `attribuer` - attribuer
-        * `refuser` - refuser
     DecisionRequest:
       type: object
       properties:
         decision:
-          $ref: '#/components/schemas/DecisionEnum'
-        motif:
           type: string
-          default: ''
-          maxLength: 300
+          minLength: 1
+          maxLength: 250
       required:
       - decision
     DefiMobileRequest:
@@ -13588,6 +14699,58 @@ components:
       - materiel
       - quantite
       - site
+    Envoi:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        libelle:
+          type: string
+          maxLength: 150
+        site:
+          type: integer
+          nullable: true
+        espace:
+          type: integer
+          nullable: true
+        cible:
+          type: string
+          readOnly: true
+        destinataires:
+          type: array
+          items:
+            type: string
+            format: email
+          maxItems: 30
+        jour_semaine:
+          allOf:
+          - $ref: '#/components/schemas/JourSemaineEnum'
+          minimum: 0
+          maximum: 32767
+        heure:
+          type: string
+          format: time
+        format_papier:
+          $ref: '#/components/schemas/FormatPapierEnum'
+        actif:
+          type: boolean
+        prochain_envoi_le:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        dernier_envoi_le:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+      required:
+      - cible
+      - dernier_envoi_le
+      - id
+      - libelle
+      - prochain_envoi_le
     EnvoiGroupeRequest:
       type: object
       properties:
@@ -13620,6 +14783,46 @@ components:
       required:
       - texte
       - titre
+    EnvoiRequest:
+      type: object
+      properties:
+        libelle:
+          type: string
+          minLength: 1
+          maxLength: 150
+        site:
+          type: integer
+          nullable: true
+        espace:
+          type: integer
+          nullable: true
+        destinataires:
+          type: array
+          items:
+            type: string
+            format: email
+            minLength: 1
+          maxItems: 30
+        destinataires_texte:
+          type: string
+          writeOnly: true
+          minLength: 1
+          description: Une adresse par ligne (saisie du formulaire).
+          maxLength: 3000
+        jour_semaine:
+          allOf:
+          - $ref: '#/components/schemas/JourSemaineEnum'
+          minimum: 0
+          maximum: 32767
+        heure:
+          type: string
+          format: time
+        format_papier:
+          $ref: '#/components/schemas/FormatPapierEnum'
+        actif:
+          type: boolean
+      required:
+      - libelle
     EnvoiSignatureModeEnum:
       enum:
       - docuseal
@@ -13867,6 +15070,59 @@ components:
       description: |-
         * `conforme` - Conforme
         * `degats` - Dégâts constatés
+    Exercice:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        annee:
+          type: integer
+          maximum: 32767
+          minimum: 0
+        statut:
+          allOf:
+          - $ref: '#/components/schemas/ExerciceStatutEnum'
+          readOnly: true
+        date_limite_attestations:
+          type: string
+          format: date
+          nullable: true
+          description: Date avant laquelle les attestations sont déposées sur le portail
+            (VAL-04).
+        cloture_le:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+      required:
+      - annee
+      - cloture_le
+      - id
+      - statut
+    ExerciceRequest:
+      type: object
+      properties:
+        annee:
+          type: integer
+          maximum: 32767
+          minimum: 0
+        date_limite_attestations:
+          type: string
+          format: date
+          nullable: true
+          description: Date avant laquelle les attestations sont déposées sur le portail
+            (VAL-04).
+      required:
+      - annee
+    ExerciceStatutEnum:
+      enum:
+      - ouvert
+      - cloture
+      type: string
+      description: |-
+        * `ouvert` - Ouvert
+        * `cloture` - Clôturé
     ExportFormatEnum:
       enum:
       - csv
@@ -13987,6 +15243,14 @@ components:
       - debut
       - fin
       - motif
+    FormatPapierEnum:
+      enum:
+      - A4
+      - A3
+      type: string
+      description: |-
+        * `A4` - A4
+        * `A3` - A3
     GenerationRequest:
       type: object
       description: |-
@@ -15055,18 +16319,14 @@ components:
           maxLength: 30
         valeur_journaliere_centimes:
           type: integer
-          maximum: 2147483647
-          minimum: 0
+          readOnly: true
           title: Valeur de référence d'une journée de prêt (centimes)
         prestation_code:
+          type: string
+          readOnly: true
           description: Code de la prestation facturée (grille tarifaire), vide si
             gratuit.
-          oneOf:
-          - type: string
-            maxLength: 40
-            pattern: ^[-a-zA-Z0-9_]+$
-          - type: string
-            maxLength: 0
+          pattern: ^[-a-zA-Z0-9_]+$
         reservable:
           type: boolean
         propose_portail:
@@ -15091,6 +16351,8 @@ components:
       - code
       - id
       - libelle
+      - prestation_code
+      - valeur_journaliere_centimes
     MaterielNatureEnum:
       enum:
       - fixe
@@ -15121,20 +16383,6 @@ components:
           type: string
           minLength: 1
           maxLength: 30
-        valeur_journaliere_centimes:
-          type: integer
-          maximum: 2147483647
-          minimum: 0
-          title: Valeur de référence d'une journée de prêt (centimes)
-        prestation_code:
-          description: Code de la prestation facturée (grille tarifaire), vide si
-            gratuit.
-          oneOf:
-          - type: string
-            maxLength: 40
-            pattern: ^[-a-zA-Z0-9_]+$
-          - type: string
-            maxLength: 0
         reservable:
           type: boolean
         propose_portail:
@@ -15210,6 +16458,90 @@ components:
       required:
       - corps
       - dossier
+    Methode:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        exercice:
+          type: integer
+        famille:
+          type: integer
+        famille_libelle:
+          type: string
+          readOnly: true
+        methode:
+          $ref: '#/components/schemas/MethodeEnum'
+        cout_horaire_centimes:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+          nullable: true
+          description: Coût de revient d'une heure.
+        loyer_m2_annuel_centimes:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+          nullable: true
+          description: Valeur locative annuelle du m².
+        heures_annuelles_reference:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+          description: Heures d'ouverture annuelles servant à ramener la valeur locative
+            à l'heure.
+        deliberation_reference:
+          type: string
+          maxLength: 120
+      required:
+      - exercice
+      - famille
+      - famille_libelle
+      - id
+    MethodeEnum:
+      enum:
+      - tarif_reference
+      - cout_revient
+      - valeur_locative
+      type: string
+      description: |-
+        * `tarif_reference` - Tarif de référence voté
+        * `cout_revient` - Coût de revient horaire
+        * `valeur_locative` - Valeur locative
+    MethodeRequest:
+      type: object
+      properties:
+        exercice:
+          type: integer
+        famille:
+          type: integer
+        methode:
+          $ref: '#/components/schemas/MethodeEnum'
+        cout_horaire_centimes:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+          nullable: true
+          description: Coût de revient d'une heure.
+        loyer_m2_annuel_centimes:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+          nullable: true
+          description: Valeur locative annuelle du m².
+        heures_annuelles_reference:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+          description: Heures d'ouverture annuelles servant à ramener la valeur locative
+            à l'heure.
+        deliberation_reference:
+          type: string
+          maxLength: 120
+      required:
+      - exercice
+      - famille
     ModeleDocument:
       type: object
       properties:
@@ -16090,6 +17422,29 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Dossier'
+    PaginatedEnvoiList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Envoi'
     PaginatedEspaceList:
       type: object
       required:
@@ -16136,6 +17491,29 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/EtatDesLieux'
+    PaginatedExerciceList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Exercice'
     PaginatedFamilleEspaceList:
       type: object
       required:
@@ -16504,6 +17882,29 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Message'
+    PaginatedMethodeList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Methode'
     PaginatedMouvementStockList:
       type: object
       required:
@@ -16918,6 +18319,29 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/StockMateriel'
+    PaginatedSubventionList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Subvention'
     PaginatedTarifList:
       type: object
       required:
@@ -17033,6 +18457,29 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Vacation'
+    PaginatedValorisationList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Valorisation'
     PanneMateriel:
       type: object
       properties:
@@ -17290,6 +18737,44 @@ components:
           nullable: true
         observations:
           type: string
+    PatchedEnvoiRequest:
+      type: object
+      properties:
+        libelle:
+          type: string
+          minLength: 1
+          maxLength: 150
+        site:
+          type: integer
+          nullable: true
+        espace:
+          type: integer
+          nullable: true
+        destinataires:
+          type: array
+          items:
+            type: string
+            format: email
+            minLength: 1
+          maxItems: 30
+        destinataires_texte:
+          type: string
+          writeOnly: true
+          minLength: 1
+          description: Une adresse par ligne (saisie du formulaire).
+          maxLength: 3000
+        jour_semaine:
+          allOf:
+          - $ref: '#/components/schemas/JourSemaineEnum'
+          minimum: 0
+          maximum: 32767
+        heure:
+          type: string
+          format: time
+        format_papier:
+          $ref: '#/components/schemas/FormatPapierEnum'
+        actif:
+          type: boolean
     PatchedEspaceRequest:
       type: object
       properties:
@@ -17358,6 +18843,19 @@ components:
           title: Réservable depuis le portail
         actif:
           type: boolean
+    PatchedExerciceRequest:
+      type: object
+      properties:
+        annee:
+          type: integer
+          maximum: 32767
+          minimum: 0
+        date_limite_attestations:
+          type: string
+          format: date
+          nullable: true
+          description: Date avant laquelle les attestations sont déposées sur le portail
+            (VAL-04).
     PatchedFamilleEspaceRequest:
       type: object
       properties:
@@ -17552,20 +19050,6 @@ components:
           type: string
           minLength: 1
           maxLength: 30
-        valeur_journaliere_centimes:
-          type: integer
-          maximum: 2147483647
-          minimum: 0
-          title: Valeur de référence d'une journée de prêt (centimes)
-        prestation_code:
-          description: Code de la prestation facturée (grille tarifaire), vide si
-            gratuit.
-          oneOf:
-          - type: string
-            maxLength: 40
-            pattern: ^[-a-zA-Z0-9_]+$
-          - type: string
-            maxLength: 0
         reservable:
           type: boolean
         propose_portail:
@@ -17586,6 +19070,36 @@ components:
           description: 'Consommables : alerte sous ce stock.'
         actif:
           type: boolean
+    PatchedMethodeRequest:
+      type: object
+      properties:
+        exercice:
+          type: integer
+        famille:
+          type: integer
+        methode:
+          $ref: '#/components/schemas/MethodeEnum'
+        cout_horaire_centimes:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+          nullable: true
+          description: Coût de revient d'une heure.
+        loyer_m2_annuel_centimes:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+          nullable: true
+          description: Valeur locative annuelle du m².
+        heures_annuelles_reference:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+          description: Heures d'ouverture annuelles servant à ramener la valeur locative
+            à l'heure.
+        deliberation_reference:
+          type: string
+          maxLength: 120
     PatchedModeleDocumentRequest:
       type: object
       properties:
@@ -18543,6 +20057,11 @@ components:
         reservation:
           type: integer
           nullable: true
+        occurrence:
+          type: integer
+          nullable: true
+          description: 'Séance du prêt : le matériel suit ses horaires, son annulation
+            et sa facturation.'
         stock:
           type: integer
         materiel_libelle:
@@ -18579,6 +20098,11 @@ components:
         manquants:
           type: integer
           readOnly: true
+        manquants_regles:
+          type: boolean
+          readOnly: true
+          description: 'Le service a statué sur les manquants (retenue proposée ou
+            prise en charge) : la caution peut être restituée.'
         origine:
           allOf:
           - $ref: '#/components/schemas/PretOrigineEnum'
@@ -18603,6 +20127,7 @@ components:
       - dossier_numero
       - id
       - manquants
+      - manquants_regles
       - materiel_libelle
       - motif
       - origine
@@ -18631,6 +20156,11 @@ components:
         reservation:
           type: integer
           nullable: true
+        occurrence:
+          type: integer
+          nullable: true
+          description: 'Séance du prêt : le matériel suit ses horaires, son annulation
+            et sa facturation.'
         stock:
           type: integer
         quantite:
@@ -19023,6 +20553,10 @@ components:
           type: string
           default: ''
           maxLength: 300
+        solde:
+          type: boolean
+          default: true
+          description: 'Faux : retour partiel, le prêt reste sorti.'
       required:
       - quantite
     Role:
@@ -19623,6 +21157,68 @@ components:
       - site
       - site_nom
       - unite
+    Subvention:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        exercice:
+          type: integer
+        usager:
+          type: integer
+        usager_nom:
+          type: string
+          readOnly: true
+        montant_centimes:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+        objet:
+          type: string
+          maxLength: 250
+        deliberation_reference:
+          type: string
+          maxLength: 120
+        reference_import:
+          type: string
+          readOnly: true
+          description: Ligne du fichier importé.
+        importe_le:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - exercice
+      - id
+      - importe_le
+      - montant_centimes
+      - reference_import
+      - usager
+      - usager_nom
+    SubventionRequest:
+      type: object
+      properties:
+        exercice:
+          type: integer
+        usager:
+          type: integer
+        montant_centimes:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+        objet:
+          type: string
+          maxLength: 250
+        deliberation_reference:
+          type: string
+          maxLength: 120
+      required:
+      - exercice
+      - montant_centimes
+      - usager
     Tarif:
       type: object
       properties:
@@ -19669,6 +21265,23 @@ components:
       - grille
       - id
       - prix_centimes
+    TarifMaterielRequest:
+      type: object
+      properties:
+        valeur_journaliere_centimes:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+          title: Valeur de référence d'une journée de prêt (centimes)
+        prestation_code:
+          description: Code de la prestation facturée (grille tarifaire), vide si
+            gratuit.
+          oneOf:
+          - type: string
+            maxLength: 40
+            pattern: ^[-a-zA-Z0-9_]+$
+          - type: string
+            maxLength: 0
     TarifRequest:
       type: object
       properties:
@@ -20356,6 +21969,101 @@ components:
           maxLength: 500
       required:
       - accepter
+    Valorisation:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        exercice:
+          type: integer
+          readOnly: true
+        annee:
+          type: integer
+          readOnly: true
+        usager:
+          type: integer
+          readOnly: true
+        usager_nom:
+          type: string
+          readOnly: true
+        usager_type:
+          type: string
+          readOnly: true
+        version:
+          type: integer
+          readOnly: true
+          default: 1
+        actuelle:
+          type: boolean
+          readOnly: true
+          default: true
+        figee:
+          type: boolean
+          readOnly: true
+        minutes:
+          type: integer
+          readOnly: true
+        montant_espaces:
+          type: integer
+          readOnly: true
+        montant_materiel:
+          type: integer
+          readOnly: true
+        montant_personnel:
+          type: integer
+          readOnly: true
+        total:
+          type: integer
+          readOnly: true
+        calcule_le:
+          type: string
+          format: date-time
+          readOnly: true
+        calcule_par:
+          type: string
+          readOnly: true
+        motif_recalcul:
+          type: string
+          readOnly: true
+        document:
+          type: integer
+          readOnly: true
+          nullable: true
+          description: Attestation.
+        deposee_le:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+          description: Attestation mise à disposition sur le portail.
+        lignes:
+          type: array
+          items:
+            type: object
+            additionalProperties: {}
+          readOnly: true
+      required:
+      - actuelle
+      - annee
+      - calcule_le
+      - calcule_par
+      - deposee_le
+      - document
+      - exercice
+      - figee
+      - id
+      - lignes
+      - minutes
+      - montant_espaces
+      - montant_materiel
+      - montant_personnel
+      - motif_recalcul
+      - total
+      - usager
+      - usager_nom
+      - usager_type
+      - version
     Verification:
       type: object
       properties:

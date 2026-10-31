@@ -161,4 +161,17 @@ convenir avec l'éditeur et le service financier.
 | Format de l'export paie | Personnel → Compteurs d'heures | Colonnes attendues par le logiciel de paie de la DRH (export livré : CSV point-virgule, heures décimales) | Exporter le mois et l'importer dans la paie en recette |
 | Abonnements iCal | Personnel → Agents → « Lien iCal » | Rien : l'adresse est servie par l'API de gestion, joignable du LAN et du VPN | Abonner un agenda au lien puis le révoquer : l'agenda ne se met plus à jour |
 
+## 11 bis. Pilotage, éditions et valorisation — VAL-01 à VAL-08, STA-01 à STA-05, DSH-01 à DSH-06, IMP-01 à IMP-04
+
+| Élément | Où le saisir | Ce que la Ville fournit | Vérification |
+| --- | --- | --- | --- |
+| Seuils de convention et de compte rendu | Paramètres (groupe Valorisation), réservés à l'ordonnateur (`gerer_tarifs`) | Confirmation par le service juridique des seuils (23 000 €, 153 000 €) et de leur fondement (ADR 0007, point 4) | Une association au-delà de 23 000 € (nature + numéraire) apparaît en alerte dans la synthèse |
+| Méthodes par famille et délibérations | Pilotage → Méthodes de valorisation | Délibération fixant la méthode (tarif voté par défaut ; coût de revient ou valeur locative), références des délibérations | Calculer un exercice puis comparer une ligne avec la grille votée |
+| Coût horaire chargé du personnel dédié | Paramètres (`valorisation.cout_horaire_personnel_centimes`), repris par chaque nouvel exercice | Coût chargé d'une heure de gardien (DRH) | Une séance gardiennée fait apparaître une ligne « Personnel dédié » |
+| Import des subventions en numéraire | Pilotage → Valorisation → « Importer les subventions » | Export CSV du logiciel financier (CIVIL Finances Publiques) : identifiant (SIRET, RNA ou nom), montant au format 22 980,50, objet, délibération | Importer le fichier de l'exercice : les lignes non rapprochées sont listées avant tout remplacement |
+| Signataire de l'attestation | Paramètres `signature.elu_nom` et `signature.elu_courriel` (comme les conventions) | Élu délégataire signataire des attestations de valorisation | Clôturer un exercice de recette, éditer une attestation : l'élu reçoit l'invitation DocuSeal ; l'attestation apparaît sur le portail après signature |
+| Date de dépôt des attestations | Paramètre `valorisation.date_depot_attestations` (JJ-MM, défaut 31-03) ou date propre à l'exercice | Date à laquelle les associations doivent disposer de l'attestation | Le compteur « Attestations à déposer » passe en alerte 30 jours avant |
+| Domaines des destinataires des plannings | Paramètre `pilotage.domaines_destinataires` (défaut chatillon92.fr) | Domaines de messagerie professionnels autorisés (Ville, éventuellement établissements partenaires) | Une adresse hors domaine est refusée à la saisie de l'envoi programmé |
+| Plage d'ouverture par défaut des statistiques | Paramètre `statistiques.ouverture_defaut` (8 h – 22 h) | Heures d'ouverture retenues pour un espace sans horaires saisis | Le taux d'occupation d'un espace sans horaires est calculé sur cette plage |
+
 ## 12. PayFiP — complété au lot 7

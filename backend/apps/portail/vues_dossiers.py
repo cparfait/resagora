@@ -55,7 +55,7 @@ def dossiers_du_contact(contact: Contact) -> QuerySet[Dossier]:
 
 
 def dossier_autorise(contact: Contact, identifiant: Any) -> Dossier:
-    dossier = dossiers_du_contact(contact).filter(pk=identifiant).first() if str(identifiant).isdigit() else None
+    dossier = dossiers_du_contact(contact).filter(pk=identifiant).first() if str(identifiant).isdecimal() else None
     if dossier is None:
         raise Introuvable()
     return dossier
@@ -305,7 +305,7 @@ class VueDossiersPortail(VueContact):
         contact = contact_courant(request)
         qs = dossiers_du_contact(contact).order_by("-cree_le")
         usager = request.query_params.get("usager", "")
-        if usager.isdigit():
+        if usager.isdecimal():
             qs = qs.filter(usager_id=int(usager))
         return Response([representation_dossier(d) for d in qs[:200]])
 
