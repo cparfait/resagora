@@ -1,0 +1,150 @@
+id;lot;priorite;source;libelle;scenario_recette
+SEC-01;0;M;skill securite-dmz;Séparation DMZ/LAN : façade sans base, liste blanche de routes, flux unique mTLS 8443;R0-01 Appeler une route hors liste blanche depuis Internet : 404 ; appeler l'API portail sans certificat client : refus
+SEC-02;0;M;skill securite-dmz;Authentification des agents par l'Active Directory en LDAPS, groupes AD vers rôles;R0-02 Se connecter au back-office avec un compte de l'annuaire de test et vérifier le rôle obtenu
+SEC-03;0;M;skill securite-dmz;Double authentification (TOTP) obligatoire pour l'administration et la régie;R0-03 Un administrateur sans TOTP enrôlé est invité à l'enrôler avant toute action
+SEC-04;2;M;skill securite-dmz;Comptes usagers : Argon2id, politique ANSSI, verrouillage progressif, TOTP proposé, réinitialisation à usage unique, pas d'énumération;R2-04 Cinq mots de passe faux puis attente imposée ; message identique compte connu/inconnu
+SEC-05;0;M;skill securite-dmz;CSRF, CORS fermé, en-têtes de sécurité (CSP stricte, HSTS, nosniff, Referrer-Policy, Permissions-Policy);R0-05 Contrôler les en-têtes des réponses du portail et du back-office
+SEC-06;0;M;skill securite-dmz;Limitation de débit (connexion, inscription, réinitialisation, dépôt, téléversement);R0-06 Enchaîner 20 connexions en une minute : réponse 429
+SEC-07;2;M;skill securite-dmz;Fichiers déposés : quarantaine DMZ, taille, extension et type réel, ClamAV, renommage, SHA-256, téléchargement contrôlé;R2-07 Déposer le fichier de test EICAR : rejet journalisé
+SEC-08;0;M;skill securite-dmz;Journal d'audit et journaux techniques conservés 6 mois minimum, intégrité protégée;R0-08 Modifier une ligne du journal en base : la vérification d'intégrité la signale
+SEC-09;0;M;skill securite-dmz;Secrets fournis par fichiers, jamais dans le dépôt ni journalisés;R0-09 Rechercher un secret dans les journaux et le dépôt : aucun résultat
+SEC-10;4;M;skill securite-dmz §6.7;Accès mobile des gardiens : option A (VPN, LAN) et option B (façade DMZ, double facteur, certificat d'appareil), jeton d'appareil révocable;R4-10 Révoquer un appareil : sa synchronisation suivante est refusée
+REF-01;0;M;reconstitué;Référentiel des sites, bâtiments et espaces (capacité, surface, accessibilité, équipements, photos);R1-01 Créer un site, un bâtiment et un espace et les retrouver au planning
+REF-02;0;M;reconstitué;Types et familles d'espaces (gymnase, salle, terrain, salle des fêtes…);R1-02 Filtrer le catalogue par famille
+REF-03;1;M;reconstitué;Horaires d'ouverture par espace et par saison;R1-03 Une demande hors horaires d'ouverture est refusée avec un message clair
+REF-04;1;M;skill planning-personnel;Gardiennage requis par espace et temps d'ouverture/fermeture;R1-04 Un espace gardienné génère un besoin de personnel élargi des temps d'ouverture et de fermeture
+REF-05;1;M;skill metier-reservations;Hiérarchie espaces / sous-espaces (gymnase divisible);R1-05 Réserver le gymnase entier bloque ses tiers de terrain et inversement
+REF-06;1;M;skill metier-reservations;Fermetures exceptionnelles : occurrences impactées signalées, usagers notifiés;R1-06 Créer une fermeture après coup : les occurrences sont signalées et les usagers notifiés
+REF-07;1;S;skill metier-reservations;Espaces partageables jusqu'à leur capacité simultanée;R1-07 Deux réservations simultanées sur une piste partageable de capacité 2 sont acceptées, la troisième refusée
+REF-08;1;S;reconstitué;Documents rattachés à un espace (règlement intérieur, plan, consignes de sécurité);R1-08 Consulter le règlement intérieur d'un espace depuis le portail
+USR-01;1;M;reconstitué;Fiche usager typée (association, école, entreprise/CSE, particulier, service municipal), SIRET/RNA, résidence;R1-11 Créer une association conventionnée locale et un particulier non résident
+USR-02;1;M;reconstitué;Contacts multiples par usager, avec rôle;R1-12 Un contact rattaché à deux associations voit les dossiers des deux
+USR-03;1;M;reconstitué;Pièces justificatives exigées par type d'usager, avec date de validité et alerte d'expiration;R1-13 Une attestation d'assurance expirée apparaît dans les alertes
+USR-04;1;S;reconstitué;Conventionnement des associations locales (utilisé par la priorité RG-03);R1-14 Une association conventionnée est classée avant une association non conventionnée
+USR-05;1;S;reconstitué;Historique des dossiers et réservations par usager;R1-15 Consulter l'historique d'un usager
+USR-06;2;M;reconstitué;RGPD : durées de conservation, anonymisation, export des données d'un usager;R2-16 Anonymiser un usager inactif depuis la durée paramétrée
+PLA-01;1;M;skill frontend-backoffice;Planning multi-vues : jour, semaine, mois, chronologie par ressource, multi-sites, liste accessible;R1-21 Basculer entre les six vues du planning
+PLA-02;1;M;skill frontend-backoffice;Glisser-déposer avec contrôle de conflit côté serveur avant validation;R1-22 Déplacer une occurrence sur un créneau occupé : retour à la position initiale et message
+PLA-03;1;S;skill frontend-backoffice;Vues enregistrées par agent, couleurs par statut ou type d'usager, légende;R1-23 Enregistrer une vue filtrée et la rouvrir
+PLA-04;1;M;skill metier-reservations;Récurrences RRULE avec exclusion des vacances zone C et des jours fériés ; modification de l'occurrence, des suivantes ou de la série;R1-24 Créer un créneau hebdomadaire sur la saison : aucune occurrence pendant les vacances de la Toussaint
+PLA-05;1;M;skill metier-reservations;Campagne annuelle des créneaux : dépôt, instruction, arbitrage, commission, attribution en lot;R1-25 Dérouler une campagne complète jusqu'à l'attribution
+PLA-06;1;M;skill metier-reservations;Cycle de statuts des réservations et transitions contrôlées;R1-26 Une réservation passe de demande à clôturée
+PLA-07;1;M;reconstitué;Détection des conflits et proposition de créneaux ou d'espaces alternatifs;R1-27 Une demande en conflit propose trois alternatives
+PLA-08;1;M;reconstitué;Options avec date d'expiration, relance puis libération;R1-28 Une option expirée est libérée après relance
+PLA-09;1;C;reconstitué;Liste d'attente sur un créneau occupé, proposée à la libération;R1-29 Annuler une réservation : le premier en liste d'attente est notifié
+PLA-10;1;M;reconstitué;Annulation par l'usager ou la Ville, avec motif et application du barème;R1-30 Annuler tardivement : frais calculés
+PLA-11;1;S;reconstitué;Saisie de la présence et des heures réalisées par occurrence;R1-31 Marquer une occurrence « absence non signalée »
+PLA-12;1;M;skill metier-reservations;Priorité municipale déplaçant une réservation confirmée, avec notification;R1-32 Un événement municipal déplace un créneau confirmé et l'association est prévenue
+POR-01;2;M;reconstitué;Compte usager sur le portail : inscription, validation par la Ville, connexion, gestion des contacts;R2-01 Créer un compte association et le faire valider
+POR-02;2;M;skill portail-rgaa;Disponibilités publiques anonymisées;R2-02 Consulter les disponibilités sans compte : aucun nom d'usager
+POR-03;2;M;reconstitué;Catalogue des espaces avec fiches, photos décrites et capacité;R2-03 Parcourir le catalogue au clavier
+POR-04;2;M;skill portail-rgaa;Demande guidée en quatre étapes avec brouillon;R2-05 Déposer une demande en quatre étapes, quitter, reprendre le brouillon
+POR-05;2;M;reconstitué;Suivi des dossiers, documents et factures par l'usager;R2-06 Suivre le statut d'un dossier et télécharger sa convention
+POR-06;2;M;reconstitué;Dépôt des pièces justificatives depuis le portail;R2-08 Déposer une attestation d'assurance PDF
+POR-07;7;M;skill finances-ciril;Paiement en ligne PayFiP depuis le portail;R7-01 Payer une facture en ligne sur le simulateur PayFiP
+POR-08;2;S;reconstitué;Messagerie avec la Ville rattachée au dossier;R2-09 Envoyer un message sur un dossier et recevoir la réponse de l'agent
+POR-09;2;M;skill portail-rgaa;Conformité RGAA 4.1.2 et déclaration d'accessibilité;R2-10 Zéro violation axe-core sur toutes les pages et états d'erreur
+POR-10;2;S;reconstitué;Signature électronique accessible depuis le portail;R2-11 Signer une convention depuis le portail
+TAR-01;3;M;reconstitué;Grilles tarifaires par espace, type d'usager et unité, avec validité et délibération;R3-01 Créer une grille tarifaire votée
+TAR-02;3;M;skill finances-ciril;Majorations (week-end, soirée, férié, non-résident) et prestations annexes;R3-02 Un particulier non résident réservant un samedi soir paie les majorations
+TAR-03;3;M;skill finances-ciril;Gratuité ou réduction : pourcentage sur tarif de référence conservé, fondement obligatoire;R3-03 Une gratuité sans délibération est refusée
+TAR-04;3;M;reconstitué;Devis généré, accepté, avec tarif figé;R3-04 Accepter un devis puis modifier la grille : le devis ne change pas
+TAR-05;3;M;skill finances-ciril;Factures numérotées chronologiquement sans trou par exercice, avoirs;R3-05 Émettre deux factures et un avoir : numérotation continue
+TAR-06;3;M;skill finances-ciril;Export des titres de recettes vers Ciril (format configurable, lots rejouables);R3-06 Exporter un lot de titres en tableur
+TAR-07;7;M;skill finances-ciril;Paiement en ligne PayFiP (Titres et Rôles, Régie), notification revérifiée, idempotence, rapprochement quotidien;R7-02 Recevoir deux fois la même notification PayFiP : un seul encaissement
+TAR-08;3;M;reconstitué;Frais d'annulation selon barème et délai (RG-08);R3-08 Annuler à J-3 : frais de 50 %
+TAR-09;3;S;reconstitué;Acomptes exigés selon le type de réservation;R3-09 Une location exige un acompte avant confirmation
+TAR-10;3;M;skill finances-ciril;Rapprochement : factures titrées non soldées après échéance;R3-10 Lister les factures en retard
+TAR-11;3;S;reconstitué;Simulation de tarif sur le portail avant demande;R3-11 Simuler le tarif d'une salle des fêtes
+TAR-12;3;M;skill finances-ciril;Règlement par virement : coordonnées du comptable public et référence sur la facture;R3-12 La facture affiche l'IBAN du comptable et la référence
+TAR-13;3;M;skill finances-ciril;Statuts de paiement et import des encaissements (état Ciril configurable) ou pointage manuel;R3-13 Importer l'état des titres soldés
+CAU-01;3;M;skill finances-ciril;Montant de caution par espace et type d'usager;R3-21 Une salle des fêtes exige une caution de 500 €
+CAU-02;3;M;skill finances-ciril;Cycle de statuts de la caution;R3-22 Une caution passe d'attendue à restituée
+CAU-03;3;M;skill finances-ciril;Restitution proposée seulement après l'état des lieux de sortie;R3-23 Pas de restitution avant l'état des lieux de sortie
+CAU-04;3;M;skill finances-ciril;Retenue motivée : motif, photos, montant, notification de l'usager;R3-24 Retenir 120 € avec photos : l'usager est notifié
+CAU-05;3;M;skill finances-ciril;Séparation des tâches au-delà d'un seuil;R3-25 Une retenue au-delà du seuil doit être validée par un second agent
+CAU-06;3;M;skill finances-ciril;Journal inaltérable et état exportable des cautions;R3-26 Exporter l'état des cautions
+CAU-07;3;S;skill finances-ciril;Alerte de délai de restitution;R3-27 Une caution non restituée après le délai apparaît en alerte
+DOC-01;2;M;skill documents-signature;Modèles .docx versionnés éditables par l'administrateur fonctionnel;R2-21 Déposer une nouvelle version de modèle
+DOC-02;2;M;reconstitué;Catalogue de modèles fournis (convention, contrat de location, devis, facture, avoir, état des lieux, attribution, refus, attestation de valorisation, fermeture);R2-22 Générer chaque modèle avec le jeu de démonstration
+DOC-03;2;M;skill documents-signature;Contexte de fusion typé (récurrence lisible, montants en euros…);R2-23 La convention affiche « tous les mardis de 18 h à 20 h, hors vacances scolaires »
+DOC-04;2;M;skill documents-signature;Conversion PDF/A-2b par Gotenberg, empreinte SHA-256;R2-24 Le PDF généré est un PDF/A avec empreinte enregistrée
+DOC-05;2;M;skill documents-signature;Avenant pour toute modification d'un document signé (RG-13);R2-25 Modifier une convention signée produit un avenant
+DOC-06;2;M;skill documents-signature;Génération en lot en tâche de fond avec progression et rapport d'erreurs;R2-26 Générer 40 conventions en lot
+DOC-07;2;M;skill documents-signature;Rattachement au dossier et téléchargement contrôlé;R2-27 Un autre usager ne peut pas télécharger le document
+SIG-01;2;M;skill documents-signature;Envoi à DocuSeal avec signataires ordonnés et expiration;R2-31 Envoyer une convention à signer : usager puis élu
+SIG-02;2;M;skill documents-signature;Webhooks DocuSeal relayés par la façade et revérifiés par l'API;R2-32 Un webhook falsifié est ignoré
+SIG-03;2;M;skill documents-signature;Récupération du PDF signé et du journal de preuve, purge côté DocuSeal;R2-33 Après signature, le PDF signé est au dossier et la soumission purgée
+SIG-04;2;S;skill documents-signature;Relances avant expiration et annulation par l'agent;R2-34 Relance automatique à J-3 de l'expiration
+SIG-05;2;M;skill documents-signature;Circuit de signature manuelle (scan déposé);R2-35 Déposer le scan signé : statut « signé manuellement »
+COM-01;2;M;reconstitué;Notifications électroniques transactionnelles depuis des modèles de messages;R2-41 Valider une demande envoie un courriel à l'usager
+COM-02;2;M;reconstitué;Messagerie par dossier entre agents et usagers;R2-42 Échanger des messages sur un dossier
+COM-03;2;M;reconstitué;Notifications groupées (fermeture, attribution, refus motivés);R2-43 Notifier tous les usagers d'une fermeture
+COM-04;2;S;reconstitué;Journal des envois et préférences de notification;R2-44 Consulter le journal des envois
+COM-05;2;C;reconstitué;Envoi de SMS par un adaptateur configurable;R2-45 Envoyer un SMS de rappel sur le simulateur
+PER-01;4;M;reconstitué;Fiches des agents et habilitations (SSIAP, PSC1) avec validité;R4-01 Une habilitation expirée exclut l'agent des propositions
+PER-02;4;M;skill planning-personnel;Besoins de personnel générés par les réservations, fusionnés par site;R4-02 Deux créneaux contigus forment un seul besoin
+PER-03;4;M;skill planning-personnel;Vacations et trames hebdomadaires par saison;R4-03 Appliquer une trame sur la saison
+PER-04;4;M;skill planning-personnel;Proposition d'affectation conforme aux règles;R4-04 Proposer un remplaçant à un gardien absent
+PER-05;4;M;skill planning-personnel;Moteur de règles de temps de travail, forçage motivé et tracé;R4-05 Une vacation dépassant 10 h est signalée
+PER-06;4;M;reconstitué;Absences et remplacements;R4-06 Saisir une absence : la vacation devient non couverte
+PER-07;4;M;skill planning-personnel;Compteurs d'heures et export paie;R4-07 Exporter les compteurs du mois
+PER-08;4;S;skill planning-personnel;Abonnement iCal personnel à jeton révocable;R4-08 S'abonner au planning iCal puis révoquer le jeton
+PER-09;4;M;skill planning-personnel;Signalement d'incident rattaché à l'occurrence et à l'usager;R4-09 Signaler un incident depuis le mobile
+MOB-01;4;M;skill mobile-gardiens;Application mobile installable fonctionnant hors ligne;R4-21 Ouvrir l'application en mode avion
+MOB-02;4;M;skill mobile-gardiens;Planning local et pointage des heures réelles;R4-22 Pointer hors ligne
+MOB-03;4;M;skill mobile-gardiens;États des lieux avec photos et signature;R4-23 Réaliser un état des lieux de sortie avec photo et signature
+MOB-04;4;M;skill mobile-gardiens;Incidents saisis hors ligne;R4-24 Saisir un incident hors ligne
+MOB-05;4;M;skill mobile-gardiens;File d'envoi persistante, envoi par lots, idempotence;R4-25 Fermer l'application hors ligne puis revenir en réseau : saisie reçue une fois
+MOB-06;4;M;skill mobile-gardiens;Conflits : saisie sur occurrence annulée conservée et signalée;R4-26 Pointer une occurrence annulée entre-temps : signalement au gestionnaire
+MOB-07;4;M;skill mobile-gardiens;Paquet minimal (pas de montants ni pièces ni autres sites), stockage chiffré;R4-27 Le paquet ne contient aucun montant
+MOB-08;4;M;skill mobile-gardiens;Fraîcheur affichée, alerte au-delà de 24 h, purge après 7 jours;R4-28 Après 7 jours sans synchronisation, les données sont effacées
+MAT-01;5;M;reconstitué;Inventaire du matériel (fixe, mobile, consommable) par site et espace;R5-01 Créer un matériel et l'affecter à un espace
+MAT-02;5;M;reconstitué;Réservation de matériel avec un dossier et contrôle de disponibilité;R5-02 Réserver 20 tables quand 15 sont disponibles : refus
+MAT-03;5;M;reconstitué;Mouvements de stock (sortie, retour, transfert, perte) et état du stock;R5-03 Enregistrer le retour de 18 tables sur 20 : 2 manquantes signalées
+MAT-04;5;S;reconstitué;Maintenance et contrôles périodiques du matériel;R5-04 Un contrôle périodique dépassé apparaît en alerte
+MAT-05;5;S;reconstitué;Signalement de panne rendant le matériel indisponible;R5-05 Un matériel en panne n'est plus réservable
+VAL-01;6;M;skill valorisation-subventions;Méthodes de valorisation paramétrées par famille d'espaces (tarif de référence, coût de revient, valeur locative);R6-01 Changer de méthode entre deux exercices
+VAL-02;6;M;skill valorisation-subventions;Calcul par association et par exercice (espaces, matériel, personnel dédié, partage);R6-02 Valoriser un espace partagé entre deux associations
+VAL-03;6;M;skill valorisation-subventions;Base : occurrences non annulées dans les délais, absences non signalées valorisées;R6-03 Une annulation hors délai reste valorisée
+VAL-04;6;M;skill valorisation-subventions;Attestation annuelle par association déposée sur le portail;R6-04 L'association télécharge son attestation
+VAL-05;6;M;skill valorisation-subventions;État annexe du compte administratif exportable;R6-05 Exporter l'annexe du compte administratif
+VAL-06;6;M;skill valorisation-subventions;Alertes de seuil 23 000 € et 153 000 € avec subventions en numéraire importées;R6-06 Une association à 24 000 € déclenche l'alerte de convention
+VAL-07;6;S;skill valorisation-subventions;Simulation en cours d'année;R6-07 Simuler la valorisation au 30 juin
+VAL-08;6;M;skill valorisation-subventions;Montants figés à la clôture, recalcul tracé;R6-08 Clôturer l'exercice puis tenter un recalcul sans procédure : refus
+STA-01;6;M;reconstitué;Taux d'occupation par espace, site et période;R6-21 Afficher le taux d'occupation du mois
+STA-02;6;M;reconstitué;Répartition par type d'usager et par activité;R6-22 Répartition des heures par type d'usager
+STA-03;6;M;reconstitué;Recettes, gratuités et réductions;R6-23 Montant des recettes et des gratuités de l'année
+STA-04;6;M;reconstitué;Exports tableur des statistiques;R6-24 Exporter les statistiques en tableur
+STA-05;6;S;reconstitué;Indicateurs de personnel (heures planifiées, réalisées, supplémentaires);R6-25 Indicateurs de personnel du trimestre
+DSH-01;6;M;skill frontend-backoffice;Tableau de bord gestionnaire « que dois-je traiter aujourd'hui ? »;R6-31 Le tableau de bord liste les demandes à instruire
+DSH-02;6;M;skill planning-personnel;Besoins de personnel non couverts visibles;R6-32 Un besoin non couvert apparaît au tableau de bord
+DSH-03;6;M;reconstitué;Alertes (pièces expirées, options expirantes, cautions en retard, factures impayées, contrôles matériel);R6-33 Les alertes du jour sont listées
+DSH-04;6;M;reconstitué;Tableau de bord direction (occupation, recettes, valorisation, tendances);R6-34 Le tableau de bord direction affiche les indicateurs annuels
+DSH-05;6;S;reconstitué;Tableau de bord filtré par périmètre de l'agent;R6-35 Un agent d'un site ne voit que son site
+DSH-06;6;M;skill frontend-backoffice;Compteurs cliquables ouvrant la liste filtrée;R6-36 Cliquer sur un compteur ouvre la liste filtrée
+IMP-01;6;M;skill documents-signature;Plannings imprimés par espace et par site (A4/A3, noir et blanc, QR code, date d'édition);R6-41 Imprimer le planning hebdomadaire d'un gymnase
+IMP-02;4;M;skill planning-personnel;Planning PDF par agent et par site;R4-41 Éditer le planning PDF d'un gardien
+IMP-03;6;S;skill documents-signature;Affichage en salle avec QR code vers la version en ligne;R6-43 Afficher la feuille de salle avec QR code
+IMP-04;6;S;skill planning-personnel;Envoi programmé des plannings;R6-44 Programmer l'envoi hebdomadaire du planning
+IMP-05;4;S;skill planning-personnel;Export iCal des plannings;R4-45 Télécharger le planning d'un espace en iCal
+ADM-01;1;M;skill metier-reservations;Calendrier des saisons : vacances scolaires zone C et jours fériés;R1-41 Importer le calendrier scolaire zone C
+ADM-02;1;M;reconstitué;Paramètres fonctionnels (délais, seuils, barèmes) modifiables et tracés;R1-42 Modifier le délai d'expiration des options
+ADM-03;0;M;skill backend-django;Gestion des agents, rôles et périmètres;R0-11 Attribuer un rôle limité à un site
+ADM-04;2;M;reconstitué;Gestion des modèles de documents et de messages;R2-46 Modifier le modèle du courriel de validation
+ADM-05;0;M;reconstitué;Consultation et export du journal d'audit;R0-12 Filtrer le journal d'audit par agent
+ADM-06;0;M;skill backend-django;Correspondance groupes AD vers rôles configurable;R0-13 Ajouter un groupe AD et son rôle
+RG-01;1;M;skill metier-reservations;Pas de chevauchement de deux occurrences validées/confirmées sur un même espace ou espace/sous-espace, sauf partageable;R1-51 Deux agents valident simultanément deux demandes concurrentes : une seule réussit
+RG-02;1;M;skill metier-reservations;Une demande ou une option ne bloque pas le créneau;R1-52 Deux demandes sur le même créneau sont acceptées en instruction
+RG-03;1;M;skill metier-reservations;Priorité : Ville > scolaire en temps scolaire > associations conventionnées locales > autres associations > entreprises et particuliers;R1-53 Arbitrage d'une campagne en conflit
+RG-04;3;M;skill finances-ciril;Tarif appliqué = tarif en vigueur à la date d'occupation, figé sur le devis accepté;R3-31 Changement de grille après acceptation sans effet
+RG-05;3;M;skill finances-ciril;Gratuité = réduction de 100 % sur un tarif de référence conservé;R3-32 Gratuité sans tarif de référence : erreur bloquante
+RG-06;1;M;skill metier-reservations;Confirmation subordonnée aux conditions du type de réservation (dossier complet, convention signée, acompte, caution);R1-54 Confirmer sans convention signée : refus motivé
+RG-07;1;M;skill metier-reservations;Option expirée libérée après une relance;R1-55 Option expirée libérée
+RG-08;3;M;skill metier-reservations;Annulation tardive : frais selon barème;R3-33 Frais d'annulation tardive
+RG-09;4;M;skill metier-reservations;Espace gardienné : besoin de personnel ; modification ou annulation : mise à jour et notification de l'agent;R4-51 Annuler un créneau gardienné : vacation à revoir et agent notifié
+RG-10;4;M;skill planning-personnel;Pas de chevauchement de vacations pour un agent;R4-52 Affecter un agent sur deux vacations simultanées : refus
+RG-11;3;M;skill finances-ciril;Restitution de caution seulement après l'état des lieux de sortie;R3-34 Restitution impossible avant état des lieux
+RG-12;6;M;skill metier-reservations;Valorisation sur les heures non annulées dans les délais;R6-51 Valorisation après annulations
+RG-13;2;M;CLAUDE.md;Documents signés, factures et journaux de caution immuables : correction par avenant ou avoir;R2-51 Tenter de modifier une facture émise : refus
+RG-14;0;M;CLAUDE.md;Droits = rôle × périmètre, vérifiés côté serveur sur chaque objet;R0-14 Un agent du site A ne peut pas lire un dossier du site B

@@ -1,0 +1,150 @@
+id;lot;priorite;libelle;code;tests;scenario_recette;statut
+SEC-01;0;M;Séparation DMZ/LAN : façade sans base, liste blanche de routes, flux unique mTLS 8443;backend/apps/noyau/middleware.py backend/config/settings/base.py backend/config/urls_gestion.py backend/config/urls_portail.py;backend/apps/noyau/tests/test_socle.py;R0-01 Appeler une route hors liste blanche depuis Internet : 404 ;couverte
+SEC-02;0;M;Authentification des agents par l'Active Directory en LDAPS, groupes AD vers rôles;backend/apps/habilitations/api/views.py backend/apps/habilitations/ldap.py backend/apps/habilitations/models.py backend/config/settings/base.py;backend/apps/habilitations/tests/test_authentification.py;R0-02 Se connecter au back-office avec un compte de l'annuaire de test et vérifier le rôle obtenu;couverte
+SEC-03;0;M;Double authentification (TOTP) obligatoire pour l'administration et la régie;backend/apps/habilitations/api/views.py backend/apps/habilitations/models.py backend/apps/habilitations/permissions.py backend/apps/habilitations/totp.py backend/config/settings/base.py;backend/apps/habilitations/tests/test_authentification.py;R0-03 Un administrateur sans TOTP enrôlé est invité à l'enrôler avant toute action;couverte
+SEC-04;2;M;Comptes usagers : Argon2id, politique ANSSI, verrouillage progressif, TOTP proposé, réinitialisation à usage unique, pas d'énumération;;;R2-04 Cinq mots de passe faux puis attente imposée ;ouverte
+SEC-05;0;M;CSRF, CORS fermé, en-têtes de sécurité (CSP stricte, HSTS, nosniff, Referrer-Policy, Permissions-Policy);backend/apps/noyau/exceptions.py backend/apps/noyau/middleware.py backend/config/settings/base.py;backend/apps/noyau/tests/test_socle.py;R0-05 Contrôler les en-têtes des réponses du portail et du back-office;couverte
+SEC-06;0;M;Limitation de débit (connexion, inscription, réinitialisation, dépôt, téléversement);backend/apps/habilitations/api/views.py backend/apps/noyau/debit.py;backend/apps/habilitations/tests/test_authentification.py;R0-06 Enchaîner 20 connexions en une minute : réponse 429;couverte
+SEC-07;2;M;Fichiers déposés : quarantaine DMZ, taille, extension et type réel, ClamAV, renommage, SHA-256, téléchargement contrôlé;;;R2-07 Déposer le fichier de test EICAR : rejet journalisé;ouverte
+SEC-08;0;M;Journal d'audit et journaux techniques conservés 6 mois minimum, intégrité protégée;backend/apps/audit/api.py backend/apps/audit/models.py backend/apps/audit/services.py backend/apps/audit/tasks.py backend/apps/noyau/api.py backend/config/settings/base.py;backend/apps/audit/tests/test_journal.py;R0-08 Modifier une ligne du journal en base : la vérification d'intégrité la signale;couverte
+SEC-09;0;M;Secrets fournis par fichiers, jamais dans le dépôt ni journalisés;backend/apps/noyau/journaux.py backend/apps/noyau/secrets.py backend/config/settings/base.py;backend/apps/noyau/tests/test_socle.py;R0-09 Rechercher un secret dans les journaux et le dépôt : aucun résultat;couverte
+SEC-10;4;M;Accès mobile des gardiens : option A (VPN, LAN) et option B (façade DMZ, double facteur, certificat d'appareil), jeton d'appareil révocable;backend/config/settings/base.py backend/config/urls_gestion.py backend/config/urls_portail.py;backend/apps/noyau/tests/test_socle.py;R4-10 Révoquer un appareil : sa synchronisation suivante est refusée;couverte
+REF-01;0;M;Référentiel des sites, bâtiments et espaces (capacité, surface, accessibilité, équipements, photos);backend/apps/referentiel/api/views.py backend/apps/referentiel/models.py;backend/apps/referentiel/tests/test_referentiel.py;R1-01 Créer un site, un bâtiment et un espace et les retrouver au planning;couverte
+REF-02;0;M;Types et familles d'espaces (gymnase, salle, terrain, salle des fêtes…);backend/apps/referentiel/api/views.py backend/apps/referentiel/models.py;backend/apps/referentiel/tests/test_referentiel.py;R1-02 Filtrer le catalogue par famille;couverte
+REF-03;1;M;Horaires d'ouverture par espace et par saison;;;R1-03 Une demande hors horaires d'ouverture est refusée avec un message clair;ouverte
+REF-04;1;M;Gardiennage requis par espace et temps d'ouverture/fermeture;backend/apps/referentiel/models.py;;R1-04 Un espace gardienné génère un besoin de personnel élargi des temps d'ouverture et de fermeture;ouverte
+REF-05;1;M;Hiérarchie espaces / sous-espaces (gymnase divisible);backend/apps/referentiel/models.py;;R1-05 Réserver le gymnase entier bloque ses tiers de terrain et inversement;ouverte
+REF-06;1;M;Fermetures exceptionnelles : occurrences impactées signalées, usagers notifiés;;;R1-06 Créer une fermeture après coup : les occurrences sont signalées et les usagers notifiés;ouverte
+REF-07;1;S;Espaces partageables jusqu'à leur capacité simultanée;backend/apps/referentiel/models.py;;R1-07 Deux réservations simultanées sur une piste partageable de capacité 2 sont acceptées, la troisième refusée;ouverte
+REF-08;1;S;Documents rattachés à un espace (règlement intérieur, plan, consignes de sécurité);;;R1-08 Consulter le règlement intérieur d'un espace depuis le portail;ouverte
+USR-01;1;M;Fiche usager typée (association, école, entreprise/CSE, particulier, service municipal), SIRET/RNA, résidence;;;R1-11 Créer une association conventionnée locale et un particulier non résident;ouverte
+USR-02;1;M;Contacts multiples par usager, avec rôle;;;R1-12 Un contact rattaché à deux associations voit les dossiers des deux;ouverte
+USR-03;1;M;Pièces justificatives exigées par type d'usager, avec date de validité et alerte d'expiration;;;R1-13 Une attestation d'assurance expirée apparaît dans les alertes;ouverte
+USR-04;1;S;Conventionnement des associations locales (utilisé par la priorité RG-03);;;R1-14 Une association conventionnée est classée avant une association non conventionnée;ouverte
+USR-05;1;S;Historique des dossiers et réservations par usager;;;R1-15 Consulter l'historique d'un usager;ouverte
+USR-06;2;M;RGPD : durées de conservation, anonymisation, export des données d'un usager;;;R2-16 Anonymiser un usager inactif depuis la durée paramétrée;ouverte
+PLA-01;1;M;Planning multi-vues : jour, semaine, mois, chronologie par ressource, multi-sites, liste accessible;;;R1-21 Basculer entre les six vues du planning;ouverte
+PLA-02;1;M;Glisser-déposer avec contrôle de conflit côté serveur avant validation;;;R1-22 Déplacer une occurrence sur un créneau occupé : retour à la position initiale et message;ouverte
+PLA-03;1;S;Vues enregistrées par agent, couleurs par statut ou type d'usager, légende;;;R1-23 Enregistrer une vue filtrée et la rouvrir;ouverte
+PLA-04;1;M;Récurrences RRULE avec exclusion des vacances zone C et des jours fériés ;;; modification de l'occurrence, des suivantes ou de la série;ouverte
+PLA-05;1;M;Campagne annuelle des créneaux : dépôt, instruction, arbitrage, commission, attribution en lot;;;R1-25 Dérouler une campagne complète jusqu'à l'attribution;ouverte
+PLA-06;1;M;Cycle de statuts des réservations et transitions contrôlées;;;R1-26 Une réservation passe de demande à clôturée;ouverte
+PLA-07;1;M;Détection des conflits et proposition de créneaux ou d'espaces alternatifs;;;R1-27 Une demande en conflit propose trois alternatives;ouverte
+PLA-08;1;M;Options avec date d'expiration, relance puis libération;;;R1-28 Une option expirée est libérée après relance;ouverte
+PLA-09;1;C;Liste d'attente sur un créneau occupé, proposée à la libération;;;R1-29 Annuler une réservation : le premier en liste d'attente est notifié;ouverte
+PLA-10;1;M;Annulation par l'usager ou la Ville, avec motif et application du barème;;;R1-30 Annuler tardivement : frais calculés;ouverte
+PLA-11;1;S;Saisie de la présence et des heures réalisées par occurrence;;;R1-31 Marquer une occurrence « absence non signalée »;ouverte
+PLA-12;1;M;Priorité municipale déplaçant une réservation confirmée, avec notification;;;R1-32 Un événement municipal déplace un créneau confirmé et l'association est prévenue;ouverte
+POR-01;2;M;Compte usager sur le portail : inscription, validation par la Ville, connexion, gestion des contacts;;;R2-01 Créer un compte association et le faire valider;ouverte
+POR-02;2;M;Disponibilités publiques anonymisées;;;R2-02 Consulter les disponibilités sans compte : aucun nom d'usager;ouverte
+POR-03;2;M;Catalogue des espaces avec fiches, photos décrites et capacité;;;R2-03 Parcourir le catalogue au clavier;ouverte
+POR-04;2;M;Demande guidée en quatre étapes avec brouillon;;;R2-05 Déposer une demande en quatre étapes, quitter, reprendre le brouillon;ouverte
+POR-05;2;M;Suivi des dossiers, documents et factures par l'usager;;;R2-06 Suivre le statut d'un dossier et télécharger sa convention;ouverte
+POR-06;2;M;Dépôt des pièces justificatives depuis le portail;;;R2-08 Déposer une attestation d'assurance PDF;ouverte
+POR-07;7;M;Paiement en ligne PayFiP depuis le portail;;;R7-01 Payer une facture en ligne sur le simulateur PayFiP;ouverte
+POR-08;2;S;Messagerie avec la Ville rattachée au dossier;;;R2-09 Envoyer un message sur un dossier et recevoir la réponse de l'agent;ouverte
+POR-09;2;M;Conformité RGAA 4.1.2 et déclaration d'accessibilité;;;R2-10 Zéro violation axe-core sur toutes les pages et états d'erreur;ouverte
+POR-10;2;S;Signature électronique accessible depuis le portail;;;R2-11 Signer une convention depuis le portail;ouverte
+TAR-01;3;M;Grilles tarifaires par espace, type d'usager et unité, avec validité et délibération;;;R3-01 Créer une grille tarifaire votée;ouverte
+TAR-02;3;M;Majorations (week-end, soirée, férié, non-résident) et prestations annexes;;;R3-02 Un particulier non résident réservant un samedi soir paie les majorations;ouverte
+TAR-03;3;M;Gratuité ou réduction : pourcentage sur tarif de référence conservé, fondement obligatoire;;;R3-03 Une gratuité sans délibération est refusée;ouverte
+TAR-04;3;M;Devis généré, accepté, avec tarif figé;;;R3-04 Accepter un devis puis modifier la grille : le devis ne change pas;ouverte
+TAR-05;3;M;Factures numérotées chronologiquement sans trou par exercice, avoirs;;;R3-05 Émettre deux factures et un avoir : numérotation continue;ouverte
+TAR-06;3;M;Export des titres de recettes vers Ciril (format configurable, lots rejouables);;;R3-06 Exporter un lot de titres en tableur;ouverte
+TAR-07;7;M;Paiement en ligne PayFiP (Titres et Rôles, Régie), notification revérifiée, idempotence, rapprochement quotidien;;;R7-02 Recevoir deux fois la même notification PayFiP : un seul encaissement;ouverte
+TAR-08;3;M;Frais d'annulation selon barème et délai (RG-08);;;R3-08 Annuler à J-3 : frais de 50 %;ouverte
+TAR-09;3;S;Acomptes exigés selon le type de réservation;;;R3-09 Une location exige un acompte avant confirmation;ouverte
+TAR-10;3;M;Rapprochement : factures titrées non soldées après échéance;;;R3-10 Lister les factures en retard;ouverte
+TAR-11;3;S;Simulation de tarif sur le portail avant demande;;;R3-11 Simuler le tarif d'une salle des fêtes;ouverte
+TAR-12;3;M;Règlement par virement : coordonnées du comptable public et référence sur la facture;;;R3-12 La facture affiche l'IBAN du comptable et la référence;ouverte
+TAR-13;3;M;Statuts de paiement et import des encaissements (état Ciril configurable) ou pointage manuel;;;R3-13 Importer l'état des titres soldés;ouverte
+CAU-01;3;M;Montant de caution par espace et type d'usager;;;R3-21 Une salle des fêtes exige une caution de 500 €;ouverte
+CAU-02;3;M;Cycle de statuts de la caution;;;R3-22 Une caution passe d'attendue à restituée;ouverte
+CAU-03;3;M;Restitution proposée seulement après l'état des lieux de sortie;;;R3-23 Pas de restitution avant l'état des lieux de sortie;ouverte
+CAU-04;3;M;Retenue motivée : motif, photos, montant, notification de l'usager;;;R3-24 Retenir 120 € avec photos : l'usager est notifié;ouverte
+CAU-05;3;M;Séparation des tâches au-delà d'un seuil;;;R3-25 Une retenue au-delà du seuil doit être validée par un second agent;ouverte
+CAU-06;3;M;Journal inaltérable et état exportable des cautions;;;R3-26 Exporter l'état des cautions;ouverte
+CAU-07;3;S;Alerte de délai de restitution;;;R3-27 Une caution non restituée après le délai apparaît en alerte;ouverte
+DOC-01;2;M;Modèles .docx versionnés éditables par l'administrateur fonctionnel;;;R2-21 Déposer une nouvelle version de modèle;ouverte
+DOC-02;2;M;Catalogue de modèles fournis (convention, contrat de location, devis, facture, avoir, état des lieux, attribution, refus, attestation de valorisation, fermeture);;;R2-22 Générer chaque modèle avec le jeu de démonstration;ouverte
+DOC-03;2;M;Contexte de fusion typé (récurrence lisible, montants en euros…);;;R2-23 La convention affiche « tous les mardis de 18 h à 20 h, hors vacances scolaires »;ouverte
+DOC-04;2;M;Conversion PDF/A-2b par Gotenberg, empreinte SHA-256;;;R2-24 Le PDF généré est un PDF/A avec empreinte enregistrée;ouverte
+DOC-05;2;M;Avenant pour toute modification d'un document signé (RG-13);;;R2-25 Modifier une convention signée produit un avenant;ouverte
+DOC-06;2;M;Génération en lot en tâche de fond avec progression et rapport d'erreurs;;;R2-26 Générer 40 conventions en lot;ouverte
+DOC-07;2;M;Rattachement au dossier et téléchargement contrôlé;;;R2-27 Un autre usager ne peut pas télécharger le document;ouverte
+SIG-01;2;M;Envoi à DocuSeal avec signataires ordonnés et expiration;;;R2-31 Envoyer une convention à signer : usager puis élu;ouverte
+SIG-02;2;M;Webhooks DocuSeal relayés par la façade et revérifiés par l'API;;;R2-32 Un webhook falsifié est ignoré;ouverte
+SIG-03;2;M;Récupération du PDF signé et du journal de preuve, purge côté DocuSeal;;;R2-33 Après signature, le PDF signé est au dossier et la soumission purgée;ouverte
+SIG-04;2;S;Relances avant expiration et annulation par l'agent;;;R2-34 Relance automatique à J-3 de l'expiration;ouverte
+SIG-05;2;M;Circuit de signature manuelle (scan déposé);;;R2-35 Déposer le scan signé : statut « signé manuellement »;ouverte
+COM-01;2;M;Notifications électroniques transactionnelles depuis des modèles de messages;;;R2-41 Valider une demande envoie un courriel à l'usager;ouverte
+COM-02;2;M;Messagerie par dossier entre agents et usagers;;;R2-42 Échanger des messages sur un dossier;ouverte
+COM-03;2;M;Notifications groupées (fermeture, attribution, refus motivés);;;R2-43 Notifier tous les usagers d'une fermeture;ouverte
+COM-04;2;S;Journal des envois et préférences de notification;;;R2-44 Consulter le journal des envois;ouverte
+COM-05;2;C;Envoi de SMS par un adaptateur configurable;;;R2-45 Envoyer un SMS de rappel sur le simulateur;ouverte
+PER-01;4;M;Fiches des agents et habilitations (SSIAP, PSC1) avec validité;;;R4-01 Une habilitation expirée exclut l'agent des propositions;ouverte
+PER-02;4;M;Besoins de personnel générés par les réservations, fusionnés par site;;;R4-02 Deux créneaux contigus forment un seul besoin;ouverte
+PER-03;4;M;Vacations et trames hebdomadaires par saison;;;R4-03 Appliquer une trame sur la saison;ouverte
+PER-04;4;M;Proposition d'affectation conforme aux règles;;;R4-04 Proposer un remplaçant à un gardien absent;ouverte
+PER-05;4;M;Moteur de règles de temps de travail, forçage motivé et tracé;;;R4-05 Une vacation dépassant 10 h est signalée;ouverte
+PER-06;4;M;Absences et remplacements;;;R4-06 Saisir une absence : la vacation devient non couverte;ouverte
+PER-07;4;M;Compteurs d'heures et export paie;;;R4-07 Exporter les compteurs du mois;ouverte
+PER-08;4;S;Abonnement iCal personnel à jeton révocable;;;R4-08 S'abonner au planning iCal puis révoquer le jeton;ouverte
+PER-09;4;M;Signalement d'incident rattaché à l'occurrence et à l'usager;;;R4-09 Signaler un incident depuis le mobile;ouverte
+MOB-01;4;M;Application mobile installable fonctionnant hors ligne;;;R4-21 Ouvrir l'application en mode avion;ouverte
+MOB-02;4;M;Planning local et pointage des heures réelles;;;R4-22 Pointer hors ligne;ouverte
+MOB-03;4;M;États des lieux avec photos et signature;;;R4-23 Réaliser un état des lieux de sortie avec photo et signature;ouverte
+MOB-04;4;M;Incidents saisis hors ligne;;;R4-24 Saisir un incident hors ligne;ouverte
+MOB-05;4;M;File d'envoi persistante, envoi par lots, idempotence;;;R4-25 Fermer l'application hors ligne puis revenir en réseau : saisie reçue une fois;ouverte
+MOB-06;4;M;Conflits : saisie sur occurrence annulée conservée et signalée;;;R4-26 Pointer une occurrence annulée entre-temps : signalement au gestionnaire;ouverte
+MOB-07;4;M;Paquet minimal (pas de montants ni pièces ni autres sites), stockage chiffré;;;R4-27 Le paquet ne contient aucun montant;ouverte
+MOB-08;4;M;Fraîcheur affichée, alerte au-delà de 24 h, purge après 7 jours;;;R4-28 Après 7 jours sans synchronisation, les données sont effacées;ouverte
+MAT-01;5;M;Inventaire du matériel (fixe, mobile, consommable) par site et espace;;;R5-01 Créer un matériel et l'affecter à un espace;ouverte
+MAT-02;5;M;Réservation de matériel avec un dossier et contrôle de disponibilité;;;R5-02 Réserver 20 tables quand 15 sont disponibles : refus;ouverte
+MAT-03;5;M;Mouvements de stock (sortie, retour, transfert, perte) et état du stock;;;R5-03 Enregistrer le retour de 18 tables sur 20 : 2 manquantes signalées;ouverte
+MAT-04;5;S;Maintenance et contrôles périodiques du matériel;;;R5-04 Un contrôle périodique dépassé apparaît en alerte;ouverte
+MAT-05;5;S;Signalement de panne rendant le matériel indisponible;;;R5-05 Un matériel en panne n'est plus réservable;ouverte
+VAL-01;6;M;Méthodes de valorisation paramétrées par famille d'espaces (tarif de référence, coût de revient, valeur locative);backend/apps/referentiel/models.py;;R6-01 Changer de méthode entre deux exercices;ouverte
+VAL-02;6;M;Calcul par association et par exercice (espaces, matériel, personnel dédié, partage);;;R6-02 Valoriser un espace partagé entre deux associations;ouverte
+VAL-03;6;M;Base : occurrences non annulées dans les délais, absences non signalées valorisées;;;R6-03 Une annulation hors délai reste valorisée;ouverte
+VAL-04;6;M;Attestation annuelle par association déposée sur le portail;;;R6-04 L'association télécharge son attestation;ouverte
+VAL-05;6;M;État annexe du compte administratif exportable;;;R6-05 Exporter l'annexe du compte administratif;ouverte
+VAL-06;6;M;Alertes de seuil 23 000 € et 153 000 € avec subventions en numéraire importées;;;R6-06 Une association à 24 000 € déclenche l'alerte de convention;ouverte
+VAL-07;6;S;Simulation en cours d'année;;;R6-07 Simuler la valorisation au 30 juin;ouverte
+VAL-08;6;M;Montants figés à la clôture, recalcul tracé;;;R6-08 Clôturer l'exercice puis tenter un recalcul sans procédure : refus;ouverte
+STA-01;6;M;Taux d'occupation par espace, site et période;;;R6-21 Afficher le taux d'occupation du mois;ouverte
+STA-02;6;M;Répartition par type d'usager et par activité;;;R6-22 Répartition des heures par type d'usager;ouverte
+STA-03;6;M;Recettes, gratuités et réductions;;;R6-23 Montant des recettes et des gratuités de l'année;ouverte
+STA-04;6;M;Exports tableur des statistiques;;;R6-24 Exporter les statistiques en tableur;ouverte
+STA-05;6;S;Indicateurs de personnel (heures planifiées, réalisées, supplémentaires);;;R6-25 Indicateurs de personnel du trimestre;ouverte
+DSH-01;6;M;Tableau de bord gestionnaire « que dois-je traiter aujourd'hui ? »;;;R6-31 Le tableau de bord liste les demandes à instruire;ouverte
+DSH-02;6;M;Besoins de personnel non couverts visibles;;;R6-32 Un besoin non couvert apparaît au tableau de bord;ouverte
+DSH-03;6;M;Alertes (pièces expirées, options expirantes, cautions en retard, factures impayées, contrôles matériel);;;R6-33 Les alertes du jour sont listées;ouverte
+DSH-04;6;M;Tableau de bord direction (occupation, recettes, valorisation, tendances);;;R6-34 Le tableau de bord direction affiche les indicateurs annuels;ouverte
+DSH-05;6;S;Tableau de bord filtré par périmètre de l'agent;;;R6-35 Un agent d'un site ne voit que son site;ouverte
+DSH-06;6;M;Compteurs cliquables ouvrant la liste filtrée;;;R6-36 Cliquer sur un compteur ouvre la liste filtrée;ouverte
+IMP-01;6;M;Plannings imprimés par espace et par site (A4/A3, noir et blanc, QR code, date d'édition);;;R6-41 Imprimer le planning hebdomadaire d'un gymnase;ouverte
+IMP-02;4;M;Planning PDF par agent et par site;;;R4-41 Éditer le planning PDF d'un gardien;ouverte
+IMP-03;6;S;Affichage en salle avec QR code vers la version en ligne;;;R6-43 Afficher la feuille de salle avec QR code;ouverte
+IMP-04;6;S;Envoi programmé des plannings;;;R6-44 Programmer l'envoi hebdomadaire du planning;ouverte
+IMP-05;4;S;Export iCal des plannings;;;R4-45 Télécharger le planning d'un espace en iCal;ouverte
+ADM-01;1;M;Calendrier des saisons : vacances scolaires zone C et jours fériés;;;R1-41 Importer le calendrier scolaire zone C;ouverte
+ADM-02;1;M;Paramètres fonctionnels (délais, seuils, barèmes) modifiables et tracés;;;R1-42 Modifier le délai d'expiration des options;ouverte
+ADM-03;0;M;Gestion des agents, rôles et périmètres;backend/apps/habilitations/api/views.py backend/apps/habilitations/models.py backend/apps/habilitations/services.py;backend/apps/habilitations/tests/test_droits.py;R0-11 Attribuer un rôle limité à un site;couverte
+ADM-04;2;M;Gestion des modèles de documents et de messages;;;R2-46 Modifier le modèle du courriel de validation;ouverte
+ADM-05;0;M;Consultation et export du journal d'audit;backend/apps/audit/api.py backend/apps/audit/models.py;backend/apps/audit/tests/test_journal.py;R0-12 Filtrer le journal d'audit par agent;couverte
+ADM-06;0;M;Correspondance groupes AD vers rôles configurable;backend/apps/habilitations/api/views.py backend/apps/habilitations/ldap.py backend/apps/habilitations/models.py backend/apps/habilitations/services.py backend/config/settings/base.py;backend/apps/habilitations/tests/test_authentification.py;R0-13 Ajouter un groupe AD et son rôle;couverte
+RG-01;1;M;Pas de chevauchement de deux occurrences validées/confirmées sur un même espace ou espace/sous-espace, sauf partageable;backend/apps/referentiel/models.py;;R1-51 Deux agents valident simultanément deux demandes concurrentes : une seule réussit;ouverte
+RG-02;1;M;Une demande ou une option ne bloque pas le créneau;;;R1-52 Deux demandes sur le même créneau sont acceptées en instruction;ouverte
+RG-03;1;M;Priorité : Ville > scolaire en temps scolaire > associations conventionnées locales > autres associations > entreprises et particuliers;;;R1-53 Arbitrage d'une campagne en conflit;ouverte
+RG-04;3;M;Tarif appliqué = tarif en vigueur à la date d'occupation, figé sur le devis accepté;;;R3-31 Changement de grille après acceptation sans effet;ouverte
+RG-05;3;M;Gratuité = réduction de 100 % sur un tarif de référence conservé;;;R3-32 Gratuité sans tarif de référence : erreur bloquante;ouverte
+RG-06;1;M;Confirmation subordonnée aux conditions du type de réservation (dossier complet, convention signée, acompte, caution);;;R1-54 Confirmer sans convention signée : refus motivé;ouverte
+RG-07;1;M;Option expirée libérée après une relance;;;R1-55 Option expirée libérée;ouverte
+RG-08;3;M;Annulation tardive : frais selon barème;;;R3-33 Frais d'annulation tardive;ouverte
+RG-09;4;M;Espace gardienné : besoin de personnel ;;; modification ou annulation : mise à jour et notification de l'agent;ouverte
+RG-10;4;M;Pas de chevauchement de vacations pour un agent;;;R4-52 Affecter un agent sur deux vacations simultanées : refus;ouverte
+RG-11;3;M;Restitution de caution seulement après l'état des lieux de sortie;;;R3-34 Restitution impossible avant état des lieux;ouverte
+RG-12;6;M;Valorisation sur les heures non annulées dans les délais;;;R6-51 Valorisation après annulations;ouverte
+RG-13;2;M;Documents signés, factures et journaux de caution immuables : correction par avenant ou avoir;;;R2-51 Tenter de modifier une facture émise : refus;ouverte
+RG-14;0;M;Droits = rôle × périmètre, vérifiés côté serveur sur chaque objet;backend/apps/habilitations/actions.py backend/apps/habilitations/models.py backend/apps/habilitations/permissions.py backend/apps/habilitations/services.py backend/apps/noyau/api.py backend/apps/referentiel/api/views.py;backend/apps/habilitations/tests/test_droits.py;R0-14 Un agent du site A ne peut pas lire un dossier du site B;couverte

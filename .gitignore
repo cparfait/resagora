@@ -1,0 +1,29 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+.mypy_cache/
+.ruff_cache/
+.pytest_cache/
+.coverage
+coverage.xml
+htmlcov/
+backend/.stockage-tests/
+backend/stockage/
+backend/static/
+# Node
+node_modules/
+dist/
+coverage/
+playwright-report/
+test-results/
+blob-report/
+*.tsbuildinfo
+# Secrets et certificats générés (jamais dans le dépôt, SEC-09)
+deploy/*/secrets/
+*.key
+.env
+.env.*
+# Divers
+.DS_Store
+Thumbs.db
