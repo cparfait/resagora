@@ -1,0 +1,75 @@
+# Routage DMZ (SEC-01). Le back-office et l'administration DocuSeal ne sont jamais publiés.
+tls:
+  certificates:
+    - certFile: /run/secrets/dmz_tls.crt
+      keyFile: /run/secrets/dmz_tls.key
+  options:
+    default:
+      minVersion: VersionTLS12
+    appareils:
+      # Option B de l'accès mobile (SEC-10) : certificat d'appareil obligatoire.
+      minVersion: VersionTLS12
+      clientAuth:
+        caFiles: [/run/secrets/ac_appareils.crt]
+        clientAuthType: RequireAndVerifyClientCert
+
+http:
+  middlewares:
+    entetes:
+      headers:
+        stsSeconds: 31536000
+        stsIncludeSubdomains: true
+        contentTypeNosniff: true
+        frameDeny: true
+        referrerPolicy: same-origin
+        customResponseHeaders:
+          Server: ""
+    debit:
+      rateLimit: { average: 50, burst: 100, period: 1s }
+    taille:
+      buffering: { maxRequestBodyBytes: 12582912 }
+    certificat-appareil:
+      passTLSClientCert:
+        info:
+          subject: { commonName: true, serialNumber: true }
+          notAfter: true
+
+  routers:
+    portail:
+      rule: "Host(`equipements.chatillon.test`)"
+      service: portail
+      middlewares: [entetes, debit]
+      priority: 10
+    facade:
+      rule: "Host(`equipements.chatillon.test`) && PathPrefix(`/api/portail/`)"
+      service: facade
+      middlewares: [entetes, debit, taille]
+      priority: 100
+    signature:
+      # Seules les pages de signature et leurs ressources : ni /api, ni /sign_in, ni l'administration.
+      rule: "Host(`signature.chatillon.test`) && PathRegexp(`^/(s|d|e|p|packs|assets|file|blobs|disk|rails/active_storage)/`)"
+      service: docuseal
+      middlewares: [entetes, debit, taille]
+      priority: 100
+    mobile-b-api:
+      rule: "Host(`gardiens.chatillon.test`) && PathPrefix(`/api/mobile/`)"
+      service: facade
+      middlewares: [entetes, debit, taille, certificat-appareil]
+      tls: { options: appareils }
+      priority: 100
+    mobile-b:
+      rule: "Host(`gardiens.chatillon.test`)"
+      service: mobile-b
+      middlewares: [entetes]
+      tls: { options: appareils }
+      priority: 10
+
+  services:
+    portail:
+      loadBalancer: { servers: [{ url: "http://portail:8080" }] }
+    facade:
+      loadBalancer: { servers: [{ url: "http://facade:8080" }], healthCheck: { path: /sante, interval: 30s } }
+    docuseal:
+      loadBalancer: { servers: [{ url: "http://docuseal:3000" }] }
+    mobile-b:
+      loadBalancer: { servers: [{ url: "http://mobile-b:8080" }] }

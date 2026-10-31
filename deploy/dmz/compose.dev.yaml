@@ -1,0 +1,13 @@
+# Surcharge de développement / recette sur un seul hôte : la façade rejoint le réseau de liaison
+# de la pile LAN pour atteindre api-portail:8443. En production, les deux zones sont sur des hôtes
+# distincts et la façade vise l'adresse du pare-feu (API_URL).
+services:
+  facade:
+    networks: [dmz_front, dmz_back, liaison]
+  docuseal:
+    networks: [dmz_front, dmz_docuseal, liaison]
+
+networks:
+  liaison:
+    name: equipements-lan_liaison_dmz
+    external: true

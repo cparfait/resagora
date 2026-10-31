@@ -1,0 +1,24 @@
+# Reverse proxy exposé sur Internet : portail statique, façade API, routes de signature DocuSeal.
+entryPoints:
+  websecure:
+    address: ":8443"
+    http:
+      tls: {}
+    transport:
+      respondingTimeouts:
+        readTimeout: 60s
+providers:
+  file:
+    filename: /etc/traefik/dynamique.yml
+    watch: false
+log:
+  level: INFO
+accessLog:
+  fields:
+    headers:
+      defaultMode: drop
+api:
+  dashboard: false
+global:
+  checkNewVersion: false
+  sendAnonymousUsage: false

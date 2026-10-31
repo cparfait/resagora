@@ -1,0 +1,24 @@
+{
+  "name": "backoffice",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -p tsconfig.json && vite build",
+    "test": "vitest run --coverage",
+    "lint": "oxlint -c ../.oxlintrc.json --deny-warnings src",
+    "typecheck": "tsc -p tsconfig.json",
+    "schema": "npm exec --prefix ../outils/codegen -- openapi-typescript ../docs/api/openapi-gestion.yaml -o src/api/schema.d.ts"
+  },
+  "dependencies": {
+    "@hookform/resolvers": "7.0.0",
+    "@tanstack/react-query": "5.105.0",
+    "openapi-fetch": "0.17.0",
+    "react": "19.3.1",
+    "react-dom": "19.3.1",
+    "react-hook-form": "7.91.0",
+    "react-router": "8.5.1",
+    "zod": "4.6.7"
+  }
+}

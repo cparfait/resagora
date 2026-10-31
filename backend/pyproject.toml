@@ -70,7 +70,7 @@ django_settings_module = "config.settings.test"
 [tool.pytest.ini_options]
 DJANGO_SETTINGS_MODULE = "config.settings.test"
 python_files = ["test_*.py"]
-addopts = "-q --strict-markers --reuse-db"
+addopts = "-q --strict-markers --reuse-db -m \"not integration\""
 markers = ["integration: nécessite les conteneurs de développement (annuaire, Mailpit, Gotenberg, ClamAV, DocuSeal)"]
 filterwarnings = ["ignore::DeprecationWarning:docxcompose.*", "ignore::DeprecationWarning:ldap3.*"]
 

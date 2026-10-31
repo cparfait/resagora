@@ -1,0 +1,100 @@
+# Zone DMZ : reverse proxy, portail statique, façade API (sans base métier), DocuSeal (signature).
+# Aucune base de données métier, aucun secret du LAN (SEC-01).
+name: equipements-dmz
+
+x-durci: &durci
+  read_only: true
+  tmpfs: [/tmp]
+  user: "10001:10001"
+  cap_drop: [ALL]
+  security_opt: ["no-new-privileges:true"]
+  pids_limit: 256
+  mem_limit: 512m
+  cpus: 1.0
+  restart: unless-stopped
+
+services:
+  proxy-dmz:
+    image: traefik:v3.7.17@sha256:30ff62491aacdb862ceb8c9edcf2627da638d7deafdd4b6dab32fe34f8aa3e90
+    <<: *durci
+    command: ["--configFile=/etc/traefik/traefik.yml"]
+    volumes: ["./traefik:/etc/traefik:ro"]
+    secrets: [dmz_tls.crt, dmz_tls.key, ac_appareils.crt]
+    ports: ["${IP_PUBLIQUE:-127.0.0.1}:443:8443"]
+    networks: [dmz_front]
+
+  portail:
+    <<: *durci
+    user: "101:101"
+    image: ${REGISTRE:-equipements}/portail:${VERSION:-dev}
+    build: { context: ../.., dockerfile: deploy/images/front.Dockerfile, args: { APPLICATION: portail } }
+    tmpfs: [/tmp, /var/cache/nginx]
+    networks: [dmz_front]
+
+  facade:
+    <<: *durci
+    image: ${REGISTRE:-equipements}/facade:${VERSION:-dev}
+    build: { context: ../.., dockerfile: deploy/images/facade.Dockerfile }
+    env_file: [parametres.env]
+    secrets: [facade_client.crt, facade_client.key, ac_interne.crt, valkey_dmz_url, docuseal_webhook_secret]
+    tmpfs: [/tmp, "/quarantaine:size=64m,mode=0700,uid=10001"]
+    networks: [dmz_front, dmz_back]
+
+  valkey-dmz:
+    image: valkey/valkey:9.1.3-trixie@sha256:3add1a336a920ea54770a001ab6feb3da5fceea96a40373a3a2cd469b815f0b7
+    command: ["valkey-server", "--save", "", "--appendonly", "no", "--maxmemory", "128mb", "--maxmemory-policy", "volatile-lru"]
+    <<: *durci
+    user: "999:999"
+    networks: [dmz_back]
+
+  clamav:
+    image: clamav/clamav:1.5.4-debian13-slim@sha256:cce3e1a43ae2bb40e11335c52c0e1e98273b12fa3d587e617f63a6907cc4b70b
+    cap_drop: [ALL]
+    cap_add: [CHOWN, SETUID, SETGID]
+    security_opt: ["no-new-privileges:true"]
+    mem_limit: 3g
+    volumes: [clamav-dmz:/var/lib/clamav]
+    networks: [dmz_back]
+    restart: unless-stopped
+
+  docuseal:
+    image: docuseal/docuseal:3.3.4@sha256:2786607f1f6eb54f982a926bd78c81ee23b6545e59d1ff548bd672094760621c
+    environment:
+      HOST: ${DOCUSEAL_HOTE:-signature.chatillon.test}
+      FORCE_SSL: "true"
+    cap_drop: [ALL]
+    cap_add: [CHOWN, SETUID, SETGID, DAC_OVERRIDE]
+    security_opt: ["no-new-privileges:true"]
+    mem_limit: 1g
+    volumes: [docuseal:/data]
+    networks: [dmz_front, dmz_docuseal]
+    restart: unless-stopped
+
+  mobile-b:
+    # Option B uniquement (SEC-10) : l'application mobile servie en DMZ, derrière le certificat d'appareil.
+    profiles: [mobile-b]
+    <<: *durci
+    user: "101:101"
+    image: ${REGISTRE:-equipements}/mobile:${VERSION:-dev}
+    build: { context: ../.., dockerfile: deploy/images/front.Dockerfile, args: { APPLICATION: mobile } }
+    tmpfs: [/tmp, /var/cache/nginx]
+    networks: [dmz_front]
+
+networks:
+  dmz_front: {}
+  dmz_back: { internal: false }
+  dmz_docuseal: {}
+
+volumes:
+  clamav-dmz:
+  docuseal:
+
+secrets:
+  dmz_tls.crt: { file: ./secrets/dmz_tls.crt }
+  dmz_tls.key: { file: ./secrets/dmz_tls.key }
+  ac_appareils.crt: { file: ./secrets/ac_appareils.crt }
+  facade_client.crt: { file: ./secrets/facade_client.crt }
+  facade_client.key: { file: ./secrets/facade_client.key }
+  ac_interne.crt: { file: ./secrets/ac_interne.crt }
+  valkey_dmz_url: { file: ./secrets/valkey_dmz_url }
+  docuseal_webhook_secret: { file: ./secrets/docuseal_webhook_secret }

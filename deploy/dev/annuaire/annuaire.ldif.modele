@@ -1,0 +1,250 @@
+# Comptes fictifs de recette (aucune donnée réelle).
+dn: dc=chatillon,dc=test
+objectClass: top
+objectClass: dcObject
+objectClass: organization
+o: Ville de Chatillon (test)
+dc: chatillon
+
+dn: ou=services,dc=chatillon,dc=test
+objectClass: organizationalUnit
+ou: services
+
+dn: ou=agents,dc=chatillon,dc=test
+objectClass: organizationalUnit
+ou: agents
+
+dn: ou=groupes,dc=chatillon,dc=test
+objectClass: organizationalUnit
+ou: groupes
+
+dn: cn=svc-equipements,ou=services,dc=chatillon,dc=test
+objectClass: inetOrgPerson
+cn: svc-equipements
+sn: Service
+uid: svc-equipements
+userPassword: @MDP_SERVICE@
+
+dn: uid=admin.recette,ou=agents,dc=chatillon,dc=test
+objectClass: inetOrgPerson
+uid: admin.recette
+cn: Camille Administratrice
+givenName: Camille
+sn: Administratrice
+mail: admin.recette@chatillon.test
+userPassword: @MDP_AGENTS@
+
+dn: uid=gest.ville,ou=agents,dc=chatillon,dc=test
+objectClass: inetOrgPerson
+uid: gest.ville
+cn: Jordan Gestionnaire
+givenName: Jordan
+sn: Gestionnaire
+mail: gest.ville@chatillon.test
+userPassword: @MDP_AGENTS@
+
+dn: uid=gest.complexe,ou=agents,dc=chatillon,dc=test
+objectClass: inetOrgPerson
+uid: gest.complexe
+cn: Sacha Responsable-Complexe
+givenName: Sacha
+sn: Responsable-Complexe
+mail: gest.complexe@chatillon.test
+userPassword: @MDP_AGENTS@
+
+dn: uid=accueil.recette,ou=agents,dc=chatillon,dc=test
+objectClass: inetOrgPerson
+uid: accueil.recette
+cn: Lou Accueil
+givenName: Lou
+sn: Accueil
+mail: accueil.recette@chatillon.test
+userPassword: @MDP_AGENTS@
+
+dn: uid=regie.recette,ou=agents,dc=chatillon,dc=test
+objectClass: inetOrgPerson
+uid: regie.recette
+cn: Noa Regisseur
+givenName: Noa
+sn: Regisseur
+mail: regie.recette@chatillon.test
+userPassword: @MDP_AGENTS@
+
+dn: uid=finances.recette,ou=agents,dc=chatillon,dc=test
+objectClass: inetOrgPerson
+uid: finances.recette
+cn: Eden Finances
+givenName: Eden
+sn: Finances
+mail: finances.recette@chatillon.test
+userPassword: @MDP_AGENTS@
+
+dn: uid=planif.recette,ou=agents,dc=chatillon,dc=test
+objectClass: inetOrgPerson
+uid: planif.recette
+cn: Alix Planificateur
+givenName: Alix
+sn: Planificateur
+mail: planif.recette@chatillon.test
+userPassword: @MDP_AGENTS@
+
+dn: uid=direction.recette,ou=agents,dc=chatillon,dc=test
+objectClass: inetOrgPerson
+uid: direction.recette
+cn: Maxime Direction
+givenName: Maxime
+sn: Direction
+mail: direction.recette@chatillon.test
+userPassword: @MDP_AGENTS@
+
+dn: uid=elu.recette,ou=agents,dc=chatillon,dc=test
+objectClass: inetOrgPerson
+uid: elu.recette
+cn: Charlie Commission
+givenName: Charlie
+sn: Commission
+mail: elu.recette@chatillon.test
+userPassword: @MDP_AGENTS@
+
+dn: uid=materiel.recette,ou=agents,dc=chatillon,dc=test
+objectClass: inetOrgPerson
+uid: materiel.recette
+cn: Andrea Technicien
+givenName: Andrea
+sn: Technicien
+mail: materiel.recette@chatillon.test
+userPassword: @MDP_AGENTS@
+
+dn: uid=gardien01,ou=agents,dc=chatillon,dc=test
+objectClass: inetOrgPerson
+uid: gardien01
+cn: Gardien01 Recette
+givenName: Gardien01
+sn: Recette
+mail: gardien01@chatillon.test
+userPassword: @MDP_AGENTS@
+
+dn: uid=gardien02,ou=agents,dc=chatillon,dc=test
+objectClass: inetOrgPerson
+uid: gardien02
+cn: Gardien02 Recette
+givenName: Gardien02
+sn: Recette
+mail: gardien02@chatillon.test
+userPassword: @MDP_AGENTS@
+
+dn: uid=gardien03,ou=agents,dc=chatillon,dc=test
+objectClass: inetOrgPerson
+uid: gardien03
+cn: Gardien03 Recette
+givenName: Gardien03
+sn: Recette
+mail: gardien03@chatillon.test
+userPassword: @MDP_AGENTS@
+
+dn: uid=gardien04,ou=agents,dc=chatillon,dc=test
+objectClass: inetOrgPerson
+uid: gardien04
+cn: Gardien04 Recette
+givenName: Gardien04
+sn: Recette
+mail: gardien04@chatillon.test
+userPassword: @MDP_AGENTS@
+
+dn: uid=gardien05,ou=agents,dc=chatillon,dc=test
+objectClass: inetOrgPerson
+uid: gardien05
+cn: Gardien05 Recette
+givenName: Gardien05
+sn: Recette
+mail: gardien05@chatillon.test
+userPassword: @MDP_AGENTS@
+
+dn: uid=gardien06,ou=agents,dc=chatillon,dc=test
+objectClass: inetOrgPerson
+uid: gardien06
+cn: Gardien06 Recette
+givenName: Gardien06
+sn: Recette
+mail: gardien06@chatillon.test
+userPassword: @MDP_AGENTS@
+
+dn: uid=gardien07,ou=agents,dc=chatillon,dc=test
+objectClass: inetOrgPerson
+uid: gardien07
+cn: Gardien07 Recette
+givenName: Gardien07
+sn: Recette
+mail: gardien07@chatillon.test
+userPassword: @MDP_AGENTS@
+
+dn: uid=gardien08,ou=agents,dc=chatillon,dc=test
+objectClass: inetOrgPerson
+uid: gardien08
+cn: Gardien08 Recette
+givenName: Gardien08
+sn: Recette
+mail: gardien08@chatillon.test
+userPassword: @MDP_AGENTS@
+
+dn: cn=GG-Equipements-Admins,ou=groupes,dc=chatillon,dc=test
+objectClass: groupOfNames
+cn: GG-Equipements-Admins
+member: uid=admin.recette,ou=agents,dc=chatillon,dc=test
+
+dn: cn=GG-Equipements-Gestionnaires,ou=groupes,dc=chatillon,dc=test
+objectClass: groupOfNames
+cn: GG-Equipements-Gestionnaires
+member: uid=gest.ville,ou=agents,dc=chatillon,dc=test
+
+dn: cn=GG-Equipements-Gestionnaires-Complexe,ou=groupes,dc=chatillon,dc=test
+objectClass: groupOfNames
+cn: GG-Equipements-Gestionnaires-Complexe
+member: uid=gest.complexe,ou=agents,dc=chatillon,dc=test
+
+dn: cn=GG-Equipements-Accueil,ou=groupes,dc=chatillon,dc=test
+objectClass: groupOfNames
+cn: GG-Equipements-Accueil
+member: uid=accueil.recette,ou=agents,dc=chatillon,dc=test
+
+dn: cn=GG-Equipements-Regie,ou=groupes,dc=chatillon,dc=test
+objectClass: groupOfNames
+cn: GG-Equipements-Regie
+member: uid=regie.recette,ou=agents,dc=chatillon,dc=test
+
+dn: cn=GG-Equipements-Finances,ou=groupes,dc=chatillon,dc=test
+objectClass: groupOfNames
+cn: GG-Equipements-Finances
+member: uid=finances.recette,ou=agents,dc=chatillon,dc=test
+
+dn: cn=GG-Equipements-Planification,ou=groupes,dc=chatillon,dc=test
+objectClass: groupOfNames
+cn: GG-Equipements-Planification
+member: uid=planif.recette,ou=agents,dc=chatillon,dc=test
+
+dn: cn=GG-Equipements-Direction,ou=groupes,dc=chatillon,dc=test
+objectClass: groupOfNames
+cn: GG-Equipements-Direction
+member: uid=direction.recette,ou=agents,dc=chatillon,dc=test
+
+dn: cn=GG-Equipements-Commission,ou=groupes,dc=chatillon,dc=test
+objectClass: groupOfNames
+cn: GG-Equipements-Commission
+member: uid=elu.recette,ou=agents,dc=chatillon,dc=test
+
+dn: cn=GG-Equipements-Materiel,ou=groupes,dc=chatillon,dc=test
+objectClass: groupOfNames
+cn: GG-Equipements-Materiel
+member: uid=materiel.recette,ou=agents,dc=chatillon,dc=test
+
+dn: cn=GG-Equipements-Gardiens,ou=groupes,dc=chatillon,dc=test
+objectClass: groupOfNames
+cn: GG-Equipements-Gardiens
+member: uid=gardien01,ou=agents,dc=chatillon,dc=test
+member: uid=gardien02,ou=agents,dc=chatillon,dc=test
+member: uid=gardien03,ou=agents,dc=chatillon,dc=test
+member: uid=gardien04,ou=agents,dc=chatillon,dc=test
+member: uid=gardien05,ou=agents,dc=chatillon,dc=test
+member: uid=gardien06,ou=agents,dc=chatillon,dc=test
+member: uid=gardien07,ou=agents,dc=chatillon,dc=test
+member: uid=gardien08,ou=agents,dc=chatillon,dc=test

@@ -1,0 +1,50 @@
+tls:
+  certificates:
+    - certFile: /run/secrets/lan_tls.crt
+      keyFile: /run/secrets/lan_tls.key
+  options:
+    default:
+      minVersion: VersionTLS12
+      sniStrict: false
+
+http:
+  middlewares:
+    entetes:
+      headers:
+        stsSeconds: 31536000
+        stsIncludeSubdomains: true
+        contentTypeNosniff: true
+        frameDeny: true
+        referrerPolicy: same-origin
+    taille:
+      buffering:
+        maxRequestBodyBytes: 20971520
+
+  routers:
+    api-gestion:
+      rule: "PathPrefix(`/api/gestion/`) || PathPrefix(`/api/mobile/`) || Path(`/sante`)"
+      service: api
+      middlewares: [entetes, taille]
+      priority: 100
+    backoffice:
+      rule: "HostRegexp(`^equipements\\..+`) || HostRegexp(`^localhost$`)"
+      service: backoffice
+      middlewares: [entetes]
+      priority: 10
+    mobile:
+      rule: "HostRegexp(`^gardiens\\..+`)"
+      service: mobile
+      middlewares: [entetes]
+      priority: 20
+
+  services:
+    api:
+      loadBalancer:
+        servers: [{ url: "http://api:8000" }]
+        healthCheck: { path: /sante, interval: 30s }
+    backoffice:
+      loadBalancer:
+        servers: [{ url: "http://backoffice:8080" }]
+    mobile:
+      loadBalancer:
+        servers: [{ url: "http://mobile:8080" }]

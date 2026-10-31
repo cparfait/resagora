@@ -1,0 +1,16 @@
+# Surcharge de développement / recette sur un seul hôte : services de test (annuaire OpenLDAP,
+# Mailpit, simulateurs PayFiP/SMS/Ciril) joints par le réseau d'outillage. Jamais en production.
+services:
+  api:
+    networks: [lan_app, lan_data, outillage, liaison_dmz]
+  api-portail:
+    networks: [lan_data, liaison_dmz, outillage]
+  worker:
+    networks: [lan_app, lan_data, outillage, liaison_dmz]
+  beat:
+    networks: [lan_data, outillage]
+
+networks:
+  outillage:
+    name: equipements-dev_default
+    external: true

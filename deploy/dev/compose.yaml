@@ -24,7 +24,12 @@ services:
     build:
       context: ../..
       dockerfile: deploy/dev/annuaire/Dockerfile
-    ports: ["127.0.0.1:50389:389", "127.0.0.1:50636:636"]
+    ports: ["127.0.0.1:50389:1389", "127.0.0.1:50636:1636"]
+    secrets: [ldap_admin_mot_de_passe, ldap_mot_de_passe, mdp_agents_demo, annuaire.crt, annuaire.key, ac_interne.crt]
+    read_only: true
+    tmpfs: [/tmp, "/run/slapd:uid=100,gid=101", "/var/lib/ldap:uid=100,gid=101"]
+    cap_drop: [ALL]
+    security_opt: ["no-new-privileges:true"]
 
   mailpit:
     image: axllent/mailpit:v1.33.0@sha256:9b3a463be15354c0f0eba91697d80e3e0d8a5623ef0e627cacc836bc17fd5231
@@ -35,20 +40,22 @@ services:
     ports: ["127.0.0.1:53000:3000"]
 
   clamav:
-    image: clamav/clamav:1.5.4-debian13-slim
+    image: clamav/clamav:1.5.4-debian13-slim@sha256:cce3e1a43ae2bb40e11335c52c0e1e98273b12fa3d587e617f63a6907cc4b70b
     ports: ["127.0.0.1:53310:3310"]
 
   docuseal:
-    image: docuseal/docuseal:3.3.4
+    image: docuseal/docuseal:3.3.4@sha256:2786607f1f6eb54f982a926bd78c81ee23b6545e59d1ff548bd672094760621c
     ports: ["127.0.0.1:53001:3000"]
     volumes: [docuseal-dev:/data]
-
-  simulateurs:
-    build:
-      context: ../..
-      dockerfile: deploy/dev/simulateurs/Dockerfile
-    ports: ["127.0.0.1:58090:8090"]
 
 volumes:
   pg-dev:
   docuseal-dev:
+
+secrets:
+  ldap_admin_mot_de_passe: { file: ./secrets/ldap_admin_mot_de_passe }
+  ldap_mot_de_passe: { file: ./secrets/ldap_mot_de_passe }
+  mdp_agents_demo: { file: ./secrets/mdp_agents_demo }
+  annuaire.crt: { file: ./secrets/annuaire.crt }
+  annuaire.key: { file: ./secrets/annuaire.key }
+  ac_interne.crt: { file: ./secrets/ac_interne.crt }

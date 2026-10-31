@@ -1,0 +1,2857 @@
+openapi: 3.0.3
+info:
+  title: API métier — équipements sportifs et associatifs de Châtillon
+  version: 1.0.0
+paths:
+  /api/gestion/admin/actions:
+    get:
+      operationId: gestion_admin_actions_retrieve
+      tags:
+      - gestion
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+  /api/gestion/admin/agents:
+    get:
+      operationId: gestion_admin_agents_list
+      description: '`chemin_site` : chemin ORM vers le site de l''objet (None = objet
+        transversal).'
+      parameters:
+      - in: query
+        name: is_active
+        schema:
+          type: boolean
+      - name: page
+        required: false
+        in: query
+        description: Un numéro de page de l'ensemble des résultats.
+        schema:
+          type: integer
+      - in: query
+        name: source
+        schema:
+          type: string
+          enum:
+          - ad
+          - local
+        description: |-
+          * `ad` - Active Directory
+          * `local` - Compte technique local
+      - name: taille
+        required: false
+        in: query
+        description: Nombre de résultats à retourner par page.
+        schema:
+          type: integer
+      tags:
+      - gestion
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedUtilisateurList'
+          description: ''
+    post:
+      operationId: gestion_admin_agents_create
+      description: '`chemin_site` : chemin ORM vers le site de l''objet (None = objet
+        transversal).'
+      tags:
+      - gestion
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UtilisateurRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/UtilisateurRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/UtilisateurRequest'
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Utilisateur'
+          description: ''
+  /api/gestion/admin/agents/{id}:
+    get:
+      operationId: gestion_admin_agents_retrieve
+      description: '`chemin_site` : chemin ORM vers le site de l''objet (None = objet
+        transversal).'
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un(une) valeur entière unique identifiant ce(cette) agent.
+        required: true
+      tags:
+      - gestion
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Utilisateur'
+          description: ''
+    patch:
+      operationId: gestion_admin_agents_partial_update
+      description: '`chemin_site` : chemin ORM vers le site de l''objet (None = objet
+        transversal).'
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un(une) valeur entière unique identifiant ce(cette) agent.
+        required: true
+      tags:
+      - gestion
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedUtilisateurRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedUtilisateurRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedUtilisateurRequest'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Utilisateur'
+          description: ''
+  /api/gestion/admin/agents/{id}/reinitialiser-totp:
+    post:
+      operationId: gestion_admin_agents_reinitialiser_totp_create
+      description: '`chemin_site` : chemin ORM vers le site de l''objet (None = objet
+        transversal).'
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un(une) valeur entière unique identifiant ce(cette) agent.
+        required: true
+      tags:
+      - gestion
+      responses:
+        '204':
+          description: No response body
+  /api/gestion/admin/groupes-ad:
+    get:
+      operationId: gestion_admin_groupes_ad_list
+      description: '`chemin_site` : chemin ORM vers le site de l''objet (None = objet
+        transversal).'
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: Un numéro de page de l'ensemble des résultats.
+        schema:
+          type: integer
+      - name: taille
+        required: false
+        in: query
+        description: Nombre de résultats à retourner par page.
+        schema:
+          type: integer
+      tags:
+      - gestion
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedGroupeADList'
+          description: ''
+    post:
+      operationId: gestion_admin_groupes_ad_create
+      description: '`chemin_site` : chemin ORM vers le site de l''objet (None = objet
+        transversal).'
+      tags:
+      - gestion
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GroupeADRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/GroupeADRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/GroupeADRequest'
+        required: true
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GroupeAD'
+          description: ''
+  /api/gestion/admin/groupes-ad/{id}:
+    get:
+      operationId: gestion_admin_groupes_ad_retrieve
+      description: '`chemin_site` : chemin ORM vers le site de l''objet (None = objet
+        transversal).'
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un(une) valeur entière unique identifiant ce(cette) groupe AD.
+        required: true
+      tags:
+      - gestion
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GroupeAD'
+          description: ''
+    put:
+      operationId: gestion_admin_groupes_ad_update
+      description: '`chemin_site` : chemin ORM vers le site de l''objet (None = objet
+        transversal).'
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un(une) valeur entière unique identifiant ce(cette) groupe AD.
+        required: true
+      tags:
+      - gestion
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GroupeADRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/GroupeADRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/GroupeADRequest'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GroupeAD'
+          description: ''
+    patch:
+      operationId: gestion_admin_groupes_ad_partial_update
+      description: '`chemin_site` : chemin ORM vers le site de l''objet (None = objet
+        transversal).'
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un(une) valeur entière unique identifiant ce(cette) groupe AD.
+        required: true
+      tags:
+      - gestion
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedGroupeADRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedGroupeADRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedGroupeADRequest'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GroupeAD'
+          description: ''
+    delete:
+      operationId: gestion_admin_groupes_ad_destroy
+      description: '`chemin_site` : chemin ORM vers le site de l''objet (None = objet
+        transversal).'
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un(une) valeur entière unique identifiant ce(cette) groupe AD.
+        required: true
+      tags:
+      - gestion
+      responses:
+        '204':
+          description: No response body
+  /api/gestion/admin/habilitations:
+    get:
+      operationId: gestion_admin_habilitations_list
+      description: '`chemin_site` : chemin ORM vers le site de l''objet (None = objet
+        transversal).'
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: Un numéro de page de l'ensemble des résultats.
+        schema:
+          type: integer
+      - in: query
+        name: perimetre
+        schema:
+          type: integer
+      - in: query
+        name: role
+        schema:
+          type: integer
+      - in: query
+        name: source
+        schema:
+          type: string
+          enum:
+          - ad
+          - manuel
+        description: |-
+          * `ad` - Groupe AD
+          * `manuel` - Attribution manuelle
+      - name: taille
+        required: false
+        in: query
+        description: Nombre de résultats à retourner par page.
+        schema:
+          type: integer
+      - in: query
+        name: utilisateur
+        schema:
+          type: integer
+      tags:
+      - gestion
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedHabilitationList'
+          description: ''
+    post:
+      operationId: gestion_admin_habilitations_create
+      description: '`chemin_site` : chemin ORM vers le site de l''objet (None = objet
+        transversal).'
+      tags:
+      - gestion
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/HabilitationRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/HabilitationRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/HabilitationRequest'
+        required: true
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Habilitation'
+          description: ''
+  /api/gestion/admin/habilitations/{id}:
+    get:
+      operationId: gestion_admin_habilitations_retrieve
+      description: '`chemin_site` : chemin ORM vers le site de l''objet (None = objet
+        transversal).'
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un(une) valeur entière unique identifiant ce(cette) habilitation.
+        required: true
+      tags:
+      - gestion
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Habilitation'
+          description: ''
+    put:
+      operationId: gestion_admin_habilitations_update
+      description: '`chemin_site` : chemin ORM vers le site de l''objet (None = objet
+        transversal).'
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un(une) valeur entière unique identifiant ce(cette) habilitation.
+        required: true
+      tags:
+      - gestion
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/HabilitationRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/HabilitationRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/HabilitationRequest'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Habilitation'
+          description: ''
+    patch:
+      operationId: gestion_admin_habilitations_partial_update
+      description: '`chemin_site` : chemin ORM vers le site de l''objet (None = objet
+        transversal).'
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un(une) valeur entière unique identifiant ce(cette) habilitation.
+        required: true
+      tags:
+      - gestion
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedHabilitationRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedHabilitationRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedHabilitationRequest'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Habilitation'
+          description: ''
+    delete:
+      operationId: gestion_admin_habilitations_destroy
+      description: '`chemin_site` : chemin ORM vers le site de l''objet (None = objet
+        transversal).'
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un(une) valeur entière unique identifiant ce(cette) habilitation.
+        required: true
+      tags:
+      - gestion
+      responses:
+        '204':
+          description: No response body
+  /api/gestion/admin/perimetres:
+    get:
+      operationId: gestion_admin_perimetres_list
+      description: '`chemin_site` : chemin ORM vers le site de l''objet (None = objet
+        transversal).'
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: Un numéro de page de l'ensemble des résultats.
+        schema:
+          type: integer
+      - name: taille
+        required: false
+        in: query
+        description: Nombre de résultats à retourner par page.
+        schema:
+          type: integer
+      tags:
+      - gestion
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedPerimetreList'
+          description: ''
+    post:
+      operationId: gestion_admin_perimetres_create
+      description: '`chemin_site` : chemin ORM vers le site de l''objet (None = objet
+        transversal).'
+      tags:
+      - gestion
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PerimetreRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PerimetreRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PerimetreRequest'
+        required: true
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Perimetre'
+          description: ''
+  /api/gestion/admin/perimetres/{id}:
+    get:
+      operationId: gestion_admin_perimetres_retrieve
+      description: '`chemin_site` : chemin ORM vers le site de l''objet (None = objet
+        transversal).'
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un(une) valeur entière unique identifiant ce(cette) perimetre.
+        required: true
+      tags:
+      - gestion
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Perimetre'
+          description: ''
+    put:
+      operationId: gestion_admin_perimetres_update
+      description: '`chemin_site` : chemin ORM vers le site de l''objet (None = objet
+        transversal).'
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un(une) valeur entière unique identifiant ce(cette) perimetre.
+        required: true
+      tags:
+      - gestion
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PerimetreRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PerimetreRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PerimetreRequest'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Perimetre'
+          description: ''
+    patch:
+      operationId: gestion_admin_perimetres_partial_update
+      description: '`chemin_site` : chemin ORM vers le site de l''objet (None = objet
+        transversal).'
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un(une) valeur entière unique identifiant ce(cette) perimetre.
+        required: true
+      tags:
+      - gestion
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedPerimetreRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedPerimetreRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedPerimetreRequest'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Perimetre'
+          description: ''
+    delete:
+      operationId: gestion_admin_perimetres_destroy
+      description: '`chemin_site` : chemin ORM vers le site de l''objet (None = objet
+        transversal).'
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un(une) valeur entière unique identifiant ce(cette) perimetre.
+        required: true
+      tags:
+      - gestion
+      responses:
+        '204':
+          description: No response body
+  /api/gestion/admin/roles:
+    get:
+      operationId: gestion_admin_roles_list
+      description: '`chemin_site` : chemin ORM vers le site de l''objet (None = objet
+        transversal).'
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: Un numéro de page de l'ensemble des résultats.
+        schema:
+          type: integer
+      - name: taille
+        required: false
+        in: query
+        description: Nombre de résultats à retourner par page.
+        schema:
+          type: integer
+      tags:
+      - gestion
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedRoleList'
+          description: ''
+    post:
+      operationId: gestion_admin_roles_create
+      description: '`chemin_site` : chemin ORM vers le site de l''objet (None = objet
+        transversal).'
+      tags:
+      - gestion
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RoleRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/RoleRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/RoleRequest'
+        required: true
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Role'
+          description: ''
+  /api/gestion/admin/roles/{id}:
+    get:
+      operationId: gestion_admin_roles_retrieve
+      description: '`chemin_site` : chemin ORM vers le site de l''objet (None = objet
+        transversal).'
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un(une) valeur entière unique identifiant ce(cette) role.
+        required: true
+      tags:
+      - gestion
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Role'
+          description: ''
+    put:
+      operationId: gestion_admin_roles_update
+      description: '`chemin_site` : chemin ORM vers le site de l''objet (None = objet
+        transversal).'
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un(une) valeur entière unique identifiant ce(cette) role.
+        required: true
+      tags:
+      - gestion
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RoleRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/RoleRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/RoleRequest'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Role'
+          description: ''
+    patch:
+      operationId: gestion_admin_roles_partial_update
+      description: '`chemin_site` : chemin ORM vers le site de l''objet (None = objet
+        transversal).'
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un(une) valeur entière unique identifiant ce(cette) role.
+        required: true
+      tags:
+      - gestion
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedRoleRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedRoleRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedRoleRequest'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Role'
+          description: ''
+    delete:
+      operationId: gestion_admin_roles_destroy
+      description: '`chemin_site` : chemin ORM vers le site de l''objet (None = objet
+        transversal).'
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un(une) valeur entière unique identifiant ce(cette) role.
+        required: true
+      tags:
+      - gestion
+      responses:
+        '204':
+          description: No response body
+  /api/gestion/audit/journal:
+    get:
+      operationId: gestion_audit_journal_list
+      parameters:
+      - in: query
+        name: acteur
+        schema:
+          type: integer
+      - in: query
+        name: acteur_libelle
+        schema:
+          type: string
+      - in: query
+        name: action
+        schema:
+          type: string
+      - in: query
+        name: au
+        schema:
+          type: string
+          format: date-time
+      - in: query
+        name: canal
+        schema:
+          type: string
+      - in: query
+        name: du
+        schema:
+          type: string
+          format: date-time
+      - in: query
+        name: objet_id
+        schema:
+          type: string
+      - in: query
+        name: objet_type
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: Un numéro de page de l'ensemble des résultats.
+        schema:
+          type: integer
+      - name: taille
+        required: false
+        in: query
+        description: Nombre de résultats à retourner par page.
+        schema:
+          type: integer
+      tags:
+      - gestion
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedJournalAuditList'
+          description: ''
+  /api/gestion/audit/journal/{id}:
+    get:
+      operationId: gestion_audit_journal_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un(une) valeur entière unique identifiant ce(cette) entrée du
+          journal d'audit.
+        required: true
+      tags:
+      - gestion
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JournalAudit'
+          description: ''
+  /api/gestion/audit/journal/export:
+    get:
+      operationId: gestion_audit_journal_export_retrieve
+      tags:
+      - gestion
+      responses:
+        '200':
+          content:
+            text/csv:
+              schema:
+                type: string
+          description: ''
+  /api/gestion/audit/journal/verification:
+    get:
+      operationId: gestion_audit_journal_verification_retrieve
+      tags:
+      - gestion
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Verification'
+          description: ''
+  /api/gestion/auth/connexion:
+    post:
+      operationId: gestion_auth_connexion_create
+      description: |-
+        Mot de passe AD ; la double authentification suit si le rôle l'exige. Messages identiques
+        en cas d'identifiant inconnu ou de mot de passe faux (pas d'énumération de comptes).
+      tags:
+      - gestion
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ConnexionRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ConnexionRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ConnexionRequest'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EtapeConnexion'
+          description: ''
+  /api/gestion/auth/csrf:
+    get:
+      operationId: gestion_auth_csrf_retrieve
+      tags:
+      - gestion
+      responses:
+        '204':
+          description: No response body
+  /api/gestion/auth/deconnexion:
+    post:
+      operationId: gestion_auth_deconnexion_create
+      tags:
+      - gestion
+      responses:
+        '204':
+          description: No response body
+  /api/gestion/auth/totp:
+    post:
+      operationId: gestion_auth_totp_create
+      description: Saisie du code de l'application d'authentification après le mot
+        de passe (SEC-03).
+      tags:
+      - gestion
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CodeTotpRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/CodeTotpRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CodeTotpRequest'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EtapeConnexion'
+          description: ''
+  /api/gestion/auth/totp/enrolement:
+    get:
+      operationId: gestion_auth_totp_enrolement_retrieve
+      tags:
+      - gestion
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Enrolement'
+          description: ''
+    post:
+      operationId: gestion_auth_totp_enrolement_create
+      tags:
+      - gestion
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CodeTotpRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/CodeTotpRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CodeTotpRequest'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EtapeConnexion'
+          description: ''
+  /api/gestion/moi:
+    get:
+      operationId: gestion_moi_retrieve
+      description: 'Profil et actions autorisées par périmètre : l''interface masque,
+        l''API refuse.'
+      tags:
+      - gestion
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Moi'
+          description: ''
+  /api/gestion/referentiel/batiments:
+    get:
+      operationId: gestion_referentiel_batiments_list
+      description: '`chemin_site` : chemin ORM vers le site de l''objet (None = objet
+        transversal).'
+      parameters:
+      - in: query
+        name: actif
+        schema:
+          type: boolean
+      - name: page
+        required: false
+        in: query
+        description: Un numéro de page de l'ensemble des résultats.
+        schema:
+          type: integer
+      - in: query
+        name: site
+        schema:
+          type: integer
+      - name: taille
+        required: false
+        in: query
+        description: Nombre de résultats à retourner par page.
+        schema:
+          type: integer
+      tags:
+      - gestion
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedBatimentList'
+          description: ''
+    post:
+      operationId: gestion_referentiel_batiments_create
+      description: '`chemin_site` : chemin ORM vers le site de l''objet (None = objet
+        transversal).'
+      tags:
+      - gestion
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BatimentRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/BatimentRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/BatimentRequest'
+        required: true
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Batiment'
+          description: ''
+  /api/gestion/referentiel/batiments/{id}:
+    get:
+      operationId: gestion_referentiel_batiments_retrieve
+      description: '`chemin_site` : chemin ORM vers le site de l''objet (None = objet
+        transversal).'
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un(une) valeur entière unique identifiant ce(cette) batiment.
+        required: true
+      tags:
+      - gestion
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Batiment'
+          description: ''
+    put:
+      operationId: gestion_referentiel_batiments_update
+      description: '`chemin_site` : chemin ORM vers le site de l''objet (None = objet
+        transversal).'
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un(une) valeur entière unique identifiant ce(cette) batiment.
+        required: true
+      tags:
+      - gestion
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BatimentRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/BatimentRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/BatimentRequest'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Batiment'
+          description: ''
+    patch:
+      operationId: gestion_referentiel_batiments_partial_update
+      description: '`chemin_site` : chemin ORM vers le site de l''objet (None = objet
+        transversal).'
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un(une) valeur entière unique identifiant ce(cette) batiment.
+        required: true
+      tags:
+      - gestion
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedBatimentRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedBatimentRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedBatimentRequest'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Batiment'
+          description: ''
+    delete:
+      operationId: gestion_referentiel_batiments_destroy
+      description: '`chemin_site` : chemin ORM vers le site de l''objet (None = objet
+        transversal).'
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un(une) valeur entière unique identifiant ce(cette) batiment.
+        required: true
+      tags:
+      - gestion
+      responses:
+        '204':
+          description: No response body
+  /api/gestion/referentiel/espaces:
+    get:
+      operationId: gestion_referentiel_espaces_list
+      description: '`chemin_site` : chemin ORM vers le site de l''objet (None = objet
+        transversal).'
+      parameters:
+      - in: query
+        name: actif
+        schema:
+          type: boolean
+      - in: query
+        name: batiment
+        schema:
+          type: integer
+      - in: query
+        name: batiment__site
+        schema:
+          type: integer
+      - in: query
+        name: famille
+        schema:
+          type: integer
+      - in: query
+        name: gardiennage_requis
+        schema:
+          type: boolean
+      - name: page
+        required: false
+        in: query
+        description: Un numéro de page de l'ensemble des résultats.
+        schema:
+          type: integer
+      - in: query
+        name: parent
+        schema:
+          type: integer
+      - in: query
+        name: partageable
+        schema:
+          type: boolean
+      - name: taille
+        required: false
+        in: query
+        description: Nombre de résultats à retourner par page.
+        schema:
+          type: integer
+      tags:
+      - gestion
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedEspaceList'
+          description: ''
+    post:
+      operationId: gestion_referentiel_espaces_create
+      description: '`chemin_site` : chemin ORM vers le site de l''objet (None = objet
+        transversal).'
+      tags:
+      - gestion
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EspaceRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/EspaceRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/EspaceRequest'
+        required: true
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Espace'
+          description: ''
+  /api/gestion/referentiel/espaces/{id}:
+    get:
+      operationId: gestion_referentiel_espaces_retrieve
+      description: '`chemin_site` : chemin ORM vers le site de l''objet (None = objet
+        transversal).'
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un(une) valeur entière unique identifiant ce(cette) espace.
+        required: true
+      tags:
+      - gestion
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Espace'
+          description: ''
+    put:
+      operationId: gestion_referentiel_espaces_update
+      description: '`chemin_site` : chemin ORM vers le site de l''objet (None = objet
+        transversal).'
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un(une) valeur entière unique identifiant ce(cette) espace.
+        required: true
+      tags:
+      - gestion
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EspaceRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/EspaceRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/EspaceRequest'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Espace'
+          description: ''
+    patch:
+      operationId: gestion_referentiel_espaces_partial_update
+      description: '`chemin_site` : chemin ORM vers le site de l''objet (None = objet
+        transversal).'
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un(une) valeur entière unique identifiant ce(cette) espace.
+        required: true
+      tags:
+      - gestion
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedEspaceRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedEspaceRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedEspaceRequest'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Espace'
+          description: ''
+    delete:
+      operationId: gestion_referentiel_espaces_destroy
+      description: '`chemin_site` : chemin ORM vers le site de l''objet (None = objet
+        transversal).'
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un(une) valeur entière unique identifiant ce(cette) espace.
+        required: true
+      tags:
+      - gestion
+      responses:
+        '204':
+          description: No response body
+  /api/gestion/referentiel/familles:
+    get:
+      operationId: gestion_referentiel_familles_list
+      description: '`chemin_site` : chemin ORM vers le site de l''objet (None = objet
+        transversal).'
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: Un numéro de page de l'ensemble des résultats.
+        schema:
+          type: integer
+      - name: taille
+        required: false
+        in: query
+        description: Nombre de résultats à retourner par page.
+        schema:
+          type: integer
+      tags:
+      - gestion
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedFamilleEspaceList'
+          description: ''
+    post:
+      operationId: gestion_referentiel_familles_create
+      description: '`chemin_site` : chemin ORM vers le site de l''objet (None = objet
+        transversal).'
+      tags:
+      - gestion
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FamilleEspaceRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/FamilleEspaceRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/FamilleEspaceRequest'
+        required: true
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FamilleEspace'
+          description: ''
+  /api/gestion/referentiel/familles/{id}:
+    get:
+      operationId: gestion_referentiel_familles_retrieve
+      description: '`chemin_site` : chemin ORM vers le site de l''objet (None = objet
+        transversal).'
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un(une) valeur entière unique identifiant ce(cette) famille d'espaces.
+        required: true
+      tags:
+      - gestion
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FamilleEspace'
+          description: ''
+    put:
+      operationId: gestion_referentiel_familles_update
+      description: '`chemin_site` : chemin ORM vers le site de l''objet (None = objet
+        transversal).'
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un(une) valeur entière unique identifiant ce(cette) famille d'espaces.
+        required: true
+      tags:
+      - gestion
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FamilleEspaceRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/FamilleEspaceRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/FamilleEspaceRequest'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FamilleEspace'
+          description: ''
+    patch:
+      operationId: gestion_referentiel_familles_partial_update
+      description: '`chemin_site` : chemin ORM vers le site de l''objet (None = objet
+        transversal).'
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un(une) valeur entière unique identifiant ce(cette) famille d'espaces.
+        required: true
+      tags:
+      - gestion
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedFamilleEspaceRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedFamilleEspaceRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedFamilleEspaceRequest'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FamilleEspace'
+          description: ''
+    delete:
+      operationId: gestion_referentiel_familles_destroy
+      description: '`chemin_site` : chemin ORM vers le site de l''objet (None = objet
+        transversal).'
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un(une) valeur entière unique identifiant ce(cette) famille d'espaces.
+        required: true
+      tags:
+      - gestion
+      responses:
+        '204':
+          description: No response body
+  /api/gestion/referentiel/sites:
+    get:
+      operationId: gestion_referentiel_sites_list
+      description: '`chemin_site` : chemin ORM vers le site de l''objet (None = objet
+        transversal).'
+      parameters:
+      - in: query
+        name: actif
+        schema:
+          type: boolean
+      - name: page
+        required: false
+        in: query
+        description: Un numéro de page de l'ensemble des résultats.
+        schema:
+          type: integer
+      - name: taille
+        required: false
+        in: query
+        description: Nombre de résultats à retourner par page.
+        schema:
+          type: integer
+      tags:
+      - gestion
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedSiteList'
+          description: ''
+    post:
+      operationId: gestion_referentiel_sites_create
+      description: '`chemin_site` : chemin ORM vers le site de l''objet (None = objet
+        transversal).'
+      tags:
+      - gestion
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SiteRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/SiteRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/SiteRequest'
+        required: true
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Site'
+          description: ''
+  /api/gestion/referentiel/sites/{id}:
+    get:
+      operationId: gestion_referentiel_sites_retrieve
+      description: '`chemin_site` : chemin ORM vers le site de l''objet (None = objet
+        transversal).'
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un(une) valeur entière unique identifiant ce(cette) site.
+        required: true
+      tags:
+      - gestion
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Site'
+          description: ''
+    put:
+      operationId: gestion_referentiel_sites_update
+      description: '`chemin_site` : chemin ORM vers le site de l''objet (None = objet
+        transversal).'
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un(une) valeur entière unique identifiant ce(cette) site.
+        required: true
+      tags:
+      - gestion
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SiteRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/SiteRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/SiteRequest'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Site'
+          description: ''
+    patch:
+      operationId: gestion_referentiel_sites_partial_update
+      description: '`chemin_site` : chemin ORM vers le site de l''objet (None = objet
+        transversal).'
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un(une) valeur entière unique identifiant ce(cette) site.
+        required: true
+      tags:
+      - gestion
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedSiteRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedSiteRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedSiteRequest'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Site'
+          description: ''
+    delete:
+      operationId: gestion_referentiel_sites_destroy
+      description: '`chemin_site` : chemin ORM vers le site de l''objet (None = objet
+        transversal).'
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un(une) valeur entière unique identifiant ce(cette) site.
+        required: true
+      tags:
+      - gestion
+      responses:
+        '204':
+          description: No response body
+components:
+  schemas:
+    Batiment:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        site:
+          type: integer
+        site_nom:
+          type: string
+          readOnly: true
+        nom:
+          type: string
+          maxLength: 150
+        erp_categorie:
+          type: string
+          title: Catégorie ERP
+          maxLength: 3
+        erp_type:
+          type: string
+          title: Type ERP
+          maxLength: 3
+        actif:
+          type: boolean
+      required:
+      - id
+      - nom
+      - site
+      - site_nom
+    BatimentRequest:
+      type: object
+      properties:
+        site:
+          type: integer
+        nom:
+          type: string
+          minLength: 1
+          maxLength: 150
+        erp_categorie:
+          type: string
+          title: Catégorie ERP
+          maxLength: 3
+        erp_type:
+          type: string
+          title: Type ERP
+          maxLength: 3
+        actif:
+          type: boolean
+      required:
+      - nom
+      - site
+    CodeTotpRequest:
+      type: object
+      properties:
+        code:
+          type: string
+          minLength: 1
+          pattern: ^\s*\d{3}\s?\d{3}\s*$
+      required:
+      - code
+    ConnexionRequest:
+      type: object
+      properties:
+        identifiant:
+          type: string
+          minLength: 1
+          maxLength: 128
+        mot_de_passe:
+          type: string
+          minLength: 1
+          maxLength: 256
+      required:
+      - identifiant
+      - mot_de_passe
+    Enrolement:
+      type: object
+      properties:
+        uri:
+          type: string
+        qr_svg:
+          type: string
+        graine:
+          type: string
+      required:
+      - graine
+      - qr_svg
+      - uri
+    Espace:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        code:
+          type: string
+          maxLength: 40
+          pattern: ^[-a-zA-Z0-9_]+$
+        nom:
+          type: string
+          maxLength: 150
+        batiment:
+          type: integer
+        batiment_nom:
+          type: string
+          readOnly: true
+        site:
+          type: integer
+          readOnly: true
+        site_nom:
+          type: string
+          readOnly: true
+        parent:
+          type: integer
+          nullable: true
+          description: 'Espace englobant : réserver l''un bloque l''autre (REF-05).'
+        famille:
+          type: integer
+        famille_libelle:
+          type: string
+          readOnly: true
+        description:
+          type: string
+        capacite:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+          title: Capacité d'accueil (personnes)
+        surface_m2:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+          title: Surface (m²)
+        accessible_pmr:
+          type: boolean
+          title: Accessible aux personnes à mobilité réduite
+        equipements:
+          type: string
+          title: Équipements fixes
+        activites:
+          type: string
+          title: Activités possibles
+          maxLength: 300
+        gardiennage_requis:
+          type: boolean
+          description: Toute occupation génère un besoin de gardien (REF-04).
+        temps_ouverture_min:
+          type: integer
+          maximum: 32767
+          minimum: 0
+          title: Temps d'ouverture (min)
+        temps_fermeture_min:
+          type: integer
+          maximum: 32767
+          minimum: 0
+          title: Temps de fermeture (min)
+        partageable:
+          type: boolean
+          description: Plusieurs réservations simultanées possibles (REF-07).
+        capacite_simultanee:
+          type: integer
+          maximum: 32767
+          minimum: 0
+          title: Réservations simultanées maximum
+        reservable_portail:
+          type: boolean
+          title: Réservable depuis le portail
+        actif:
+          type: boolean
+      required:
+      - batiment
+      - batiment_nom
+      - code
+      - famille
+      - famille_libelle
+      - id
+      - nom
+      - site
+      - site_nom
+    EspaceRequest:
+      type: object
+      properties:
+        code:
+          type: string
+          minLength: 1
+          maxLength: 40
+          pattern: ^[-a-zA-Z0-9_]+$
+        nom:
+          type: string
+          minLength: 1
+          maxLength: 150
+        batiment:
+          type: integer
+        parent:
+          type: integer
+          nullable: true
+          description: 'Espace englobant : réserver l''un bloque l''autre (REF-05).'
+        famille:
+          type: integer
+        description:
+          type: string
+        capacite:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+          title: Capacité d'accueil (personnes)
+        surface_m2:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+          title: Surface (m²)
+        accessible_pmr:
+          type: boolean
+          title: Accessible aux personnes à mobilité réduite
+        equipements:
+          type: string
+          title: Équipements fixes
+        activites:
+          type: string
+          title: Activités possibles
+          maxLength: 300
+        gardiennage_requis:
+          type: boolean
+          description: Toute occupation génère un besoin de gardien (REF-04).
+        temps_ouverture_min:
+          type: integer
+          maximum: 32767
+          minimum: 0
+          title: Temps d'ouverture (min)
+        temps_fermeture_min:
+          type: integer
+          maximum: 32767
+          minimum: 0
+          title: Temps de fermeture (min)
+        partageable:
+          type: boolean
+          description: Plusieurs réservations simultanées possibles (REF-07).
+        capacite_simultanee:
+          type: integer
+          maximum: 32767
+          minimum: 0
+          title: Réservations simultanées maximum
+        reservable_portail:
+          type: boolean
+          title: Réservable depuis le portail
+        actif:
+          type: boolean
+      required:
+      - batiment
+      - code
+      - famille
+      - nom
+    EtapeConnexion:
+      type: object
+      properties:
+        etape:
+          $ref: '#/components/schemas/EtapeEnum'
+        utilisateur:
+          $ref: '#/components/schemas/Moi'
+      required:
+      - etape
+    EtapeEnum:
+      enum:
+      - connecte
+      - code_totp
+      - enrolement_totp
+      type: string
+      description: |-
+        * `connecte` - connecte
+        * `code_totp` - code_totp
+        * `enrolement_totp` - enrolement_totp
+    FamilleEspace:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        code:
+          type: string
+          maxLength: 40
+          pattern: ^[-a-zA-Z0-9_]+$
+        libelle:
+          type: string
+          maxLength: 120
+        ordre:
+          type: integer
+          maximum: 32767
+          minimum: 0
+      required:
+      - code
+      - id
+      - libelle
+    FamilleEspaceRequest:
+      type: object
+      properties:
+        code:
+          type: string
+          minLength: 1
+          maxLength: 40
+          pattern: ^[-a-zA-Z0-9_]+$
+        libelle:
+          type: string
+          minLength: 1
+          maxLength: 120
+        ordre:
+          type: integer
+          maximum: 32767
+          minimum: 0
+      required:
+      - code
+      - libelle
+    GroupeAD:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        dn:
+          type: string
+          title: DN du groupe
+          maxLength: 500
+        libelle:
+          type: string
+          maxLength: 200
+        role:
+          type: integer
+        perimetre:
+          type: integer
+        actif:
+          type: boolean
+      required:
+      - dn
+      - id
+      - perimetre
+      - role
+    GroupeADRequest:
+      type: object
+      properties:
+        dn:
+          type: string
+          minLength: 1
+          title: DN du groupe
+          maxLength: 500
+        libelle:
+          type: string
+          maxLength: 200
+        role:
+          type: integer
+        perimetre:
+          type: integer
+        actif:
+          type: boolean
+      required:
+      - dn
+      - perimetre
+      - role
+    Habilitation:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        utilisateur:
+          type: integer
+        role:
+          type: integer
+        role_libelle:
+          type: string
+          readOnly: true
+        perimetre:
+          type: integer
+        perimetre_nom:
+          type: string
+          readOnly: true
+        source:
+          allOf:
+          - $ref: '#/components/schemas/HabilitationSourceEnum'
+          readOnly: true
+          default: manuel
+        debut:
+          type: string
+          format: date
+        fin:
+          type: string
+          format: date
+          nullable: true
+      required:
+      - id
+      - perimetre
+      - perimetre_nom
+      - role
+      - role_libelle
+      - source
+      - utilisateur
+    HabilitationMoi:
+      type: object
+      properties:
+        role:
+          type: string
+        role_libelle:
+          type: string
+        perimetre:
+          type: string
+        tous_sites:
+          type: boolean
+        sites:
+          type: array
+          items:
+            type: integer
+        actions:
+          type: array
+          items:
+            type: string
+      required:
+      - actions
+      - perimetre
+      - role
+      - role_libelle
+      - sites
+      - tous_sites
+    HabilitationRequest:
+      type: object
+      properties:
+        utilisateur:
+          type: integer
+        role:
+          type: integer
+        perimetre:
+          type: integer
+        debut:
+          type: string
+          format: date
+        fin:
+          type: string
+          format: date
+          nullable: true
+      required:
+      - perimetre
+      - role
+      - utilisateur
+    HabilitationSourceEnum:
+      enum:
+      - ad
+      - manuel
+      type: string
+      description: |-
+        * `ad` - Groupe AD
+        * `manuel` - Attribution manuelle
+    JournalAudit:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        horodatage:
+          type: string
+          format: date-time
+        acteur:
+          type: integer
+          nullable: true
+        acteur_libelle:
+          type: string
+          maxLength: 200
+        canal:
+          type: string
+          maxLength: 20
+        action:
+          type: string
+          maxLength: 80
+        objet_type:
+          type: string
+          maxLength: 80
+        objet_id:
+          type: string
+          maxLength: 64
+        objet_libelle:
+          type: string
+          maxLength: 300
+        avant:
+          nullable: true
+        apres:
+          nullable: true
+        adresse_ip:
+          type: string
+          nullable: true
+        empreinte:
+          type: string
+          maxLength: 64
+      required:
+      - action
+      - empreinte
+      - horodatage
+      - id
+    Moi:
+      type: object
+      properties:
+        id:
+          type: integer
+        identifiant:
+          type: string
+        nom_affiche:
+          type: string
+        courriel:
+          oneOf:
+          - type: string
+            format: email
+          - type: string
+            maxLength: 0
+        double_authentification_exigee:
+          type: boolean
+        double_authentification_active:
+          type: boolean
+        double_authentification_validee:
+          type: boolean
+        habilitations:
+          type: array
+          items:
+            $ref: '#/components/schemas/HabilitationMoi'
+      required:
+      - courriel
+      - double_authentification_active
+      - double_authentification_exigee
+      - double_authentification_validee
+      - habilitations
+      - id
+      - identifiant
+      - nom_affiche
+    PaginatedBatimentList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Batiment'
+    PaginatedEspaceList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Espace'
+    PaginatedFamilleEspaceList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/FamilleEspace'
+    PaginatedGroupeADList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/GroupeAD'
+    PaginatedHabilitationList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Habilitation'
+    PaginatedJournalAuditList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/JournalAudit'
+    PaginatedPerimetreList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Perimetre'
+    PaginatedRoleList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Role'
+    PaginatedSiteList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Site'
+    PaginatedUtilisateurList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Utilisateur'
+    PatchedBatimentRequest:
+      type: object
+      properties:
+        site:
+          type: integer
+        nom:
+          type: string
+          minLength: 1
+          maxLength: 150
+        erp_categorie:
+          type: string
+          title: Catégorie ERP
+          maxLength: 3
+        erp_type:
+          type: string
+          title: Type ERP
+          maxLength: 3
+        actif:
+          type: boolean
+    PatchedEspaceRequest:
+      type: object
+      properties:
+        code:
+          type: string
+          minLength: 1
+          maxLength: 40
+          pattern: ^[-a-zA-Z0-9_]+$
+        nom:
+          type: string
+          minLength: 1
+          maxLength: 150
+        batiment:
+          type: integer
+        parent:
+          type: integer
+          nullable: true
+          description: 'Espace englobant : réserver l''un bloque l''autre (REF-05).'
+        famille:
+          type: integer
+        description:
+          type: string
+        capacite:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+          title: Capacité d'accueil (personnes)
+        surface_m2:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+          title: Surface (m²)
+        accessible_pmr:
+          type: boolean
+          title: Accessible aux personnes à mobilité réduite
+        equipements:
+          type: string
+          title: Équipements fixes
+        activites:
+          type: string
+          title: Activités possibles
+          maxLength: 300
+        gardiennage_requis:
+          type: boolean
+          description: Toute occupation génère un besoin de gardien (REF-04).
+        temps_ouverture_min:
+          type: integer
+          maximum: 32767
+          minimum: 0
+          title: Temps d'ouverture (min)
+        temps_fermeture_min:
+          type: integer
+          maximum: 32767
+          minimum: 0
+          title: Temps de fermeture (min)
+        partageable:
+          type: boolean
+          description: Plusieurs réservations simultanées possibles (REF-07).
+        capacite_simultanee:
+          type: integer
+          maximum: 32767
+          minimum: 0
+          title: Réservations simultanées maximum
+        reservable_portail:
+          type: boolean
+          title: Réservable depuis le portail
+        actif:
+          type: boolean
+    PatchedFamilleEspaceRequest:
+      type: object
+      properties:
+        code:
+          type: string
+          minLength: 1
+          maxLength: 40
+          pattern: ^[-a-zA-Z0-9_]+$
+        libelle:
+          type: string
+          minLength: 1
+          maxLength: 120
+        ordre:
+          type: integer
+          maximum: 32767
+          minimum: 0
+    PatchedGroupeADRequest:
+      type: object
+      properties:
+        dn:
+          type: string
+          minLength: 1
+          title: DN du groupe
+          maxLength: 500
+        libelle:
+          type: string
+          maxLength: 200
+        role:
+          type: integer
+        perimetre:
+          type: integer
+        actif:
+          type: boolean
+    PatchedHabilitationRequest:
+      type: object
+      properties:
+        utilisateur:
+          type: integer
+        role:
+          type: integer
+        perimetre:
+          type: integer
+        debut:
+          type: string
+          format: date
+        fin:
+          type: string
+          format: date
+          nullable: true
+    PatchedPerimetreRequest:
+      type: object
+      properties:
+        nom:
+          type: string
+          minLength: 1
+          maxLength: 120
+        tous_sites:
+          type: boolean
+        sites:
+          type: array
+          items:
+            type: integer
+    PatchedRoleRequest:
+      type: object
+      properties:
+        code:
+          type: string
+          minLength: 1
+          maxLength: 40
+          pattern: ^[-a-zA-Z0-9_]+$
+        libelle:
+          type: string
+          minLength: 1
+          maxLength: 120
+        actions:
+          type: array
+          items:
+            type: string
+            minLength: 1
+            maxLength: 40
+        double_authentification:
+          type: boolean
+          description: 'Double authentification obligatoire (administration, régie
+            : SEC-03).'
+    PatchedSiteRequest:
+      type: object
+      properties:
+        code:
+          type: string
+          minLength: 1
+          maxLength: 30
+          pattern: ^[-a-zA-Z0-9_]+$
+        nom:
+          type: string
+          minLength: 1
+          maxLength: 150
+        adresse:
+          type: string
+          maxLength: 250
+        code_postal:
+          type: string
+          maxLength: 5
+        commune:
+          type: string
+          maxLength: 80
+        telephone:
+          type: string
+          maxLength: 20
+        actif:
+          type: boolean
+    PatchedUtilisateurRequest:
+      type: object
+      properties:
+        is_active:
+          type: boolean
+          title: Actif
+          description: Précise si l’utilisateur doit être considéré comme actif. Décochez
+            ceci plutôt que de supprimer le compte.
+    Perimetre:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        nom:
+          type: string
+          maxLength: 120
+        tous_sites:
+          type: boolean
+        sites:
+          type: array
+          items:
+            type: integer
+      required:
+      - id
+      - nom
+    PerimetreRequest:
+      type: object
+      properties:
+        nom:
+          type: string
+          minLength: 1
+          maxLength: 120
+        tous_sites:
+          type: boolean
+        sites:
+          type: array
+          items:
+            type: integer
+      required:
+      - nom
+    Role:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        code:
+          type: string
+          maxLength: 40
+          pattern: ^[-a-zA-Z0-9_]+$
+        libelle:
+          type: string
+          maxLength: 120
+        actions:
+          type: array
+          items:
+            type: string
+            maxLength: 40
+        double_authentification:
+          type: boolean
+          description: 'Double authentification obligatoire (administration, régie
+            : SEC-03).'
+      required:
+      - code
+      - id
+      - libelle
+    RoleRequest:
+      type: object
+      properties:
+        code:
+          type: string
+          minLength: 1
+          maxLength: 40
+          pattern: ^[-a-zA-Z0-9_]+$
+        libelle:
+          type: string
+          minLength: 1
+          maxLength: 120
+        actions:
+          type: array
+          items:
+            type: string
+            minLength: 1
+            maxLength: 40
+        double_authentification:
+          type: boolean
+          description: 'Double authentification obligatoire (administration, régie
+            : SEC-03).'
+      required:
+      - code
+      - libelle
+    Site:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        code:
+          type: string
+          maxLength: 30
+          pattern: ^[-a-zA-Z0-9_]+$
+        nom:
+          type: string
+          maxLength: 150
+        adresse:
+          type: string
+          maxLength: 250
+        code_postal:
+          type: string
+          maxLength: 5
+        commune:
+          type: string
+          maxLength: 80
+        telephone:
+          type: string
+          maxLength: 20
+        actif:
+          type: boolean
+      required:
+      - code
+      - id
+      - nom
+    SiteRequest:
+      type: object
+      properties:
+        code:
+          type: string
+          minLength: 1
+          maxLength: 30
+          pattern: ^[-a-zA-Z0-9_]+$
+        nom:
+          type: string
+          minLength: 1
+          maxLength: 150
+        adresse:
+          type: string
+          maxLength: 250
+        code_postal:
+          type: string
+          maxLength: 5
+        commune:
+          type: string
+          maxLength: 80
+        telephone:
+          type: string
+          maxLength: 20
+        actif:
+          type: boolean
+      required:
+      - code
+      - nom
+    Utilisateur:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        username:
+          type: string
+          readOnly: true
+          title: Nom d’utilisateur
+          description: Requis. 150 caractères maximum. Uniquement des lettres, nombres
+            et les caractères « @ », « . », « + », « - » et « _ ».
+        first_name:
+          type: string
+          readOnly: true
+          title: Prénom
+        last_name:
+          type: string
+          readOnly: true
+          title: Nom
+        email:
+          type: string
+          format: email
+          readOnly: true
+          title: Adresse électronique
+        nom_affiche:
+          type: string
+          readOnly: true
+        is_active:
+          type: boolean
+          title: Actif
+          description: Précise si l’utilisateur doit être considéré comme actif. Décochez
+            ceci plutôt que de supprimer le compte.
+        source:
+          allOf:
+          - $ref: '#/components/schemas/UtilisateurSourceEnum'
+          readOnly: true
+        totp_actif:
+          type: boolean
+          readOnly: true
+        last_login:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+          title: Dernière connexion
+        derniere_synchronisation_ad:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        habilitations:
+          type: array
+          items:
+            $ref: '#/components/schemas/Habilitation'
+          readOnly: true
+      required:
+      - derniere_synchronisation_ad
+      - email
+      - first_name
+      - habilitations
+      - id
+      - last_login
+      - last_name
+      - nom_affiche
+      - source
+      - totp_actif
+      - username
+    UtilisateurRequest:
+      type: object
+      properties:
+        is_active:
+          type: boolean
+          title: Actif
+          description: Précise si l’utilisateur doit être considéré comme actif. Décochez
+            ceci plutôt que de supprimer le compte.
+    UtilisateurSourceEnum:
+      enum:
+      - ad
+      - local
+      type: string
+      description: |-
+        * `ad` - Active Directory
+        * `local` - Compte technique local
+    Verification:
+      type: object
+      properties:
+        entrees_verifiees:
+          type: integer
+        integre:
+          type: boolean
+        anomalies:
+          type: array
+          items:
+            type: string
+      required:
+      - anomalies
+      - entrees_verifiees
+      - integre

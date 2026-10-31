@@ -1,0 +1,21 @@
+# Reverse proxy interne du LAN : back-office, application mobile (VPN, option A) et API de gestion.
+entryPoints:
+  websecure:
+    address: ":8443"
+    http:
+      tls: {}
+providers:
+  file:
+    filename: /etc/traefik/dynamique.yml
+    watch: false
+log:
+  level: INFO
+accessLog:
+  fields:
+    headers:
+      defaultMode: drop
+api:
+  dashboard: false
+global:
+  checkNewVersion: false
+  sendAnonymousUsage: false

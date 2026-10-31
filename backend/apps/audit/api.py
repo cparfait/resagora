@@ -38,8 +38,8 @@ class JournalAuditSerializer(serializers.ModelSerializer):
 
 
 class FiltreJournal(django_filters.FilterSet):
-    du = django_filters.IsoDateTimeFilter(field_name="horodatage", lookup_expr="gte")
-    au = django_filters.IsoDateTimeFilter(field_name="horodatage", lookup_expr="lte")
+    du = django_filters.DateFilter(field_name="horodatage", lookup_expr="date__gte")
+    au = django_filters.DateFilter(field_name="horodatage", lookup_expr="date__lte")
     action = django_filters.CharFilter(lookup_expr="icontains")
     acteur_libelle = django_filters.CharFilter(lookup_expr="icontains")
 

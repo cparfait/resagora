@@ -1,0 +1,12 @@
+{
+  "name": "codegen-openapi",
+  "private": true,
+  "description": "Génération des types TypeScript depuis l'OpenAPI ; isolé car openapi-typescript exige l'API JavaScript de TypeScript 5 (D-010).",
+  "devDependencies": {
+    "openapi-typescript": "7.13.0",
+    "typescript": "5.9.3"
+  },
+  "overrides": {
+    "minimatch": "11.0.3"
+  }
+}
