@@ -2,5 +2,224 @@ openapi: 3.0.3
 info:
   title: API métier — équipements sportifs et associatifs de Châtillon
   version: 1.0.0
-paths: {}
-components: {}
+paths:
+  /api/portail/catalogue/espaces:
+    get:
+      operationId: espaces_list
+      description: 'Base des vues publiques du portail : pas d''authentification,
+        débit limité.'
+      parameters:
+      - in: query
+        name: accessible_pmr
+        schema:
+          type: boolean
+      - in: query
+        name: batiment__site
+        schema:
+          type: integer
+      - in: query
+        name: famille
+        schema:
+          type: integer
+      - name: page
+        required: false
+        in: query
+        description: Un numéro de page de l'ensemble des résultats.
+        schema:
+          type: integer
+      - name: taille
+        required: false
+        in: query
+        description: Nombre de résultats à retourner par page.
+        schema:
+          type: integer
+      tags:
+      - espaces
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedEspacePublicList'
+          description: ''
+  /api/portail/catalogue/espaces/{id}:
+    get:
+      operationId: espaces_retrieve
+      description: 'Base des vues publiques du portail : pas d''authentification,
+        débit limité.'
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - espaces
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EspacePublic'
+          description: ''
+  /api/portail/catalogue/familles:
+    get:
+      operationId: familles_list
+      description: 'Base des vues publiques du portail : pas d''authentification,
+        débit limité.'
+      tags:
+      - familles
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/FamillePublique'
+          description: ''
+  /api/portail/catalogue/sites:
+    get:
+      operationId: sites_list
+      description: 'Base des vues publiques du portail : pas d''authentification,
+        débit limité.'
+      tags:
+      - sites
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SitePublic'
+          description: ''
+components:
+  schemas:
+    EspacePublic:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        nom:
+          type: string
+          maxLength: 150
+        site:
+          type: integer
+          readOnly: true
+        site_nom:
+          type: string
+          readOnly: true
+        adresse:
+          type: string
+          readOnly: true
+        famille:
+          type: integer
+        famille_libelle:
+          type: string
+          readOnly: true
+        parent:
+          type: integer
+          nullable: true
+          readOnly: true
+        parent_nom:
+          type: string
+          nullable: true
+          readOnly: true
+        description:
+          type: string
+        capacite:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+          title: Capacité d'accueil (personnes)
+        surface_m2:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+          title: Surface (m²)
+        accessible_pmr:
+          type: boolean
+          title: Accessible aux personnes à mobilité réduite
+        equipements:
+          type: string
+          title: Équipements fixes
+        activites:
+          type: string
+          title: Activités possibles
+          maxLength: 300
+        partageable:
+          type: boolean
+          description: Plusieurs réservations simultanées possibles (REF-07).
+      required:
+      - adresse
+      - famille
+      - famille_libelle
+      - id
+      - nom
+      - parent
+      - parent_nom
+      - site
+      - site_nom
+    FamillePublique:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        code:
+          type: string
+          maxLength: 40
+          pattern: ^[-a-zA-Z0-9_]+$
+        libelle:
+          type: string
+          maxLength: 120
+      required:
+      - code
+      - id
+      - libelle
+    PaginatedEspacePublicList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/EspacePublic'
+    SitePublic:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        nom:
+          type: string
+          maxLength: 150
+        adresse:
+          type: string
+          maxLength: 250
+        code_postal:
+          type: string
+          maxLength: 5
+        commune:
+          type: string
+          maxLength: 80
+      required:
+      - id
+      - nom

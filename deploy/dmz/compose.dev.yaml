@@ -1,16 +1,22 @@
 # Surcharge de développement / recette sur un seul hôte : la façade rejoint le réseau de liaison
-# de la pile LAN pour atteindre api-portail:8443. En production, les deux zones sont sur des hôtes
-# distincts et la façade vise l'adresse du pare-feu (API_URL).
+# de la pile LAN pour atteindre api-portail:8443 ; DocuSeal rejoint le réseau de signature du LAN.
+# En production, les zones sont sur des hôtes distincts et seuls les flux du pare-feu existent.
 services:
   proxy-dmz:
     # Sur le poste de développement, le portail est publié sur 127.0.0.1:9443 (le 443 sert au proxy LAN).
     ports: !override ["127.0.0.1:9443:8443"]
   facade:
     networks: [dmz_front, dmz_back, liaison]
+    environment:
+      FORWARDED_ALLOW_IPS: 10.231.10.250
+      PAYFIP_SANS_FILTRE_IP: "1"
   docuseal:
-    networks: [dmz_front, dmz_docuseal, liaison]
+    networks: [dmz_signature, liaison_signature]
 
 networks:
   liaison:
     name: equipements-lan_liaison_dmz
+    external: true
+  liaison_signature:
+    name: equipements-liaison-signature
     external: true

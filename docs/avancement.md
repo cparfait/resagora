@@ -3,6 +3,9 @@
 > Mémoire du projet : relire ce fichier après toute interruption.
 > Référentiel des exigences : `docs/recette/exigences.csv` (reconstitué, voir D-001).
 > Matrice générée : `docs/recette/matrice.csv` (`make matrice`).
+> Commandes utiles sous Windows : `backend/.venv/Scripts/python -m pytest` (tests API, base 127.0.0.1:55432),
+> `docker compose -f deploy/dev/compose.yaml --profile outils run --rm outils make preparer lint test`,
+> e2e : `cd e2e && PLAYWRIGHT_BROWSERS_PATH=../.playwright npx playwright test`.
 
 ## Lot 0 — Socle
 
@@ -10,21 +13,46 @@ Exigences : SEC-01, SEC-02, SEC-03, SEC-05, SEC-06, SEC-08, SEC-09, REF-01, REF-
 
 | Étape | Contenu | Exigences | État |
 | --- | --- | --- | --- |
-| 0.1 | Dépôt, docs, Makefile, CI, contrôle des motifs interdits, matrice | — | en cours |
-| 0.2 | Projet Django (réglages, santé, DRF, OpenAPI, pytest, ruff, mypy) | SEC-05, SEC-09 | à faire |
-| 0.3 | Référentiel de base (sites, bâtiments, espaces, familles) | REF-01, REF-02 | à faire |
-| 0.4 | Habilitations rôle × périmètre, actions, `peut()`, `/api/gestion/moi` | RG-14, ADM-03 | à faire |
-| 0.5 | Journal d'audit chaîné et immuable, décorateur `@audite`, consultation | SEC-08, ADM-05 | à faire |
-| 0.6 | Authentification AD (LDAPS ldap3), groupes → rôles, TOTP admin/régie, limitation de débit | SEC-02, SEC-03, SEC-06, ADM-06 | à faire |
-| 0.7 | Façade DMZ (liste blanche, mTLS, en-têtes) et contrôle mTLS côté API | SEC-01, SEC-05 | à faire |
-| 0.8 | Docker : images durcies, compose LAN, DMZ et dev, certificats de développement, secrets | SEC-01, SEC-09 | à faire |
-| 0.9 | Fronts : squelettes back-office, portail et mobile, connexion agent | SEC-02 | à faire |
-| 0.10 | Revue sécurité et métier, e2e, critère de sortie | — | à faire |
+| 0.1 | Dépôt, docs, Makefile, CI, contrôle des motifs interdits, matrice | — | fait |
+| 0.2 | Projet Django (réglages par canal, santé, DRF, OpenAPI, pytest, ruff, mypy) | SEC-05, SEC-09 | fait |
+| 0.3 | Référentiel de base (sites, bâtiments, espaces hiérarchiques, familles) | REF-01, REF-02 | fait |
+| 0.4 | Habilitations rôle × périmètre, actions, `peut()`, `/api/gestion/moi` | RG-14, ADM-03 | fait |
+| 0.5 | Journal d'audit chaîné et immuable, `@audite`, consultation, export, vérification | SEC-08, ADM-05 | fait |
+| 0.6 | AD LDAPS (ldap3), groupes → rôles, TOTP admin/régie/finances, limitation de débit | SEC-02, SEC-03, SEC-06, ADM-06 | fait |
+| 0.7 | Façade DMZ (liste blanche, sessions, CSRF, quarantaine ClamAV, rappels) + canal portail mTLS | SEC-01, SEC-05, SEC-07 | fait |
+| 0.8 | Images durcies, compose LAN/DMZ/dev, certificats et secrets de dev, annuaire OpenLDAP | SEC-01, SEC-09 | fait |
+| 0.9 | Back-office : connexion AD + TOTP, cadre, référentiel, administration, journal | SEC-02, SEC-03, ADM-03/05/06 | fait |
+| 0.10 | Revues sécurité et métier (0 bloquant ; 6 majeurs sécurité et 10 points métier corrigés), e2e Playwright + axe, critère de sortie | — | fait |
 
-Critère de sortie (reconstitué, §9.2 indisponible) : pile LAN et DMZ démarrée, agent authentifié
-par l'annuaire de test, droits rôle × périmètre testés (autorisé et refusé), journal d'audit
-vérifiable, flux façade → API en mTLS seulement.
+Critère de sortie (reconstitué, §9.2 indisponible) :
+- [x] pile LAN et DMZ démarrée en conteneurs ;
+- [x] agent authentifié par l'annuaire de test (LDAPS) avec rôle issu de son groupe ;
+- [x] droits rôle × périmètre testés (autorisé et refusé) côté API et interface ;
+- [x] journal d'audit chaîné, immuable et vérifiable ;
+- [x] flux façade → API en mTLS seulement (refus sans certificat client vérifié) ;
+- [x] revues sécurité et métier traitées (ADR 0005, D-015 à D-020).
+
+**Lot 0 terminé le 2026-10-31.**
+
+## Lot 1 — Réservations
+
+Exigences : REF-03 à REF-08, USR-01 à USR-05, PLA-01 à PLA-12, ADM-01, ADM-02, RG-01, RG-02, RG-03, RG-06, RG-07 (+ COM-01 socle des notifications, utilisé par REF-06, PLA-08, PLA-12).
+
+| Étape | Contenu | Exigences | État |
+| --- | --- | --- | --- |
+| 1.1 | Paramètres fonctionnels tracés ; saisons, calendrier scolaire zone C (client open data + import) et jours fériés calculés | ADM-01, ADM-02 | à faire |
+| 1.2 | Horaires d'ouverture, fermetures exceptionnelles, documents d'espace (stockage contrôlé) | REF-03, REF-06, REF-08 | à faire |
+| 1.3 | Usagers, contacts, rattachements, conventionnement, pièces justificatives et alertes | USR-01 à USR-05 | à faire |
+| 1.4 | Dossiers, réservations, récurrences RRULE, occurrences, verrous par espaces feuilles + contrainte d'exclusion | PLA-04, PLA-06, REF-05, REF-07, RG-01, RG-02 | à faire |
+| 1.5 | Cycle de statuts, conditions de confirmation enfichables, options et relance, annulation, présence | PLA-06, PLA-08, PLA-10, PLA-11, RG-06, RG-07 | à faire |
+| 1.6 | Conflits et alternatives, liste d'attente, priorité municipale, fermeture → impacts | PLA-07, PLA-09, PLA-12, REF-06, RG-03 | à faire |
+| 1.7 | Campagne annuelle : dépôt, instruction, arbitrage RG-03, commission, attribution en lot | PLA-05, RG-03 | à faire |
+| 1.8 | Notifications électroniques (socle COM-01) | COM-01 | à faire |
+| 1.9 | Back-office : usagers, dossiers, planning six vues, glisser-déposer contrôlé, vues enregistrées, campagne, calendrier, paramètres | PLA-01, PLA-02, PLA-03 | à faire |
+| 1.10 | e2e du lot, revues, critère de sortie | — | à faire |
 
 ## Journal
 
 - 2026-10-31 — Démarrage. Cahier des charges absent (D-001), référentiel reconstitué.
+- 2026-10-31 — Revues lot 0 : passage à python-ldap (ldap3 non maintenu), rôle PostgreSQL applicatif, HMAC + ancrage + purge du journal, verrouillage et réactivation TOTP, appariement objectGUID, séparation des tâches, routes DocuSeal restreintes. 109 tests API, 26 façade, 21 front, 4 e2e.
+- 2026-10-31 — Lot 0 : 61+ tests API, 19 tests façade, 21 tests front, 4 e2e (axe sans violation) ; pile LAN + DMZ en conteneurs, chaîne mTLS vérifiée.

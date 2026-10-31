@@ -28,3 +28,4 @@ deploy/*/secrets/
 .DS_Store
 Thumbs.db
 .playwright/
+.patchs/

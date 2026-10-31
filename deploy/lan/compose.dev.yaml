@@ -1,14 +1,20 @@
 # Surcharge de développement / recette sur un seul hôte : services de test (annuaire OpenLDAP,
 # Mailpit, simulateurs PayFiP/SMS/Ciril) joints par le réseau d'outillage. Jamais en production.
+# L'API de gestion n'est jamais sur le réseau de liaison avec la DMZ : seule api-portail l'est.
+# DocuSeal (DMZ) est joint par le réseau « liaison_signature », sans la façade.
 services:
   api:
-    networks: [lan_app, lan_data, outillage, liaison_dmz]
+    networks:
+      lan_app: {}
+      lan_data: {}
+      outillage: {}
+      liaison_signature: {}
   api-portail:
     # Sur un hôte unique, la façade joint api-portail par le réseau de liaison : pas de port publié.
     ports: !reset []
     networks: [lan_data, liaison_dmz, outillage]
   worker:
-    networks: [lan_app, lan_data, outillage, liaison_dmz]
+    networks: [lan_app, lan_data, sortie_lan, outillage, liaison_signature]
   beat:
     networks: [lan_data, outillage]
 
@@ -16,3 +22,5 @@ networks:
   outillage:
     name: equipements-dev_default
     external: true
+  liaison_signature:
+    name: equipements-liaison-signature

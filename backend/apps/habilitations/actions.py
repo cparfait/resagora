@@ -1,6 +1,9 @@
-"""Catalogue des actions (verbes) contrôlées par rôle × périmètre (RG-14).
+"""Catalogue des actions (verbes) contrôlées par rôle × périmètre (RG-14) et rôles initiaux (ADM-03).
 
 Une action = un verbe métier. Les rôles regroupent des actions ; les périmètres limitent les sites.
+Séparation des tâches (ADR 0005) : l'ordonnateur (émission, avoirs, titres) est distinct de la régie
+(encaissement, réception et restitution des cautions) ; l'administrateur gère les droits sans
+exercer d'acte financier ; le contrôle interne lit le journal d'audit.
 """
 
 from __future__ import annotations
@@ -24,7 +27,7 @@ ACTIONS: dict[str, str] = {
     "cloturer_reservation": "Saisir le réalisé et clôturer",
     "gerer_campagne": "Ouvrir et instruire les campagnes de créneaux annuels",
     "arbitrer_campagne": "Arbitrer et attribuer les créneaux en commission",
-    "deplacer_priorite": "Déplacer une réservation confirmée pour priorité municipale",
+    "deplacer_priorite": "Déplacer une réservation confirmée pour priorité municipale (avec motif)",
     # Documents, signature, communication
     "lire_document": "Consulter et télécharger les documents",
     "generer_document": "Générer des documents et avenants",
@@ -36,16 +39,17 @@ ACTIONS: dict[str, str] = {
     # Finances
     "lire_finances": "Consulter tarifs, devis, factures et cautions",
     "gerer_tarifs": "Gérer les grilles tarifaires et barèmes",
-    "emettre_facture": "Émettre devis et factures",
-    "emettre_avoir": "Émettre des avoirs",
-    "exporter_titres": "Exporter les titres de recettes vers Ciril",
-    "encaisser": "Pointer les encaissements",
-    "gerer_caution": "Gérer les cautions",
+    "emettre_facture": "Émettre devis et factures (ordonnateur)",
+    "emettre_avoir": "Émettre des avoirs (ordonnateur)",
+    "exporter_titres": "Exporter les titres de recettes vers Ciril (ordonnateur)",
+    "encaisser": "Pointer les encaissements (régie)",
+    "gerer_caution": "Enregistrer la réception et la restitution des cautions (régie)",
+    "proposer_retenue": "Constater un dommage et proposer une retenue de caution",
     "valider_retenue": "Valider les retenues de caution au-delà du seuil",
     # Personnel et mobile
     "lire_personnel": "Consulter le planning du personnel",
     "planifier_personnel": "Planifier vacations, trames et remplacements",
-    "gerer_agents": "Gérer les fiches agents, habilitations et absences",
+    "gerer_agents": "Gérer les fiches agents, qualifications (SSIAP, PSC1) et absences",
     "forcer_regle": "Forcer une règle de temps de travail avec motif",
     "utiliser_mobile": "Utiliser l'application mobile des gardiens",
     "gerer_appareils": "Enrôler et révoquer les appareils mobiles",
@@ -64,14 +68,62 @@ ACTIONS: dict[str, str] = {
     "lire_audit": "Consulter et exporter le journal d'audit",
 }
 
-_LECTURE = [a for a in ACTIONS if a.startswith("lire_") and a != "lire_audit"]
+#: Actions qui imposent la double authentification au rôle qui les porte (SEC-03).
+ACTIONS_SENSIBLES = frozenset(
+    {
+        "administrer",
+        "lire_audit",
+        "encaisser",
+        "gerer_caution",
+        "emettre_avoir",
+        "exporter_titres",
+        "valider_retenue",
+        "cloturer_valorisation",
+        "gerer_parametres",
+        "anonymiser_usager",
+        "gerer_appareils",
+    }
+)
+
+#: Couples d'actions qu'un même agent ne peut pas cumuler (séparation ordonnateur / comptable, ADR 0005).
+INCOMPATIBILITES: list[tuple[str, str]] = [
+    ("encaisser", "emettre_facture"),
+    ("encaisser", "emettre_avoir"),
+    ("gerer_caution", "valider_retenue"),
+    ("administrer", "encaisser"),
+]
+
+_LECTURE_METIER = [
+    "lire_referentiel",
+    "lire_usager",
+    "lire_reservation",
+    "lire_document",
+    "lire_message",
+    "lire_finances",
+    "lire_personnel",
+    "lire_materiel",
+    "lire_valorisation",
+    "lire_statistiques",
+]
 
 ROLES_INITIAUX: dict[str, dict[str, object]] = {
-    "administrateur": {"libelle": "Administrateur", "actions": list(ACTIONS), "double_authentification": True},
+    "administrateur": {
+        "libelle": "Administrateur fonctionnel",
+        "actions": [
+            *_LECTURE_METIER,
+            "administrer",
+            "gerer_parametres",
+            "gerer_modele",
+            "anonymiser_usager",
+            "lire_audit",
+            "gerer_referentiel",
+        ],
+        "double_authentification": True,
+    },
     "gestionnaire": {
         "libelle": "Gestionnaire des équipements",
         "actions": [
-            *_LECTURE,
+            *_LECTURE_METIER,
             "gerer_referentiel",
             "gerer_usager",
             "valider_compte_usager",
@@ -82,12 +134,13 @@ ROLES_INITIAUX: dict[str, dict[str, object]] = {
             "annuler_reservation",
             "cloturer_reservation",
             "gerer_campagne",
+            "deplacer_priorite",
             "generer_document",
             "envoyer_signature",
             "envoyer_message",
             "notifier_groupe",
             "emettre_facture",
-            "gerer_caution",
+            "proposer_retenue",
             "gerer_materiel",
             "calculer_valorisation",
         ],
@@ -110,7 +163,7 @@ ROLES_INITIAUX: dict[str, dict[str, object]] = {
     },
     "elu_commission": {
         "libelle": "Membre de la commission d'attribution",
-        "actions": ["lire_referentiel", "lire_usager", "lire_reservation", "arbitrer_campagne", "deplacer_priorite"],
+        "actions": ["lire_referentiel", "lire_reservation", "arbitrer_campagne"],
         "double_authentification": False,
     },
     "regisseur": {
@@ -123,12 +176,11 @@ ROLES_INITIAUX: dict[str, dict[str, object]] = {
             "lire_document",
             "encaisser",
             "gerer_caution",
-            "emettre_facture",
         ],
         "double_authentification": True,
     },
     "financier": {
-        "libelle": "Service financier",
+        "libelle": "Service financier (ordonnateur)",
         "actions": [
             "lire_referentiel",
             "lire_usager",
@@ -139,7 +191,6 @@ ROLES_INITIAUX: dict[str, dict[str, object]] = {
             "emettre_facture",
             "emettre_avoir",
             "exporter_titres",
-            "encaisser",
             "valider_retenue",
             "lire_valorisation",
             "calculer_valorisation",
@@ -160,7 +211,7 @@ ROLES_INITIAUX: dict[str, dict[str, object]] = {
             "gerer_appareils",
             "lire_materiel",
         ],
-        "double_authentification": False,
+        "double_authentification": True,
     },
     "gardien": {
         "libelle": "Gardien",
@@ -174,7 +225,12 @@ ROLES_INITIAUX: dict[str, dict[str, object]] = {
     },
     "direction": {
         "libelle": "Direction",
-        "actions": [*_LECTURE, "lire_tableau_direction"],
+        "actions": [*_LECTURE_METIER, "lire_tableau_direction"],
         "double_authentification": False,
+    },
+    "controle_interne": {
+        "libelle": "Contrôle interne",
+        "actions": [*_LECTURE_METIER, "lire_audit"],
+        "double_authentification": True,
     },
 }

@@ -148,6 +148,8 @@ code { background: var(--bleu-clair); padding: 0 0.25em; border-radius: 3px; fon
 .connexion__graine { word-break: break-all; }
 .connexion__enrolement img { display: block; margin: 0.5rem auto; background: #fff; }
 
+.code-reactivation { font-size: 2rem; font-weight: 700; letter-spacing: 0.3em; text-align: center; background: var(--bleu-clair); padding: 0.75rem; border-radius: var(--rayon); }
+
 /* Cartes */
 .liste-cartes { list-style: none; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr)); gap: 1rem; }
 .carte { background: var(--surface); border: 1px solid var(--bordure); border-radius: var(--rayon); padding: 1rem; }

@@ -20,6 +20,7 @@ export default function Agents() {
   const [perimetre, setPerimetre] = useState("");
   const [fin, setFin] = useState("");
   const [erreur, setErreur] = useState<string | null>(null);
+  const [reactivation, setReactivation] = useState<{ agent: string; jeton: string; expire: string } | null>(null);
 
   const actualiser = () => client.invalidateQueries({ queryKey: ["agents"] });
 
@@ -43,11 +44,13 @@ export default function Agents() {
   });
 
   const reinitialiser = useMutation({
-    mutationFn: (id: number) => requete<void>("POST", `/api/gestion/admin/agents/${id}/reinitialiser-totp`),
-    onSuccess: async () => {
-      annoncer("Double authentification réinitialisée : l'agent devra la réactiver à sa prochaine connexion.");
+    mutationFn: (a: Agent) =>
+      requete<{ jeton_enrolement: string; expire_le: string }>("POST", `/api/gestion/admin/agents/${a.id}/reinitialiser-totp`).then((r) => ({ ...r, agent: a.nom_affiche ?? a.username })),
+    onSuccess: async (resultat) => {
+      setReactivation({ agent: resultat.agent, jeton: resultat.jeton_enrolement, expire: new Date(resultat.expire_le).toLocaleString("fr-FR") });
       await actualiser();
     },
+    onError: (e) => annoncer(e instanceof ErreurApi ? e.message : "Réinitialisation impossible.", "erreur"),
   });
 
   const basculer = useMutation({
@@ -103,7 +106,7 @@ export default function Agents() {
               Ajouter une habilitation
             </Bouton>
             {a.totp_actif ? (
-              <Bouton variante="lien" onClick={() => reinitialiser.mutate(a.id)} aria-label={`Réinitialiser la double authentification de ${a.nom_affiche}`}>
+              <Bouton variante="lien" onClick={() => reinitialiser.mutate(a)} aria-label={`Réinitialiser la double authentification de ${a.nom_affiche}`}>
                 Réinitialiser le TOTP
               </Bouton>
             ) : null}
@@ -113,6 +116,19 @@ export default function Agents() {
           </>
         )}
       />
+      <Dialogue ouvert={reactivation !== null} titre="Code de réactivation à transmettre" onFermer={() => setReactivation(null)}>
+        <p>
+          La double authentification de <strong>{reactivation?.agent}</strong> est réinitialisée et ses sessions sont fermées. Transmettez-lui ce code par
+          téléphone ou en main propre ; il ne sera plus affiché.
+        </p>
+        <p className="code-reactivation" aria-label="Code de réactivation">
+          {reactivation?.jeton}
+        </p>
+        <p>Valable jusqu'au {reactivation?.expire}.</p>
+        <div className="formulaire__actions">
+          <Bouton onClick={() => setReactivation(null)}>J'ai transmis le code</Bouton>
+        </div>
+      </Dialogue>
       <Dialogue ouvert={agent !== null} titre={`Habilitation pour ${agent?.nom_affiche ?? ""}`} onFermer={() => setAgent(null)}>
         <form onSubmit={soumettre}>
           {erreur ? (

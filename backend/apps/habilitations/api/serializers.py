@@ -6,6 +6,7 @@ from rest_framework import serializers
 
 from apps.referentiel.models import Site
 
+from ..actions import ACTIONS_SENSIBLES
 from ..models import GroupeAD, Habilitation, Perimetre, Role, Utilisateur
 from ..services import verifier_actions
 
@@ -17,6 +18,17 @@ class ConnexionSerializer(serializers.Serializer):
 
 class CodeTotpSerializer(serializers.Serializer):
     code = serializers.RegexField(r"^\s*\d{3}\s?\d{3}\s*$", error_messages={"invalid": "Le code comporte 6 chiffres."})
+
+
+class JetonEnrolementSerializer(serializers.Serializer):
+    jeton = serializers.RegexField(
+        r"^\s*[0-9]{8}\s*$", error_messages={"invalid": "Le code de réactivation comporte 8 chiffres."}
+    )
+
+
+class JetonReinitialisationSerializer(serializers.Serializer):
+    jeton_enrolement = serializers.CharField()
+    expire_le = serializers.DateTimeField()
 
 
 class HabilitationMoiSerializer(serializers.Serializer):
@@ -40,7 +52,7 @@ class MoiSerializer(serializers.Serializer):
 
 
 class EtapeConnexionSerializer(serializers.Serializer):
-    etape = serializers.ChoiceField(choices=["connecte", "code_totp", "enrolement_totp"])
+    etape = serializers.ChoiceField(choices=["connecte", "code_totp", "enrolement_totp", "jeton_enrolement"])
     utilisateur = MoiSerializer(required=False)
 
 
@@ -58,6 +70,20 @@ class RoleSerializer(serializers.ModelSerializer):
     def validate_actions(self, valeur: list[str]) -> list[str]:
         verifier_actions(valeur)
         return sorted(set(valeur))
+
+    def validate(self, donnees: dict[str, Any]) -> dict[str, Any]:
+        actions = set(donnees.get("actions", getattr(self.instance, "actions", [])))
+        exigee = donnees.get("double_authentification")
+        sensibles = sorted(actions & ACTIONS_SENSIBLES)
+        if sensibles and exigee is False:
+            raise serializers.ValidationError(
+                {
+                    "double_authentification": "Ce rôle porte des actions sensibles ("
+                    + ", ".join(sensibles)
+                    + ") : la double authentification est obligatoire."
+                }
+            )
+        return donnees
 
 
 class PerimetreSerializer(serializers.ModelSerializer):

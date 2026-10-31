@@ -29,3 +29,35 @@ class JournalAudit(models.Model):
 
     def __str__(self) -> str:
         return f"{self.horodatage:%Y-%m-%d %H:%M} {self.acteur_libelle} {self.action} {self.objet_type}#{self.objet_id}"
+
+
+class PointControleJournal(models.Model):
+    """Trace immuable d'une purge : dernière entrée purgée, son empreinte et l'archive produite (SEC-08)."""
+
+    cree_le = models.DateTimeField(auto_now_add=True)
+    dernier_id = models.BigIntegerField(unique=True)
+    empreinte = models.CharField(max_length=64)
+    nombre = models.PositiveIntegerField()
+    archive = models.CharField(max_length=300)
+    archive_sha256 = models.CharField(max_length=64)
+
+    class Meta:
+        ordering = ["-dernier_id"]
+
+    def __str__(self) -> str:
+        return f"Purge jusqu'à l'entrée {self.dernier_id}"
+
+
+class AncrageJournal(models.Model):
+    """Ancrage horaire de la dernière empreinte (aussi écrit dans les journaux techniques)."""
+
+    cree_le = models.DateTimeField(auto_now_add=True)
+    dernier_id = models.BigIntegerField()
+    empreinte = models.CharField(max_length=64)
+    nombre = models.PositiveIntegerField()
+
+    class Meta:
+        ordering = ["-dernier_id"]
+
+    def __str__(self) -> str:
+        return f"Ancrage {self.dernier_id}"

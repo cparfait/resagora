@@ -10,6 +10,18 @@ from apps.habilitations.models import Utilisateur
 from apps.habilitations.permissions import CLE_SESSION_TOTP
 
 
+@pytest.fixture(scope="session")
+def django_db_setup(django_db_setup, django_db_blocker):  # type: ignore[no-untyped-def]
+    """Base de test : le vidage des tables immuables est autorisé (jamais en recette ni en production)."""
+    from django.db import connection
+
+    with django_db_blocker.unblock(), connection.cursor() as curseur:
+        curseur.execute("SELECT current_database()")
+        nom = curseur.fetchone()[0]
+        curseur.execute(f"ALTER DATABASE \"{nom}\" SET equipements.truncate_autorise = 'oui'")
+        curseur.execute("SET equipements.truncate_autorise = 'oui'")
+
+
 @pytest.fixture(autouse=True)
 def _vider_cache() -> None:
     cache.clear()

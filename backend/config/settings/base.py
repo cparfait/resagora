@@ -51,6 +51,7 @@ MIDDLEWARE = [
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "apps.habilitations.middleware.InactiviteMiddleware",
     "apps.audit.middleware.ContexteAuditMiddleware",
 ]
 
@@ -104,6 +105,12 @@ SESSION_COOKIE_HTTPONLY = True
 SESSION_COOKIE_SAMESITE = "Lax"
 SESSION_COOKIE_AGE = entier("SESSION_DUREE_SECONDES", 8 * 3600)
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True
+# Déconnexion après inactivité (minutes) ; plus courte pour les rôles à double authentification.
+SESSION_INACTIVITE_MINUTES = entier("SESSION_INACTIVITE_MINUTES", 60)
+SESSION_INACTIVITE_SENSIBLE_MINUTES = entier("SESSION_INACTIVITE_SENSIBLE_MINUTES", 20)
+# Verrouillage de la double authentification après échecs successifs (SEC-03).
+TOTP_ECHECS_MAX = entier("TOTP_ECHECS_MAX", 5)
+TOTP_VERROU_MINUTES = entier("TOTP_VERROU_MINUTES", 15)
 CSRF_COOKIE_NAME = "__Host-csrf-agent"
 CSRF_COOKIE_SECURE = True
 CSRF_COOKIE_SAMESITE = "Strict"
@@ -155,6 +162,8 @@ SPECTACULAR_SETTINGS = {
     "TITLE": "API métier — équipements sportifs et associatifs de Châtillon",
     "VERSION": "1.0.0",
     "SERVE_INCLUDE_SCHEMA": False,
+    "SERVE_PERMISSIONS": ["rest_framework.permissions.IsAuthenticated"],
+    "SERVE_AUTHENTICATION": ["apps.habilitations.authentification.SessionAgentAuthentication"],
     "COMPONENT_SPLIT_REQUEST": True,
     "ENUM_NAME_OVERRIDES": {},
 }
@@ -176,6 +185,7 @@ LDAP: dict[str, Any] = {
     "ATTRIBUT_NOM": os.environ.get("LDAP_ATTRIBUT_NOM", "sn"),
     "ATTRIBUT_COURRIEL": os.environ.get("LDAP_ATTRIBUT_COURRIEL", "mail"),
     "ATTRIBUT_GROUPES": os.environ.get("LDAP_ATTRIBUT_GROUPES", "memberOf"),
+    "ATTRIBUT_GUID": os.environ.get("LDAP_ATTRIBUT_GUID", "objectGUID"),
     "DELAI_SECONDES": entier("LDAP_DELAI_SECONDES", 5),
 }
 
@@ -192,9 +202,11 @@ CELERY_WORKER_PREFETCH_MULTIPLIER = 1
 CELERY_TIMEZONE = TIME_ZONE
 CELERY_BEAT_SCHEDULE: dict[str, dict[str, object]] = {
     "verifier-journal-audit": {"task": "apps.audit.tasks.verifier_integrite", "schedule": timedelta(hours=6)},
+    "ancrer-journal-audit": {"task": "apps.audit.tasks.ancrer_journal", "schedule": timedelta(hours=1)},
 }
 
-# Journal d'audit (SEC-08) : conservation minimale 6 mois.
+# Journal d'audit (SEC-08) : clé HMAC de la chaîne et conservation minimale 6 mois.
+CLE_AUDIT = secret("audit_cle_hmac", defaut="")
 AUDIT_CONSERVATION_JOURS = max(183, entier("AUDIT_CONSERVATION_JOURS", 400))
 
 LOGGING = {

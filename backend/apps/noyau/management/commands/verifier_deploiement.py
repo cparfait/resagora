@@ -30,6 +30,10 @@ class Command(BaseCommand):
             erreurs.append("Secret django_secret_key trop court.")
         if not settings.SESSION_COOKIE_SECURE or not settings.CSRF_COOKIE_SECURE:
             erreurs.append("Cookies non sécurisés.")
+        if not settings.LDAP["VERIFIER_CERTIFICAT"]:
+            erreurs.append("La vérification du certificat de l'annuaire est désactivée (LDAP_VERIFIER_CERTIFICAT).")
+        if not str(settings.LDAP["URI"]).startswith("ldaps://") and not settings.LDAP["STARTTLS"]:
+            erreurs.append("L'annuaire doit être joint en LDAPS ou en StartTLS.")
         call_command("check", "--deploy", "--fail-level", "ERROR")
         if erreurs:
             raise CommandError(" ; ".join(erreurs))

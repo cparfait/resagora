@@ -1,51 +1,67 @@
 # Interface unique des tâches du projet (CI et postes de développement).
-# Sous Windows sans GNU Make : docker compose -f deploy/dev/compose.yaml run --rm outils make <cible> (D-005).
+# Poste Windows sans GNU Make (D-005) :
+#   docker compose -f deploy/dev/compose.yaml run --rm outils make preparer lint test
 
 SHELL := /bin/bash
 PYTHON ?= python3
-BACK := backend
-VENV_PY := $(shell if [ -x $(BACK)/.venv/bin/python ]; then echo .venv/bin/python; elif [ -x $(BACK)/.venv/Scripts/python ]; then echo .venv/Scripts/python; else echo $(PYTHON); fi)
-COMPOSE_DEV := docker compose -f deploy/dev/compose.yaml
-COMPOSE_LAN := docker compose -f deploy/lan/compose.yaml
-COMPOSE_DMZ := docker compose -f deploy/dmz/compose.yaml
 export PYTHONIOENCODING := utf-8
 
-.PHONY: up up-dmz down certs secrets demo test test-back test-front lint lint-back lint-front motifs matrice \
-        e2e a11y trivy sbom schema format-changed migrations-reversibles recette
+# Interpréteurs : variables d'environnement BACK_PY / FACADE_PY (conteneur d'outillage), sinon venv local.
+BACK_PY ?= $(shell if [ -x backend/.venv/bin/python ]; then echo $(CURDIR)/backend/.venv/bin/python; elif [ -x backend/.venv/Scripts/python.exe ]; then echo $(CURDIR)/backend/.venv/Scripts/python.exe; else echo $(PYTHON); fi)
+FACADE_PY ?= $(shell if [ -x facade/.venv/bin/python ]; then echo $(CURDIR)/facade/.venv/bin/python; elif [ -x facade/.venv/Scripts/python.exe ]; then echo $(CURDIR)/facade/.venv/Scripts/python.exe; else echo $(PYTHON); fi)
+
+COMPOSE_DEV := docker compose -f deploy/dev/compose.yaml
+COMPOSE_LAN := docker compose -f deploy/lan/compose.yaml -f deploy/lan/compose.dev.yaml
+COMPOSE_DMZ := docker compose -f deploy/dmz/compose.yaml -f deploy/dmz/compose.dev.yaml
+
+.PHONY: preparer up up-dmz down certs secrets demo test test-back test-facade test-front test-integration lint lint-back \
+        lint-facade lint-front motifs matrice e2e a11y trivy sbom schema format-changed migrations-reversibles recette
+
+preparer: ## Environnements Python (uv) et dépendances npm verrouillées
+	cd backend && UV_PROJECT_ENVIRONMENT=$${BACK_VENV:-.venv} uv sync --frozen --inexact
+	cd facade && UV_PROJECT_ENVIRONMENT=$${FACADE_VENV:-.venv} uv sync --frozen --inexact
+	npm ci --no-audit --no-fund
+	npm ci --prefix outils/codegen --no-audit --no-fund
 
 ## Piles ------------------------------------------------------------------------------------------
 
-up: certs secrets ## Pile LAN complète (API, back-office, mobile, services de développement)
-	$(COMPOSE_DEV) up -d postgres-dev valkey-dev annuaire mailpit simulateurs
-	$(COMPOSE_LAN) up -d --build
+certs: ## Autorités et certificats de développement (mTLS, LDAPS) — jamais en production
+	$(BACK_PY) scripts/certificats_dev.py
 
-up-dmz: certs secrets ## Façade et portail DMZ (relais mTLS vers la pile LAN)
-	$(COMPOSE_DMZ) up -d --build
+secrets: ## Secrets de développement aléatoires dans deploy/*/secrets (ignorés par Git)
+	$(BACK_PY) scripts/secrets_dev.py
+
+up: certs secrets ## Services de test + pile LAN (API, tâches, back-office, mobile)
+	$(COMPOSE_DEV) up -d postgres-dev valkey-dev annuaire mailpit simulateurs
+	$(COMPOSE_LAN) up -d --build --wait
+	$(COMPOSE_LAN) exec -T api python manage.py amorcer_groupes_ad - < deploy/dev/groupes-ad-recette.json
+
+up-dmz: certs secrets ## Façade, portail et signature (DMZ) reliés à la pile LAN
+	$(COMPOSE_DMZ) up -d --build --wait
 
 down:
 	-$(COMPOSE_DMZ) down
 	-$(COMPOSE_LAN) down
 	-$(COMPOSE_DEV) down
 
-certs: ## Autorité de certification et certificats de développement (mTLS, LDAPS) — jamais en production
-	$(PYTHON) scripts/certificats_dev.py
-
-secrets: ## Secrets de développement générés aléatoirement dans deploy/*/secrets (ignorés par Git)
-	$(PYTHON) scripts/secrets_dev.py
-
-demo: ## Jeu de données de démonstration (anonyme)
-	$(COMPOSE_LAN) exec api python manage.py charger_demo
+demo: ## Jeu de données de démonstration anonyme (3 sites, 40 espaces, une saison complète)
+	$(COMPOSE_LAN) exec -T api python manage.py charger_demo
 
 ## Tests ------------------------------------------------------------------------------------------
 
-test: test-back test-front
+test: test-back test-facade test-front
 
 test-back:
-	cd $(BACK) && $(VENV_PY) -m pytest --cov --cov-report=term --cov-report=xml
-	cd facade && $(VENV_PY_FACADE) -m pytest
+	cd backend && $(BACK_PY) -m pytest --cov --cov-report=term --cov-report=xml
+
+test-facade:
+	cd facade && $(FACADE_PY) -m pytest
 
 test-front:
 	npm run test --workspaces --if-present
+
+test-integration: ## Tests contre les conteneurs de test (annuaire, Mailpit, Gotenberg, ClamAV, DocuSeal, simulateurs)
+	cd backend && $(BACK_PY) -m pytest -m integration
 
 e2e:
 	npm run e2e --workspace e2e
@@ -53,17 +69,19 @@ e2e:
 a11y:
 	npm run a11y --workspace e2e
 
-migrations-reversibles: ## Applique toutes les migrations puis revient à zéro, puis réapplique
-	cd $(BACK) && $(VENV_PY) scripts_migrations.py
+migrations-reversibles: ## Applique toutes les migrations, revient à zéro, puis réapplique (CLAUDE.md règle 7)
+	cd backend && DJANGO_SETTINGS_MODULE=config.settings.test $(BACK_PY) manage.py verifier_migrations_reversibles
 
 ## Qualité ----------------------------------------------------------------------------------------
 
-lint: lint-back lint-front motifs
+lint: lint-back lint-facade lint-front motifs
 
 lint-back:
-	cd $(BACK) && $(VENV_PY) -m ruff check . && $(VENV_PY) -m ruff format --check . && $(VENV_PY) -m mypy .
-	cd $(BACK) && DJANGO_SETTINGS_MODULE=config.settings.test $(VENV_PY) manage.py makemigrations --check --dry-run
-	cd facade && $(VENV_PY_FACADE) -m ruff check . && $(VENV_PY_FACADE) -m ruff format --check . && $(VENV_PY_FACADE) -m mypy .
+	cd backend && $(BACK_PY) -m ruff check . && $(BACK_PY) -m ruff format --check . && $(BACK_PY) -m mypy .
+	cd backend && DJANGO_SETTINGS_MODULE=config.settings.test $(BACK_PY) manage.py makemigrations --check --dry-run
+
+lint-facade:
+	cd facade && $(FACADE_PY) -m ruff check . && $(FACADE_PY) -m ruff format --check . && $(FACADE_PY) -m mypy .
 
 lint-front:
 	npm run lint --workspaces --if-present
@@ -75,20 +93,20 @@ motifs: ## Échoue si TODO, FIXME, NotImplementedError, fonctions vides… dans 
 matrice: ## Régénère docs/recette/matrice.csv et échoue si une exigence n'a pas son code et ses tests
 	$(PYTHON) scripts/matrice.py --jusqua-lot 7
 
-schema: ## Schéma OpenAPI et types TypeScript générés (jamais de DTO écrits à la main)
-	cd $(BACK) && DJANGO_SETTINGS_MODULE=config.settings.test $(VENV_PY) manage.py exporter_schemas ../docs/api
+schema: ## Schémas OpenAPI et types TypeScript générés (jamais de DTO écrits à la main)
+	cd backend && DJANGO_SETTINGS_MODULE=config.settings.test $(BACK_PY) manage.py exporter_schemas ../docs/api
 	npm run schema --workspaces --if-present
 
-trivy: ## Analyse des images et des dépendances ; bloquant sur CVE critiques/hautes corrigeables
+trivy: ## Images et dépendances ; bloquant sur CVE critiques/hautes corrigeables
 	$(PYTHON) scripts/analyse_trivy.py
 
 sbom:
 	$(PYTHON) scripts/analyse_trivy.py --sbom
 
-recette: lint test e2e a11y motifs matrice trivy
+recette: lint test migrations-reversibles motifs matrice trivy e2e a11y
 
 format-changed:
-	@git diff --name-only --diff-filter=AM HEAD 2>/dev/null | grep -E '^(backend|facade)/.*\.py$$' | \
-	  while read f; do d=$${f%%/*}; (cd $$d && $(VENV_PY) -m ruff format -q "$${f#*/}"); done || true
-
-VENV_PY_FACADE := $(shell if [ -x facade/.venv/bin/python ]; then echo .venv/bin/python; elif [ -x facade/.venv/Scripts/python ]; then echo .venv/Scripts/python; else echo $(PYTHON); fi)
+	@git diff --name-only --diff-filter=AM HEAD 2>/dev/null | grep -E '^backend/.*\.py$$' | sed 's|^backend/||' | \
+	  (cd backend && xargs -r $(BACK_PY) -m ruff format -q) || true
+	@git diff --name-only --diff-filter=AM HEAD 2>/dev/null | grep -E '^facade/.*\.py$$' | sed 's|^facade/||' | \
+	  (cd facade && xargs -r $(FACADE_PY) -m ruff format -q) || true

@@ -30,7 +30,7 @@ export interface paths {
         /** @description `chemin_site` : chemin ORM vers le site de l'objet (None = objet transversal). */
         get: operations["gestion_admin_agents_list"];
         put?: never;
-        /** @description `chemin_site` : chemin ORM vers le site de l'objet (None = objet transversal). */
+        /** @description Les agents naissent à leur première connexion par l'annuaire : pas de création manuelle. */
         post: operations["gestion_admin_agents_create"];
         delete?: never;
         options?: never;
@@ -65,7 +65,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** @description `chemin_site` : chemin ORM vers le site de l'objet (None = objet transversal). */
+        /** @description Retire l'appareil de l'agent, ferme ses sessions et renvoie le code de réactivation (une seule fois). */
         post: operations["gestion_admin_agents_reinitialiser_totp_create"];
         delete?: never;
         options?: never;
@@ -374,6 +374,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/gestion/auth/totp/jeton": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description Après une réinitialisation, l'agent saisit le code à usage unique remis par l'administrateur. */
+        post: operations["gestion_auth_totp_jeton_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/gestion/moi": {
         parameters: {
             query?: never;
@@ -656,9 +673,10 @@ export interface components {
          * @description * `connecte` - connecte
          *     * `code_totp` - code_totp
          *     * `enrolement_totp` - enrolement_totp
+         *     * `jeton_enrolement` - jeton_enrolement
          * @enum {string}
          */
-        EtapeEnum: "connecte" | "code_totp" | "enrolement_totp";
+        EtapeEnum: "connecte" | "code_totp" | "enrolement_totp" | "jeton_enrolement";
         FamilleEspace: {
             readonly id: number;
             code: string;
@@ -724,6 +742,14 @@ export interface components {
          * @enum {string}
          */
         HabilitationSourceEnum: "ad" | "manuel";
+        JetonEnrolementRequest: {
+            jeton: string;
+        };
+        JetonReinitialisation: {
+            jeton_enrolement: string;
+            /** Format: date-time */
+            expire_le: string;
+        };
         JournalAudit: {
             readonly id: number;
             /** Format: date-time */
@@ -1234,12 +1260,13 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description No response body */
-            204: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["JetonReinitialisation"];
+                };
             };
         };
     };
@@ -2052,6 +2079,31 @@ export interface operations {
                 "application/json": components["schemas"]["CodeTotpRequest"];
                 "application/x-www-form-urlencoded": components["schemas"]["CodeTotpRequest"];
                 "multipart/form-data": components["schemas"]["CodeTotpRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EtapeConnexion"];
+                };
+            };
+        };
+    };
+    gestion_auth_totp_jeton_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["JetonEnrolementRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["JetonEnrolementRequest"];
+                "multipart/form-data": components["schemas"]["JetonEnrolementRequest"];
             };
         };
         responses: {

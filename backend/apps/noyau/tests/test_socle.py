@@ -10,7 +10,7 @@ from rest_framework.test import APIClient
 
 from apps.noyau import secrets
 from apps.noyau.journaux import FiltreDonneesSensibles, masquer
-from apps.noyau.montants import appliquer_taux, centimes, euros, proratiser
+from apps.noyau.montants import appliquer_taux, centimes, euros, proratiser, repartir
 from tests.fabriques import agent
 
 pytestmark = pytest.mark.django_db
@@ -92,4 +92,10 @@ def test_montants_en_centimes():
     assert centimes("1 000,10 €") == 100010
     assert appliquer_taux(1001, 5000) == 501
     assert proratiser(1000, 1, 3) == 333
-    assert proratiser(1000, 1, 0) == 0
+    with pytest.raises(ValueError):
+        proratiser(1000, 1, 0)
+    with pytest.raises(ValueError):
+        appliquer_taux(100, 12000)
+    assert centimes("1.234,56") == 123456
+    assert repartir(1000, [1, 1, 1]) == [334, 333, 333]
+    assert sum(repartir(1999, [3, 5, 7])) == 1999

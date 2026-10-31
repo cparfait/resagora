@@ -49,6 +49,9 @@ class FamilleEspace(models.Model):
     libelle = models.CharField(max_length=120)
     ordre = models.PositiveSmallIntegerField(default=0)
 
+    #: Référentiel commun : seul un agent habilité sur toute la Ville peut le modifier (RG-14, ADR 0005).
+    ecriture_ville_entiere = True
+
     class Meta:
         ordering = ["ordre", "libelle"]
         verbose_name = "famille d'espaces"
@@ -121,6 +124,13 @@ class Espace(models.Model):
                 resultat.append(espace)
                 a_visiter.extend(espace.sous_espaces.all())
         return resultat
+
+    def feuilles(self) -> list[Espace]:
+        """Espaces sans sous-espace couverts par celui-ci (lui-même s'il n'en a pas) : base des verrous RG-01."""
+        descendants = self.descendants()
+        if not descendants:
+            return [self]
+        return [e for e in descendants if not any(d.parent_id == e.pk for d in descendants)]
 
     def ids_lies(self) -> set[int]:
         """Espace, ancêtres et descendants : l'ensemble bloqué par une occupation (REF-05, RG-01)."""

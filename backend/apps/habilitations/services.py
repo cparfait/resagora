@@ -9,7 +9,7 @@ from django.db.models import Model, QuerySet
 from apps.audit.services import journaliser
 from apps.noyau.exceptions import AccesRefuse, ErreurValidation
 
-from .actions import ACTIONS
+from .actions import ACTIONS, INCOMPATIBILITES
 from .models import GroupeAD, Habilitation, Perimetre, Role, Utilisateur
 
 M = TypeVar("M", bound=Model)
@@ -28,12 +28,17 @@ def _sites(objet: object) -> set[int] | None:
     return methode()
 
 
+def est_lecture(action: str) -> bool:
+    return action.startswith("lire_")
+
+
 def peut(utilisateur: Utilisateur | None, action: str, objet: object | None = None) -> bool:
-    """Vrai si l'agent dispose de `action` sur un périmètre qui couvre `objet`.
+    """Vrai si l'agent dispose de `action` sur un périmètre qui couvre `objet` (ADR 0005).
 
     - sans objet : l'action est accordée sur au moins un périmètre ;
-    - objet transversal (`sites_concernes()` renvoie None) : idem ;
-    - objet situé : l'un de ses sites doit appartenir au périmètre (ou périmètre « tous sites ») ;
+    - objet transversal (`sites_concernes()` renvoie None) : idem, sauf pour écrire un objet de
+      référentiel commun (`ecriture_ville_entiere = True`, ex. familles) qui exige « tous sites » ;
+    - objet situé : en lecture, l'un de ses sites doit être couvert ; en écriture, tous ses sites ;
     - objet sans site ni méthode : seul un périmètre « tous sites » l'autorise.
     """
     if action not in ACTIONS:
@@ -45,15 +50,17 @@ def peut(utilisateur: Utilisateur | None, action: str, objet: object | None = No
         return False
     if objet is None:
         return True
+    if any(h.perimetre.tous_sites for h in habilitations):
+        return True
     sites = _sites(objet)
     if sites is None:
-        return True
+        return est_lecture(action) or not getattr(objet, "ecriture_ville_entiere", False)
+    couverts: set[int] = set()
     for habilitation in habilitations:
-        if habilitation.perimetre.tous_sites:
-            return True
-        if sites & {s.pk for s in habilitation.perimetre.sites.all()}:
-            return True
-    return False
+        couverts |= {s.pk for s in habilitation.perimetre.sites.all()}
+    if not sites:
+        return False
+    return bool(sites & couverts) if est_lecture(action) else sites <= couverts
 
 
 def exiger(utilisateur: Utilisateur | None, action: str, objet: object | None = None) -> None:
@@ -106,9 +113,44 @@ def verifier_actions(actions: list[str]) -> None:
         raise ErreurValidation("Actions inconnues : " + ", ".join(inconnues), code="actions_inconnues")
 
 
+def verifier_incompatibilites(utilisateur: Utilisateur, role: Role, sauf: Habilitation | None = None) -> None:
+    """Refuse un cumul d'actions incompatibles pour un même agent (séparation des tâches, ADR 0005)."""
+    actions = set(role.actions)
+    for h in utilisateur.habilitations.select_related("role"):
+        if sauf is not None and h.pk == sauf.pk:
+            continue
+        actions |= set(h.role.actions)
+    for premiere, seconde in INCOMPATIBILITES:
+        if premiere in actions and seconde in actions:
+            raise ErreurValidation(
+                f"Cumul interdit pour un même agent : « {ACTIONS[premiere]} » et « {ACTIONS[seconde]} ».",
+                code="cumul_incompatible",
+            )
+
+
+def propager_groupe_ad(groupe: GroupeAD) -> None:
+    """Applique tout de suite la modification d'une correspondance aux agents concernés (ADM-06)."""
+    for habilitation in list(groupe.habilitations.select_related("utilisateur")):
+        avant = {"role": habilitation.role_id, "perimetre": habilitation.perimetre_id}
+        if not groupe.actif:
+            journaliser("retirer_habilitation_ad", habilitation, avant=avant, apres={"motif": "groupe désactivé"})
+            habilitation.delete()
+            continue
+        if (habilitation.role_id, habilitation.perimetre_id) != (groupe.role_id, groupe.perimetre_id):
+            habilitation.role_id, habilitation.perimetre_id = groupe.role_id, groupe.perimetre_id
+            habilitation.save(update_fields=["role", "perimetre"])
+            journaliser(
+                "modifier_habilitation_ad",
+                habilitation,
+                avant=avant,
+                apres={"role": groupe.role_id, "perimetre": groupe.perimetre_id},
+            )
+
+
 def attribuer(acteur: Utilisateur, utilisateur: Utilisateur, role: Role, perimetre: Perimetre, **dates: Any) -> Habilitation:
     """Attribution manuelle d'un rôle sur un périmètre (ADM-03)."""
     exiger(acteur, "administrer")
+    verifier_incompatibilites(utilisateur, role)
     habilitation, _ = Habilitation.objects.update_or_create(
         utilisateur=utilisateur, role=role, perimetre=perimetre, source="manuel", defaults=dates
     )
@@ -146,6 +188,11 @@ def synchroniser_groupes_ad(utilisateur: Utilisateur, dns_groupes: list[str]) ->
             habilitation.delete()
     for cle, groupe in attendues.items():
         if cle not in existantes:
+            try:
+                verifier_incompatibilites(utilisateur, groupe.role)
+            except ErreurValidation as refus:
+                journaliser("cumul_refuse_ad", utilisateur, apres={"groupe": groupe.dn, "motif": refus.message})
+                continue
             habilitation = Habilitation.objects.create(
                 utilisateur=utilisateur, role=groupe.role, perimetre=groupe.perimetre, source="ad", groupe_ad=groupe
             )

@@ -9,7 +9,7 @@ import type { Enrolement, EtapeConnexion } from "../api/types";
 import { Bouton } from "../ui/Bouton";
 import { ChampTexte } from "../ui/Champ";
 
-type Etape = "identifiants" | "code_totp" | "enrolement_totp";
+type Etape = "identifiants" | "code_totp" | "enrolement_totp" | "jeton_enrolement";
 
 export function Connexion() {
   const client = useQueryClient();
@@ -54,6 +54,8 @@ export function Connexion() {
         setMotDePasse("");
       } else if (etape === "code_totp") {
         await terminer(await requete<EtapeConnexion>("POST", "/api/gestion/auth/totp", { code }));
+      } else if (etape === "jeton_enrolement") {
+        await terminer(await requete<EtapeConnexion>("POST", "/api/gestion/auth/totp/jeton", { jeton: code }));
       } else {
         await terminer(await requete<EtapeConnexion>("POST", "/api/gestion/auth/totp/enrolement", { code }));
       }
@@ -68,6 +70,7 @@ export function Connexion() {
     identifiants: "Connexion",
     code_totp: "Vérification en deux étapes",
     enrolement_totp: "Activer la vérification en deux étapes",
+    jeton_enrolement: "Réactiver la vérification en deux étapes",
   };
 
   return (
@@ -118,7 +121,23 @@ export function Connexion() {
               )}
             </div>
           ) : null}
-          {etape !== "identifiants" ? (
+          {etape === "jeton_enrolement" ? (
+            <>
+              <p>Votre appareil d'authentification a été réinitialisé. Saisissez le code de réactivation à 8 chiffres que l'administrateur vous a transmis.</p>
+              <ChampTexte
+                libelle="Code de réactivation"
+                name="jeton"
+                inputMode="numeric"
+                autoComplete="off"
+                pattern="[0-9]{8}"
+                maxLength={9}
+                obligatoire
+                value={code}
+                onChange={(e) => setCode(e.target.value)}
+              />
+            </>
+          ) : null}
+          {etape === "code_totp" || etape === "enrolement_totp" ? (
             <ChampTexte
               libelle="Code à 6 chiffres"
               name="code"

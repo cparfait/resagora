@@ -5,6 +5,7 @@ from __future__ import annotations
 from django.contrib.auth.models import AbstractUser
 from django.contrib.postgres.fields import ArrayField
 from django.db import models
+from django.db.models.functions import Lower
 from django.utils import timezone
 
 
@@ -15,6 +16,17 @@ class Utilisateur(AbstractUser):
     source = models.CharField(max_length=8, choices=SOURCES, default="ad")
     totp_secret_chiffre = models.TextField(blank=True, default="")
     totp_actif = models.BooleanField(default=False)
+    totp_reinitialise = models.BooleanField(default=False, help_text="Réenrôlement soumis au code remis par l'administrateur.")
+    jeton_enrolement_empreinte = models.CharField(max_length=64, blank=True, default="")
+    jeton_enrolement_expire = models.DateTimeField(null=True, blank=True)
+    identifiant_annuaire = models.CharField(
+        "identifiant immuable dans l'annuaire",
+        max_length=64,
+        unique=True,
+        null=True,
+        blank=True,
+        help_text="objectGUID (Active Directory) ou entryUUID : l'agent n'est jamais apparié par son seul nom de compte.",
+    )
     derniere_synchronisation_ad = models.DateTimeField(null=True, blank=True)
 
     class Meta:
@@ -60,6 +72,14 @@ class Role(models.Model):
 
     def __str__(self) -> str:
         return self.libelle
+
+    def save(self, *args: object, **kwargs: object) -> None:
+        from .actions import ACTIONS_SENSIBLES
+
+        # Un rôle qui porte une action sensible exige toujours la double authentification (SEC-03).
+        if ACTIONS_SENSIBLES.intersection(self.actions):
+            self.double_authentification = True
+        super().save(*args, **kwargs)  # type: ignore[arg-type]
 
 
 class Perimetre(models.Model):
@@ -111,10 +131,21 @@ class GroupeAD(models.Model):
     class Meta:
         verbose_name = "groupe AD"
         ordering = ["dn"]
+        constraints = [models.UniqueConstraint(Lower("dn"), name="groupe_ad_dn_unique_sans_casse")]
 
     def __str__(self) -> str:
         return self.libelle or self.dn
 
     def save(self, *args: object, **kwargs: object) -> None:
+        from .services import propager_groupe_ad
+
         self.dn = self.dn.strip()
         super().save(*args, **kwargs)  # type: ignore[arg-type]
+        propager_groupe_ad(self)
+
+    def delete(self, *args: object, **kwargs: object) -> tuple[int, dict[str, int]]:
+        from apps.audit.services import journaliser
+
+        for habilitation in self.habilitations.all():
+            journaliser("retirer_habilitation_ad", habilitation, avant={"groupe": self.dn}, apres={"motif": "groupe supprimé"})
+        return super().delete(*args, **kwargs)  # type: ignore[arg-type]

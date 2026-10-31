@@ -48,7 +48,37 @@ services:
     ports: ["127.0.0.1:53001:3000"]
     volumes: [docuseal-dev:/data]
 
+  outils:
+    # make sous Linux pour les postes Windows (D-005) : dépendances natives dans des volumes dédiés.
+    profiles: [outils]
+    build: { context: ../.., dockerfile: deploy/dev/outils.Dockerfile }
+    working_dir: /depot
+    volumes:
+      - ../..:/depot
+      - outils-node:/depot/node_modules
+      - outils-codegen:/depot/outils/codegen/node_modules
+      - outils-bo:/depot/backoffice/node_modules
+      - outils-portail:/depot/portail/node_modules
+      - outils-mobile:/depot/mobile/node_modules
+      - outils-e2e:/depot/e2e/node_modules
+      - outils-venvs:/venvs
+    environment:
+      BACK_VENV: /venvs/backend
+      FACADE_VENV: /venvs/facade
+      BACK_PY: /venvs/backend/bin/python
+      FACADE_PY: /venvs/facade/bin/python
+      POSTGRES_HOST: postgres-dev
+      POSTGRES_PORT: "5432"
+      PLAYWRIGHT_BROWSERS_PATH: /venvs/playwright
+
 volumes:
+  outils-node:
+  outils-codegen:
+  outils-bo:
+  outils-portail:
+  outils-mobile:
+  outils-e2e:
+  outils-venvs:
   pg-dev:
   docuseal-dev:
 

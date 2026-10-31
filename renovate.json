@@ -1,0 +1,14 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": ["config:recommended", "docker:pinDigests", ":pinAllExceptPeerDependencies"],
+  "timezone": "Europe/Paris",
+  "labels": ["dependances"],
+  "vulnerabilityAlerts": { "enabled": true, "schedule": ["at any time"], "labels": ["securite"] },
+  "packageRules": [
+    { "matchUpdateTypes": ["patch", "digest", "pin"], "schedule": ["before 6am on monday"], "groupName": "correctifs hebdomadaires" },
+    { "matchUpdateTypes": ["minor"], "schedule": ["before 6am on the first day of the month"], "groupName": "mineures mensuelles" },
+    { "matchUpdateTypes": ["major"], "dependencyDashboardApproval": true, "description": "Montée majeure : ADR obligatoire (§6.6)." },
+    { "matchPackageNames": ["postgres"], "matchUpdateTypes": ["major"], "enabled": false, "description": "PostgreSQL 19 : procédure pg_upgrade et ADR." },
+    { "matchFileNames": ["outils/codegen/package.json"], "matchPackageNames": ["typescript"], "allowedVersions": "<6", "description": "openapi-typescript exige TypeScript 5 (D-010)." }
+  ]
+}

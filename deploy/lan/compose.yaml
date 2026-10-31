@@ -1,8 +1,16 @@
 # Zone LAN : API métier, base, tâches, back-office, application mobile (option A), services internes.
 # Seul flux entrant depuis la DMZ : api-portail sur 8443 en mTLS (SEC-01).
+# Base : le rôle « equipements » (propriétaire) ne sert qu'aux migrations et à la maintenance ;
+# les services applicatifs utilisent « equipements_app », sans privilège d'administration (ADR 0005).
 name: equipements-lan
 
+x-journaux: &journaux
+  logging:
+    driver: json-file
+    options: { max-size: "50m", max-file: "20" }
+
 x-durci: &durci
+  <<: *journaux
   read_only: true
   tmpfs: [/tmp]
   user: "10001:10001"
@@ -18,8 +26,20 @@ x-api: &api
   image: ${REGISTRE:-equipements}/api:${VERSION:-dev}
   build: { context: ../.., dockerfile: deploy/images/api.Dockerfile }
   env_file: [parametres.env]
-  secrets: [django_secret_key, cle_chiffrement, postgres_password, valkey_url, ldap_mot_de_passe, ldap_ac.pem,
-            docuseal_api_jeton, payfip_secret, smtp_mot_de_passe]
+  environment: &env_api
+    POSTGRES_USER: equipements_app
+    FORWARDED_ALLOW_IPS: 10.231.20.250
+  secrets: &secrets_api
+    - django_secret_key
+    - cle_chiffrement
+    - audit_cle_hmac
+    - { source: postgres_app_password, target: postgres_password }
+    - valkey_url
+    - ldap_mot_de_passe
+    - ldap_ac.pem
+    - docuseal_api_jeton
+    - payfip_secret
+    - smtp_mot_de_passe
   volumes: [stockage:/stockage]
   networks: [lan_app, lan_data]
   depends_on:
@@ -27,14 +47,17 @@ x-api: &api
 
 services:
   postgres:
+    <<: *journaux
     image: postgres:18.6-trixie@sha256:979bccfde35445db618c65107d27d08c6c21339d8dc3ad4c830c6633947be0e4
     environment:
       POSTGRES_DB: equipements
       POSTGRES_USER: equipements
       POSTGRES_PASSWORD_FILE: /run/secrets/postgres_password
       POSTGRES_INITDB_ARGS: "--data-checksums"
-    secrets: [postgres_password]
-    volumes: [pgdata:/var/lib/postgresql]
+    secrets: [postgres_password, postgres_app_password]
+    volumes:
+      - pgdata:/var/lib/postgresql
+      - ./postgres/initdb:/docker-entrypoint-initdb.d:ro
     networks: [lan_data]
     cap_drop: [ALL]
     cap_add: [CHOWN, SETUID, SETGID, DAC_OVERRIDE, FOWNER]
@@ -47,10 +70,11 @@ services:
 
   valkey:
     image: valkey/valkey:9.1.3-trixie@sha256:3add1a336a920ea54770a001ab6feb3da5fceea96a40373a3a2cd469b815f0b7
-    entrypoint: ["sh", "-c", "exec valkey-server --save '' --appendonly no --enable-debug-command no --requirepass \"$$(cat /run/secrets/valkey_mot_de_passe)\""]
-    secrets: [valkey_mot_de_passe]
     <<: *durci
     user: "999:999"
+    # Le mot de passe est écrit dans un fichier de configuration temporaire, jamais en argument de commande.
+    entrypoint: ["sh", "-c", "printf 'requirepass %s\\nsave \"\"\\nappendonly no\\nenable-debug-command no\\n' \"$$(cat /run/secrets/valkey_mot_de_passe)\" > /tmp/valkey.conf && exec valkey-server /tmp/valkey.conf"]
+    secrets: [valkey_mot_de_passe]
     networks: [lan_data]
 
   migrations:
@@ -58,23 +82,37 @@ services:
     image: ${REGISTRE:-equipements}/api:${VERSION:-dev}
     build: { context: ../.., dockerfile: deploy/images/api.Dockerfile }
     env_file: [parametres.env]
-    secrets: [django_secret_key, cle_chiffrement, postgres_password, valkey_url]
-    command: ["sh", "-c", "python manage.py migrate --noinput && python manage.py verifier_deploiement"]
+    environment: { POSTGRES_USER: equipements }
+    secrets: [django_secret_key, cle_chiffrement, audit_cle_hmac, postgres_password, valkey_url]
+    command: ["sh", "-c", "python manage.py migrate --noinput && python manage.py accorder_droits equipements_app && python manage.py verifier_deploiement"]
     restart: "no"
     networks: [lan_data]
     depends_on: { postgres: { condition: service_healthy } }
 
   api:
     <<: *api
-    environment: { CANAL: gestion }
+    environment: { <<: *env_api, CANAL: gestion }
+    networks:
+      lan_app: {}
+      lan_data: {}
 
   api-portail:
     <<: *api
-    environment: { CANAL: portail }
-    secrets: [django_secret_key, cle_chiffrement, postgres_password, valkey_url, api_portail.crt, api_portail.key, ac_facade.crt,
-              docuseal_api_jeton, payfip_secret, smtp_mot_de_passe]
-    command: ["gunicorn", "config.wsgi", "--bind", "0.0.0.0:8443", "--control-socket", "/tmp/gunicorn.ctl", "--workers", "3", "--timeout", "60",
-              "--certfile", "/run/secrets/api_portail.crt", "--keyfile", "/run/secrets/api_portail.key",
+    environment: { <<: *env_api, CANAL: portail }
+    secrets:
+      - django_secret_key
+      - cle_chiffrement
+      - audit_cle_hmac
+      - { source: postgres_app_password, target: postgres_password }
+      - valkey_url
+      - api_portail.crt
+      - api_portail.key
+      - ac_facade.crt
+      - docuseal_api_jeton
+      - payfip_secret
+      - smtp_mot_de_passe
+    command: ["gunicorn", "config.wsgi", "--bind", "0.0.0.0:8443", "--control-socket", "/tmp/gunicorn.ctl", "--workers", "3",
+              "--timeout", "60", "--certfile", "/run/secrets/api_portail.crt", "--keyfile", "/run/secrets/api_portail.key",
               "--ca-certs", "/run/secrets/ac_facade.crt", "--cert-reqs", "2"]
     healthcheck: { test: ["CMD", "python", "-c", "import socket;socket.create_connection(('127.0.0.1',8443),3)"], interval: 30s }
     ports: ["${IP_LIAISON_DMZ:-127.0.0.1}:8443:8443"]
@@ -84,6 +122,7 @@ services:
     <<: *api
     command: ["celery", "-A", "config", "worker", "--loglevel=INFO", "--concurrency=2", "-Q", "celery,documents,notifications"]
     healthcheck: { test: ["CMD", "celery", "-A", "config", "inspect", "ping", "--timeout", "5"], interval: 60s }
+    networks: [lan_app, lan_data, sortie_lan]
 
   beat:
     <<: *api
@@ -113,7 +152,8 @@ services:
     volumes: ["./traefik:/etc/traefik:ro"]
     secrets: [lan_tls.crt, lan_tls.key]
     ports: ["${IP_LAN:-127.0.0.1}:443:8443"]
-    networks: [lan_app]
+    networks:
+      lan_app: { ipv4_address: 10.231.20.250 }
 
   gotenberg:
     image: gotenberg/gotenberg:8.39.0@sha256:13672f317b443c793e972b1bd2155ec62a3e7b6891b411e8196442cc053ee5f5
@@ -124,19 +164,23 @@ services:
     networks: [lan_app]
 
   clamav:
+    <<: *journaux
     image: clamav/clamav:1.5.4-debian13-slim@sha256:cce3e1a43ae2bb40e11335c52c0e1e98273b12fa3d587e617f63a6907cc4b70b
     cap_drop: [ALL]
     cap_add: [CHOWN, SETUID, SETGID]
     security_opt: ["no-new-privileges:true"]
     mem_limit: 3g
     volumes: [clamav-lan:/var/lib/clamav]
-    networks: [lan_app]
+    # lan_app pour l'analyse, sortie_lan pour les mises à jour des signatures (freshclam) par le proxy de la Ville.
+    networks: [lan_app, sortie_lan]
     restart: unless-stopped
 
 networks:
-  lan_app: {}
+  lan_app:
+    ipam: { config: [{ subnet: 10.231.20.0/24 }] }
   lan_data: { internal: true }
   liaison_dmz: {}
+  sortie_lan: {}
 
 volumes:
   pgdata:
@@ -146,7 +190,9 @@ volumes:
 secrets:
   django_secret_key: { file: ./secrets/django_secret_key }
   cle_chiffrement: { file: ./secrets/cle_chiffrement }
+  audit_cle_hmac: { file: ./secrets/audit_cle_hmac }
   postgres_password: { file: ./secrets/postgres_password }
+  postgres_app_password: { file: ./secrets/postgres_app_password }
   valkey_url: { file: ./secrets/valkey_url }
   valkey_mot_de_passe: { file: ./secrets/valkey_mot_de_passe }
   ldap_mot_de_passe: { file: ./secrets/ldap_mot_de_passe }

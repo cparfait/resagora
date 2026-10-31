@@ -32,12 +32,12 @@ class Route:
     debit: str = "public"
 
 
-ID = r"\d{1,12}"
+ID = r"[0-9]{1,12}"
 UUID = r"[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}"
 
 
 def r(methode: str, chemin: str, nature: Nature = Nature.JSON, session: bool = False, debit: str = "public") -> Route:
-    return Route(methode, re.compile("^" + chemin.replace("{id}", ID).replace("{uuid}", UUID) + "$"), nature, session, debit)
+    return Route(methode, re.compile(chemin.replace("{id}", ID).replace("{uuid}", UUID), re.ASCII), nature, session, debit)
 
 
 ROUTES: list[Route] = [
@@ -133,6 +133,6 @@ DEBITS: dict[str, tuple[int, int]] = {
 def trouver(methode: str, chemin: str, mobile_option: str = "A") -> Route | None:
     routes = ROUTES + (ROUTES_MOBILE if mobile_option == "B" else [])
     for route in routes:
-        if route.methode == methode and route.motif.match(chemin):
+        if route.methode == methode and route.motif.fullmatch(chemin):
             return route
     return None

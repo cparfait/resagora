@@ -28,5 +28,6 @@ def dechiffrer(jeton: str) -> str:
 
 def empreinte_hmac(valeur: str) -> str:
     """Empreinte non réversible d'un jeton (stockage des jetons portail, mobile, iCal)."""
-    cle = hashlib.sha256(("hmac:" + settings.SECRET_KEY).encode()).digest()
+    # Clé dérivée de la clé de chiffrement (et non de SECRET_KEY) : changer SECRET_KEY n'invalide pas les jetons.
+    cle = hashlib.sha256(("hmac:" + settings.CLE_CHIFFREMENT).encode()).digest()
     return hmac.new(cle, valeur.encode(), hashlib.sha256).hexdigest()

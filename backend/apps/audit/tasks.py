@@ -4,7 +4,7 @@ import logging
 
 from celery import shared_task
 
-from .services import verifier_chaine
+from .services import ancrer, verifier_chaine
 
 journal = logging.getLogger(__name__)
 
@@ -16,3 +16,10 @@ def verifier_integrite() -> dict[str, object]:
     if not resultat.integre:
         journal.error("Journal d'audit : %d anomalie(s) d'intégrité", len(resultat.anomalies))
     return {"entrees": resultat.entrees_verifiees, "anomalies": resultat.anomalies}
+
+
+@shared_task(name="apps.audit.tasks.ancrer_journal")
+def ancrer_journal() -> int | None:
+    """Ancrage horaire de la chaîne (détection de troncature, SEC-08)."""
+    ancrage = ancrer()
+    return ancrage.dernier_id if ancrage else None

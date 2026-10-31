@@ -9,6 +9,7 @@ quarantaine et antivirus des fichiers (SEC-07), vérification des rappels DocuSe
 from __future__ import annotations
 
 import hmac
+import ipaddress
 import json
 import logging
 import secrets
@@ -95,9 +96,20 @@ class Facade:
             return transmise[-min(self.config.nombre_proxies, len(transmise))]
         return request.client.host if request.client else "inconnue"
 
+    @staticmethod
+    def cle_debit(adresse: str) -> str:
+        """IPv6 : comptage par préfixe /64 (une box change d'adresse dans son préfixe)."""
+        try:
+            ip = ipaddress.ip_address(adresse)
+        except ValueError:
+            return adresse
+        if ip.version == 6:
+            return str(ipaddress.ip_network(f"{ip}/64", strict=False))
+        return str(ip)
+
     def debit_depasse(self, route: Route, adresse: str) -> bool:
         maximum, fenetre = DEBITS[route.debit]
-        return self.magasin.incrementer(f"debit:{route.debit}:{adresse}", fenetre) > maximum
+        return self.magasin.incrementer(f"debit:{route.debit}:{self.cle_debit(adresse)}", fenetre) > maximum
 
     def cookie(self, reponse: Response, nom: str, valeur: str, duree: int, http_only: bool = True) -> None:
         nom_effectif = nom if self.config.cookies_securises else nom.removeprefix("__Host-")
@@ -122,7 +134,8 @@ class Facade:
         entetes = {
             "Accept": "application/json",
             "Accept-Language": "fr",
-            "X-Request-Id": request.headers.get("x-request-id", uuid.uuid4().hex)[:64],
+            # Identifiant de corrélation toujours généré ici : celui envoyé par Internet n'est pas repris.
+            "X-Request-Id": request.state.identifiant_requete,
             "X-Forwarded-For": self.adresse_client(request),
             "X-Forwarded-Proto": "https",
         }
@@ -138,13 +151,14 @@ class Facade:
     async def appeler(self, methode: str, chemin: str, **options: Any) -> httpx.Response | None:
         try:
             return await self.client.request(methode, chemin, **options)
-        except httpx.HTTPError as erreur_api:
+        except (httpx.HTTPError, httpx.InvalidURL) as erreur_api:
             journal.error("API métier injoignable : %s", type(erreur_api).__name__)
             return None
 
     # --- routes locales ------------------------------------------------------------------------
 
     async def etat_session(self, request: Request) -> Response:
+        request.state.identifiant_requete = uuid.uuid4().hex
         """Indique l'état de connexion et fournit le jeton CSRF (double soumission pour les visiteurs)."""
         identifiant = self.lire_cookie(request, COOKIE_SESSION)
         session = self.sessions.lire(identifiant)
@@ -177,7 +191,9 @@ class Facade:
     # --- relais --------------------------------------------------------------------------------
 
     async def relayer(self, request: Request) -> Response:
-        chemin = request.url.path
+        # Chemin exact de la requête (sans la normalisation d'URL qui retirerait des caractères de contrôle).
+        chemin = request.scope["path"]
+        request.state.identifiant_requete = uuid.uuid4().hex
         route = trouver(request.method, chemin, self.config.mobile_option)
         if route is None:
             return erreur(404, "introuvable", "Élément introuvable.")
@@ -186,7 +202,10 @@ class Facade:
             return erreur(
                 429, "trop_de_requetes", "Trop de tentatives. Réessayez dans quelques minutes.", **{"Retry-After": "60"}
             )
-        taille_annoncee = int(request.headers.get("content-length") or 0)
+        longueur = request.headers.get("content-length") or "0"
+        if not longueur.isascii() or not longueur.isdigit():
+            return erreur(400, "requete_invalide", "La requête est invalide.")
+        taille_annoncee = int(longueur)
         limite = (
             self.config.taille_max_fichier + 1024 * 1024 if route.nature == Nature.TELEVERSEMENT else self.config.taille_max_json
         )
@@ -229,7 +248,7 @@ class Facade:
             return erreur(503, "indisponible", "Le service est momentanément indisponible. Réessayez plus tard.")
 
         if route.nature == Nature.CONNEXION:
-            return self.ouvrir_session(reponse_api)
+            return self.ouvrir_session(reponse_api, identifiant)
         if route.nature == Nature.DECONNEXION:
             if identifiant:
                 self.sessions.supprimer(identifiant)
@@ -242,9 +261,11 @@ class Facade:
             self.sessions.supprimer(identifiant)
         return self.reponse_relayee(reponse_api)
 
-    def ouvrir_session(self, reponse_api: httpx.Response) -> Response:
+    def ouvrir_session(self, reponse_api: httpx.Response, ancienne: str | None = None) -> Response:
         if reponse_api.status_code != 200:
             return self.reponse_relayee(reponse_api)
+        if ancienne:
+            self.sessions.supprimer(ancienne)
         donnees = reponse_api.json()
         jeton = donnees.pop("jeton", None)
         if not jeton:
@@ -302,7 +323,7 @@ class Facade:
         return self.reponse_relayee(reponse_api)
 
     async def relayer_notification_payfip(self, request: Request, chemin: str, adresse: str) -> Response:
-        if self.config.ips_payfip and adresse not in self.config.ips_payfip:
+        if not self.config.payfip_sans_filtre_ip and adresse not in self.config.ips_payfip:
             journal.warning("Notification PayFiP refusée depuis %s", adresse)
             return erreur(403, "non_autorise", "Non autorisé.")
         corps = await request.body()
@@ -338,7 +359,7 @@ class Facade:
 
 def creer_application(config: Configuration | None = None, **dependances: Any) -> Starlette:
     facade = Facade(config or Configuration(), **dependances)
-    methodes = ["GET", "POST", "PUT", "PATCH", "DELETE", "HEAD", "OPTIONS"]
+    methodes = ["GET", "POST", "PUT", "PATCH", "DELETE", "HEAD", "OPTIONS", "TRACE", "CONNECT"]
     application = Starlette(
         routes=[
             RouteStarlette("/sante", facade.sante, methods=["GET"]),

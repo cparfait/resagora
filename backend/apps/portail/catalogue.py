@@ -27,7 +27,8 @@ class EspacePublicSerializer(serializers.ModelSerializer):
     site_nom = serializers.CharField(source="batiment.site.nom", read_only=True)
     adresse = serializers.CharField(source="batiment.site.adresse", read_only=True)
     famille_libelle = serializers.CharField(source="famille.libelle", read_only=True)
-    parent_nom = serializers.CharField(source="parent.nom", read_only=True, default=None)
+    parent = serializers.SerializerMethodField()  # type: ignore[assignment]
+    parent_nom = serializers.SerializerMethodField()
 
     class Meta:
         model = Espace
@@ -49,6 +50,19 @@ class EspacePublicSerializer(serializers.ModelSerializer):
             "activites",
             "partageable",
         ]
+
+    def get_parent(self, espace: Espace) -> int | None:
+        parent = _parent_public(espace)
+        return parent.pk if parent else None
+
+    def get_parent_nom(self, espace: Espace) -> str | None:
+        parent = _parent_public(espace)
+        return parent.nom if parent else None
+
+
+def _parent_public(espace: Espace) -> Espace | None:
+    parent = espace.parent
+    return parent if parent is not None and parent.actif and parent.reservable_portail else None
 
 
 def espaces_publics() -> QuerySet[Espace]:

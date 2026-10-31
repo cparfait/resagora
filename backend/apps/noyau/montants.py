@@ -2,7 +2,9 @@
 
 from __future__ import annotations
 
-from decimal import ROUND_HALF_UP, Decimal
+from decimal import ROUND_HALF_UP, Decimal, InvalidOperation
+
+from .exceptions import ErreurValidation
 
 ESPACE_FINE = " "
 
@@ -20,17 +22,36 @@ def centimes(valeur: str | Decimal | int) -> int:
     texte = str(valeur)
     for caractere in (" ", ESPACE_FINE, " ", "€"):
         texte = texte.replace(caractere, "")
+    if "," in texte and "." in texte:
+        texte = texte.replace(".", "")
     texte = texte.replace(",", ".")
-    return int((Decimal(texte) * 100).quantize(Decimal("1"), rounding=ROUND_HALF_UP))
+    try:
+        return int((Decimal(texte) * 100).quantize(Decimal("1"), rounding=ROUND_HALF_UP))
+    except InvalidOperation as erreur:
+        raise ErreurValidation(f"Montant invalide : « {valeur} ».", code="montant_invalide") from erreur
 
 
 def appliquer_taux(montant: int, taux_pour_dix_mille: int) -> int:
     """Applique un taux exprimé en dix-millièmes (10000 = 100 %), arrondi au centime le plus proche."""
+    if not 0 <= taux_pour_dix_mille <= 10000:
+        raise ValueError(f"Taux hors bornes (0 à 10000) : {taux_pour_dix_mille}")
     resultat = Decimal(montant) * Decimal(taux_pour_dix_mille) / Decimal(10000)
     return int(resultat.quantize(Decimal("1"), rounding=ROUND_HALF_UP))
 
 
 def proratiser(montant: int, numerateur: int, denominateur: int) -> int:
-    if denominateur == 0:
-        return 0
+    if denominateur <= 0:
+        raise ValueError("Prorata impossible : dénominateur nul ou négatif.")
     return int((Decimal(montant) * numerateur / denominateur).quantize(Decimal("1"), rounding=ROUND_HALF_UP))
+
+
+def repartir(montant: int, poids: list[int]) -> list[int]:
+    """Répartit `montant` selon `poids` au plus fort reste : la somme des parts égale toujours le montant."""
+    total = sum(poids)
+    if total <= 0:
+        raise ValueError("Répartition impossible : poids nuls.")
+    parts = [montant * p // total for p in poids]
+    restes = sorted(range(len(poids)), key=lambda i: (montant * poids[i]) % total, reverse=True)
+    for i in restes[: montant - sum(parts)]:
+        parts[i] += 1
+    return parts

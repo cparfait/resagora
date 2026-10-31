@@ -69,8 +69,17 @@ class EspaceSerializer(serializers.ModelSerializer):
                 parent.pk == self.instance.pk or parent.pk in {e.pk for e in self.instance.descendants()}
             ):
                 raise serializers.ValidationError({"parent": "Un espace ne peut pas être inclus dans lui-même."})
-            if batiment is not None and parent.batiment.site_id != batiment.site_id:
-                raise serializers.ValidationError({"parent": "L'espace englobant doit être sur le même site."})
+            if batiment is not None and parent.batiment_id != batiment.pk:
+                raise serializers.ValidationError({"parent": "L'espace englobant doit être dans le même bâtiment."})
+        if (
+            self.instance is not None
+            and batiment is not None
+            and batiment.pk != self.instance.batiment_id
+            and self.instance.sous_espaces.exists()
+        ):
+            raise serializers.ValidationError(
+                {"batiment": "Déplacez d'abord les sous-espaces : un espace divisé reste dans son bâtiment."}
+            )
         partageable = donnees.get("partageable", getattr(self.instance, "partageable", False))
         if not partageable and donnees.get("capacite_simultanee", 1) > 1:
             raise serializers.ValidationError(

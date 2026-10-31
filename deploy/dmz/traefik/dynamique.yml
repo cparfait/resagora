@@ -46,8 +46,16 @@ http:
       middlewares: [entetes, debit, taille]
       priority: 100
     signature:
-      # Seules les pages de signature et leurs ressources : ni /api, ni /sign_in, ni l'administration.
-      rule: "Host(`signature.chatillon.test`) && PathRegexp(`^/(s|d|e|p|packs|assets|file|blobs|disk|rails/active_storage)/`)"
+      # Seules les pages de signature des signataires (/s/<jeton>) et leurs ressources statiques et fichiers.
+      # Exclus : /api (sauf dépôt de l'image de signature par le signataire), /d/ (liens partagés de modèles),
+      # /rails/active_storage/direct_uploads (dépôt anonyme), /sign_in, /settings et toute l'administration.
+      rule: >-
+        Host(`signature.chatillon.test`) && (
+          PathRegexp(`^/s/[A-Za-z0-9_-]{8,}(/[A-Za-z0-9_./-]*)?$`) ||
+          PathRegexp(`^/(packs|assets)/[A-Za-z0-9_./-]+$`) ||
+          (PathRegexp(`^/(file|blobs_proxy)/[A-Za-z0-9_./=-]+$`) && Method(`GET`)) ||
+          (Path(`/api/attachments`) && Method(`POST`))
+        )
       service: docuseal
       middlewares: [entetes, debit, taille]
       priority: 100

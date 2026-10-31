@@ -59,8 +59,8 @@ paths:
           description: ''
     post:
       operationId: gestion_admin_agents_create
-      description: '`chemin_site` : chemin ORM vers le site de l''objet (None = objet
-        transversal).'
+      description: 'Les agents naissent à leur première connexion par l''annuaire
+        : pas de création manuelle.'
       tags:
       - gestion
       requestBody:
@@ -136,8 +136,8 @@ paths:
   /api/gestion/admin/agents/{id}/reinitialiser-totp:
     post:
       operationId: gestion_admin_agents_reinitialiser_totp_create
-      description: '`chemin_site` : chemin ORM vers le site de l''objet (None = objet
-        transversal).'
+      description: Retire l'appareil de l'agent, ferme ses sessions et renvoie le
+        code de réactivation (une seule fois).
       parameters:
       - in: path
         name: id
@@ -148,8 +148,12 @@ paths:
       tags:
       - gestion
       responses:
-        '204':
-          description: No response body
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JetonReinitialisation'
+          description: ''
   /api/gestion/admin/groupes-ad:
     get:
       operationId: gestion_admin_groupes_ad_list
@@ -800,7 +804,7 @@ paths:
         name: au
         schema:
           type: string
-          format: date-time
+          format: date
       - in: query
         name: canal
         schema:
@@ -809,7 +813,7 @@ paths:
         name: du
         schema:
           type: string
-          format: date-time
+          format: date
       - in: query
         name: objet_id
         schema:
@@ -979,6 +983,32 @@ paths:
           multipart/form-data:
             schema:
               $ref: '#/components/schemas/CodeTotpRequest'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EtapeConnexion'
+          description: ''
+  /api/gestion/auth/totp/jeton:
+    post:
+      operationId: gestion_auth_totp_jeton_create
+      description: Après une réinitialisation, l'agent saisit le code à usage unique
+        remis par l'administrateur.
+      tags:
+      - gestion
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/JetonEnrolementRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/JetonEnrolementRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/JetonEnrolementRequest'
         required: true
       responses:
         '200':
@@ -1916,11 +1946,13 @@ components:
       - connecte
       - code_totp
       - enrolement_totp
+      - jeton_enrolement
       type: string
       description: |-
         * `connecte` - connecte
         * `code_totp` - code_totp
         * `enrolement_totp` - enrolement_totp
+        * `jeton_enrolement` - jeton_enrolement
     FamilleEspace:
       type: object
       properties:
@@ -2098,6 +2130,26 @@ components:
       description: |-
         * `ad` - Groupe AD
         * `manuel` - Attribution manuelle
+    JetonEnrolementRequest:
+      type: object
+      properties:
+        jeton:
+          type: string
+          minLength: 1
+          pattern: ^\s*[0-9]{8}\s*$
+      required:
+      - jeton
+    JetonReinitialisation:
+      type: object
+      properties:
+        jeton_enrolement:
+          type: string
+        expire_le:
+          type: string
+          format: date-time
+      required:
+      - expire_le
+      - jeton_enrolement
     JournalAudit:
       type: object
       properties:

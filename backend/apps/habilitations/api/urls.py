@@ -16,6 +16,7 @@ urlpatterns = [
     path("auth/deconnexion", views.VueDeconnexion.as_view(), name="deconnexion"),
     path("auth/totp", views.VueTotp.as_view(), name="totp"),
     path("auth/totp/enrolement", views.VueEnrolementTotp.as_view(), name="totp-enrolement"),
+    path("auth/totp/jeton", views.VueJetonEnrolement.as_view(), name="totp-jeton"),
     path("moi", views.VueMoi.as_view(), name="moi"),
     path("admin/actions", views.VueCatalogueActions.as_view(), name="actions"),
     *routeur.urls,

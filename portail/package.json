@@ -3,14 +3,7 @@
   "private": true,
   "version": "1.0.0",
   "type": "module",
-  "scripts": {
-    "dev": "vite",
-    "build": "tsc -p tsconfig.json && vite build",
-    "test": "vitest run --coverage",
-    "lint": "oxlint -c ../.oxlintrc.json --deny-warnings src",
-    "typecheck": "tsc -p tsconfig.json",
-    "schema": "npm exec --prefix ../outils/codegen -- openapi-typescript ../docs/api/openapi-portail.yaml -o src/api/schema.d.ts"
-  },
+  "scripts": {},
   "dependencies": {
     "@tanstack/react-query": "5.105.0",
     "react": "19.3.1",

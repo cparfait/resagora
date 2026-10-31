@@ -274,3 +274,99 @@ def test_sec01_api_injoignable_message_neutre(config):
     )
     reponse = TestClient(application).get("/api/portail/catalogue/sites")
     assert reponse.status_code == 503 and "momentanément" in reponse.json()["message"]
+
+
+def appel_brut(application, methode: str, chemin_brut: bytes) -> int:
+    """Appel ASGI direct avec un chemin non normalisé (le client HTTP de test normalise les « .. »)."""
+    import asyncio
+
+    statut = {}
+
+    async def recevoir():
+        return {"type": "http.request", "body": b"", "more_body": False}
+
+    async def envoyer(message):
+        if message["type"] == "http.response.start":
+            statut["code"] = message["status"]
+
+    from urllib.parse import unquote
+
+    portee = {
+        "type": "http",
+        "asgi": {"version": "3.0"},
+        "http_version": "1.1",
+        "method": methode,
+        "scheme": "https",
+        "path": unquote(chemin_brut.decode("latin-1")),
+        "raw_path": chemin_brut,
+        "query_string": b"",
+        "root_path": "",
+        "headers": [(b"host", b"equipements.chatillon.test")],
+        "client": ("198.51.100.7", 1234),
+        "server": ("facade", 8080),
+    }
+    asyncio.run(application(portee, recevoir, envoyer))
+    return statut["code"]
+
+
+def test_sec01_chemins_encodes_et_methodes_hors_liste_refuses(config, api):
+    application = creer_application(
+        config, magasin=MagasinMemoire(), transport=httpx.MockTransport(api), analyseur=AnalyseurFactice()
+    )
+    for chemin in [
+        b"/api/portail/%2e%2e/gestion/moi",
+        b"/api/portail/..%2fgestion/moi",
+        b"//api/portail/catalogue/sites",
+        b"/api/portail/catalogue/sites%0A",
+        "/api/portail/catalogue/espaces/١".encode(),
+        b"/api/portail/catalogue/sites%3F",
+    ]:
+        assert appel_brut(application, "GET", chemin) == 404, chemin
+    for methode in ["HEAD", "OPTIONS", "PUT", "TRACE"]:
+        assert appel_brut(application, methode, b"/api/portail/catalogue/sites") == 404, methode
+    assert api.requetes == []
+
+
+def test_sec01_adresse_client_prise_au_dernier_proxy(config, api):
+    c = client(config, api)
+    c.get("/api/portail/catalogue/sites", headers={"X-Forwarded-For": "1.2.3.4, 5.6.7.8"})
+    assert api.requetes[-1].headers["x-forwarded-for"] == "5.6.7.8"
+
+
+def test_sec06_debit_compte_par_prefixe_ipv6(config, api):
+    from facade.app import Facade
+
+    assert Facade.cle_debit("2001:db8:1:2:aaaa::1") == Facade.cle_debit("2001:db8:1:2:bbbb::2") == "2001:db8:1:2::/64"
+    assert Facade.cle_debit("198.51.100.7") == "198.51.100.7"
+
+
+def test_sec05_identifiant_de_requete_genere_par_la_facade(config, api):
+    client(config, api).get("/api/portail/catalogue/sites", headers={"X-Request-Id": "injecte\nfaux"})
+    assert len(api.requetes[-1].headers["x-request-id"]) == 32 and "injecte" not in api.requetes[-1].headers["x-request-id"]
+
+
+def test_sec05_longueur_de_contenu_invalide(config, api):
+    application = creer_application(
+        config, magasin=MagasinMemoire(), transport=httpx.MockTransport(api), analyseur=AnalyseurFactice()
+    )
+    reponse = TestClient(application).post("/api/portail/simulation-tarif", headers={"Content-Length": "abc"}, content=b"")
+    assert reponse.status_code in {400, 413}
+
+
+def test_tar07_notification_payfip_refusee_si_aucune_adresse_configuree(config, api):
+    config.ips_payfip = []
+    assert (
+        client(config, api)
+        .post("/api/portail/payfip/notification", content=b"idop=ABC", headers={"X-Forwarded-For": "203.0.113.10"})
+        .status_code
+        == 403
+    )
+
+
+def test_sec04_nouvelle_connexion_detruit_l_ancienne_session(config, api):
+    c = client(config, api)
+    connecter(c)
+    ancien = c.cookies.get("__Host-portail")
+    connecter(c)
+    facade = c.app.state.facade
+    assert facade.sessions.lire(ancien) is None

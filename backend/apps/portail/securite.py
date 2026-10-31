@@ -7,6 +7,7 @@ from typing import Any
 from django.conf import settings
 from rest_framework.permissions import BasePermission
 from rest_framework.request import Request
+from rest_framework.views import APIView
 
 
 class CanalPortail(BasePermission):
@@ -16,9 +17,9 @@ class CanalPortail(BasePermission):
         return settings.CANAL == "portail"
 
 
-class VuePublique:
-    """Mélange pour les vues publiques du portail : pas d'authentification, débit limité."""
+class VuePublique(APIView):
+    """Base des vues publiques du portail : pas d'authentification, débit limité."""
 
-    authentication_classes: list[type] = []
-    permission_classes: list[type] = [CanalPortail]
+    authentication_classes = ()
+    permission_classes = (CanalPortail,)
     throttle_scope = "public"

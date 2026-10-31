@@ -44,6 +44,7 @@ class Configuration:
     ips_payfip: list[str] = field(
         default_factory=lambda: [i.strip() for i in os.environ.get("IPS_NOTIFICATION_PAYFIP", "").split(",") if i.strip()]
     )
+    payfip_sans_filtre_ip: bool = field(default_factory=lambda: os.environ.get("PAYFIP_SANS_FILTRE_IP", "0") == "1")
     mobile_option: str = field(default_factory=lambda: os.environ.get("MOBILE_OPTION", "A"))
     entete_certificat_appareil: str = field(
         default_factory=lambda: os.environ.get("ENTETE_CERTIFICAT_APPAREIL", "X-Forwarded-Tls-Client-Cert-Info")

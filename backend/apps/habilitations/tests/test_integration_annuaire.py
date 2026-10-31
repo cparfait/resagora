@@ -1,6 +1,6 @@
-"""SEC-02 / ADM-06 contre le vrai annuaire de test (OpenLDAP en LDAPS, conteneur `annuaire`).
+"""SEC-02 / ADM-06 contre le vrai annuaire de test (OpenLDAP en LDAPS, conteneur `annuaire`) avec python-ldap.
 
-Lancer avec : pytest -m integration (les secrets de développement doivent exister, `make secrets certs`).
+Lancer avec : pytest -m integration (Linux ; secrets de développement présents, `make secrets certs`).
 """
 
 from __future__ import annotations
@@ -13,9 +13,10 @@ import pytest
 from apps.habilitations.ldap import Annuaire, AnnuaireIndisponible
 
 pytestmark = [pytest.mark.integration, pytest.mark.django_db]
+pytest.importorskip("ldap", reason="python-ldap absent (poste Windows) : lancer dans le conteneur d'outillage")
 
 SECRETS = Path(__file__).resolve().parents[4] / "deploy" / "dev" / "secrets"
-URI = os.environ.get("ANNUAIRE_TEST_URI", "ldaps://localhost:50636")
+URI = os.environ.get("ANNUAIRE_TEST_URI", "ldaps://annuaire:1636")
 
 
 def _conf(**surcharges: object) -> dict[str, object]:
@@ -37,6 +38,7 @@ def _conf(**surcharges: object) -> dict[str, object]:
         "ATTRIBUT_NOM": "sn",
         "ATTRIBUT_COURRIEL": "mail",
         "ATTRIBUT_GROUPES": "memberOf",
+        "ATTRIBUT_GUID": "entryUUID",
         "DELAI_SECONDES": 5,
     }
     conf.update(surcharges)
@@ -47,9 +49,9 @@ def _mdp_agents() -> str:
     return (SECRETS / "mdp_agents_demo").read_text().strip()
 
 
-def test_sec02_ldaps_reel_authentifie_et_lit_les_groupes():
+def test_sec02_ldaps_reel_authentifie_lit_les_groupes_et_l_identifiant_immuable():
     entree = Annuaire(_conf()).authentifier("gest.ville", _mdp_agents())
-    assert entree is not None and entree.courriel == "gest.ville@chatillon.test"
+    assert entree is not None and entree.courriel == "gest.ville@chatillon.test" and len(entree.guid) == 36
     assert "cn=GG-Equipements-Gestionnaires,ou=groupes,dc=chatillon,dc=test" in entree.groupes
 
 
