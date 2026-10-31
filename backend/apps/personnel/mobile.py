@@ -399,7 +399,15 @@ def paquet(agent: Agent) -> dict[str, Any]:
                     "effectif": dossier.effectif,
                     "referent": {"nom": str(referent.contact), "telephone": referent.contact.telephone} if referent else None,
                     "etat_des_lieux": dossier.type_reservation.exige_caution,
-                    "materiel": [],
+                    # Matériel à remettre pour la séance (MAT-03) : libellé et quantité, jamais de valeur.
+                    "materiel": [
+                        {
+                            "libelle": p.stock.materiel.libelle,
+                            "quantite": p.quantite_sortie if p.quantite_sortie is not None else p.quantite,
+                            "statut": p.get_statut_display(),
+                        }
+                        for p in o.materiels.filter(statut__in=["validee", "sortie"]).select_related("stock__materiel")
+                    ],
                 }
             )
     sites = {v.site_id: v.site for v in vacations}

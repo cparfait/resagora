@@ -100,12 +100,20 @@ def test_mob07_paquet_minimal_sans_montant_ni_piece_ni_autre_site(terrain, clien
     _autre_site, autre_espace = site_gardienne()
     seance(autre_espace, JOUR, "18:00", "20:00")
     grille_votee(terrain["espace"])
+    from apps.materiel import services as materiel
+    from apps.materiel.models import Materiel
+
+    tables = Materiel.objects.create(code="table", libelle="Table pliante", valeur_journaliere_centimes=300)
+    stock = materiel.entrer(tables, terrain["site"], 20, acteur="système")
+    reservation = terrain["seance"].reservation
+    materiel.reserver(reservation.dossier, stock, 8, acteur="système", occurrence=reservation.occurrences.get())
     jeton = _connecter(client_api, terrain["agent"])
     paquet = _client_mobile(jeton).get("/api/mobile/paquet")
     assert paquet.status_code == 200
     donnees = paquet.json()
     assert [v["id"] for v in donnees["vacations"]] == [terrain["vacation"].pk]
     assert [s["id"] for s in donnees["seances"]] == [terrain["seance"].pk]
+    assert donnees["seances"][0]["materiel"] == [{"libelle": "Table pliante", "quantite": 8, "statut": "Validée"}]
     texte = paquet.content.decode()
     assert "prix" not in texte and "montant" not in texte and "centimes" not in texte and "piece" not in texte
     assert donnees["genere_le"] and donnees["parametres"]["purge_jours"] == 7 and "commune" in donnees["grilles"]

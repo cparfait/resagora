@@ -12,6 +12,7 @@ from django.apps import apps
 
 MIGRATIONS_DE_REFERENCE = [
     ("apps.habilitations.migrations.0005_roles_separation_des_taches", "appliquer"),
+    ("apps.habilitations.migrations.0006_signaler_panne_materiel", "ajouter"),
     ("apps.referentiel.migrations.0002_familles_initiales", "creer"),
     ("apps.usagers.migrations.0002_types_pieces", "creer"),
     ("apps.reservations.migrations.0002_types_reservation", "creer"),
@@ -21,6 +22,9 @@ MIGRATIONS_DE_REFERENCE = [
     ("apps.communication.migrations.0005_modeles_lot3", "creer"),
     ("apps.communication.migrations.0006_modeles_corrections_lot2", "creer"),
     ("apps.communication.migrations.0008_modeles_lot4", "creer"),
+    ("apps.communication.migrations.0009_modeles_corrections_lot3", "creer"),
+    ("apps.communication.migrations.0010_modeles_corrections_lot4", "creer"),
+    ("apps.communication.migrations.0011_modeles_lot5", "creer"),
     ("apps.documents.migrations.0002_modeles_initiaux", "creer"),
     ("apps.personnel.migrations.0002_types_habilitation", "creer"),
 ]

@@ -6,7 +6,8 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState, type FormEvent } from "react";
 import { Link, useNavigate, useParams, useSearchParams } from "react-router";
 import { chemin, ErreurApi, messageErreur, requete } from "../api/http";
-import type { Creneau, Dossier, EspacePublic, Page, PieceExigee, Structure, TypeDemande } from "../api/types";
+import type { Creneau, Dossier, EspacePublic, MaterielDemande, Page, PieceExigee, Structure, TypeDemande } from "../api/types";
+import { ChoixMateriel } from "./Materiel";
 import { Bouton } from "../ui/Bouton";
 import { Case, Champ, Liste, ResumeErreurs, Zone } from "../ui/Champs";
 import { Alerte, Chargement, ErreurChargement, TitrePage, date } from "../ui/Elements";
@@ -146,6 +147,7 @@ export function Demande() {
   const [type, setType] = useState("");
   const [creneaux, setCreneaux] = useState<Creneau[]>([creneauVide(parametres.get("espace") ?? "")]);
   const [details, setDetails] = useState({ objet: "", activite: "", effectif: "", observations: "" });
+  const [materiel, setMateriel] = useState<MaterielDemande[]>([]);
   const etape = id ? (dossier.data?.etape ?? 1) : 1;
   const usagerCourant = dossier.data ? String(dossier.data.usager) : usager || (valides.length === 1 ? String(valides[0]?.id) : "");
   const types = useQuery({
@@ -172,6 +174,7 @@ export function Demande() {
       effectif: dossier.data.effectif ? String(dossier.data.effectif) : "",
       observations: dossier.data.observations ?? "",
     });
+    setMateriel(dossier.data.materiel_demande ?? []);
   }
 
   const echec = (e: unknown) => {
@@ -307,13 +310,14 @@ export function Demande() {
           className="formulaire"
           onSubmit={(e) => {
             e.preventDefault();
-            modifier.mutate({ etape: 3, objet: details.objet, activite: details.activite, effectif: Number(details.effectif) || 0, observations: details.observations });
+            modifier.mutate({ etape: 3, objet: details.objet, activite: details.activite, effectif: Number(details.effectif) || 0, observations: details.observations, materiel });
           }}
         >
           <Champ libelle="Objet de la demande" nom="objet" obligatoire aide="Par exemple : entraînements de l'équipe senior, tournoi de fin d'année." value={details.objet} onChange={(e) => setDetails({ ...details, objet: e.target.value })} erreur={champs.objet?.join(" ")} />
           <Champ libelle="Activité pratiquée" nom="activite" value={details.activite} onChange={(e) => setDetails({ ...details, activite: e.target.value })} />
           <Champ libelle="Nombre de personnes attendues" nom="effectif" type="number" min={1} inputMode="numeric" obligatoire value={details.effectif} onChange={(e) => setDetails({ ...details, effectif: e.target.value })} erreur={champs.effectif?.join(" ")} />
-          <Zone libelle="Précisions (matériel souhaité, besoins particuliers…)" nom="observations" maxLength={2000} value={details.observations} onChange={(e) => setDetails({ ...details, observations: e.target.value })} />
+          <ChoixMateriel espace={creneaux[0]?.espace ? Number(creneaux[0].espace) : null} valeurs={materiel} onChange={setMateriel} />
+          <Zone libelle="Précisions (besoins particuliers…)" nom="observations" maxLength={2000} value={details.observations} onChange={(e) => setDetails({ ...details, observations: e.target.value })} />
           <div className="actions">
             <Bouton variante="secondaire" onClick={() => modifier.mutate({ etape: 1 })}>
               Revenir à l'étape 1
@@ -356,6 +360,12 @@ export function Demande() {
             <dd>{dossier.data.objet}</dd>
             <dt>Personnes attendues</dt>
             <dd>{dossier.data.effectif || "Non précisé"}</dd>
+            {dossier.data.materiel_demande?.length ? (
+              <>
+                <dt>Matériel demandé</dt>
+                <dd>{dossier.data.materiel_demande.reduce((total, m) => total + m.quantite, 0)} élément(s), examinés par la Ville avec la réservation</dd>
+              </>
+            ) : null}
             <dt>Créneaux</dt>
             <dd>
               <ul>

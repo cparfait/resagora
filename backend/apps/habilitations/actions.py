@@ -56,6 +56,7 @@ ACTIONS: dict[str, str] = {
     # Matériel
     "lire_materiel": "Consulter le matériel",
     "gerer_materiel": "Gérer le matériel, les mouvements et la maintenance",
+    "signaler_panne_materiel": "Signaler une panne de matériel",
     # Pilotage
     "lire_valorisation": "Consulter la valorisation",
     "calculer_valorisation": "Calculer la valorisation et éditer les attestations",
@@ -147,6 +148,7 @@ ROLES_INITIAUX: dict[str, dict[str, object]] = {
             "emettre_facture",
             "proposer_retenue",
             "gerer_materiel",
+            "signaler_panne_materiel",
             "calculer_valorisation",
         ],
         "double_authentification": False,
@@ -215,17 +217,18 @@ ROLES_INITIAUX: dict[str, dict[str, object]] = {
             "forcer_regle",
             "gerer_appareils",
             "lire_materiel",
+            "signaler_panne_materiel",
         ],
         "double_authentification": True,
     },
     "gardien": {
         "libelle": "Gardien",
-        "actions": ["utiliser_mobile", "lire_referentiel", "lire_materiel"],
+        "actions": ["utiliser_mobile", "lire_referentiel", "lire_materiel", "signaler_panne_materiel"],
         "double_authentification": False,
     },
     "technicien_materiel": {
         "libelle": "Technicien matériel",
-        "actions": ["lire_referentiel", "lire_reservation", "lire_materiel", "gerer_materiel"],
+        "actions": ["lire_referentiel", "lire_reservation", "lire_materiel", "signaler_panne_materiel", "gerer_materiel"],
         "double_authentification": False,
     },
     "direction": {

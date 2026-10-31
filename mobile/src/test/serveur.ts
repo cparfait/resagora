@@ -34,6 +34,7 @@ export const PAQUET: Paquet = {
       effectif: 20,
       referent: { nom: "Référent fictif", telephone: "01 00 00 00 00" },
       etat_des_lieux: true,
+      materiel: [{ libelle: "Table pliante", quantite: 8, statut: "Validée" }],
     },
   ],
   grilles: { gymnase: ["Sol propre", "Filets en place"], commune: ["Lumières éteintes"] },

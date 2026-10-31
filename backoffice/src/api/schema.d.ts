@@ -663,6 +663,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/gestion/documents/documents/{id}/controler-scan": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description DOC-02 à DOC-07, SIG-01 à SIG-05 : documents d'un dossier, génération, signature, avenants. */
+        post: operations["gestion_documents_documents_controler_scan_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/gestion/documents/documents/{id}/envoyer-signature": {
         parameters: {
             query?: never;
@@ -731,6 +748,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/gestion/documents/documents/{id}/scan": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description SIG-05 : scan déposé par l'usager, à contrôler. */
+        get: operations["gestion_documents_documents_scan_retrieve"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/gestion/documents/documents/{id}/scan-signe": {
         parameters: {
             query?: never;
@@ -742,6 +776,23 @@ export interface paths {
         put?: never;
         /** @description DOC-02 à DOC-07, SIG-01 à SIG-05 : documents d'un dossier, génération, signature, avenants. */
         post: operations["gestion_documents_documents_scan_signe_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gestion/documents/documents/{id}/visibilite": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description DOC-07 : un document peut être retiré du portail (ou y être remis) ; il reste dans le dossier. */
+        post: operations["gestion_documents_documents_visibilite_create"];
         delete?: never;
         options?: never;
         head?: never;
@@ -794,6 +845,23 @@ export interface paths {
         get: operations["gestion_documents_lots_retrieve"];
         put?: never;
         post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gestion/documents/lots/{id}/relancer": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description DOC-06 : relance d'un lot en échec ou interrompu (les dossiers déjà traités sont ignorés). */
+        post: operations["gestion_documents_lots_relancer_create"];
         delete?: never;
         options?: never;
         head?: never;
@@ -904,6 +972,1239 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/gestion/finances/cautions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description `chemin_site` : chemin ORM vers le site de l'objet (None = objet transversal). */
+        get: operations["gestion_finances_cautions_list"];
+        put?: never;
+        /** @description `chemin_site` : chemin ORM vers le site de l'objet (None = objet transversal). */
+        post: operations["gestion_finances_cautions_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gestion/finances/cautions/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description `chemin_site` : chemin ORM vers le site de l'objet (None = objet transversal). */
+        get: operations["gestion_finances_cautions_retrieve"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gestion/finances/cautions/{id}/encaisser": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description `chemin_site` : chemin ORM vers le site de l'objet (None = objet transversal). */
+        post: operations["gestion_finances_cautions_encaisser_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gestion/finances/cautions/{id}/photos/{photo}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description CAU-05 : le second agent examine les photos de la retenue avant de statuer. */
+        get: operations["gestion_finances_cautions_photos_retrieve"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gestion/finances/cautions/{id}/recevoir": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description `chemin_site` : chemin ORM vers le site de l'objet (None = objet transversal). */
+        post: operations["gestion_finances_cautions_recevoir_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gestion/finances/cautions/{id}/restituer": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description `chemin_site` : chemin ORM vers le site de l'objet (None = objet transversal). */
+        post: operations["gestion_finances_cautions_restituer_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gestion/finances/cautions/{id}/retenue": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description `chemin_site` : chemin ORM vers le site de l'objet (None = objet transversal). */
+        post: operations["gestion_finances_cautions_retenue_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gestion/finances/cautions/{id}/valider-retenue": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description `chemin_site` : chemin ORM vers le site de l'objet (None = objet transversal). */
+        post: operations["gestion_finances_cautions_valider_retenue_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gestion/finances/cautions/alertes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description CAU-07 : cautions à restituer dont le délai est dépassé. */
+        get: operations["gestion_finances_cautions_alertes_list"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gestion/finances/cautions/export": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description CAU-06 : état des cautions (tableur). */
+        get: operations["gestion_finances_cautions_export_retrieve"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gestion/finances/etats-des-lieux": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description `chemin_site` : chemin ORM vers le site de l'objet (None = objet transversal). */
+        get: operations["gestion_finances_etats_des_lieux_list"];
+        put?: never;
+        /** @description `chemin_site` : chemin ORM vers le site de l'objet (None = objet transversal). */
+        post: operations["gestion_finances_etats_des_lieux_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gestion/finances/etats-des-lieux/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description `chemin_site` : chemin ORM vers le site de l'objet (None = objet transversal). */
+        get: operations["gestion_finances_etats_des_lieux_retrieve"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gestion/finances/grilles": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description TAR-01 : une grille se prépare, puis est votée (délibération obligatoire) ; votée, elle ne se modifie plus. */
+        get: operations["gestion_finances_grilles_list"];
+        put?: never;
+        /** @description TAR-01 : une grille se prépare, puis est votée (délibération obligatoire) ; votée, elle ne se modifie plus. */
+        post: operations["gestion_finances_grilles_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gestion/finances/grilles/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description TAR-01 : une grille se prépare, puis est votée (délibération obligatoire) ; votée, elle ne se modifie plus. */
+        get: operations["gestion_finances_grilles_retrieve"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** @description TAR-01 : une grille se prépare, puis est votée (délibération obligatoire) ; votée, elle ne se modifie plus. */
+        patch: operations["gestion_finances_grilles_partial_update"];
+        trace?: never;
+    };
+    "/api/gestion/finances/grilles/{id}/archiver": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description Une grille ne s'archive qu'au terme de sa période (elle reste la référence des pièces de cette période). */
+        post: operations["gestion_finances_grilles_archiver_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gestion/finances/grilles/{id}/dupliquer": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description Prépare la grille suivante à partir d'une grille existante (tarifs, majorations, prestations copiés). */
+        post: operations["gestion_finances_grilles_dupliquer_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gestion/finances/grilles/{id}/voter": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description TAR-01 : une grille se prépare, puis est votée (délibération obligatoire) ; votée, elle ne se modifie plus. */
+        post: operations["gestion_finances_grilles_voter_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gestion/finances/imports-encaissements": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description TAR-13 : import de l'état des titres soldés (CSV ou XLSX exporté de Ciril). */
+        get: operations["gestion_finances_imports_encaissements_list"];
+        put?: never;
+        /** @description TAR-13 : import de l'état des titres soldés (CSV ou XLSX exporté de Ciril). */
+        post: operations["gestion_finances_imports_encaissements_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gestion/finances/imports-encaissements/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description TAR-13 : import de l'état des titres soldés (CSV ou XLSX exporté de Ciril). */
+        get: operations["gestion_finances_imports_encaissements_retrieve"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gestion/finances/lots-titres": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description TAR-06 : lots d'export vers Ciril, rejouables (le fichier du lot est conservé à l'identique). */
+        get: operations["gestion_finances_lots_titres_list"];
+        put?: never;
+        /** @description TAR-06 : lots d'export vers Ciril, rejouables (le fichier du lot est conservé à l'identique). */
+        post: operations["gestion_finances_lots_titres_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gestion/finances/lots-titres/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description TAR-06 : lots d'export vers Ciril, rejouables (le fichier du lot est conservé à l'identique). */
+        get: operations["gestion_finances_lots_titres_retrieve"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gestion/finances/lots-titres/{id}/annuler": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description TAR-06 : lot rejeté par Ciril ; ses pièces redeviennent à exporter, le fichier reste consultable. */
+        post: operations["gestion_finances_lots_titres_annuler_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gestion/finances/lots-titres/{id}/fichier": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description TAR-06 : lots d'export vers Ciril, rejouables (le fichier du lot est conservé à l'identique). */
+        get: operations["gestion_finances_lots_titres_fichier_retrieve"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gestion/finances/lots-titres/a-titrer": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description TAR-06 : lots d'export vers Ciril, rejouables (le fichier du lot est conservé à l'identique). */
+        get: operations["gestion_finances_lots_titres_a_titrer_list"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gestion/finances/majorations": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Le contenu d'une grille votée est figé (RG-04 : les devis et factures s'y réfèrent). */
+        get: operations["gestion_finances_majorations_list"];
+        put?: never;
+        /** @description Le contenu d'une grille votée est figé (RG-04 : les devis et factures s'y réfèrent). */
+        post: operations["gestion_finances_majorations_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gestion/finances/majorations/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Le contenu d'une grille votée est figé (RG-04 : les devis et factures s'y réfèrent). */
+        get: operations["gestion_finances_majorations_retrieve"];
+        /** @description Le contenu d'une grille votée est figé (RG-04 : les devis et factures s'y réfèrent). */
+        put: operations["gestion_finances_majorations_update"];
+        post?: never;
+        /** @description Le contenu d'une grille votée est figé (RG-04 : les devis et factures s'y réfèrent). */
+        delete: operations["gestion_finances_majorations_destroy"];
+        options?: never;
+        head?: never;
+        /** @description Le contenu d'une grille votée est figé (RG-04 : les devis et factures s'y réfèrent). */
+        patch: operations["gestion_finances_majorations_partial_update"];
+        trace?: never;
+    };
+    "/api/gestion/finances/pieces": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Devis, factures, acomptes, avoirs : lecture dans le périmètre des dossiers ; écritures par les services. */
+        get: operations["gestion_finances_pieces_list"];
+        put?: never;
+        /** @description Devis, factures, acomptes, avoirs : lecture dans le périmètre des dossiers ; écritures par les services. */
+        post: operations["gestion_finances_pieces_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gestion/finances/pieces/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Devis, factures, acomptes, avoirs : lecture dans le périmètre des dossiers ; écritures par les services. */
+        get: operations["gestion_finances_pieces_retrieve"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gestion/finances/pieces/{id}/accepter": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description Acceptation enregistrée par un agent (devis signé reçu au guichet). */
+        post: operations["gestion_finances_pieces_accepter_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gestion/finances/pieces/{id}/avoir": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description Devis, factures, acomptes, avoirs : lecture dans le périmètre des dossiers ; écritures par les services. */
+        post: operations["gestion_finances_pieces_avoir_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gestion/finances/pieces/{id}/fichier": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Devis, factures, acomptes, avoirs : lecture dans le périmètre des dossiers ; écritures par les services. */
+        get: operations["gestion_finances_pieces_fichier_retrieve"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gestion/finances/pieces/{id}/pointer": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description Devis, factures, acomptes, avoirs : lecture dans le périmètre des dossiers ; écritures par les services. */
+        post: operations["gestion_finances_pieces_pointer_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gestion/finances/pieces/{id}/titre": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description Devis, factures, acomptes, avoirs : lecture dans le périmètre des dossiers ; écritures par les services. */
+        post: operations["gestion_finances_pieces_titre_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gestion/finances/pieces/acompte": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description Devis, factures, acomptes, avoirs : lecture dans le périmètre des dossiers ; écritures par les services. */
+        post: operations["gestion_finances_pieces_acompte_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gestion/finances/pieces/devis": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description Devis, factures, acomptes, avoirs : lecture dans le périmètre des dossiers ; écritures par les services. */
+        post: operations["gestion_finances_pieces_devis_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gestion/finances/pieces/facturer": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description Devis, factures, acomptes, avoirs : lecture dans le périmètre des dossiers ; écritures par les services. */
+        post: operations["gestion_finances_pieces_facturer_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gestion/finances/pieces/retards": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description TAR-10 : factures non soldées après l'échéance, dans le périmètre de l'agent. */
+        get: operations["gestion_finances_pieces_retards_list"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gestion/finances/prestations": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Le contenu d'une grille votée est figé (RG-04 : les devis et factures s'y réfèrent). */
+        get: operations["gestion_finances_prestations_list"];
+        put?: never;
+        /** @description Le contenu d'une grille votée est figé (RG-04 : les devis et factures s'y réfèrent). */
+        post: operations["gestion_finances_prestations_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gestion/finances/prestations/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Le contenu d'une grille votée est figé (RG-04 : les devis et factures s'y réfèrent). */
+        get: operations["gestion_finances_prestations_retrieve"];
+        /** @description Le contenu d'une grille votée est figé (RG-04 : les devis et factures s'y réfèrent). */
+        put: operations["gestion_finances_prestations_update"];
+        post?: never;
+        /** @description Le contenu d'une grille votée est figé (RG-04 : les devis et factures s'y réfèrent). */
+        delete: operations["gestion_finances_prestations_destroy"];
+        options?: never;
+        head?: never;
+        /** @description Le contenu d'une grille votée est figé (RG-04 : les devis et factures s'y réfèrent). */
+        patch: operations["gestion_finances_prestations_partial_update"];
+        trace?: never;
+    };
+    "/api/gestion/finances/reductions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description TAR-03, RG-05 : gratuité ou réduction, toujours fondée (délibération, convention). */
+        get: operations["gestion_finances_reductions_list"];
+        put?: never;
+        /** @description TAR-03, RG-05 : gratuité ou réduction, toujours fondée (délibération, convention). */
+        post: operations["gestion_finances_reductions_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gestion/finances/reductions/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description TAR-03, RG-05 : gratuité ou réduction, toujours fondée (délibération, convention). */
+        get: operations["gestion_finances_reductions_retrieve"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** @description TAR-03, RG-05 : gratuité ou réduction, toujours fondée (délibération, convention). */
+        patch: operations["gestion_finances_reductions_partial_update"];
+        trace?: never;
+    };
+    "/api/gestion/finances/simulation": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description TAR-11 au guichet : chiffrage d'un créneau pour un usager donné (réductions comprises). */
+        post: operations["gestion_finances_simulation_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gestion/finances/tarifs": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Le contenu d'une grille votée est figé (RG-04 : les devis et factures s'y réfèrent). */
+        get: operations["gestion_finances_tarifs_list"];
+        put?: never;
+        /** @description Le contenu d'une grille votée est figé (RG-04 : les devis et factures s'y réfèrent). */
+        post: operations["gestion_finances_tarifs_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gestion/finances/tarifs/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Le contenu d'une grille votée est figé (RG-04 : les devis et factures s'y réfèrent). */
+        get: operations["gestion_finances_tarifs_retrieve"];
+        /** @description Le contenu d'une grille votée est figé (RG-04 : les devis et factures s'y réfèrent). */
+        put: operations["gestion_finances_tarifs_update"];
+        post?: never;
+        /** @description Le contenu d'une grille votée est figé (RG-04 : les devis et factures s'y réfèrent). */
+        delete: operations["gestion_finances_tarifs_destroy"];
+        options?: never;
+        head?: never;
+        /** @description Le contenu d'une grille votée est figé (RG-04 : les devis et factures s'y réfèrent). */
+        patch: operations["gestion_finances_tarifs_partial_update"];
+        trace?: never;
+    };
+    "/api/gestion/materiel/catalogue": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description MAT-01 : catalogue (transversal) ; un article ne se supprime pas, il se désactive. */
+        get: operations["gestion_materiel_catalogue_list"];
+        put?: never;
+        /** @description MAT-01 : catalogue (transversal) ; un article ne se supprime pas, il se désactive. */
+        post: operations["gestion_materiel_catalogue_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gestion/materiel/catalogue/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description MAT-01 : catalogue (transversal) ; un article ne se supprime pas, il se désactive. */
+        get: operations["gestion_materiel_catalogue_retrieve"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** @description MAT-01 : catalogue (transversal) ; un article ne se supprime pas, il se désactive. */
+        patch: operations["gestion_materiel_catalogue_partial_update"];
+        trace?: never;
+    };
+    "/api/gestion/materiel/controles": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description MAT-04 : historique des contrôles, maintenances et réparations (saisie par l'action « controle » du stock). */
+        get: operations["gestion_materiel_controles_list"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gestion/materiel/controles/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description MAT-04 : historique des contrôles, maintenances et réparations (saisie par l'action « controle » du stock). */
+        get: operations["gestion_materiel_controles_retrieve"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gestion/materiel/mouvements": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description MAT-03 : journal des mouvements, en lecture seule (immuable en base). */
+        get: operations["gestion_materiel_mouvements_list"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gestion/materiel/mouvements/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description MAT-03 : journal des mouvements, en lecture seule (immuable en base). */
+        get: operations["gestion_materiel_mouvements_retrieve"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gestion/materiel/pannes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description MAT-05 : pannes ouvertes et résolues (signalement par l'action « panne » du stock). */
+        get: operations["gestion_materiel_pannes_list"];
+        put?: never;
+        /** @description MAT-05 : pannes ouvertes et résolues (signalement par l'action « panne » du stock). */
+        post: operations["gestion_materiel_pannes_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gestion/materiel/pannes/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description MAT-05 : pannes ouvertes et résolues (signalement par l'action « panne » du stock). */
+        get: operations["gestion_materiel_pannes_retrieve"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gestion/materiel/pannes/{id}/resoudre": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description MAT-05 : pannes ouvertes et résolues (signalement par l'action « panne » du stock). */
+        post: operations["gestion_materiel_pannes_resoudre_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gestion/materiel/prets": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description MAT-02, MAT-03 : prêts rattachés aux dossiers (site du matériel dans le périmètre). */
+        get: operations["gestion_materiel_prets_list"];
+        put?: never;
+        /** @description MAT-02, MAT-03 : prêts rattachés aux dossiers (site du matériel dans le périmètre). */
+        post: operations["gestion_materiel_prets_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gestion/materiel/prets/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description MAT-02, MAT-03 : prêts rattachés aux dossiers (site du matériel dans le périmètre). */
+        get: operations["gestion_materiel_prets_retrieve"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gestion/materiel/prets/{id}/refuser": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description MAT-02, MAT-03 : prêts rattachés aux dossiers (site du matériel dans le périmètre). */
+        post: operations["gestion_materiel_prets_refuser_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gestion/materiel/prets/{id}/rendre": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description MAT-02, MAT-03 : prêts rattachés aux dossiers (site du matériel dans le périmètre). */
+        post: operations["gestion_materiel_prets_rendre_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gestion/materiel/prets/{id}/retrouver": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description MAT-02, MAT-03 : prêts rattachés aux dossiers (site du matériel dans le périmètre). */
+        post: operations["gestion_materiel_prets_retrouver_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gestion/materiel/prets/{id}/sortir": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description MAT-02, MAT-03 : prêts rattachés aux dossiers (site du matériel dans le périmètre). */
+        post: operations["gestion_materiel_prets_sortir_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gestion/materiel/prets/{id}/valider": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description MAT-02, MAT-03 : prêts rattachés aux dossiers (site du matériel dans le périmètre). */
+        post: operations["gestion_materiel_prets_valider_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gestion/materiel/stocks": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description MAT-01, MAT-03 : stocks par site et espace ; les quantités ne changent que par les mouvements. */
+        get: operations["gestion_materiel_stocks_list"];
+        put?: never;
+        /** @description MAT-01, MAT-03 : stocks par site et espace ; les quantités ne changent que par les mouvements. */
+        post: operations["gestion_materiel_stocks_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gestion/materiel/stocks/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description MAT-01, MAT-03 : stocks par site et espace ; les quantités ne changent que par les mouvements. */
+        get: operations["gestion_materiel_stocks_retrieve"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gestion/materiel/stocks/{id}/controle": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description MAT-01, MAT-03 : stocks par site et espace ; les quantités ne changent que par les mouvements. */
+        post: operations["gestion_materiel_stocks_controle_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gestion/materiel/stocks/{id}/disponibilite": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description MAT-02 : quantité disponible sur une période (unités en état moins le plus fort engagement). */
+        get: operations["gestion_materiel_stocks_disponibilite_retrieve"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gestion/materiel/stocks/{id}/inventaire": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description MAT-01, MAT-03 : stocks par site et espace ; les quantités ne changent que par les mouvements. */
+        post: operations["gestion_materiel_stocks_inventaire_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gestion/materiel/stocks/{id}/panne": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description MAT-05 : tout agent qui voit le matériel peut signaler une panne (gardien, planificateur, technicien). */
+        post: operations["gestion_materiel_stocks_panne_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gestion/materiel/stocks/{id}/perte": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description MAT-01, MAT-03 : stocks par site et espace ; les quantités ne changent que par les mouvements. */
+        post: operations["gestion_materiel_stocks_perte_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gestion/materiel/stocks/{id}/transferer": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description MAT-01, MAT-03 : stocks par site et espace ; les quantités ne changent que par les mouvements. */
+        post: operations["gestion_materiel_stocks_transferer_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gestion/materiel/stocks/alertes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description MAT-04, DSH-03 : contrôles dépassés et consommables sous le seuil, dans le périmètre. */
+        get: operations["gestion_materiel_stocks_alertes_retrieve"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gestion/materiel/stocks/entrer": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description MAT-01, MAT-03 : stocks par site et espace ; les quantités ne changent que par les mouvements. */
+        post: operations["gestion_materiel_stocks_entrer_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gestion/materiel/stocks/etat": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description MAT-03 : état du stock (sur place, sortis, hors service, prêts à venir, contrôle), exportable. */
+        get: operations["gestion_materiel_stocks_etat_retrieve"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/gestion/moi": {
         parameters: {
             query?: never;
@@ -935,6 +2236,644 @@ export interface paths {
         options?: never;
         head?: never;
         patch: operations["gestion_parametres_partial_update"];
+        trace?: never;
+    };
+    "/api/gestion/personnel/absences": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description PER-06 : saisir une absence libère les vacations de l'agent (elles deviennent « à pourvoir »). */
+        get: operations["gestion_personnel_absences_list"];
+        put?: never;
+        /** @description PER-06 : saisir une absence libère les vacations de l'agent (elles deviennent « à pourvoir »). */
+        post: operations["gestion_personnel_absences_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gestion/personnel/absences/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description PER-06 : saisir une absence libère les vacations de l'agent (elles deviennent « à pourvoir »). */
+        get: operations["gestion_personnel_absences_retrieve"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gestion/personnel/agents": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description PER-01 : un agent est lisible si l'un de ses sites est dans le périmètre. */
+        get: operations["gestion_personnel_agents_list"];
+        put?: never;
+        /** @description PER-01 : un agent est lisible si l'un de ses sites est dans le périmètre. */
+        post: operations["gestion_personnel_agents_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gestion/personnel/agents/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description PER-01 : un agent est lisible si l'un de ses sites est dans le périmètre. */
+        get: operations["gestion_personnel_agents_retrieve"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** @description PER-01 : un agent est lisible si l'un de ses sites est dans le périmètre. */
+        patch: operations["gestion_personnel_agents_partial_update"];
+        trace?: never;
+    };
+    "/api/gestion/personnel/agents/{id}/ical": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description PER-08 : nouveau lien d'abonnement (le précédent est révoqué) ; affiché une seule fois. */
+        post: operations["gestion_personnel_agents_ical_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gestion/personnel/agents/{id}/revoquer-ical": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description PER-01 : un agent est lisible si l'un de ses sites est dans le périmètre. */
+        post: operations["gestion_personnel_agents_revoquer_ical_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gestion/personnel/appareils": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description SEC-10 : appareils des gardiens ; retirer un appareil coupe ses sessions. */
+        get: operations["gestion_personnel_appareils_list"];
+        put?: never;
+        /** @description SEC-10 : appareils des gardiens ; retirer un appareil coupe ses sessions. */
+        post: operations["gestion_personnel_appareils_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gestion/personnel/appareils/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description SEC-10 : appareils des gardiens ; retirer un appareil coupe ses sessions. */
+        get: operations["gestion_personnel_appareils_retrieve"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gestion/personnel/appareils/{id}/autoriser": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description Nouvel appareil d'un agent dont un appareil a été retiré, ou au-delà de deux appareils : autorisation explicite. */
+        post: operations["gestion_personnel_appareils_autoriser_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gestion/personnel/appareils/{id}/retirer": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description SEC-10 : appareils des gardiens ; retirer un appareil coupe ses sessions. */
+        post: operations["gestion_personnel_appareils_retirer_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gestion/personnel/besoins": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description PER-02, DSH-02 : besoins de gardiennage, couverts ou non. */
+        get: operations["gestion_personnel_besoins_list"];
+        put?: never;
+        /** @description PER-02, DSH-02 : besoins de gardiennage, couverts ou non. */
+        post: operations["gestion_personnel_besoins_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gestion/personnel/besoins/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description PER-02, DSH-02 : besoins de gardiennage, couverts ou non. */
+        get: operations["gestion_personnel_besoins_retrieve"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gestion/personnel/besoins/{id}/vacation": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description PER-02, DSH-02 : besoins de gardiennage, couverts ou non. */
+        post: operations["gestion_personnel_besoins_vacation_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gestion/personnel/besoins/recalculer": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description Recalcul explicite (après une reprise de données) des besoins d'un site sur une période (31 jours au plus). */
+        post: operations["gestion_personnel_besoins_recalculer_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gestion/personnel/compteurs": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description PER-07 : compteurs d'heures par agent sur la période (dans le périmètre) et export pour la paie. */
+        get: operations["gestion_personnel_compteurs_retrieve"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gestion/personnel/habilitations": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description `chemin_site` : chemin ORM vers le site de l'objet (None = objet transversal). */
+        get: operations["gestion_personnel_habilitations_list"];
+        put?: never;
+        /** @description `chemin_site` : chemin ORM vers le site de l'objet (None = objet transversal). */
+        post: operations["gestion_personnel_habilitations_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gestion/personnel/habilitations/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description `chemin_site` : chemin ORM vers le site de l'objet (None = objet transversal). */
+        get: operations["gestion_personnel_habilitations_retrieve"];
+        /** @description `chemin_site` : chemin ORM vers le site de l'objet (None = objet transversal). */
+        put: operations["gestion_personnel_habilitations_update"];
+        post?: never;
+        /** @description `chemin_site` : chemin ORM vers le site de l'objet (None = objet transversal). */
+        delete: operations["gestion_personnel_habilitations_destroy"];
+        options?: never;
+        head?: never;
+        /** @description `chemin_site` : chemin ORM vers le site de l'objet (None = objet transversal). */
+        patch: operations["gestion_personnel_habilitations_partial_update"];
+        trace?: never;
+    };
+    "/api/gestion/personnel/ical/{jeton}.ics": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description PER-08 : flux iCal personnel ; le jeton du lien remplace l'authentification et se révoque. */
+        get: operations["gestion_personnel_ical_.ics_retrieve"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gestion/personnel/incidents": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description PER-09 : incidents rattachés à la séance et à l'usager ; le traitement est tracé. */
+        get: operations["gestion_personnel_incidents_list"];
+        put?: never;
+        /** @description PER-09 : incidents rattachés à la séance et à l'usager ; le traitement est tracé. */
+        post: operations["gestion_personnel_incidents_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gestion/personnel/incidents/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description PER-09 : incidents rattachés à la séance et à l'usager ; le traitement est tracé. */
+        get: operations["gestion_personnel_incidents_retrieve"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** @description PER-09 : incidents rattachés à la séance et à l'usager ; le traitement est tracé. */
+        patch: operations["gestion_personnel_incidents_partial_update"];
+        trace?: never;
+    };
+    "/api/gestion/personnel/lignes-trame": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description `chemin_site` : chemin ORM vers le site de l'objet (None = objet transversal). */
+        get: operations["gestion_personnel_lignes_trame_list"];
+        put?: never;
+        /** @description `chemin_site` : chemin ORM vers le site de l'objet (None = objet transversal). */
+        post: operations["gestion_personnel_lignes_trame_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gestion/personnel/lignes-trame/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description `chemin_site` : chemin ORM vers le site de l'objet (None = objet transversal). */
+        get: operations["gestion_personnel_lignes_trame_retrieve"];
+        /** @description `chemin_site` : chemin ORM vers le site de l'objet (None = objet transversal). */
+        put: operations["gestion_personnel_lignes_trame_update"];
+        post?: never;
+        /** @description `chemin_site` : chemin ORM vers le site de l'objet (None = objet transversal). */
+        delete: operations["gestion_personnel_lignes_trame_destroy"];
+        options?: never;
+        head?: never;
+        /** @description `chemin_site` : chemin ORM vers le site de l'objet (None = objet transversal). */
+        patch: operations["gestion_personnel_lignes_trame_partial_update"];
+        trace?: never;
+    };
+    "/api/gestion/personnel/saisies": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description MOB-06 : saisies reçues du terrain, dont celles conservées en conflit à examiner. */
+        get: operations["gestion_personnel_saisies_list"];
+        put?: never;
+        /** @description MOB-06 : saisies reçues du terrain, dont celles conservées en conflit à examiner. */
+        post: operations["gestion_personnel_saisies_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gestion/personnel/saisies/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description MOB-06 : saisies reçues du terrain, dont celles conservées en conflit à examiner. */
+        get: operations["gestion_personnel_saisies_retrieve"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gestion/personnel/saisies/{id}/examinee": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description MOB-06 : saisies reçues du terrain, dont celles conservées en conflit à examiner. */
+        post: operations["gestion_personnel_saisies_examinee_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gestion/personnel/trames": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description `chemin_site` : chemin ORM vers le site de l'objet (None = objet transversal). */
+        get: operations["gestion_personnel_trames_list"];
+        put?: never;
+        /** @description `chemin_site` : chemin ORM vers le site de l'objet (None = objet transversal). */
+        post: operations["gestion_personnel_trames_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gestion/personnel/trames/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description `chemin_site` : chemin ORM vers le site de l'objet (None = objet transversal). */
+        get: operations["gestion_personnel_trames_retrieve"];
+        /** @description `chemin_site` : chemin ORM vers le site de l'objet (None = objet transversal). */
+        put: operations["gestion_personnel_trames_update"];
+        post?: never;
+        /** @description `chemin_site` : chemin ORM vers le site de l'objet (None = objet transversal). */
+        delete: operations["gestion_personnel_trames_destroy"];
+        options?: never;
+        head?: never;
+        /** @description `chemin_site` : chemin ORM vers le site de l'objet (None = objet transversal). */
+        patch: operations["gestion_personnel_trames_partial_update"];
+        trace?: never;
+    };
+    "/api/gestion/personnel/trames/{id}/appliquer": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description PER-03 : génère les vacations de la semaine type sur toute la saison. */
+        post: operations["gestion_personnel_trames_appliquer_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gestion/personnel/types-habilitation": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description `chemin_site` : chemin ORM vers le site de l'objet (None = objet transversal). */
+        get: operations["gestion_personnel_types_habilitation_list"];
+        put?: never;
+        /** @description `chemin_site` : chemin ORM vers le site de l'objet (None = objet transversal). */
+        post: operations["gestion_personnel_types_habilitation_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gestion/personnel/types-habilitation/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description `chemin_site` : chemin ORM vers le site de l'objet (None = objet transversal). */
+        get: operations["gestion_personnel_types_habilitation_retrieve"];
+        /** @description `chemin_site` : chemin ORM vers le site de l'objet (None = objet transversal). */
+        put: operations["gestion_personnel_types_habilitation_update"];
+        post?: never;
+        /** @description `chemin_site` : chemin ORM vers le site de l'objet (None = objet transversal). */
+        delete: operations["gestion_personnel_types_habilitation_destroy"];
+        options?: never;
+        head?: never;
+        /** @description `chemin_site` : chemin ORM vers le site de l'objet (None = objet transversal). */
+        patch: operations["gestion_personnel_types_habilitation_partial_update"];
+        trace?: never;
+    };
+    "/api/gestion/personnel/vacations": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description `chemin_site` : chemin ORM vers le site de l'objet (None = objet transversal). */
+        get: operations["gestion_personnel_vacations_list"];
+        put?: never;
+        /** @description `chemin_site` : chemin ORM vers le site de l'objet (None = objet transversal). */
+        post: operations["gestion_personnel_vacations_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gestion/personnel/vacations/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description `chemin_site` : chemin ORM vers le site de l'objet (None = objet transversal). */
+        get: operations["gestion_personnel_vacations_retrieve"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** @description `chemin_site` : chemin ORM vers le site de l'objet (None = objet transversal). */
+        patch: operations["gestion_personnel_vacations_partial_update"];
+        trace?: never;
+    };
+    "/api/gestion/personnel/vacations/{id}/affecter": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description `chemin_site` : chemin ORM vers le site de l'objet (None = objet transversal). */
+        post: operations["gestion_personnel_vacations_affecter_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gestion/personnel/vacations/{id}/annuler": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description `chemin_site` : chemin ORM vers le site de l'objet (None = objet transversal). */
+        post: operations["gestion_personnel_vacations_annuler_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gestion/personnel/vacations/{id}/candidats": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description PER-04 : propositions d'affectation (remplaçant compris), règles de temps de travail indiquées. */
+        get: operations["gestion_personnel_vacations_candidats_retrieve"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gestion/personnel/vacations/planning-pdf": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description IMP-02 : planning PDF d'un agent ou d'un site (noir et blanc, date d'édition, QR code). */
+        get: operations["gestion_personnel_vacations_planning_pdf_retrieve"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
         trace?: never;
     };
     "/api/gestion/referentiel/batiments": {
@@ -1585,6 +3524,23 @@ export interface paths {
         };
         /** @description PLA-01 : séances d'une période pour les vues jour, semaine, mois, chronologie, multi-sites et liste. */
         get: operations["gestion_reservations_planning_list"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gestion/reservations/planning.ics": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description IMP-05 : planning d'un espace en iCalendar (séances validées et annulées signalées), dans le périmètre. */
+        get: operations["gestion_reservations_planning.ics_retrieve"];
         put?: never;
         post?: never;
         delete?: never;
@@ -2467,10 +4423,206 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/mobile/auth/connexion": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * @description Compte de l'annuaire et rôle « gardien » ; second facteur exigé en option B ou si l'agent l'a activé. Tout refus
+         *     antérieur au code TOTP reçoit la même réponse (pas d'oracle sur le mot de passe) ; en option B, le certificat
+         *     d'appareil est vérifié avant l'annuaire et seul le compte de cet appareil peut s'y connecter.
+         */
+        post: operations["mobile_auth_connexion_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/mobile/auth/deconnexion": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["mobile_auth_deconnexion_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/mobile/auth/totp": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["mobile_auth_totp_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/mobile/paquet": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["mobile_paquet_retrieve"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/mobile/photos": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description Photos compressées sur l'appareil, envoyées avant la saisie qui les cite ; idempotent. */
+        post: operations["mobile_photos_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/mobile/saisies": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["mobile_saisies_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/mobile/sante": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Appel léger qui confirme le réseau avant l'envoi de la file (MOB-05). */
+        get: operations["mobile_sante_retrieve"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        Absence: {
+            readonly id: number;
+            agent: number;
+            readonly agent_nom: string;
+            /** Format: date-time */
+            debut: string;
+            /** Format: date-time */
+            fin: string;
+            nature: components["schemas"]["AbsenceNatureEnum"];
+            commentaire?: string;
+            /** Format: date-time */
+            readonly cree_le: string;
+        };
+        /**
+         * @description * `conge` - Congé
+         *     * `maladie` - Arrêt maladie
+         *     * `formation` - Formation
+         *     * `autre` - Autre absence
+         * @enum {string}
+         */
+        AbsenceNatureEnum: "conge" | "maladie" | "formation" | "autre";
+        AbsenceRequest: {
+            agent: number;
+            /** Format: date-time */
+            debut: string;
+            /** Format: date-time */
+            fin: string;
+            nature: components["schemas"]["AbsenceNatureEnum"];
+            commentaire?: string;
+        };
+        AffectationRequest: {
+            agent: number | null;
+            /** @default false */
+            forcer: boolean;
+            /** @default  */
+            motif: string;
+        };
+        Agent: {
+            readonly id: number;
+            readonly utilisateur: number | null;
+            matricule: string;
+            /**
+             * Identifiant de l'annuaire
+             * @description Rattache la fiche au compte de l'annuaire à la première connexion (sAMAccountName).
+             */
+            identifiant_ad?: string;
+            prenom: string;
+            nom: string;
+            courriel?: string;
+            telephone?: string;
+            /** @description Sites où l'agent peut être affecté. */
+            sites: number[];
+            readonly sites_noms: string[];
+            site_prefere?: number | null;
+            /** Durée hebdomadaire de référence (minutes) */
+            duree_hebdo_minutes?: number;
+            actif?: boolean;
+            readonly habilitations: components["schemas"]["HabilitationAgent"][];
+        };
+        AgentRequest: {
+            matricule: string;
+            /**
+             * Identifiant de l'annuaire
+             * @description Rattache la fiche au compte de l'annuaire à la première connexion (sAMAccountName).
+             */
+            identifiant_ad?: string;
+            prenom: string;
+            nom: string;
+            courriel?: string;
+            telephone?: string;
+            /** @description Sites où l'agent peut être affecté. */
+            sites: number[];
+            site_prefere?: number | null;
+            /** Durée hebdomadaire de référence (minutes) */
+            duree_hebdo_minutes?: number;
+            actif?: boolean;
+        };
         Alternative: {
             espace: number;
             espace_nom: string;
@@ -2497,6 +4649,29 @@ export interface components {
             fermetures: string[];
             description: string;
         };
+        Appareil: {
+            readonly id: number;
+            agent: number;
+            readonly agent_nom: string;
+            libelle: string;
+            /** @description SHA-256 du certificat d'appareil (option B, accès par la DMZ). */
+            readonly empreinte_certificat: string;
+            readonly actif: boolean;
+            /** @description Nouvel appareil d'un agent dont un appareil a été retiré : à autoriser par le planificateur. */
+            readonly a_autoriser: boolean;
+            /** Format: date-time */
+            readonly enregistre_le: string;
+            /** Format: date-time */
+            readonly revoque_le: string | null;
+            /** Format: date-time */
+            readonly derniere_synchronisation: string | null;
+        };
+        AppareilRequest: {
+            agent: number;
+            libelle: string;
+            /** @description PEM du certificat (option B). */
+            certificat?: string;
+        };
         AttestationRequest: {
             condition: components["schemas"]["ConditionEnum"];
             motif: string;
@@ -2505,6 +4680,10 @@ export interface components {
             decisions: {
                 [key: string]: components["schemas"]["DecisionRequest"];
             };
+        };
+        AvoirRequest: {
+            motif: string;
+            lignes?: number[];
         };
         Batiment: {
             readonly id: number;
@@ -2526,6 +4705,24 @@ export interface components {
             erp_type?: string;
             actif?: boolean;
         };
+        Besoin: {
+            readonly id: number;
+            readonly site: number;
+            readonly site_nom: string;
+            /** Format: date-time */
+            readonly debut: string;
+            /** Format: date-time */
+            readonly fin: string;
+            readonly statut: components["schemas"]["BesoinStatutEnum"];
+            readonly seances: string[];
+        };
+        /**
+         * @description * `a_couvrir` - À couvrir
+         *     * `couvert` - Couvert
+         *     * `supprime` - Supprimé (séances annulées)
+         * @enum {string}
+         */
+        BesoinStatutEnum: "a_couvrir" | "couvert" | "supprime";
         Campagne: {
             readonly id: number;
             saison: number;
@@ -2561,6 +4758,65 @@ export interface components {
          * @enum {string}
          */
         CanalEnum: "courriel" | "sms" | "portail";
+        /**
+         * @description * `association_locale` - Association locale
+         *     * `association` - Association extérieure
+         *     * `ecole` - École ou établissement scolaire
+         *     * `entreprise` - Entreprise ou comité social et économique
+         *     * `particulier` - Particulier
+         *     * `service_municipal` - Service municipal
+         *     * `autre_collectivite` - Autre collectivité ou organisme public
+         * @enum {string}
+         */
+        CategorieEnum: "association_locale" | "association" | "ecole" | "entreprise" | "particulier" | "service_municipal" | "autre_collectivite";
+        Caution: {
+            readonly id: number;
+            readonly dossier: number;
+            readonly dossier_numero: string;
+            readonly reservation: number;
+            readonly usager: number;
+            readonly usager_nom: string;
+            readonly espace_nom: string;
+            /** Format: date */
+            readonly fin_occupation: string;
+            readonly montant: number;
+            readonly statut: components["schemas"]["CautionStatutEnum"];
+            readonly mode: components["schemas"]["CautionModeEnum"];
+            /** @description N° de chèque, référence de consignation… */
+            readonly reference: string;
+            /** Format: date */
+            readonly recue_le: string | null;
+            readonly montant_retenu: number;
+            readonly motif_retenue: string;
+            /** Format: date */
+            readonly restituee_le: string | null;
+            readonly mouvements: {
+                [key: string]: unknown;
+            }[];
+            readonly derniere_seance: number | null;
+            readonly etat_sortie: string | null;
+            readonly photos_retenue: number[];
+        };
+        /**
+         * @description * `cheque` - Chèque (non encaissé)
+         *     * `consignation` - Consignation auprès du comptable
+         *     * `virement` - Virement
+         * @enum {string}
+         */
+        CautionModeEnum: "cheque" | "consignation" | "virement";
+        /**
+         * @description * `attendue` - Attendue
+         *     * `recue` - Reçue
+         *     * `restituable` - Restituable
+         *     * `retenue_a_valider` - Retenue à valider (second agent)
+         *     * `restituee` - Restituée
+         *     * `retenue_partielle` - Retenue partielle
+         *     * `retenue_totale` - Retenue totale
+         *     * `solde_restitue` - Retenue partielle, solde restitué
+         *     * `encaissee` - Encaissée
+         * @enum {string}
+         */
+        CautionStatutEnum: "attendue" | "recue" | "restituable" | "retenue_a_valider" | "restituee" | "retenue_partielle" | "retenue_totale" | "solde_restitue" | "encaissee";
         Circuit: {
             readonly id: number;
             mode?: components["schemas"]["CircuitModeEnum"];
@@ -2676,6 +4932,14 @@ export interface components {
             /** Format: date-time */
             fin: string;
         };
+        ConnexionMobileRequest: {
+            identifiant: string;
+            mot_de_passe: string;
+            /** @default  */
+            appareil: string;
+            /** Format: uuid */
+            appareil_id?: string | null;
+        };
         ConnexionRequest: {
             identifiant: string;
             mot_de_passe: string;
@@ -2705,6 +4969,38 @@ export interface components {
             conflits: components["schemas"]["Conflit"][];
             alternatives: components["schemas"]["Alternative"][];
         };
+        ControleMateriel: {
+            readonly id: number;
+            readonly stock: number;
+            readonly stock_libelle: string;
+            readonly nature: components["schemas"]["NatureC37Enum"];
+            /** Format: date */
+            readonly realise_le: string;
+            readonly conforme: boolean;
+            readonly observations: string;
+            readonly prestataire: string;
+            /** Format: date */
+            readonly prochain_le: string | null;
+            /** Format: date-time */
+            readonly cree_le: string;
+        };
+        ControleSaisieRequest: {
+            /** @default controle */
+            nature: components["schemas"]["NatureC37Enum"];
+            /** Format: date */
+            realise_le: string;
+            /** @default true */
+            conforme: boolean;
+            /** @default  */
+            observations: string;
+            /** @default  */
+            prestataire: string;
+        };
+        ControleScanRequest: {
+            accepter: boolean;
+            /** @default  */
+            motif: string;
+        };
         /**
          * @description * `attribuer` - attribuer
          *     * `refuser` - refuser
@@ -2716,6 +5012,10 @@ export interface components {
             /** @default  */
             motif: string;
         };
+        DefiMobileRequest: {
+            defi: string;
+            code: string;
+        };
         DeplacementRequest: {
             espace: number;
             /** Format: date-time */
@@ -2726,6 +5026,10 @@ export interface components {
             forcer_horaires: boolean;
             /** @default  */
             motif_forcage: string;
+        };
+        DepotImportRequest: {
+            /** Format: binary */
+            fichier: string;
         };
         /**
          * @description * `reglement` - reglement
@@ -2763,6 +5067,10 @@ export interface components {
             fichier: string;
             /** @default  */
             commentaire: string;
+        };
+        DevisRequest: {
+            dossier: number;
+            prestations?: components["schemas"]["PrestationDemandeeRequest"][];
         };
         Document: {
             readonly id: number;
@@ -2809,10 +5117,11 @@ export interface components {
          *     * `en_signature` - En signature
          *     * `signe` - Signé électroniquement
          *     * `signe_manuellement` - Signé manuellement
+         *     * `scan_a_controler` - Scan signé à contrôler
          *     * `annule` - Annulé
          * @enum {string}
          */
-        DocumentStatutEnum: "genere" | "en_signature" | "signe" | "signe_manuellement" | "annule";
+        DocumentStatutEnum: "genere" | "en_signature" | "signe" | "signe_manuellement" | "scan_a_controler" | "annule";
         Dossier: {
             readonly id: number;
             readonly numero: string;
@@ -2827,7 +5136,7 @@ export interface components {
             effectif?: number;
             saison?: number | null;
             campagne?: number | null;
-            readonly origine: components["schemas"]["OrigineEnum"];
+            readonly origine: components["schemas"]["DossierOrigineEnum"];
             observations?: string;
             readonly statut: string;
             /** Format: date-time */
@@ -2838,21 +5147,30 @@ export interface components {
             readonly conditions_attestees: unknown;
             readonly reservations: components["schemas"]["Reservation"][];
         };
+        /**
+         * @description * `guichet` - Guichet
+         *     * `portail` - Portail
+         *     * `campagne` - Campagne annuelle
+         *     * `ville` - Service municipal
+         * @enum {string}
+         */
+        DossierOrigineEnum: "guichet" | "portail" | "campagne" | "ville";
         DossierRequest: {
-            usager: number;
-            contact?: number | null;
-            type_reservation: number;
-            objet: string;
-            activite?: string;
-            effectif?: number;
-            saison?: number | null;
-            campagne?: number | null;
-            observations?: string;
+            dossier: number;
+            seances?: number[];
         };
         Enrolement: {
             uri: string;
             qr_svg: string;
             graine: string;
+        };
+        EntreeRequest: {
+            materiel: number;
+            site: number;
+            espace?: number | null;
+            quantite: number;
+            /** @default  */
+            motif: string;
         };
         EnvoiGroupeRequest: {
             titre: string;
@@ -2956,6 +5274,35 @@ export interface components {
          * @enum {string}
          */
         EtapeEnum: "connecte" | "code_totp" | "enrolement_totp" | "jeton_enrolement";
+        EtatDesLieux: {
+            readonly id: number;
+            readonly occurrence: number;
+            readonly moment: components["schemas"]["MomentEnum"];
+            readonly constat: components["schemas"]["EtatDesLieuxConstatEnum"];
+            readonly observations: string;
+            readonly source: components["schemas"]["SourceCf2Enum"];
+            /** Format: date-time */
+            readonly constate_le: string;
+            /** Format: date-time */
+            readonly cree_le: string;
+        };
+        /**
+         * @description * `conforme` - Conforme
+         *     * `degats` - Dégâts constatés
+         * @enum {string}
+         */
+        EtatDesLieuxConstatEnum: "conforme" | "degats";
+        /**
+         * @description * `csv` - csv
+         *     * `xlsx` - xlsx
+         *     * `xml` - xml
+         * @enum {string}
+         */
+        ExportFormatEnum: "csv" | "xlsx" | "xml";
+        ExportRequest: {
+            pieces?: number[];
+            format?: components["schemas"]["ExportFormatEnum"];
+        };
         FamilleEspace: {
             readonly id: number;
             code: string;
@@ -2990,10 +5337,79 @@ export interface components {
             fin: string;
             motif: string;
         };
+        /**
+         * @description L'objet dépend de la nature du modèle : un dossier, une séance (état des lieux) ou une fermeture et un usager
+         *     (avis de fermeture).
+         */
         GenerationRequest: {
             modele: string;
-            dossier: number;
+            dossier?: number;
+            seance?: number;
+            fermeture?: number;
+            usager?: number;
         };
+        /**
+         * @description * `mineur` - Mineur
+         *     * `majeur` - Majeur
+         *     * `securite` - Sécurité des personnes
+         * @enum {string}
+         */
+        GraviteEnum: "mineur" | "majeur" | "securite";
+        Grille: {
+            readonly id: number;
+            nom: string;
+            /**
+             * Applicable à partir du
+             * Format: date
+             */
+            debut: string;
+            /**
+             * Applicable jusqu'au
+             * Format: date
+             */
+            fin?: string | null;
+            /** Référence de la délibération */
+            deliberation_reference?: string;
+            /** Format: date */
+            deliberation_date?: string | null;
+            readonly statut: components["schemas"]["GrilleStatutEnum"];
+            /**
+             * Début de la soirée (majoration)
+             * Format: time
+             */
+            heure_soiree?: string | null;
+            /** Format: date-time */
+            readonly cree_le: string;
+        };
+        GrilleRequest: {
+            nom: string;
+            /**
+             * Applicable à partir du
+             * Format: date
+             */
+            debut: string;
+            /**
+             * Applicable jusqu'au
+             * Format: date
+             */
+            fin?: string | null;
+            /** Référence de la délibération */
+            deliberation_reference?: string;
+            /** Format: date */
+            deliberation_date?: string | null;
+            /**
+             * Début de la soirée (majoration)
+             * Format: time
+             */
+            heure_soiree?: string | null;
+        };
+        /**
+         * @description * `brouillon` - En préparation
+         *     * `votee` - Votée
+         *     * `archivee` - Archivée
+         * @enum {string}
+         */
+        GrilleStatutEnum: "brouillon" | "votee" | "archivee";
         GroupeAD: {
             readonly id: number;
             /** DN du groupe */
@@ -3024,6 +5440,31 @@ export interface components {
             debut?: string;
             /** Format: date */
             fin?: string | null;
+        };
+        HabilitationAgent: {
+            readonly id: number;
+            agent: number;
+            type: number;
+            readonly type_libelle: string;
+            /** Format: date */
+            obtenue_le: string;
+            /**
+             * Format: date
+             * @description Vide : sans limite de validité.
+             */
+            valide_jusqu_au?: string | null;
+            readonly valide: boolean;
+        };
+        HabilitationAgentRequest: {
+            agent: number;
+            type: number;
+            /** Format: date */
+            obtenue_le: string;
+            /**
+             * Format: date
+             * @description Vide : sans limite de validité.
+             */
+            valide_jusqu_au?: string | null;
         };
         HabilitationMoi: {
             role: string;
@@ -3071,9 +5512,67 @@ export interface components {
             /** @description Plage valable aussi pendant les vacances scolaires. */
             pendant_vacances?: boolean;
         };
+        Import: {
+            readonly id: number;
+            lignes_lues?: number;
+            rapprochees?: number;
+            rejets?: unknown;
+            /** Format: date-time */
+            readonly cree_le: string;
+        };
+        Incident: {
+            readonly id: number;
+            site: number;
+            readonly site_nom: string;
+            /** @default  */
+            readonly espace_nom: string;
+            occurrence?: number | null;
+            readonly usager: number | null;
+            /** @default  */
+            readonly usager_nom: string;
+            nature: components["schemas"]["IncidentNatureEnum"];
+            gravite?: components["schemas"]["GraviteEnum"];
+            description: string;
+            /** Format: date-time */
+            constate_le: string;
+            /** @default  */
+            readonly signale_par_nom: string;
+            readonly source: components["schemas"]["SourceCf2Enum"];
+            traite?: boolean;
+            suite_donnee?: string;
+            /** Format: date-time */
+            readonly cree_le: string;
+        };
+        /**
+         * @description * `degradation` - Dégradation
+         *     * `comportement` - Comportement
+         *     * `accident` - Accident ou blessure
+         *     * `technique` - Problème technique
+         *     * `absence_usager` - Usager absent
+         *     * `autre` - Autre
+         * @enum {string}
+         */
+        IncidentNatureEnum: "degradation" | "comportement" | "accident" | "technique" | "absence_usager" | "autre";
+        IncidentRequest: {
+            site: number;
+            occurrence?: number | null;
+            nature: components["schemas"]["IncidentNatureEnum"];
+            gravite?: components["schemas"]["GraviteEnum"];
+            description: string;
+            /** Format: date-time */
+            constate_le: string;
+            traite?: boolean;
+            suite_donnee?: string;
+        };
         InvitationRequest: {
             contact: number;
         };
+        /**
+         * @description * `reparee` - Réparée
+         *     * `rebut` - Mise au rebut
+         * @enum {string}
+         */
+        IssueEnum: "reparee" | "rebut";
         JetonEnrolementRequest: {
             jeton: string;
         };
@@ -3082,6 +5581,17 @@ export interface components {
             /** Format: date-time */
             expire_le: string;
         };
+        /**
+         * @description * `0` - Lundi
+         *     * `1` - Mardi
+         *     * `2` - Mercredi
+         *     * `3` - Jeudi
+         *     * `4` - Vendredi
+         *     * `5` - Samedi
+         *     * `6` - Dimanche
+         * @enum {integer}
+         */
+        JourEnum: 0 | 1 | 2 | 3 | 4 | 5 | 6;
         /**
          * @description * `0` - lundi
          *     * `1` - mardi
@@ -3108,6 +5618,73 @@ export interface components {
             apres?: unknown;
             adresse_ip?: string | null;
             empreinte: string;
+        };
+        Ligne: {
+            readonly id: number;
+            rang: number;
+            libelle: string;
+            nature: components["schemas"]["LigneNatureEnum"];
+            /** @description Minutes pour l'unité « heure », sinon nombre d'unités. */
+            quantite: number;
+            unite: components["schemas"]["UniteEnum"];
+            /** Format: int64 */
+            prix_unitaire: number;
+            /** Format: int64 */
+            montant_reference: number;
+            taux_reduction?: number;
+            /** Format: int64 */
+            montant_du: number;
+            fondement?: string;
+            occurrence?: number | null;
+        };
+        /**
+         * @description * `occupation` - Occupation
+         *     * `majoration` - Majoration
+         *     * `prestation` - Prestation
+         *     * `frais` - Frais d'annulation
+         *     * `acompte` - Acompte
+         * @enum {string}
+         */
+        LigneNatureEnum: "occupation" | "majoration" | "prestation" | "frais" | "acompte";
+        LigneRequest: {
+            rang: number;
+            libelle: string;
+            nature: components["schemas"]["LigneNatureEnum"];
+            /** @description Minutes pour l'unité « heure », sinon nombre d'unités. */
+            quantite: number;
+            unite: components["schemas"]["UniteEnum"];
+            /** Format: int64 */
+            prix_unitaire: number;
+            /** Format: int64 */
+            montant_reference: number;
+            taux_reduction?: number;
+            /** Format: int64 */
+            montant_du: number;
+            fondement?: string;
+            occurrence?: number | null;
+        };
+        LigneTrame: {
+            readonly id: number;
+            trame: number;
+            jour: components["schemas"]["JourEnum"];
+            /** Format: time */
+            heure_debut: string;
+            /** Format: time */
+            heure_fin: string;
+            agent?: number | null;
+            /** @default  */
+            readonly agent_nom: string;
+            type?: components["schemas"]["Type94cEnum"];
+        };
+        LigneTrameRequest: {
+            trame: number;
+            jour: components["schemas"]["JourEnum"];
+            /** Format: time */
+            heure_debut: string;
+            /** Format: time */
+            heure_fin: string;
+            agent?: number | null;
+            type?: components["schemas"]["Type94cEnum"];
         };
         ListeAttente: {
             readonly id: number;
@@ -3163,6 +5740,112 @@ export interface components {
          * @enum {string}
          */
         LotStatutEnum: "en_attente" | "en_cours" | "termine" | "echec";
+        LotTitres: {
+            readonly id: number;
+            numero: string;
+            format: components["schemas"]["LotTitresFormatEnum"];
+            readonly pieces: string[];
+            /** Format: int64 */
+            total_centimes: number;
+            /** Format: date-time */
+            readonly cree_le: string;
+            /**
+             * Format: date-time
+             * @description Lot rejeté par Ciril : ses pièces sont à réexporter.
+             */
+            annule_le?: string | null;
+            motif_annulation?: string;
+        };
+        /**
+         * @description * `csv` - CSV
+         *     * `xlsx` - Tableur XLSX
+         *     * `xml` - XML
+         * @enum {string}
+         */
+        LotTitresFormatEnum: "csv" | "xlsx" | "xml";
+        Majoration: {
+            readonly id: number;
+            grille: number;
+            nature: components["schemas"]["MajorationNatureEnum"];
+            /**
+             * Taux (dix-millièmes)
+             * @description 2500 = 25 %.
+             */
+            taux: number;
+            /** @description Catégories concernées (vide : toutes). */
+            categories?: unknown;
+        };
+        /**
+         * @description * `week_end` - Week-end (samedi et dimanche)
+         *     * `soiree` - Soirée (à partir de l'heure indiquée)
+         *     * `ferie` - Jour férié
+         *     * `non_resident` - Usager non résident
+         * @enum {string}
+         */
+        MajorationNatureEnum: "week_end" | "soiree" | "ferie" | "non_resident";
+        MajorationRequest: {
+            grille: number;
+            nature: components["schemas"]["MajorationNatureEnum"];
+            /**
+             * Taux (dix-millièmes)
+             * @description 2500 = 25 %.
+             */
+            taux: number;
+            /** @description Catégories concernées (vide : toutes). */
+            categories?: unknown;
+        };
+        Materiel: {
+            readonly id: number;
+            code: string;
+            libelle: string;
+            nature?: components["schemas"]["MaterielNatureEnum"];
+            description?: string;
+            unite?: string;
+            /** Valeur de référence d'une journée de prêt (centimes) */
+            valeur_journaliere_centimes?: number;
+            /** @description Code de la prestation facturée (grille tarifaire), vide si gratuit. */
+            prestation_code?: string;
+            reservable?: boolean;
+            /** Proposé aux usagers sur le portail */
+            propose_portail?: boolean;
+            /**
+             * Périodicité du contrôle (jours)
+             * @description Contrôle réglementaire ou de sécurité (MAT-04).
+             */
+            periodicite_controle_jours?: number | null;
+            /** @description Consommables : alerte sous ce stock. */
+            seuil_alerte?: number | null;
+            actif?: boolean;
+        };
+        /**
+         * @description * `fixe` - Équipement fixe d'un espace
+         *     * `mobile` - Matériel mobile, prêté
+         *     * `consommable` - Consommable
+         * @enum {string}
+         */
+        MaterielNatureEnum: "fixe" | "mobile" | "consommable";
+        MaterielRequest: {
+            code: string;
+            libelle: string;
+            nature?: components["schemas"]["MaterielNatureEnum"];
+            description?: string;
+            unite?: string;
+            /** Valeur de référence d'une journée de prêt (centimes) */
+            valeur_journaliere_centimes?: number;
+            /** @description Code de la prestation facturée (grille tarifaire), vide si gratuit. */
+            prestation_code?: string;
+            reservable?: boolean;
+            /** Proposé aux usagers sur le portail */
+            propose_portail?: boolean;
+            /**
+             * Périodicité du contrôle (jours)
+             * @description Contrôle réglementaire ou de sécurité (MAT-04).
+             */
+            periodicite_controle_jours?: number | null;
+            /** @description Consommables : alerte sous ce stock. */
+            seuil_alerte?: number | null;
+            actif?: boolean;
+        };
         Message: {
             readonly id: number;
             dossier: number;
@@ -3254,12 +5937,52 @@ export interface components {
             double_authentification_validee: boolean;
             habilitations: components["schemas"]["HabilitationMoi"][];
         };
+        /**
+         * @description * `entree` - Entrée
+         *     * `sortie` - Sortie
+         * @enum {string}
+         */
+        MomentEnum: "entree" | "sortie";
+        MotifPretRequest: {
+            motif: string;
+        };
         MotifRequest: {
             motif: string;
         };
         MotifUsagerRequest: {
             motif: string;
         };
+        MouvementStock: {
+            readonly id: number;
+            readonly type: components["schemas"]["MouvementStockTypeEnum"];
+            readonly type_libelle: string;
+            readonly stock: number;
+            readonly stock_libelle: string;
+            readonly stock_destination: number | null;
+            /** @default  */
+            readonly destination_libelle: string;
+            /** @description Positive ; négative seulement pour un ajustement d'inventaire à la baisse. */
+            readonly quantite: number;
+            readonly reservation: number | null;
+            readonly motif: string;
+            readonly acteur_libelle: string;
+            /** Format: date-time */
+            readonly horodatage: string;
+        };
+        /**
+         * @description * `entree` - Entrée (achat, don)
+         *     * `sortie` - Sortie (prêt)
+         *     * `retour` - Retour de prêt
+         *     * `transfert` - Transfert entre lieux
+         *     * `perte` - Perte ou vol
+         *     * `panne` - Mise hors service
+         *     * `reparation` - Remise en service
+         *     * `rebut` - Mise au rebut
+         *     * `consommation` - Consommation
+         *     * `inventaire` - Ajustement d'inventaire
+         * @enum {string}
+         */
+        MouvementStockTypeEnum: "entree" | "sortie" | "retour" | "transfert" | "perte" | "panne" | "reparation" | "rebut" | "consommation" | "inventaire";
         /**
          * @description * `convention` - Convention d'occupation
          *     * `contrat_location` - Contrat de location
@@ -3275,6 +5998,13 @@ export interface components {
          * @enum {string}
          */
         NatureA83Enum: "convention" | "contrat_location" | "avenant" | "devis" | "facture" | "avoir" | "etat_des_lieux" | "attribution" | "refus" | "attestation_valorisation" | "fermeture";
+        /**
+         * @description * `controle` - Contrôle périodique
+         *     * `maintenance` - Maintenance
+         *     * `reparation` - Réparation
+         * @enum {string}
+         */
+        NatureC37Enum: "controle" | "maintenance" | "reparation";
         Notification: {
             readonly id: number;
             readonly canal: components["schemas"]["CanalEnum"];
@@ -3367,14 +6097,36 @@ export interface components {
         OptionRequest: {
             jours?: number;
         };
-        /**
-         * @description * `guichet` - Guichet
-         *     * `portail` - Portail
-         *     * `campagne` - Campagne annuelle
-         *     * `ville` - Service municipal
-         * @enum {string}
-         */
-        OrigineEnum: "guichet" | "portail" | "campagne" | "ville";
+        PaginatedAbsenceList: {
+            /** @example 123 */
+            count: number;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?page=4
+             */
+            next?: string | null;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?page=2
+             */
+            previous?: string | null;
+            results: components["schemas"]["Absence"][];
+        };
+        PaginatedAgentList: {
+            /** @example 123 */
+            count: number;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?page=4
+             */
+            next?: string | null;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?page=2
+             */
+            previous?: string | null;
+            results: components["schemas"]["Agent"][];
+        };
         PaginatedAlternativeList: {
             /** @example 123 */
             count: number;
@@ -3389,6 +6141,21 @@ export interface components {
              */
             previous?: string | null;
             results: components["schemas"]["Alternative"][];
+        };
+        PaginatedAppareilList: {
+            /** @example 123 */
+            count: number;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?page=4
+             */
+            next?: string | null;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?page=2
+             */
+            previous?: string | null;
+            results: components["schemas"]["Appareil"][];
         };
         PaginatedBatimentList: {
             /** @example 123 */
@@ -3405,6 +6172,21 @@ export interface components {
             previous?: string | null;
             results: components["schemas"]["Batiment"][];
         };
+        PaginatedBesoinList: {
+            /** @example 123 */
+            count: number;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?page=4
+             */
+            next?: string | null;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?page=2
+             */
+            previous?: string | null;
+            results: components["schemas"]["Besoin"][];
+        };
         PaginatedCampagneList: {
             /** @example 123 */
             count: number;
@@ -3419,6 +6201,21 @@ export interface components {
              */
             previous?: string | null;
             results: components["schemas"]["Campagne"][];
+        };
+        PaginatedCautionList: {
+            /** @example 123 */
+            count: number;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?page=4
+             */
+            next?: string | null;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?page=2
+             */
+            previous?: string | null;
+            results: components["schemas"]["Caution"][];
         };
         PaginatedCompteList: {
             /** @example 123 */
@@ -3449,6 +6246,21 @@ export interface components {
              */
             previous?: string | null;
             results: components["schemas"]["Contact"][];
+        };
+        PaginatedControleMaterielList: {
+            /** @example 123 */
+            count: number;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?page=4
+             */
+            next?: string | null;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?page=2
+             */
+            previous?: string | null;
+            results: components["schemas"]["ControleMateriel"][];
         };
         PaginatedDocumentList: {
             /** @example 123 */
@@ -3495,6 +6307,21 @@ export interface components {
             previous?: string | null;
             results: components["schemas"]["Espace"][];
         };
+        PaginatedEtatDesLieuxList: {
+            /** @example 123 */
+            count: number;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?page=4
+             */
+            next?: string | null;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?page=2
+             */
+            previous?: string | null;
+            results: components["schemas"]["EtatDesLieux"][];
+        };
         PaginatedFamilleEspaceList: {
             /** @example 123 */
             count: number;
@@ -3525,6 +6352,21 @@ export interface components {
             previous?: string | null;
             results: components["schemas"]["Fermeture"][];
         };
+        PaginatedGrilleList: {
+            /** @example 123 */
+            count: number;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?page=4
+             */
+            next?: string | null;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?page=2
+             */
+            previous?: string | null;
+            results: components["schemas"]["Grille"][];
+        };
         PaginatedGroupeADList: {
             /** @example 123 */
             count: number;
@@ -3539,6 +6381,21 @@ export interface components {
              */
             previous?: string | null;
             results: components["schemas"]["GroupeAD"][];
+        };
+        PaginatedHabilitationAgentList: {
+            /** @example 123 */
+            count: number;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?page=4
+             */
+            next?: string | null;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?page=2
+             */
+            previous?: string | null;
+            results: components["schemas"]["HabilitationAgent"][];
         };
         PaginatedHabilitationList: {
             /** @example 123 */
@@ -3555,6 +6412,36 @@ export interface components {
             previous?: string | null;
             results: components["schemas"]["Habilitation"][];
         };
+        PaginatedImportList: {
+            /** @example 123 */
+            count: number;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?page=4
+             */
+            next?: string | null;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?page=2
+             */
+            previous?: string | null;
+            results: components["schemas"]["Import"][];
+        };
+        PaginatedIncidentList: {
+            /** @example 123 */
+            count: number;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?page=4
+             */
+            next?: string | null;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?page=2
+             */
+            previous?: string | null;
+            results: components["schemas"]["Incident"][];
+        };
         PaginatedJournalAuditList: {
             /** @example 123 */
             count: number;
@@ -3569,6 +6456,21 @@ export interface components {
              */
             previous?: string | null;
             results: components["schemas"]["JournalAudit"][];
+        };
+        PaginatedLigneTrameList: {
+            /** @example 123 */
+            count: number;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?page=4
+             */
+            next?: string | null;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?page=2
+             */
+            previous?: string | null;
+            results: components["schemas"]["LigneTrame"][];
         };
         PaginatedListeAttenteList: {
             /** @example 123 */
@@ -3600,6 +6502,51 @@ export interface components {
             previous?: string | null;
             results: components["schemas"]["Lot"][];
         };
+        PaginatedLotTitresList: {
+            /** @example 123 */
+            count: number;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?page=4
+             */
+            next?: string | null;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?page=2
+             */
+            previous?: string | null;
+            results: components["schemas"]["LotTitres"][];
+        };
+        PaginatedMajorationList: {
+            /** @example 123 */
+            count: number;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?page=4
+             */
+            next?: string | null;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?page=2
+             */
+            previous?: string | null;
+            results: components["schemas"]["Majoration"][];
+        };
+        PaginatedMaterielList: {
+            /** @example 123 */
+            count: number;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?page=4
+             */
+            next?: string | null;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?page=2
+             */
+            previous?: string | null;
+            results: components["schemas"]["Materiel"][];
+        };
         PaginatedMessageList: {
             /** @example 123 */
             count: number;
@@ -3614,6 +6561,21 @@ export interface components {
              */
             previous?: string | null;
             results: components["schemas"]["Message"][];
+        };
+        PaginatedMouvementStockList: {
+            /** @example 123 */
+            count: number;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?page=4
+             */
+            next?: string | null;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?page=2
+             */
+            previous?: string | null;
+            results: components["schemas"]["MouvementStock"][];
         };
         PaginatedNotificationList: {
             /** @example 123 */
@@ -3645,6 +6607,21 @@ export interface components {
             previous?: string | null;
             results: components["schemas"]["Occurrence"][];
         };
+        PaginatedPanneMaterielList: {
+            /** @example 123 */
+            count: number;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?page=4
+             */
+            next?: string | null;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?page=2
+             */
+            previous?: string | null;
+            results: components["schemas"]["PanneMateriel"][];
+        };
         PaginatedPerimetreList: {
             /** @example 123 */
             count: number;
@@ -3675,6 +6652,21 @@ export interface components {
             previous?: string | null;
             results: components["schemas"]["Photo"][];
         };
+        PaginatedPieceComptableList: {
+            /** @example 123 */
+            count: number;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?page=4
+             */
+            next?: string | null;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?page=2
+             */
+            previous?: string | null;
+            results: components["schemas"]["PieceComptable"][];
+        };
         PaginatedPieceList: {
             /** @example 123 */
             count: number;
@@ -3690,6 +6682,36 @@ export interface components {
             previous?: string | null;
             results: components["schemas"]["Piece"][];
         };
+        PaginatedPrestationList: {
+            /** @example 123 */
+            count: number;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?page=4
+             */
+            next?: string | null;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?page=2
+             */
+            previous?: string | null;
+            results: components["schemas"]["Prestation"][];
+        };
+        PaginatedPretList: {
+            /** @example 123 */
+            count: number;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?page=4
+             */
+            next?: string | null;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?page=2
+             */
+            previous?: string | null;
+            results: components["schemas"]["Pret"][];
+        };
         PaginatedRattachementList: {
             /** @example 123 */
             count: number;
@@ -3704,6 +6726,21 @@ export interface components {
              */
             previous?: string | null;
             results: components["schemas"]["Rattachement"][];
+        };
+        PaginatedReductionList: {
+            /** @example 123 */
+            count: number;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?page=4
+             */
+            next?: string | null;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?page=2
+             */
+            previous?: string | null;
+            results: components["schemas"]["Reduction"][];
         };
         PaginatedReservationList: {
             /** @example 123 */
@@ -3735,6 +6772,21 @@ export interface components {
             previous?: string | null;
             results: components["schemas"]["Role"][];
         };
+        PaginatedSaisieList: {
+            /** @example 123 */
+            count: number;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?page=4
+             */
+            next?: string | null;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?page=2
+             */
+            previous?: string | null;
+            results: components["schemas"]["Saisie"][];
+        };
         PaginatedSaisonList: {
             /** @example 123 */
             count: number;
@@ -3764,6 +6816,51 @@ export interface components {
              */
             previous?: string | null;
             results: components["schemas"]["Site"][];
+        };
+        PaginatedStockMaterielList: {
+            /** @example 123 */
+            count: number;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?page=4
+             */
+            next?: string | null;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?page=2
+             */
+            previous?: string | null;
+            results: components["schemas"]["StockMateriel"][];
+        };
+        PaginatedTarifList: {
+            /** @example 123 */
+            count: number;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?page=4
+             */
+            next?: string | null;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?page=2
+             */
+            previous?: string | null;
+            results: components["schemas"]["Tarif"][];
+        };
+        PaginatedTrameList: {
+            /** @example 123 */
+            count: number;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?page=4
+             */
+            next?: string | null;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?page=2
+             */
+            previous?: string | null;
+            results: components["schemas"]["Trame"][];
         };
         PaginatedUsagerList: {
             /** @example 123 */
@@ -3795,6 +6892,54 @@ export interface components {
             previous?: string | null;
             results: components["schemas"]["Utilisateur"][];
         };
+        PaginatedVacationList: {
+            /** @example 123 */
+            count: number;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?page=4
+             */
+            next?: string | null;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?page=2
+             */
+            previous?: string | null;
+            results: components["schemas"]["Vacation"][];
+        };
+        PanneMateriel: {
+            readonly id: number;
+            readonly stock: number;
+            readonly stock_libelle: string;
+            readonly quantite: number;
+            readonly description: string;
+            readonly source: components["schemas"]["PanneMaterielSourceEnum"];
+            readonly statut: components["schemas"]["PanneMaterielStatutEnum"];
+            /** Format: date-time */
+            readonly signalee_le: string;
+            /** Format: date-time */
+            readonly resolue_le: string | null;
+            readonly resolution: string;
+        };
+        /**
+         * @description * `backoffice` - Back-office
+         *     * `controle` - Contrôle non conforme
+         *     * `incident` - Incident signalé
+         * @enum {string}
+         */
+        PanneMaterielSourceEnum: "backoffice" | "controle" | "incident";
+        /**
+         * @description * `ouverte` - En panne
+         *     * `reparee` - Réparée
+         *     * `rebut` - Mise au rebut
+         * @enum {string}
+         */
+        PanneMaterielStatutEnum: "ouverte" | "reparee" | "rebut";
+        PanneSaisieRequest: {
+            /** @default 1 */
+            quantite: number;
+            description: string;
+        };
         Parametre: {
             cle: string;
             libelle: string;
@@ -3802,6 +6947,24 @@ export interface components {
             aide: string;
             valeur: unknown;
             defaut: unknown;
+        };
+        PatchedAgentRequest: {
+            matricule?: string;
+            /**
+             * Identifiant de l'annuaire
+             * @description Rattache la fiche au compte de l'annuaire à la première connexion (sAMAccountName).
+             */
+            identifiant_ad?: string;
+            prenom?: string;
+            nom?: string;
+            courriel?: string;
+            telephone?: string;
+            /** @description Sites où l'agent peut être affecté. */
+            sites?: number[];
+            site_prefere?: number | null;
+            /** Durée hebdomadaire de référence (minutes) */
+            duree_hebdo_minutes?: number;
+            actif?: boolean;
         };
         PatchedBatimentRequest: {
             site?: number;
@@ -3887,6 +7050,28 @@ export interface components {
             libelle?: string;
             ordre?: number;
         };
+        PatchedGrilleRequest: {
+            nom?: string;
+            /**
+             * Applicable à partir du
+             * Format: date
+             */
+            debut?: string;
+            /**
+             * Applicable jusqu'au
+             * Format: date
+             */
+            fin?: string | null;
+            /** Référence de la délibération */
+            deliberation_reference?: string;
+            /** Format: date */
+            deliberation_date?: string | null;
+            /**
+             * Début de la soirée (majoration)
+             * Format: time
+             */
+            heure_soiree?: string | null;
+        };
         PatchedGroupeADRequest: {
             /** DN du groupe */
             dn?: string;
@@ -3894,6 +7079,17 @@ export interface components {
             role?: number;
             perimetre?: number;
             actif?: boolean;
+        };
+        PatchedHabilitationAgentRequest: {
+            agent?: number;
+            type?: number;
+            /** Format: date */
+            obtenue_le?: string;
+            /**
+             * Format: date
+             * @description Vide : sans limite de validité.
+             */
+            valide_jusqu_au?: string | null;
         };
         PatchedHabilitationRequest: {
             utilisateur?: number;
@@ -3914,6 +7110,60 @@ export interface components {
             fin?: string;
             /** @description Plage valable aussi pendant les vacances scolaires. */
             pendant_vacances?: boolean;
+        };
+        PatchedIncidentRequest: {
+            site?: number;
+            occurrence?: number | null;
+            nature?: components["schemas"]["IncidentNatureEnum"];
+            gravite?: components["schemas"]["GraviteEnum"];
+            description?: string;
+            /** Format: date-time */
+            constate_le?: string;
+            traite?: boolean;
+            suite_donnee?: string;
+        };
+        PatchedLigneTrameRequest: {
+            trame?: number;
+            jour?: components["schemas"]["JourEnum"];
+            /** Format: time */
+            heure_debut?: string;
+            /** Format: time */
+            heure_fin?: string;
+            agent?: number | null;
+            type?: components["schemas"]["Type94cEnum"];
+        };
+        PatchedMajorationRequest: {
+            grille?: number;
+            nature?: components["schemas"]["MajorationNatureEnum"];
+            /**
+             * Taux (dix-millièmes)
+             * @description 2500 = 25 %.
+             */
+            taux?: number;
+            /** @description Catégories concernées (vide : toutes). */
+            categories?: unknown;
+        };
+        PatchedMaterielRequest: {
+            code?: string;
+            libelle?: string;
+            nature?: components["schemas"]["MaterielNatureEnum"];
+            description?: string;
+            unite?: string;
+            /** Valeur de référence d'une journée de prêt (centimes) */
+            valeur_journaliere_centimes?: number;
+            /** @description Code de la prestation facturée (grille tarifaire), vide si gratuit. */
+            prestation_code?: string;
+            reservable?: boolean;
+            /** Proposé aux usagers sur le portail */
+            propose_portail?: boolean;
+            /**
+             * Périodicité du contrôle (jours)
+             * @description Contrôle réglementaire ou de sécurité (MAT-04).
+             */
+            periodicite_controle_jours?: number | null;
+            /** @description Consommables : alerte sous ce stock. */
+            seuil_alerte?: number | null;
+            actif?: boolean;
         };
         PatchedModeleDocumentRequest: {
             libelle?: string;
@@ -3964,6 +7214,13 @@ export interface components {
             description?: string;
             ordre?: number;
         };
+        PatchedPrestationRequest: {
+            grille?: number;
+            code?: string;
+            libelle?: string;
+            unite?: components["schemas"]["UniteEnum"];
+            prix_centimes?: number;
+        };
         PatchedRattachementRequest: {
             usager?: number;
             contact?: number;
@@ -3971,6 +7228,22 @@ export interface components {
             principal?: boolean;
             /** @description Signe les conventions au nom de l'usager. */
             peut_signer?: boolean;
+        };
+        PatchedReductionRequest: {
+            usager?: number;
+            /** @description Vide : toutes les réservations de l'usager. */
+            type_reservation?: number | null;
+            /**
+             * Taux de réduction (dix-millièmes)
+             * @description 10000 = gratuité.
+             */
+            taux?: number;
+            /** @description Délibération, convention ou décision (référence). */
+            fondement?: string;
+            /** Format: date */
+            debut?: string;
+            /** Format: date */
+            fin?: string | null;
         };
         PatchedRoleRequest: {
             code?: string;
@@ -4000,6 +7273,29 @@ export interface components {
             commune?: string;
             telephone?: string;
             actif?: boolean;
+        };
+        PatchedTarifRequest: {
+            grille?: number;
+            espace?: number | null;
+            /** @description Tarif commun à une famille d'espaces (un tarif propre à l'espace prévaut). */
+            famille?: number | null;
+            categorie?: components["schemas"]["CategorieEnum"];
+            unite?: components["schemas"]["UniteEnum"];
+            /** @description RG-05 : jamais nul ; une gratuité est une réduction de 100 %. */
+            prix_centimes?: number;
+            /** @description CAU-01 : caution exigée (0 : aucune). */
+            caution_centimes?: number;
+        };
+        PatchedTrameRequest: {
+            nom?: string;
+            saison?: number;
+            site?: number;
+        };
+        PatchedTypeHabilitationRequest: {
+            code?: string;
+            libelle?: string;
+            /** @description Un besoin de gardiennage exige cette habilitation. */
+            exigee_pour_gardiennage?: boolean;
         };
         PatchedTypePieceRequest: {
             code?: string;
@@ -4058,6 +7354,14 @@ export interface components {
              * @description Précise si l’utilisateur doit être considéré comme actif. Décochez ceci plutôt que de supprimer le compte.
              */
             is_active?: boolean;
+        };
+        PatchedVacationRequest: {
+            site?: number;
+            /** Format: date-time */
+            debut?: string;
+            /** Format: date-time */
+            fin?: string;
+            type?: components["schemas"]["Type94cEnum"];
         };
         PatchedVueEnregistreeRequest: {
             nom?: string;
@@ -4126,6 +7430,12 @@ export interface components {
             description: string;
             ordre?: number;
         };
+        PhotoRequest: {
+            /** Format: uuid */
+            uuid: string;
+            /** Format: binary */
+            fichier: string;
+        };
         Piece: {
             readonly id: number;
             usager: number;
@@ -4145,6 +7455,86 @@ export interface components {
             readonly depose_le: string;
             readonly depose_par_portail: boolean;
         };
+        PieceComptable: {
+            readonly id: number;
+            readonly nature: components["schemas"]["PieceComptableNatureEnum"];
+            readonly numero: string | null;
+            readonly exercice: number | null;
+            readonly dossier: number;
+            readonly dossier_numero: string;
+            readonly usager: number;
+            readonly usager_nom: string;
+            /** @description Devis d'origine d'une facture, ou facture corrigée par un avoir. */
+            readonly origine: number | null;
+            /** @default  */
+            readonly origine_numero: string;
+            readonly objet: string;
+            readonly statut: components["schemas"]["PieceComptableStatutEnum"];
+            /** Format: date */
+            readonly emise_le: string | null;
+            /** Format: date */
+            readonly echeance: string | null;
+            /**
+             * Devis valable jusqu'au
+             * Format: date
+             */
+            readonly validite: string | null;
+            /** @description Somme des montants de référence (centimes). */
+            readonly total_reference: number;
+            /** @description Somme des montants dus (centimes, négatif pour un avoir). */
+            readonly total_du: number;
+            readonly acompte_deduit: number;
+            readonly montant_regle: number;
+            /** @description Cumul des avoirs émis sur cette facture (centimes, positif). */
+            readonly montant_avoirs: number;
+            readonly montant_titre: number;
+            readonly reste_du: number;
+            /** @description TAR-12 : coordonnées du comptable figées à l'émission (titulaire, IBAN, BIC). */
+            readonly reglement: unknown;
+            /** @description Avoir : motif de la correction. */
+            readonly motif: string;
+            readonly reference_virement: string;
+            /** Numéro de titre Ciril */
+            readonly titre_numero: string;
+            /** Format: date */
+            readonly titre_le: string | null;
+            /** Format: date */
+            readonly solde_le: string | null;
+            /** Format: date-time */
+            readonly accepte_le: string | null;
+            readonly document: number | null;
+            readonly lignes: components["schemas"]["Ligne"][];
+        };
+        /**
+         * @description * `devis` - Devis
+         *     * `acompte` - Facture d'acompte
+         *     * `facture` - Facture
+         *     * `avoir` - Avoir
+         * @enum {string}
+         */
+        PieceComptableNatureEnum: "devis" | "acompte" | "facture" | "avoir";
+        /**
+         * @description * `brouillon` - Brouillon
+         *     * `emis` - Émis
+         *     * `accepte` - Devis accepté
+         *     * `refuse` - Devis refusé
+         *     * `expire` - Devis expiré
+         *     * `remplace` - Devis remplacé
+         *     * `a_titrer` - À titrer
+         *     * `titre_emis` - Titre émis
+         *     * `solde` - Soldée
+         *     * `solde_partiel` - Partiellement soldée
+         *     * `en_recouvrement` - En recouvrement
+         *     * `annulee` - Annulée par avoir
+         * @enum {string}
+         */
+        PieceComptableStatutEnum: "brouillon" | "emis" | "accepte" | "refuse" | "expire" | "remplace" | "a_titrer" | "titre_emis" | "solde" | "solde_partiel" | "en_recouvrement" | "annulee";
+        PointageRequest: {
+            montant: number;
+            /** Format: date */
+            date: string;
+            reference: string;
+        };
         /**
          * @description * `present` - present
          *     * `absent_signale` - absent_signale
@@ -4159,11 +7549,90 @@ export interface components {
             /** Format: date-time */
             fin_reel?: string | null;
         };
+        Prestation: {
+            readonly id: number;
+            grille: number;
+            code: string;
+            libelle: string;
+            unite?: components["schemas"]["UniteEnum"];
+            prix_centimes: number;
+        };
+        PrestationDemandeeRequest: {
+            code: string;
+            /** @default 1 */
+            quantite: number;
+        };
+        PrestationRequest: {
+            grille: number;
+            code: string;
+            libelle: string;
+            unite?: components["schemas"]["UniteEnum"];
+            prix_centimes: number;
+        };
+        Pret: {
+            readonly id: number;
+            dossier: number;
+            readonly dossier_numero: string;
+            readonly usager_nom: string;
+            reservation?: number | null;
+            stock: number;
+            readonly materiel_libelle: string;
+            readonly unite: string;
+            readonly site_nom: string;
+            quantite: number;
+            /** Format: date-time */
+            debut?: string;
+            /** Format: date-time */
+            fin?: string;
+            readonly statut: components["schemas"]["PretStatutEnum"];
+            readonly quantite_sortie: number | null;
+            readonly quantite_rendue: number | null;
+            readonly manquants: number;
+            readonly origine: components["schemas"]["PretOrigineEnum"];
+            commentaire?: string;
+            /** @description Motif d'un refus ou d'une annulation. */
+            readonly motif: string;
+            readonly signalement: string;
+            /** Format: date-time */
+            readonly cree_le: string;
+        };
+        /**
+         * @description * `backoffice` - Back-office
+         *     * `portail` - Portail
+         * @enum {string}
+         */
+        PretOrigineEnum: "backoffice" | "portail";
+        PretRequest: {
+            dossier: number;
+            reservation?: number | null;
+            stock: number;
+            quantite: number;
+            /** Format: date-time */
+            debut?: string;
+            /** Format: date-time */
+            fin?: string;
+            commentaire?: string;
+        };
+        /**
+         * @description * `demandee` - Demandée
+         *     * `validee` - Validée
+         *     * `sortie` - Sortie (remise à l'usager)
+         *     * `rendue` - Rendue
+         *     * `refusee` - Refusée
+         *     * `annulee` - Annulée
+         * @enum {string}
+         */
+        PretStatutEnum: "demandee" | "validee" | "sortie" | "rendue" | "refusee" | "annulee";
         PrioriteMunicipaleRequest: {
             motif: string;
             deplacements?: {
                 [key: string]: components["schemas"]["DeplacementRequest"];
             };
+        };
+        QuantiteStockRequest: {
+            quantite: number;
+            /** @default  */
+            motif: string;
         };
         Rattachement: {
             readonly id: number;
@@ -4185,6 +7654,55 @@ export interface components {
             /** @description Signe les conventions au nom de l'usager. */
             peut_signer?: boolean;
         };
+        /**
+         * @description * `cheque` - cheque
+         *     * `consignation` - consignation
+         *     * `virement` - virement
+         * @enum {string}
+         */
+        ReceptionModeEnum: "cheque" | "consignation" | "virement";
+        ReceptionRequest: {
+            mode: components["schemas"]["ReceptionModeEnum"];
+            reference: string;
+            /** Format: date */
+            date?: string;
+        };
+        Reduction: {
+            readonly id: number;
+            usager: number;
+            readonly usager_nom: string;
+            /** @description Vide : toutes les réservations de l'usager. */
+            type_reservation?: number | null;
+            /**
+             * Taux de réduction (dix-millièmes)
+             * @description 10000 = gratuité.
+             */
+            taux: number;
+            /** @description Délibération, convention ou décision (référence). */
+            fondement: string;
+            /** Format: date */
+            debut: string;
+            /** Format: date */
+            fin?: string | null;
+            /** Format: date-time */
+            readonly cree_le: string;
+        };
+        ReductionRequest: {
+            usager: number;
+            /** @description Vide : toutes les réservations de l'usager. */
+            type_reservation?: number | null;
+            /**
+             * Taux de réduction (dix-millièmes)
+             * @description 10000 = gratuité.
+             */
+            taux: number;
+            /** @description Délibération, convention ou décision (référence). */
+            fondement: string;
+            /** Format: date */
+            debut: string;
+            /** Format: date */
+            fin?: string | null;
+        };
         RefusRequest: {
             motif: string;
             /** @default  */
@@ -4196,6 +7714,7 @@ export interface components {
             readonly espace: number;
             readonly espace_nom: string;
             readonly site_nom: string;
+            readonly site: number;
             readonly statut: components["schemas"]["StatutReservationEnum"];
             /** Règle de récurrence (RFC 5545) */
             readonly recurrence: string;
@@ -4226,6 +7745,21 @@ export interface components {
             readonly nombre_occurrences: number;
             readonly conditions_manquantes: string[];
         };
+        ResolutionPanneRequest: {
+            issue: components["schemas"]["IssueEnum"];
+            /** @default  */
+            resolution: string;
+        };
+        RetenueRequest: {
+            montant: number;
+            motif: string;
+            photos: string[];
+        };
+        RetourPretRequest: {
+            quantite: number;
+            /** @default  */
+            observations: string;
+        };
         Role: {
             readonly id: number;
             code: string;
@@ -4251,6 +7785,54 @@ export interface components {
             actions?: string[];
             /** @description Double authentification obligatoire (administration, régie : SEC-03). */
             double_authentification?: boolean;
+        };
+        Saisie: {
+            readonly id: number;
+            /** Format: uuid */
+            readonly uuid: string;
+            readonly agent: number;
+            readonly agent_nom: string;
+            readonly appareil: string;
+            readonly type: components["schemas"]["SaisieTypeEnum"];
+            /** Format: date-time */
+            readonly horodatage_appareil: string;
+            readonly donnees: unknown;
+            readonly statut: components["schemas"]["SaisieStatutEnum"];
+            readonly message: string;
+            /** Format: date-time */
+            readonly recue_le: string;
+        };
+        /**
+         * @description * `conforme` - conforme
+         *     * `degats` - degats
+         * @enum {string}
+         */
+        SaisieEtatConstatEnum: "conforme" | "degats";
+        SaisieEtatRequest: {
+            occurrence: number;
+            constat: components["schemas"]["SaisieEtatConstatEnum"];
+            /** @default  */
+            observations: string;
+            photos?: string[];
+        };
+        /**
+         * @description * `acceptee` - Acceptée
+         *     * `conflit` - Conservée et signalée (conflit)
+         *     * `rejetee` - Rejetée
+         * @enum {string}
+         */
+        SaisieStatutEnum: "acceptee" | "conflit" | "rejetee";
+        /**
+         * @description * `pointage` - Pointage
+         *     * `etat_des_lieux` - État des lieux
+         *     * `incident` - Incident
+         * @enum {string}
+         */
+        SaisieTypeEnum: "pointage" | "etat_des_lieux" | "incident";
+        SaisiesRequest: {
+            saisies: {
+                [key: string]: unknown;
+            }[];
         };
         Saison: {
             readonly id: number;
@@ -4321,6 +7903,16 @@ export interface components {
             /** Format: date-time */
             signe_le: string | null;
         };
+        SimulationGestionRequest: {
+            espace: number;
+            usager: number;
+            /** Format: date */
+            date: string;
+            /** Format: time */
+            heure_debut: string;
+            /** Format: time */
+            heure_fin: string;
+        };
         Site: {
             readonly id: number;
             code: string;
@@ -4340,6 +7932,15 @@ export interface components {
             telephone?: string;
             actif?: boolean;
         };
+        SortiePretRequest: {
+            quantite?: number;
+        };
+        /**
+         * @description * `backoffice` - Back-office
+         *     * `mobile` - Application mobile
+         * @enum {string}
+         */
+        SourceCf2Enum: "backoffice" | "mobile";
         /**
          * @description * `preparation` - En préparation
          *     * `ouverte` - Ouverte aux demandes
@@ -4399,6 +8000,101 @@ export interface components {
          * @enum {string}
          */
         StatutUsagerEnum: "en_attente" | "valide" | "suspendu" | "anonymise";
+        StockMateriel: {
+            readonly id: number;
+            readonly materiel: number;
+            readonly materiel_libelle: string;
+            readonly nature: string;
+            readonly unite: string;
+            readonly site: number;
+            readonly site_nom: string;
+            readonly espace: number | null;
+            /** @default  */
+            readonly espace_nom: string;
+            readonly quantite: number;
+            readonly hors_service: number;
+            readonly en_etat: number;
+            /** Format: date */
+            readonly dernier_controle: string | null;
+            readonly echeance_controle: string | null;
+        };
+        Tarif: {
+            readonly id: number;
+            grille: number;
+            espace?: number | null;
+            /** @default  */
+            readonly espace_nom: string;
+            /** @description Tarif commun à une famille d'espaces (un tarif propre à l'espace prévaut). */
+            famille?: number | null;
+            /** @default  */
+            readonly famille_libelle: string;
+            categorie: components["schemas"]["CategorieEnum"];
+            unite?: components["schemas"]["UniteEnum"];
+            /** @description RG-05 : jamais nul ; une gratuité est une réduction de 100 %. */
+            prix_centimes: number;
+            /** @description CAU-01 : caution exigée (0 : aucune). */
+            caution_centimes?: number;
+        };
+        TarifRequest: {
+            grille: number;
+            espace?: number | null;
+            /** @description Tarif commun à une famille d'espaces (un tarif propre à l'espace prévaut). */
+            famille?: number | null;
+            categorie: components["schemas"]["CategorieEnum"];
+            unite?: components["schemas"]["UniteEnum"];
+            /** @description RG-05 : jamais nul ; une gratuité est une réduction de 100 %. */
+            prix_centimes: number;
+            /** @description CAU-01 : caution exigée (0 : aucune). */
+            caution_centimes?: number;
+        };
+        TitreRequest: {
+            titre: string;
+            /** Format: date */
+            date?: string;
+        };
+        Trame: {
+            readonly id: number;
+            nom: string;
+            saison: number;
+            readonly saison_nom: string;
+            site: number;
+            readonly site_nom: string;
+            /** Format: date-time */
+            readonly appliquee_le: string | null;
+            readonly lignes: components["schemas"]["LigneTrame"][];
+        };
+        TrameRequest: {
+            nom: string;
+            saison: number;
+            site: number;
+        };
+        TransfertRequest: {
+            quantite: number;
+            /** @default  */
+            motif: string;
+            site: number;
+            espace?: number | null;
+        };
+        /**
+         * @description * `normale` - Normale
+         *     * `supplementaire` - Heures supplémentaires
+         *     * `astreinte` - Astreinte
+         * @enum {string}
+         */
+        Type94cEnum: "normale" | "supplementaire" | "astreinte";
+        TypeHabilitation: {
+            readonly id: number;
+            code: string;
+            libelle: string;
+            /** @description Un besoin de gardiennage exige cette habilitation. */
+            exigee_pour_gardiennage?: boolean;
+        };
+        TypeHabilitationRequest: {
+            code: string;
+            libelle: string;
+            /** @description Un besoin de gardiennage exige cette habilitation. */
+            exigee_pour_gardiennage?: boolean;
+        };
         TypePiece: {
             readonly id: number;
             code: string;
@@ -4463,6 +8159,14 @@ export interface components {
          * @enum {string}
          */
         TypeUsagerEnum: "association" | "ecole" | "entreprise" | "particulier" | "service_municipal" | "autre_collectivite";
+        /**
+         * @description * `heure` - Heure
+         *     * `demi_journee` - Demi-journée (4 heures)
+         *     * `journee` - Journée
+         *     * `forfait` - Forfait par occupation
+         * @enum {string}
+         */
+        UniteEnum: "heure" | "demi_journee" | "journee" | "forfait";
         Usager: {
             readonly id: number;
             type: components["schemas"]["TypeUsagerEnum"];
@@ -4567,8 +8271,57 @@ export interface components {
          * @enum {string}
          */
         UtilisateurSourceEnum: "ad" | "local";
+        Vacation: {
+            readonly id: number;
+            site: number;
+            readonly site_nom: string;
+            readonly agent: number | null;
+            /** @default  */
+            readonly agent_nom: string;
+            /** Format: date-time */
+            debut: string;
+            /** Format: date-time */
+            fin: string;
+            readonly duree_minutes: number;
+            type?: components["schemas"]["Type94cEnum"];
+            readonly statut: components["schemas"]["VacationStatutEnum"];
+            /** @description Règles de temps de travail non respectées (PER-05). */
+            readonly violations: unknown;
+            readonly forcee: boolean;
+            readonly motif_forcage: string;
+            /**
+             * Format: date-time
+             * @description Pointage (MOB-02).
+             */
+            readonly arrivee_reelle: string | null;
+            /** Format: date-time */
+            readonly depart_reel: string | null;
+            readonly signalement: string;
+            readonly trame: number | null;
+        };
+        VacationRequest: {
+            site: number;
+            /** Format: date-time */
+            debut: string;
+            /** Format: date-time */
+            fin: string;
+            type?: components["schemas"]["Type94cEnum"];
+        };
+        /**
+         * @description * `planifiee` - Planifiée
+         *     * `a_pourvoir` - À pourvoir
+         *     * `a_revoir` - À revoir (réservations modifiées)
+         *     * `annulee` - Annulée
+         * @enum {string}
+         */
+        VacationStatutEnum: "planifiee" | "a_pourvoir" | "a_revoir" | "annulee";
         ValidationRequest: {
             usager_existant?: number | null;
+        };
+        ValidationRetenueRequest: {
+            accepter: boolean;
+            /** @default  */
+            commentaire: string;
         };
         Verification: {
             entrees_verifiees: number;
@@ -4591,6 +8344,9 @@ export interface components {
             deposee_par?: string;
             /** Format: date-time */
             readonly deposee_le: string;
+        };
+        VisibiliteRequest: {
+            visible_portail: boolean;
         };
         VueEnregistree: {
             readonly id: number;
@@ -5992,9 +9748,10 @@ export interface operations {
                  *     * `en_signature` - En signature
                  *     * `signe` - Signé électroniquement
                  *     * `signe_manuellement` - Signé manuellement
+                 *     * `scan_a_controler` - Scan signé à contrôler
                  *     * `annule` - Annulé
                  */
-                statut?: "annule" | "en_signature" | "genere" | "signe" | "signe_manuellement";
+                statut?: "annule" | "en_signature" | "genere" | "scan_a_controler" | "signe" | "signe_manuellement";
                 /** @description Nombre de résultats à retourner par page. */
                 taille?: number;
                 usager?: number;
@@ -6140,6 +9897,34 @@ export interface operations {
             };
         };
     };
+    gestion_documents_documents_controler_scan_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) document. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ControleScanRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["ControleScanRequest"];
+                "multipart/form-data": components["schemas"]["ControleScanRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Document"];
+                };
+            };
+        };
+    };
     gestion_documents_documents_envoyer_signature_create: {
         parameters: {
             query?: never;
@@ -6234,6 +10019,28 @@ export interface operations {
             };
         };
     };
+    gestion_documents_documents_scan_retrieve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) document. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/pdf": string;
+                };
+            };
+        };
+    };
     gestion_documents_documents_scan_signe_create: {
         parameters: {
             query?: never;
@@ -6247,6 +10054,34 @@ export interface operations {
         requestBody: {
             content: {
                 "multipart/form-data": components["schemas"]["ScanRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Document"];
+                };
+            };
+        };
+    };
+    gestion_documents_documents_visibilite_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) document. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["VisibiliteRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["VisibiliteRequest"];
+                "multipart/form-data": components["schemas"]["VisibiliteRequest"];
             };
         };
         responses: {
@@ -6335,6 +10170,28 @@ export interface operations {
         };
     };
     gestion_documents_lots_retrieve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) lot generation. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Lot"];
+                };
+            };
+        };
+    };
+    gestion_documents_lots_relancer_create: {
         parameters: {
             query?: never;
             header?: never;
@@ -6549,6 +10406,2544 @@ export interface operations {
             };
         };
     };
+    gestion_finances_cautions_list: {
+        parameters: {
+            query?: {
+                dossier?: number;
+                /** @description Un numéro de page de l'ensemble des résultats. */
+                page?: number;
+                /**
+                 * @description * `attendue` - Attendue
+                 *     * `recue` - Reçue
+                 *     * `restituable` - Restituable
+                 *     * `retenue_a_valider` - Retenue à valider (second agent)
+                 *     * `restituee` - Restituée
+                 *     * `retenue_partielle` - Retenue partielle
+                 *     * `retenue_totale` - Retenue totale
+                 *     * `solde_restitue` - Retenue partielle, solde restitué
+                 *     * `encaissee` - Encaissée
+                 */
+                statut?: "attendue" | "encaissee" | "recue" | "restituable" | "restituee" | "retenue_a_valider" | "retenue_partielle" | "retenue_totale" | "solde_restitue";
+                /** @description Nombre de résultats à retourner par page. */
+                taille?: number;
+                usager?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PaginatedCautionList"];
+                };
+            };
+        };
+    };
+    gestion_finances_cautions_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Caution"];
+                };
+            };
+        };
+    };
+    gestion_finances_cautions_retrieve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) caution. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Caution"];
+                };
+            };
+        };
+    };
+    gestion_finances_cautions_encaisser_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) caution. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": {
+                    reference?: string;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Caution"];
+                };
+            };
+        };
+    };
+    gestion_finances_cautions_photos_retrieve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) caution. */
+                id: number;
+                photo: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "image/jpeg": string;
+                };
+            };
+        };
+    };
+    gestion_finances_cautions_recevoir_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) caution. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ReceptionRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Caution"];
+                };
+            };
+        };
+    };
+    gestion_finances_cautions_restituer_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) caution. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Caution"];
+                };
+            };
+        };
+    };
+    gestion_finances_cautions_retenue_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) caution. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "multipart/form-data": components["schemas"]["RetenueRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Caution"];
+                };
+            };
+        };
+    };
+    gestion_finances_cautions_valider_retenue_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) caution. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ValidationRetenueRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Caution"];
+                };
+            };
+        };
+    };
+    gestion_finances_cautions_alertes_list: {
+        parameters: {
+            query?: {
+                dossier?: number;
+                /** @description Un numéro de page de l'ensemble des résultats. */
+                page?: number;
+                /**
+                 * @description * `attendue` - Attendue
+                 *     * `recue` - Reçue
+                 *     * `restituable` - Restituable
+                 *     * `retenue_a_valider` - Retenue à valider (second agent)
+                 *     * `restituee` - Restituée
+                 *     * `retenue_partielle` - Retenue partielle
+                 *     * `retenue_totale` - Retenue totale
+                 *     * `solde_restitue` - Retenue partielle, solde restitué
+                 *     * `encaissee` - Encaissée
+                 */
+                statut?: "attendue" | "encaissee" | "recue" | "restituable" | "restituee" | "retenue_a_valider" | "retenue_partielle" | "retenue_totale" | "solde_restitue";
+                /** @description Nombre de résultats à retourner par page. */
+                taille?: number;
+                usager?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PaginatedCautionList"];
+                };
+            };
+        };
+    };
+    gestion_finances_cautions_export_retrieve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "text/csv": string;
+                };
+            };
+        };
+    };
+    gestion_finances_etats_des_lieux_list: {
+        parameters: {
+            query?: {
+                /**
+                 * @description * `entree` - Entrée
+                 *     * `sortie` - Sortie
+                 */
+                moment?: "entree" | "sortie";
+                occurrence?: number;
+                occurrence__reservation__dossier?: number;
+                /** @description Un numéro de page de l'ensemble des résultats. */
+                page?: number;
+                /** @description Nombre de résultats à retourner par page. */
+                taille?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PaginatedEtatDesLieuxList"];
+                };
+            };
+        };
+    };
+    gestion_finances_etats_des_lieux_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "multipart/form-data": components["schemas"]["SaisieEtatRequest"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EtatDesLieux"];
+                };
+            };
+        };
+    };
+    gestion_finances_etats_des_lieux_retrieve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) etat des lieux. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EtatDesLieux"];
+                };
+            };
+        };
+    };
+    gestion_finances_grilles_list: {
+        parameters: {
+            query?: {
+                /** @description Un numéro de page de l'ensemble des résultats. */
+                page?: number;
+                /** @description Nombre de résultats à retourner par page. */
+                taille?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PaginatedGrilleList"];
+                };
+            };
+        };
+    };
+    gestion_finances_grilles_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GrilleRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["GrilleRequest"];
+                "multipart/form-data": components["schemas"]["GrilleRequest"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Grille"];
+                };
+            };
+        };
+    };
+    gestion_finances_grilles_retrieve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) grille tarifaire. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Grille"];
+                };
+            };
+        };
+    };
+    gestion_finances_grilles_partial_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) grille tarifaire. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["PatchedGrilleRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["PatchedGrilleRequest"];
+                "multipart/form-data": components["schemas"]["PatchedGrilleRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Grille"];
+                };
+            };
+        };
+    };
+    gestion_finances_grilles_archiver_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) grille tarifaire. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Grille"];
+                };
+            };
+        };
+    };
+    gestion_finances_grilles_dupliquer_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) grille tarifaire. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Grille"];
+                };
+            };
+        };
+    };
+    gestion_finances_grilles_voter_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) grille tarifaire. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Grille"];
+                };
+            };
+        };
+    };
+    gestion_finances_imports_encaissements_list: {
+        parameters: {
+            query?: {
+                /** @description Un numéro de page de l'ensemble des résultats. */
+                page?: number;
+                /** @description Nombre de résultats à retourner par page. */
+                taille?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PaginatedImportList"];
+                };
+            };
+        };
+    };
+    gestion_finances_imports_encaissements_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "multipart/form-data": components["schemas"]["DepotImportRequest"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Import"];
+                };
+            };
+        };
+    };
+    gestion_finances_imports_encaissements_retrieve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) import encaissements. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Import"];
+                };
+            };
+        };
+    };
+    gestion_finances_lots_titres_list: {
+        parameters: {
+            query?: {
+                /** @description Un numéro de page de l'ensemble des résultats. */
+                page?: number;
+                /** @description Nombre de résultats à retourner par page. */
+                taille?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PaginatedLotTitresList"];
+                };
+            };
+        };
+    };
+    gestion_finances_lots_titres_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["ExportRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["ExportRequest"];
+                "multipart/form-data": components["schemas"]["ExportRequest"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LotTitres"];
+                };
+            };
+        };
+    };
+    gestion_finances_lots_titres_retrieve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) lot titres. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LotTitres"];
+                };
+            };
+        };
+    };
+    gestion_finances_lots_titres_annuler_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) lot titres. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": {
+                    motif?: string;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LotTitres"];
+                };
+            };
+        };
+    };
+    gestion_finances_lots_titres_fichier_retrieve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) lot titres. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/octet-stream": string;
+                };
+            };
+        };
+    };
+    gestion_finances_lots_titres_a_titrer_list: {
+        parameters: {
+            query?: {
+                /** @description Un numéro de page de l'ensemble des résultats. */
+                page?: number;
+                /** @description Nombre de résultats à retourner par page. */
+                taille?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PaginatedPieceComptableList"];
+                };
+            };
+        };
+    };
+    gestion_finances_majorations_list: {
+        parameters: {
+            query?: {
+                grille?: number;
+                /** @description Un numéro de page de l'ensemble des résultats. */
+                page?: number;
+                /** @description Nombre de résultats à retourner par page. */
+                taille?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PaginatedMajorationList"];
+                };
+            };
+        };
+    };
+    gestion_finances_majorations_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MajorationRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["MajorationRequest"];
+                "multipart/form-data": components["schemas"]["MajorationRequest"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Majoration"];
+                };
+            };
+        };
+    };
+    gestion_finances_majorations_retrieve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) majoration. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Majoration"];
+                };
+            };
+        };
+    };
+    gestion_finances_majorations_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) majoration. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MajorationRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["MajorationRequest"];
+                "multipart/form-data": components["schemas"]["MajorationRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Majoration"];
+                };
+            };
+        };
+    };
+    gestion_finances_majorations_destroy: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) majoration. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No response body */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    gestion_finances_majorations_partial_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) majoration. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["PatchedMajorationRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["PatchedMajorationRequest"];
+                "multipart/form-data": components["schemas"]["PatchedMajorationRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Majoration"];
+                };
+            };
+        };
+    };
+    gestion_finances_pieces_list: {
+        parameters: {
+            query?: {
+                dossier?: number;
+                exercice?: number;
+                /**
+                 * @description * `devis` - Devis
+                 *     * `acompte` - Facture d'acompte
+                 *     * `facture` - Facture
+                 *     * `avoir` - Avoir
+                 */
+                nature?: "acompte" | "avoir" | "devis" | "facture";
+                /** @description Un numéro de page de l'ensemble des résultats. */
+                page?: number;
+                /**
+                 * @description * `brouillon` - Brouillon
+                 *     * `emis` - Émis
+                 *     * `accepte` - Devis accepté
+                 *     * `refuse` - Devis refusé
+                 *     * `expire` - Devis expiré
+                 *     * `remplace` - Devis remplacé
+                 *     * `a_titrer` - À titrer
+                 *     * `titre_emis` - Titre émis
+                 *     * `solde` - Soldée
+                 *     * `solde_partiel` - Partiellement soldée
+                 *     * `en_recouvrement` - En recouvrement
+                 *     * `annulee` - Annulée par avoir
+                 */
+                statut?: "a_titrer" | "accepte" | "annulee" | "brouillon" | "emis" | "en_recouvrement" | "expire" | "refuse" | "remplace" | "solde" | "solde_partiel" | "titre_emis";
+                /** @description Nombre de résultats à retourner par page. */
+                taille?: number;
+                usager?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PaginatedPieceComptableList"];
+                };
+            };
+        };
+    };
+    gestion_finances_pieces_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PieceComptable"];
+                };
+            };
+        };
+    };
+    gestion_finances_pieces_retrieve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) piece comptable. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PieceComptable"];
+                };
+            };
+        };
+    };
+    gestion_finances_pieces_accepter_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) piece comptable. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PieceComptable"];
+                };
+            };
+        };
+    };
+    gestion_finances_pieces_avoir_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) piece comptable. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AvoirRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["AvoirRequest"];
+                "multipart/form-data": components["schemas"]["AvoirRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PieceComptable"];
+                };
+            };
+        };
+    };
+    gestion_finances_pieces_fichier_retrieve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) piece comptable. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/pdf": string;
+                };
+            };
+        };
+    };
+    gestion_finances_pieces_pointer_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) piece comptable. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PointageRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["PointageRequest"];
+                "multipart/form-data": components["schemas"]["PointageRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PieceComptable"];
+                };
+            };
+        };
+    };
+    gestion_finances_pieces_titre_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) piece comptable. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TitreRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["TitreRequest"];
+                "multipart/form-data": components["schemas"]["TitreRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PieceComptable"];
+                };
+            };
+        };
+    };
+    gestion_finances_pieces_acompte_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DossierRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["DossierRequest"];
+                "multipart/form-data": components["schemas"]["DossierRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PieceComptable"];
+                };
+            };
+        };
+    };
+    gestion_finances_pieces_devis_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DevisRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["DevisRequest"];
+                "multipart/form-data": components["schemas"]["DevisRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PieceComptable"];
+                };
+            };
+        };
+    };
+    gestion_finances_pieces_facturer_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DossierRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["DossierRequest"];
+                "multipart/form-data": components["schemas"]["DossierRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PieceComptable"];
+                };
+            };
+        };
+    };
+    gestion_finances_pieces_retards_list: {
+        parameters: {
+            query?: {
+                dossier?: number;
+                exercice?: number;
+                /**
+                 * @description * `devis` - Devis
+                 *     * `acompte` - Facture d'acompte
+                 *     * `facture` - Facture
+                 *     * `avoir` - Avoir
+                 */
+                nature?: "acompte" | "avoir" | "devis" | "facture";
+                /** @description Un numéro de page de l'ensemble des résultats. */
+                page?: number;
+                /**
+                 * @description * `brouillon` - Brouillon
+                 *     * `emis` - Émis
+                 *     * `accepte` - Devis accepté
+                 *     * `refuse` - Devis refusé
+                 *     * `expire` - Devis expiré
+                 *     * `remplace` - Devis remplacé
+                 *     * `a_titrer` - À titrer
+                 *     * `titre_emis` - Titre émis
+                 *     * `solde` - Soldée
+                 *     * `solde_partiel` - Partiellement soldée
+                 *     * `en_recouvrement` - En recouvrement
+                 *     * `annulee` - Annulée par avoir
+                 */
+                statut?: "a_titrer" | "accepte" | "annulee" | "brouillon" | "emis" | "en_recouvrement" | "expire" | "refuse" | "remplace" | "solde" | "solde_partiel" | "titre_emis";
+                /** @description Nombre de résultats à retourner par page. */
+                taille?: number;
+                usager?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PaginatedPieceComptableList"];
+                };
+            };
+        };
+    };
+    gestion_finances_prestations_list: {
+        parameters: {
+            query?: {
+                grille?: number;
+                /** @description Un numéro de page de l'ensemble des résultats. */
+                page?: number;
+                /** @description Nombre de résultats à retourner par page. */
+                taille?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PaginatedPrestationList"];
+                };
+            };
+        };
+    };
+    gestion_finances_prestations_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PrestationRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["PrestationRequest"];
+                "multipart/form-data": components["schemas"]["PrestationRequest"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Prestation"];
+                };
+            };
+        };
+    };
+    gestion_finances_prestations_retrieve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) prestation. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Prestation"];
+                };
+            };
+        };
+    };
+    gestion_finances_prestations_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) prestation. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PrestationRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["PrestationRequest"];
+                "multipart/form-data": components["schemas"]["PrestationRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Prestation"];
+                };
+            };
+        };
+    };
+    gestion_finances_prestations_destroy: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) prestation. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No response body */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    gestion_finances_prestations_partial_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) prestation. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["PatchedPrestationRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["PatchedPrestationRequest"];
+                "multipart/form-data": components["schemas"]["PatchedPrestationRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Prestation"];
+                };
+            };
+        };
+    };
+    gestion_finances_reductions_list: {
+        parameters: {
+            query?: {
+                /** @description Un numéro de page de l'ensemble des résultats. */
+                page?: number;
+                /** @description Nombre de résultats à retourner par page. */
+                taille?: number;
+                type_reservation?: number;
+                usager?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PaginatedReductionList"];
+                };
+            };
+        };
+    };
+    gestion_finances_reductions_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ReductionRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["ReductionRequest"];
+                "multipart/form-data": components["schemas"]["ReductionRequest"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Reduction"];
+                };
+            };
+        };
+    };
+    gestion_finances_reductions_retrieve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) reduction. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Reduction"];
+                };
+            };
+        };
+    };
+    gestion_finances_reductions_partial_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) reduction. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["PatchedReductionRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["PatchedReductionRequest"];
+                "multipart/form-data": components["schemas"]["PatchedReductionRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Reduction"];
+                };
+            };
+        };
+    };
+    gestion_finances_simulation_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SimulationGestionRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["SimulationGestionRequest"];
+                "multipart/form-data": components["schemas"]["SimulationGestionRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
+    gestion_finances_tarifs_list: {
+        parameters: {
+            query?: {
+                /**
+                 * @description * `association_locale` - Association locale
+                 *     * `association` - Association extérieure
+                 *     * `ecole` - École ou établissement scolaire
+                 *     * `entreprise` - Entreprise ou comité social et économique
+                 *     * `particulier` - Particulier
+                 *     * `service_municipal` - Service municipal
+                 *     * `autre_collectivite` - Autre collectivité ou organisme public
+                 */
+                categorie?: "association" | "association_locale" | "autre_collectivite" | "ecole" | "entreprise" | "particulier" | "service_municipal";
+                espace?: number;
+                famille?: number;
+                grille?: number;
+                /** @description Un numéro de page de l'ensemble des résultats. */
+                page?: number;
+                /** @description Nombre de résultats à retourner par page. */
+                taille?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PaginatedTarifList"];
+                };
+            };
+        };
+    };
+    gestion_finances_tarifs_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TarifRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["TarifRequest"];
+                "multipart/form-data": components["schemas"]["TarifRequest"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Tarif"];
+                };
+            };
+        };
+    };
+    gestion_finances_tarifs_retrieve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) tarif. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Tarif"];
+                };
+            };
+        };
+    };
+    gestion_finances_tarifs_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) tarif. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TarifRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["TarifRequest"];
+                "multipart/form-data": components["schemas"]["TarifRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Tarif"];
+                };
+            };
+        };
+    };
+    gestion_finances_tarifs_destroy: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) tarif. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No response body */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    gestion_finances_tarifs_partial_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) tarif. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["PatchedTarifRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["PatchedTarifRequest"];
+                "multipart/form-data": components["schemas"]["PatchedTarifRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Tarif"];
+                };
+            };
+        };
+    };
+    gestion_materiel_catalogue_list: {
+        parameters: {
+            query?: {
+                actif?: boolean;
+                /**
+                 * @description * `fixe` - Équipement fixe d'un espace
+                 *     * `mobile` - Matériel mobile, prêté
+                 *     * `consommable` - Consommable
+                 */
+                nature?: "consommable" | "fixe" | "mobile";
+                /** @description Un numéro de page de l'ensemble des résultats. */
+                page?: number;
+                propose_portail?: boolean;
+                reservable?: boolean;
+                /** @description Nombre de résultats à retourner par page. */
+                taille?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PaginatedMaterielList"];
+                };
+            };
+        };
+    };
+    gestion_materiel_catalogue_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MaterielRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["MaterielRequest"];
+                "multipart/form-data": components["schemas"]["MaterielRequest"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Materiel"];
+                };
+            };
+        };
+    };
+    gestion_materiel_catalogue_retrieve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) matériel. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Materiel"];
+                };
+            };
+        };
+    };
+    gestion_materiel_catalogue_partial_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) matériel. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["PatchedMaterielRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["PatchedMaterielRequest"];
+                "multipart/form-data": components["schemas"]["PatchedMaterielRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Materiel"];
+                };
+            };
+        };
+    };
+    gestion_materiel_controles_list: {
+        parameters: {
+            query?: {
+                conforme?: boolean;
+                /**
+                 * @description * `controle` - Contrôle périodique
+                 *     * `maintenance` - Maintenance
+                 *     * `reparation` - Réparation
+                 */
+                nature?: "controle" | "maintenance" | "reparation";
+                /** @description Un numéro de page de l'ensemble des résultats. */
+                page?: number;
+                stock?: number;
+                /** @description Nombre de résultats à retourner par page. */
+                taille?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PaginatedControleMaterielList"];
+                };
+            };
+        };
+    };
+    gestion_materiel_controles_retrieve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) controle. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ControleMateriel"];
+                };
+            };
+        };
+    };
+    gestion_materiel_mouvements_list: {
+        parameters: {
+            query?: {
+                horodatage__gte?: string;
+                horodatage__lt?: string;
+                /** @description Un numéro de page de l'ensemble des résultats. */
+                page?: number;
+                reservation?: number;
+                stock?: number;
+                stock__materiel?: number;
+                /** @description Nombre de résultats à retourner par page. */
+                taille?: number;
+                /**
+                 * @description * `entree` - Entrée (achat, don)
+                 *     * `sortie` - Sortie (prêt)
+                 *     * `retour` - Retour de prêt
+                 *     * `transfert` - Transfert entre lieux
+                 *     * `perte` - Perte ou vol
+                 *     * `panne` - Mise hors service
+                 *     * `reparation` - Remise en service
+                 *     * `rebut` - Mise au rebut
+                 *     * `consommation` - Consommation
+                 *     * `inventaire` - Ajustement d'inventaire
+                 */
+                type?: "consommation" | "entree" | "inventaire" | "panne" | "perte" | "rebut" | "reparation" | "retour" | "sortie" | "transfert";
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PaginatedMouvementStockList"];
+                };
+            };
+        };
+    };
+    gestion_materiel_mouvements_retrieve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) mouvement. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MouvementStock"];
+                };
+            };
+        };
+    };
+    gestion_materiel_pannes_list: {
+        parameters: {
+            query?: {
+                /** @description Un numéro de page de l'ensemble des résultats. */
+                page?: number;
+                /**
+                 * @description * `backoffice` - Back-office
+                 *     * `controle` - Contrôle non conforme
+                 *     * `incident` - Incident signalé
+                 */
+                source?: "backoffice" | "controle" | "incident";
+                /**
+                 * @description * `ouverte` - En panne
+                 *     * `reparee` - Réparée
+                 *     * `rebut` - Mise au rebut
+                 */
+                statut?: "ouverte" | "rebut" | "reparee";
+                stock?: number;
+                /** @description Nombre de résultats à retourner par page. */
+                taille?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PaginatedPanneMaterielList"];
+                };
+            };
+        };
+    };
+    gestion_materiel_pannes_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PanneMateriel"];
+                };
+            };
+        };
+    };
+    gestion_materiel_pannes_retrieve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) panne. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PanneMateriel"];
+                };
+            };
+        };
+    };
+    gestion_materiel_pannes_resoudre_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) panne. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ResolutionPanneRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["ResolutionPanneRequest"];
+                "multipart/form-data": components["schemas"]["ResolutionPanneRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PanneMateriel"];
+                };
+            };
+        };
+    };
+    gestion_materiel_prets_list: {
+        parameters: {
+            query?: {
+                debut__gte?: string;
+                debut__lt?: string;
+                dossier?: number;
+                /** @description Un numéro de page de l'ensemble des résultats. */
+                page?: number;
+                /**
+                 * @description * `demandee` - Demandée
+                 *     * `validee` - Validée
+                 *     * `sortie` - Sortie (remise à l'usager)
+                 *     * `rendue` - Rendue
+                 *     * `refusee` - Refusée
+                 *     * `annulee` - Annulée
+                 */
+                statut?: "annulee" | "demandee" | "refusee" | "rendue" | "sortie" | "validee";
+                /** @description Les valeurs multiples doivent être séparées par des virgules. */
+                statut__in?: string[];
+                stock__materiel?: number;
+                stock__site?: number;
+                /** @description Nombre de résultats à retourner par page. */
+                taille?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PaginatedPretList"];
+                };
+            };
+        };
+    };
+    gestion_materiel_prets_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PretRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["PretRequest"];
+                "multipart/form-data": components["schemas"]["PretRequest"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Pret"];
+                };
+            };
+        };
+    };
+    gestion_materiel_prets_retrieve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) reservation materiel. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Pret"];
+                };
+            };
+        };
+    };
+    gestion_materiel_prets_refuser_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) reservation materiel. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MotifPretRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["MotifPretRequest"];
+                "multipart/form-data": components["schemas"]["MotifPretRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Pret"];
+                };
+            };
+        };
+    };
+    gestion_materiel_prets_rendre_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) reservation materiel. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RetourPretRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["RetourPretRequest"];
+                "multipart/form-data": components["schemas"]["RetourPretRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Pret"];
+                };
+            };
+        };
+    };
+    gestion_materiel_prets_retrouver_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) reservation materiel. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["SortiePretRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["SortiePretRequest"];
+                "multipart/form-data": components["schemas"]["SortiePretRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Pret"];
+                };
+            };
+        };
+    };
+    gestion_materiel_prets_sortir_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) reservation materiel. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["SortiePretRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["SortiePretRequest"];
+                "multipart/form-data": components["schemas"]["SortiePretRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Pret"];
+                };
+            };
+        };
+    };
+    gestion_materiel_prets_valider_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) reservation materiel. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Pret"];
+                };
+            };
+        };
+    };
+    gestion_materiel_stocks_list: {
+        parameters: {
+            query?: {
+                espace?: number;
+                materiel?: number;
+                /**
+                 * @description * `fixe` - Équipement fixe d'un espace
+                 *     * `mobile` - Matériel mobile, prêté
+                 *     * `consommable` - Consommable
+                 */
+                materiel__nature?: "consommable" | "fixe" | "mobile";
+                /** @description Un numéro de page de l'ensemble des résultats. */
+                page?: number;
+                site?: number;
+                /** @description Nombre de résultats à retourner par page. */
+                taille?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PaginatedStockMaterielList"];
+                };
+            };
+        };
+    };
+    gestion_materiel_stocks_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StockMateriel"];
+                };
+            };
+        };
+    };
+    gestion_materiel_stocks_retrieve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) stock. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StockMateriel"];
+                };
+            };
+        };
+    };
+    gestion_materiel_stocks_controle_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) stock. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ControleSaisieRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["ControleSaisieRequest"];
+                "multipart/form-data": components["schemas"]["ControleSaisieRequest"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
+    gestion_materiel_stocks_disponibilite_retrieve: {
+        parameters: {
+            query?: {
+                debut?: string;
+                fin?: string;
+            };
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) stock. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
+    gestion_materiel_stocks_inventaire_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) stock. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["QuantiteStockRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["QuantiteStockRequest"];
+                "multipart/form-data": components["schemas"]["QuantiteStockRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StockMateriel"];
+                };
+            };
+        };
+    };
+    gestion_materiel_stocks_panne_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) stock. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PanneSaisieRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["PanneSaisieRequest"];
+                "multipart/form-data": components["schemas"]["PanneSaisieRequest"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
+    gestion_materiel_stocks_perte_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) stock. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["QuantiteStockRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["QuantiteStockRequest"];
+                "multipart/form-data": components["schemas"]["QuantiteStockRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StockMateriel"];
+                };
+            };
+        };
+    };
+    gestion_materiel_stocks_transferer_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) stock. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TransfertRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["TransfertRequest"];
+                "multipart/form-data": components["schemas"]["TransfertRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StockMateriel"];
+                };
+            };
+        };
+    };
+    gestion_materiel_stocks_alertes_retrieve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
+    gestion_materiel_stocks_entrer_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["EntreeRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["EntreeRequest"];
+                "multipart/form-data": components["schemas"]["EntreeRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StockMateriel"];
+                };
+            };
+        };
+    };
+    gestion_materiel_stocks_etat_retrieve: {
+        parameters: {
+            query?: {
+                format?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
     gestion_moi_retrieve: {
         parameters: {
             query?: never;
@@ -6608,6 +13003,1569 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["Parametre"][];
+                };
+            };
+        };
+    };
+    gestion_personnel_absences_list: {
+        parameters: {
+            query?: {
+                agent?: number;
+                /**
+                 * @description * `conge` - Congé
+                 *     * `maladie` - Arrêt maladie
+                 *     * `formation` - Formation
+                 *     * `autre` - Autre absence
+                 */
+                nature?: "autre" | "conge" | "formation" | "maladie";
+                /** @description Un numéro de page de l'ensemble des résultats. */
+                page?: number;
+                /** @description Nombre de résultats à retourner par page. */
+                taille?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PaginatedAbsenceList"];
+                };
+            };
+        };
+    };
+    gestion_personnel_absences_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AbsenceRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["AbsenceRequest"];
+                "multipart/form-data": components["schemas"]["AbsenceRequest"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Absence"];
+                };
+            };
+        };
+    };
+    gestion_personnel_absences_retrieve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) absence. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Absence"];
+                };
+            };
+        };
+    };
+    gestion_personnel_agents_list: {
+        parameters: {
+            query?: {
+                actif?: boolean;
+                /** @description Un numéro de page de l'ensemble des résultats. */
+                page?: number;
+                sites?: number[];
+                /** @description Nombre de résultats à retourner par page. */
+                taille?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PaginatedAgentList"];
+                };
+            };
+        };
+    };
+    gestion_personnel_agents_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AgentRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["AgentRequest"];
+                "multipart/form-data": components["schemas"]["AgentRequest"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Agent"];
+                };
+            };
+        };
+    };
+    gestion_personnel_agents_retrieve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) agent. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Agent"];
+                };
+            };
+        };
+    };
+    gestion_personnel_agents_partial_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) agent. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["PatchedAgentRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["PatchedAgentRequest"];
+                "multipart/form-data": components["schemas"]["PatchedAgentRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Agent"];
+                };
+            };
+        };
+    };
+    gestion_personnel_agents_ical_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) agent. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
+    gestion_personnel_agents_revoquer_ical_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) agent. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
+    gestion_personnel_appareils_list: {
+        parameters: {
+            query?: {
+                actif?: boolean;
+                agent?: number;
+                /** @description Un numéro de page de l'ensemble des résultats. */
+                page?: number;
+                /** @description Nombre de résultats à retourner par page. */
+                taille?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PaginatedAppareilList"];
+                };
+            };
+        };
+    };
+    gestion_personnel_appareils_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AppareilRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["AppareilRequest"];
+                "multipart/form-data": components["schemas"]["AppareilRequest"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Appareil"];
+                };
+            };
+        };
+    };
+    gestion_personnel_appareils_retrieve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) appareil. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Appareil"];
+                };
+            };
+        };
+    };
+    gestion_personnel_appareils_autoriser_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) appareil. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Appareil"];
+                };
+            };
+        };
+    };
+    gestion_personnel_appareils_retirer_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) appareil. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Appareil"];
+                };
+            };
+        };
+    };
+    gestion_personnel_besoins_list: {
+        parameters: {
+            query?: {
+                debut__gte?: string;
+                debut__lt?: string;
+                /** @description Un numéro de page de l'ensemble des résultats. */
+                page?: number;
+                site?: number;
+                /**
+                 * @description * `a_couvrir` - À couvrir
+                 *     * `couvert` - Couvert
+                 *     * `supprime` - Supprimé (séances annulées)
+                 */
+                statut?: "a_couvrir" | "couvert" | "supprime";
+                /** @description Nombre de résultats à retourner par page. */
+                taille?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PaginatedBesoinList"];
+                };
+            };
+        };
+    };
+    gestion_personnel_besoins_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Besoin"];
+                };
+            };
+        };
+    };
+    gestion_personnel_besoins_retrieve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) besoin. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Besoin"];
+                };
+            };
+        };
+    };
+    gestion_personnel_besoins_vacation_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) besoin. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
+    gestion_personnel_besoins_recalculer_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": {
+                    site?: number;
+                    du?: string;
+                    au?: string;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
+    gestion_personnel_compteurs_retrieve: {
+        parameters: {
+            query: {
+                au: string;
+                du: string;
+                /**
+                 * @description * `json` - json
+                 *     * `csv` - csv
+                 */
+                export?: "json" | "csv";
+                site?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
+    gestion_personnel_habilitations_list: {
+        parameters: {
+            query?: {
+                agent?: number;
+                /** @description Un numéro de page de l'ensemble des résultats. */
+                page?: number;
+                /** @description Nombre de résultats à retourner par page. */
+                taille?: number;
+                type?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PaginatedHabilitationAgentList"];
+                };
+            };
+        };
+    };
+    gestion_personnel_habilitations_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["HabilitationAgentRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["HabilitationAgentRequest"];
+                "multipart/form-data": components["schemas"]["HabilitationAgentRequest"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HabilitationAgent"];
+                };
+            };
+        };
+    };
+    gestion_personnel_habilitations_retrieve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) habilitation agent. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HabilitationAgent"];
+                };
+            };
+        };
+    };
+    gestion_personnel_habilitations_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) habilitation agent. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["HabilitationAgentRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["HabilitationAgentRequest"];
+                "multipart/form-data": components["schemas"]["HabilitationAgentRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HabilitationAgent"];
+                };
+            };
+        };
+    };
+    gestion_personnel_habilitations_destroy: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) habilitation agent. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No response body */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    gestion_personnel_habilitations_partial_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) habilitation agent. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["PatchedHabilitationAgentRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["PatchedHabilitationAgentRequest"];
+                "multipart/form-data": components["schemas"]["PatchedHabilitationAgentRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HabilitationAgent"];
+                };
+            };
+        };
+    };
+    "gestion_personnel_ical_.ics_retrieve": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                jeton: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "text/calendar": string;
+                };
+            };
+        };
+    };
+    gestion_personnel_incidents_list: {
+        parameters: {
+            query?: {
+                /**
+                 * @description * `mineur` - Mineur
+                 *     * `majeur` - Majeur
+                 *     * `securite` - Sécurité des personnes
+                 */
+                gravite?: "majeur" | "mineur" | "securite";
+                /** @description Un numéro de page de l'ensemble des résultats. */
+                page?: number;
+                site?: number;
+                /** @description Nombre de résultats à retourner par page. */
+                taille?: number;
+                traite?: boolean;
+                usager?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PaginatedIncidentList"];
+                };
+            };
+        };
+    };
+    gestion_personnel_incidents_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["IncidentRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["IncidentRequest"];
+                "multipart/form-data": components["schemas"]["IncidentRequest"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Incident"];
+                };
+            };
+        };
+    };
+    gestion_personnel_incidents_retrieve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) incident. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Incident"];
+                };
+            };
+        };
+    };
+    gestion_personnel_incidents_partial_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) incident. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["PatchedIncidentRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["PatchedIncidentRequest"];
+                "multipart/form-data": components["schemas"]["PatchedIncidentRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Incident"];
+                };
+            };
+        };
+    };
+    gestion_personnel_lignes_trame_list: {
+        parameters: {
+            query?: {
+                /** @description Un numéro de page de l'ensemble des résultats. */
+                page?: number;
+                /** @description Nombre de résultats à retourner par page. */
+                taille?: number;
+                trame?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PaginatedLigneTrameList"];
+                };
+            };
+        };
+    };
+    gestion_personnel_lignes_trame_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["LigneTrameRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["LigneTrameRequest"];
+                "multipart/form-data": components["schemas"]["LigneTrameRequest"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LigneTrame"];
+                };
+            };
+        };
+    };
+    gestion_personnel_lignes_trame_retrieve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) ligne trame. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LigneTrame"];
+                };
+            };
+        };
+    };
+    gestion_personnel_lignes_trame_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) ligne trame. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["LigneTrameRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["LigneTrameRequest"];
+                "multipart/form-data": components["schemas"]["LigneTrameRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LigneTrame"];
+                };
+            };
+        };
+    };
+    gestion_personnel_lignes_trame_destroy: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) ligne trame. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No response body */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    gestion_personnel_lignes_trame_partial_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) ligne trame. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["PatchedLigneTrameRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["PatchedLigneTrameRequest"];
+                "multipart/form-data": components["schemas"]["PatchedLigneTrameRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LigneTrame"];
+                };
+            };
+        };
+    };
+    gestion_personnel_saisies_list: {
+        parameters: {
+            query?: {
+                agent?: number;
+                /** @description Un numéro de page de l'ensemble des résultats. */
+                page?: number;
+                /**
+                 * @description * `acceptee` - Acceptée
+                 *     * `conflit` - Conservée et signalée (conflit)
+                 *     * `rejetee` - Rejetée
+                 */
+                statut?: "acceptee" | "conflit" | "rejetee";
+                /** @description Nombre de résultats à retourner par page. */
+                taille?: number;
+                /**
+                 * @description * `pointage` - Pointage
+                 *     * `etat_des_lieux` - État des lieux
+                 *     * `incident` - Incident
+                 */
+                type?: "etat_des_lieux" | "incident" | "pointage";
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PaginatedSaisieList"];
+                };
+            };
+        };
+    };
+    gestion_personnel_saisies_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Saisie"];
+                };
+            };
+        };
+    };
+    gestion_personnel_saisies_retrieve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) saisie mobile. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Saisie"];
+                };
+            };
+        };
+    };
+    gestion_personnel_saisies_examinee_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) saisie mobile. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Saisie"];
+                };
+            };
+        };
+    };
+    gestion_personnel_trames_list: {
+        parameters: {
+            query?: {
+                /** @description Un numéro de page de l'ensemble des résultats. */
+                page?: number;
+                saison?: number;
+                site?: number;
+                /** @description Nombre de résultats à retourner par page. */
+                taille?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PaginatedTrameList"];
+                };
+            };
+        };
+    };
+    gestion_personnel_trames_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TrameRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["TrameRequest"];
+                "multipart/form-data": components["schemas"]["TrameRequest"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Trame"];
+                };
+            };
+        };
+    };
+    gestion_personnel_trames_retrieve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) trame. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Trame"];
+                };
+            };
+        };
+    };
+    gestion_personnel_trames_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) trame. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TrameRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["TrameRequest"];
+                "multipart/form-data": components["schemas"]["TrameRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Trame"];
+                };
+            };
+        };
+    };
+    gestion_personnel_trames_destroy: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) trame. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No response body */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    gestion_personnel_trames_partial_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) trame. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["PatchedTrameRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["PatchedTrameRequest"];
+                "multipart/form-data": components["schemas"]["PatchedTrameRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Trame"];
+                };
+            };
+        };
+    };
+    gestion_personnel_trames_appliquer_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) trame. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
+    gestion_personnel_types_habilitation_list: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TypeHabilitation"][];
+                };
+            };
+        };
+    };
+    gestion_personnel_types_habilitation_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TypeHabilitationRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["TypeHabilitationRequest"];
+                "multipart/form-data": components["schemas"]["TypeHabilitationRequest"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TypeHabilitation"];
+                };
+            };
+        };
+    };
+    gestion_personnel_types_habilitation_retrieve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) type habilitation. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TypeHabilitation"];
+                };
+            };
+        };
+    };
+    gestion_personnel_types_habilitation_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) type habilitation. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TypeHabilitationRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["TypeHabilitationRequest"];
+                "multipart/form-data": components["schemas"]["TypeHabilitationRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TypeHabilitation"];
+                };
+            };
+        };
+    };
+    gestion_personnel_types_habilitation_destroy: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) type habilitation. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No response body */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    gestion_personnel_types_habilitation_partial_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) type habilitation. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["PatchedTypeHabilitationRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["PatchedTypeHabilitationRequest"];
+                "multipart/form-data": components["schemas"]["PatchedTypeHabilitationRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TypeHabilitation"];
+                };
+            };
+        };
+    };
+    gestion_personnel_vacations_list: {
+        parameters: {
+            query?: {
+                agent?: number;
+                agent__isnull?: boolean;
+                debut__gte?: string;
+                debut__lt?: string;
+                /** @description Un numéro de page de l'ensemble des résultats. */
+                page?: number;
+                site?: number;
+                /**
+                 * @description * `planifiee` - Planifiée
+                 *     * `a_pourvoir` - À pourvoir
+                 *     * `a_revoir` - À revoir (réservations modifiées)
+                 *     * `annulee` - Annulée
+                 */
+                statut?: "a_pourvoir" | "a_revoir" | "annulee" | "planifiee";
+                /** @description Nombre de résultats à retourner par page. */
+                taille?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PaginatedVacationList"];
+                };
+            };
+        };
+    };
+    gestion_personnel_vacations_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["VacationRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["VacationRequest"];
+                "multipart/form-data": components["schemas"]["VacationRequest"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Vacation"];
+                };
+            };
+        };
+    };
+    gestion_personnel_vacations_retrieve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) vacation. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Vacation"];
+                };
+            };
+        };
+    };
+    gestion_personnel_vacations_partial_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) vacation. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["PatchedVacationRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["PatchedVacationRequest"];
+                "multipart/form-data": components["schemas"]["PatchedVacationRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Vacation"];
+                };
+            };
+        };
+    };
+    gestion_personnel_vacations_affecter_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) vacation. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AffectationRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["AffectationRequest"];
+                "multipart/form-data": components["schemas"]["AffectationRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Vacation"];
+                };
+            };
+        };
+    };
+    gestion_personnel_vacations_annuler_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) vacation. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": {
+                    motif?: string;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Vacation"];
+                };
+            };
+        };
+    };
+    gestion_personnel_vacations_candidats_retrieve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) vacation. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
+    gestion_personnel_vacations_planning_pdf_retrieve: {
+        parameters: {
+            query?: {
+                agent?: string;
+                au?: string;
+                du?: string;
+                papier?: string;
+                site?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/pdf": string;
                 };
             };
         };
@@ -8626,6 +16584,29 @@ export interface operations {
             };
         };
     };
+    "gestion_reservations_planning.ics_retrieve": {
+        parameters: {
+            query?: {
+                au?: string;
+                du?: string;
+                espace?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "text/calendar": string;
+                };
+            };
+        };
+    };
     gestion_reservations_reservations_list: {
         parameters: {
             query?: {
@@ -10513,6 +18494,170 @@ export interface operations {
         };
     };
     gestion_usagers_usagers_types_retrieve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
+    mobile_auth_connexion_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ConnexionMobileRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["ConnexionMobileRequest"];
+                "multipart/form-data": components["schemas"]["ConnexionMobileRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
+    mobile_auth_deconnexion_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No response body */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    mobile_auth_totp_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DefiMobileRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["DefiMobileRequest"];
+                "multipart/form-data": components["schemas"]["DefiMobileRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
+    mobile_paquet_retrieve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
+    mobile_photos_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "multipart/form-data": components["schemas"]["PhotoRequest"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
+    mobile_saisies_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SaisiesRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
+    mobile_sante_retrieve: {
         parameters: {
             query?: never;
             header?: never;

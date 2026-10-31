@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     "apps.documents",
     "apps.finances",
     "apps.personnel",
+    "apps.materiel",
     "apps.portail",
 ]
 
@@ -274,6 +275,10 @@ CELERY_BEAT_SCHEDULE: dict[str, dict[str, object]] = {
     "synchroniser-signatures": {"task": "apps.documents.tasks.synchroniser_signatures", "schedule": timedelta(minutes=15)},
     "relancer-signatures": {"task": "apps.documents.tasks.relancer_signatures", "schedule": timedelta(hours=6)},
     "expirer-devis": {"task": "apps.finances.tasks.expirer_devis", "schedule": crontab(hour=1, minute=15)},
+    "alerter-controles-materiel": {
+        "task": "apps.materiel.tasks.alerter_controles",
+        "schedule": crontab(hour=7, minute=30, day_of_week=1),
+    },
 }
 
 # Journal d'audit (SEC-08) : clé HMAC de la chaîne et conservation minimale 6 mois.

@@ -16,6 +16,7 @@ import { Page } from "../../ui/Page";
 import { Tableau } from "../../ui/Tableau";
 import { DocumentsDossier } from "./dossier/Documents";
 import { FinancesDossier } from "./dossier/Finances";
+import { MaterielDossier } from "../materiel/Materiel";
 import { MessagesDossier } from "./dossier/Messages";
 
 const CONDITIONS: Record<string, string> = {
@@ -257,6 +258,7 @@ export default function Dossier() {
         </section>
       ))}
       {peut("lire_finances") ? <FinancesDossier dossier={d.id} /> : null}
+      {peut("lire_materiel") ? <MaterielDossier dossier={d.id} reservations={d.reservations.filter((r) => !["annulee", "refusee"].includes(r.statut)).map((r) => ({ id: r.id, espace_nom: r.espace_nom, site: r.site }))} /> : null}
       {peut("lire_document") ? <DocumentsDossier dossier={d.id} /> : null}
       {peut("lire_message") ? <MessagesDossier dossier={d.id} /> : null}
       <Dialogue ouvert={actionMotivee !== null} titre={actionMotivee?.type === "refuser" ? "Refuser la demande" : "Annuler la réservation"} onFermer={() => setActionMotivee(null)}>

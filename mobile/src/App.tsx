@@ -467,6 +467,11 @@ function Planning({ paquet, onPointer, onEtat, onIncident }: { paquet: Paquet | 
                       {s.effectif ? `, ${s.effectif} pers.` : ""}
                       {s.statut === "annulee" ? " — séance annulée" : ""}
                     </p>
+                    {s.materiel.length ? (
+                      <p className="aide">
+                        Matériel à remettre : {s.materiel.map((m) => `${m.quantite} × ${m.libelle}`).join(", ")}
+                      </p>
+                    ) : null}
                     {s.referent ? (
                       <p className="aide">
                         Référent : {s.referent.nom}

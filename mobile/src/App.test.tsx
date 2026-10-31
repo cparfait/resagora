@@ -47,6 +47,7 @@ describe("Application des gardiens", () => {
     await choisirCode(utilisateur);
     expect(await screen.findByRole("heading", { name: /Bonjour Camille/ })).toBeInTheDocument();
     expect(screen.getByText(/Club de basket/)).toBeInTheDocument();
+    expect(screen.getByText("Matériel à remettre : 8 × Table pliante")).toBeInTheDocument();
     enLigne = false;
     const [arrivee] = screen.getAllByRole("button", { name: /Pointer mon arrivée/ });
     if (!arrivee) throw new Error("bouton absent");

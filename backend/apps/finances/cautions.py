@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import csv
 import io
+from collections.abc import Callable
 from datetime import date, timedelta
 from typing import Any
 
@@ -103,9 +104,26 @@ def degats_sur_la_reservation(caution: Caution) -> bool:
     return EtatDesLieux.objects.filter(occurrence__reservation=caution.reservation, moment="sortie", constat="degats").exists()
 
 
+#: Vérifications d'autres modules avant toute restitution (ex. matériel non rendu, lot 5) : caution → motif ou None.
+BLOCAGES_RESTITUTION: list[Callable[[Caution], str | None]] = []
+
+
+def blocage_restitution(caution: Caution) -> str | None:
+    for verification in BLOCAGES_RESTITUTION:
+        motif = verification(caution)
+        if motif:
+            return motif
+    return None
+
+
 def _restituable(caution: Caution) -> bool:
     etat = etat_de_sortie(caution)
-    return etat is not None and etat.constat == "conforme" and not degats_sur_la_reservation(caution)
+    return (
+        etat is not None
+        and etat.constat == "conforme"
+        and not degats_sur_la_reservation(caution)
+        and blocage_restitution(caution) is None
+    )
 
 
 def etat_de_sortie(caution: Caution) -> EtatDesLieux | None:
@@ -196,6 +214,9 @@ def restituer(caution: Caution, *, acteur: Any, jour: date | None = None) -> Cau
             objet=caution,
         )
         return caution
+    blocage = blocage_restitution(caution)
+    if blocage:
+        raise ErreurMetier(f"Restitution impossible : {blocage}.", code="restitution_bloquee")
     etat = etat_de_sortie(caution)
     if etat is None:
         raise ErreurMetier("La caution ne peut être restituée qu'après l'état des lieux de sortie.", code="etat_des_lieux_requis")

@@ -115,6 +115,8 @@ ROUTES: list[Route] = [
     r("GET", "/api/portail/cautions", session=True),
     r("GET", "/api/portail/attestations", session=True),
     r("GET", "/api/portail/attestations/{id}/fichier", Nature.TELECHARGEMENT, session=True),
+    r("GET", "/api/portail/materiel", session=True),
+    r("POST", "/api/portail/dossiers/{id}/materiel", session=True, debit="depot"),
     r("GET", "/api/portail/notifications", session=True),
     r("POST", "/api/portail/notifications/{id}/lue", session=True),
     # Rappels entrants des tiers, vérifiés ici puis revérifiés par l'API (SIG-02, TAR-07)

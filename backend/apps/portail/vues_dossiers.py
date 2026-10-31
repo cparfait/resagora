@@ -35,6 +35,7 @@ from apps.usagers.models import Contact, Usager
 from .authentification import Introuvable, contact_courant, usager_autorise, usagers_du_contact
 from .catalogue import espaces_publics
 from .securite import VueContact
+from .vues_materiel import MaterielDemandeSerializer, materialiser_brouillon, representation_prets, valider_materiel_demande
 from .vues_usagers import deposer_depuis_portail, representation_piece
 
 JOURS_RRULE = ["MO", "TU", "WE", "TH", "FR", "SA", "SU"]
@@ -211,9 +212,12 @@ def representation_dossier(dossier: Dossier, *, detail: bool = False) -> dict[st
             "effectif": dossier.effectif,
             "observations": dossier.observations,
             "creneaux": apercu_creneaux(dossier) if dossier.brouillon else [],
+            "materiel_demande": dossier.brouillon_materiel if dossier.brouillon else [],
+            "materiel": representation_prets(dossier),
             "reservations": [
                 {
                     "id": r.pk,
+                    "espace": r.espace_id,
                     "espace_nom": r.espace.nom,
                     "site_nom": r.espace.batiment.site.nom,
                     "description": r.description,
@@ -249,6 +253,7 @@ class ModificationDossierSerializer(serializers.Serializer):
     effectif = serializers.IntegerField(min_value=0, max_value=100_000, required=False)
     observations = serializers.CharField(max_length=2000, required=False, allow_blank=True)
     creneaux = serializers.ListField(child=CreneauSerializer(), required=False, max_length=10)
+    materiel = serializers.ListField(child=MaterielDemandeSerializer(), required=False, max_length=20)
 
 
 def _type_autorise(identifiant: int | None, usager: Usager, campagne: Campagne | None) -> TypeReservation:
@@ -341,6 +346,8 @@ class VueDossierPortail(VueContact):
                 dossier.brouillon_etape = d["etape"]
             if "creneaux" in d:
                 _enregistrer_creneaux(dossier, d["creneaux"])
+            if "materiel" in d:
+                dossier.brouillon_materiel = valider_materiel_demande(d["materiel"])
             dossier.save()
         return Response(representation_dossier(dossier, detail=True))
 
@@ -417,6 +424,8 @@ def envoyer_demande(dossier: Dossier, contact: Contact) -> Dossier:
                 else erreur.message
             )
             erreurs.append(f"Créneau {rang} : {texte}")
+    if not erreurs:
+        erreurs = materialiser_brouillon(dossier, contact)
     if erreurs:
         raise ErreurValidation(" ".join(erreurs), code="creneaux_invalides", details={"erreurs": erreurs})
     dossier.brouillon = False

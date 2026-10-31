@@ -427,3 +427,29 @@ MODELES_CORRECTIONS_LOT4: dict[str, tuple[str, str, str, str]] = {
         "",
     ),
 }
+
+
+# Lot 5 — matériel : signalements au service.
+MODELES_LOT5: dict[str, tuple[str, str, str, str]] = {
+    "materiel_manquant": (
+        "Matériel manquant au retour (service)",
+        "Matériel manquant — {{ dossier }}",
+        "Bonjour,\n\n{{ manquants }} « {{ materiel }} » manquent au retour du prêt du dossier {{ dossier }} ({{ usager }}). "
+        "Ils sont retirés du stock ; s'ils sont rapportés, enregistrez-les depuis le prêt. Une retenue sur la caution peut "
+        "être proposée.\n\nPrêts : {{ lien }}",
+        "",
+    ),
+    "materiel_indisponible": (
+        "Prêts de matériel à revoir (service)",
+        "Matériel indisponible : {{ materiel }}",
+        "Bonjour,\n\nLe stock de « {{ materiel }} » ({{ lieu }}) ne couvre plus les prêts suivants : {{ prets }}.\n"
+        "Proposez un autre matériel, un transfert ou prévenez l'usager.\n\nPrêts : {{ lien }}",
+        "",
+    ),
+    "materiel_alertes": (
+        "Contrôles et stocks du matériel (service)",
+        "Matériel : {{ nombre }} point(s) à traiter",
+        "Bonjour,\n\nContrôles périodiques dépassés et consommables sous le seuil :\n{{ lignes }}\n\nDétail : {{ lien }}",
+        "",
+    ),
+}

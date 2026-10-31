@@ -59,6 +59,7 @@ class OccurrenceSerializer(serializers.ModelSerializer):
 class ReservationSerializer(serializers.ModelSerializer):
     espace_nom = serializers.CharField(source="espace.nom", read_only=True)
     site_nom = serializers.CharField(source="espace.batiment.site.nom", read_only=True)
+    site = serializers.IntegerField(source="espace.batiment.site_id", read_only=True)
     description = serializers.CharField(read_only=True)
     nombre_occurrences = serializers.SerializerMethodField()
     conditions_manquantes = serializers.SerializerMethodField()
@@ -71,6 +72,7 @@ class ReservationSerializer(serializers.ModelSerializer):
             "espace",
             "espace_nom",
             "site_nom",
+            "site",
             "statut",
             "recurrence",
             "description",

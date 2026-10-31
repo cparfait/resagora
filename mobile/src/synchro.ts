@@ -18,6 +18,7 @@ export interface Seance {
   effectif: number | null;
   referent: { nom: string; telephone: string } | null;
   etat_des_lieux: boolean;
+  materiel: { libelle: string; quantite: number; statut: string }[];
 }
 
 export interface Vacation {

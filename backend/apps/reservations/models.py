@@ -115,6 +115,9 @@ class Dossier(models.Model):
         default=list, blank=True, help_text="Créneaux saisis sur le portail, matérialisés à l'envoi de la demande (POR-04)."
     )
     brouillon_etape = models.PositiveSmallIntegerField(default=1)
+    brouillon_materiel = models.JSONField(
+        default=list, blank=True, help_text="Matériel demandé sur le portail (étape 2), prêts créés à l'envoi (MAT-02)."
+    )
     conditions_attestees = models.JSONField(
         default=dict,
         blank=True,

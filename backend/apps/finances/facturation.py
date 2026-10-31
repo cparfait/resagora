@@ -12,7 +12,7 @@
 
 from __future__ import annotations
 
-from collections.abc import Iterable
+from collections.abc import Callable, Iterable
 from datetime import date, timedelta
 from typing import Any
 
@@ -182,6 +182,10 @@ def _produire_pdf(piece: PieceComptable, acteur: Any) -> None:
 # --- Devis (TAR-04, RG-04) ----------------------------------------------------------------------------------
 
 
+#: Fournisseurs de prestations automatiques du devis (ex. prêt d'un matériel facturé, lot 5) : dossier → lignes.
+SOURCES_PRESTATIONS: list[Callable[[Dossier], list[dict[str, Any]]]] = []
+
+
 @transaction.atomic
 def etablir_devis(dossier: Dossier, *, acteur: Any, prestations: list[dict[str, Any]] | None = None) -> PieceComptable:
     """TAR-04 : devis des séances du dossier au tarif en vigueur, prestations annexes comprises. Un nouveau devis
@@ -191,7 +195,7 @@ def etablir_devis(dossier: Dossier, *, acteur: Any, prestations: list[dict[str, 
     if not dossier.reservations.exclude(statut__in=["annulee", "refusee"]).exists():
         raise ErreurMetier("Un devis porte sur les réservations du dossier : le dossier n'en a aucune.", code="rien_a_facturer")
     lignes = lignes_du_dossier(dossier)
-    lignes += _lignes_prestations(dossier, prestations or [])
+    lignes += _lignes_prestations(dossier, [*(prestations or []), *prestations_automatiques(dossier)])
     if not lignes:
         raise ErreurMetier("Aucune séance à chiffrer dans ce dossier.", code="rien_a_facturer")
     anciens = list(PieceComptable.objects.filter(dossier=dossier, nature="devis", statut__in=["emis", "accepte"]))
@@ -219,8 +223,21 @@ def _lignes_prestations(dossier: Dossier, prestations: list[dict[str, Any]]) -> 
     reduction = reduction_applicable(dossier.usager, jour, dossier.type_reservation_id)
     taux = reduction.taux if reduction else 0
     lignes = []
+    seances = {
+        o.pk: o
+        for o in Occurrence.objects.filter(
+            pk__in=[d["occurrence"] for d in prestations if d.get("occurrence")], reservation__dossier=dossier
+        )
+    }
     for demande in prestations:
-        prestation = Prestation.objects.filter(grille=grille, code=demande.get("code")).first()
+        seance = seances.get(demande.get("occurrence") or 0)
+        if seance is not None:
+            # Prestation d'une séance (prêt de matériel) : tarif à la date de la séance, rattachée pour le suivi.
+            jour_seance = timezone.localtime(seance.debut, PARIS).date()
+            grille_seance = grille_en_vigueur(jour_seance)
+            prestation = Prestation.objects.filter(grille=grille_seance, code=demande.get("code")).first()
+        else:
+            prestation = Prestation.objects.filter(grille=grille, code=demande.get("code")).first()
         if prestation is None:
             raise ErreurValidation(
                 f"Prestation inconnue dans la grille en vigueur : {demande.get('code')}.", code="prestation_inconnue"
@@ -240,9 +257,43 @@ def _lignes_prestations(dossier: Dossier, prestations: list[dict[str, Any]]) -> 
                 taux_reduction=taux,
                 montant_du=montant - appliquer_taux(montant, taux),
                 fondement=reduction.fondement if reduction else "",
+                occurrence_id=seance.pk if seance else None,
+                seance_debut=seance.debut if seance else None,
+                seance_fin=seance.fin if seance else None,
             )
         )
     return lignes
+
+
+def prestations_automatiques(dossier: Dossier) -> list[dict[str, Any]]:
+    return [ligne for source in SOURCES_PRESTATIONS for ligne in source(dossier)]
+
+
+def _empreinte_prestations(lignes: Iterable[LigneCalculee | LigneComptable]) -> list[tuple[int | None, str, int]]:
+    return sorted((getattr(ligne, "occurrence_id", None), ligne.libelle, int(ligne.quantite)) for ligne in lignes)
+
+
+@transaction.atomic
+def crediter_prestations(occurrence: Occurrence, code: str, *, quantite: int, acteur: Any, motif: str) -> int:
+    """Prêt facturé puis annulé (séance maintenue) : avoir sur la ligne de prestation de la séance (TAR-05)."""
+    from .models import Prestation
+    from .tarification import grille_en_vigueur
+
+    prestation = Prestation.objects.filter(
+        grille=grille_en_vigueur(timezone.localtime(occurrence.debut, PARIS).date()), code=code
+    ).first()
+    if prestation is None:
+        return 0
+    lignes = list(
+        _lignes_deja_facturees()
+        .filter(occurrence=occurrence, nature="prestation", libelle=prestation.libelle, quantite=quantite)
+        .select_related("piece")[:1]
+    )
+    for ligne in lignes:
+        emettre_avoir(
+            ligne.piece, acteur=acteur if isinstance(acteur, Utilisateur) else "système", motif=motif, lignes=[ligne.pk]
+        )
+    return len(lignes)
 
 
 def accepter_devis(devis: PieceComptable, *, acteur: Any, portail: bool = False) -> PieceComptable:
@@ -291,6 +342,16 @@ def _verifier_devis_a_jour(dossier: Dossier, devis: PieceComptable) -> None:
                 f"{timezone.localtime(occurrence.debut, PARIS):%d/%m/%Y %H:%M} ajoutée ou déplacée) : établissez un nouveau devis.",
                 code="devis_perime",
             )
+    # Prestations rattachées aux séances (matériel prêté) : un prêt ajouté, annulé ou modifié périme le devis.
+    actuelles = [
+        ligne for ligne in _lignes_prestations(dossier, prestations_automatiques(dossier)) if ligne.occurrence_id is not None
+    ]
+    devisees = [ligne for ligne in devis.lignes.filter(nature="prestation", occurrence__isnull=False)]
+    if _empreinte_prestations(actuelles) != _empreinte_prestations(devisees):
+        raise ErreurMetier(
+            f"Le matériel prêté a changé depuis l'acceptation du devis {devis.numero} : établissez un nouveau devis.",
+            code="devis_perime",
+        )
 
 
 # --- Acompte (TAR-09) -------------------------------------------------------------------------------------
@@ -394,9 +455,29 @@ def facturer(dossier: Dossier, *, acteur: Any, occurrences: Iterable[Occurrence]
         ]
         lien = "devis"
     else:
-        facturees_seances = set(deja.exclude(occurrence__isnull=True).values_list("occurrence_id", flat=True))
+        facturees_seances = set(
+            deja.exclude(occurrence__isnull=True).exclude(nature="prestation").values_list("occurrence_id", flat=True)
+        )
         a_chiffrer = [o for o in choisies if o.pk not in facturees_seances] if choisies is not None else None
         lignes = [ligne for ligne in lignes_du_dossier(dossier, a_chiffrer) if ligne.occurrence_id not in facturees_seances]
+        # Sans devis, les prestations des séances (matériel prêté) sont facturées une fois, séance active seulement.
+        prestations_facturees = {
+            (o, libelle, q)
+            for o, libelle, q in deja.filter(nature="prestation").values_list("occurrence_id", "libelle", "quantite")
+        }
+        actives_seances = set(
+            Occurrence.objects.filter(reservation__dossier=dossier)
+            .exclude(statut__in=SEANCES_INACTIVES)
+            .values_list("pk", flat=True)
+        )
+        identifiants_choisis = {o.pk for o in choisies} if choisies is not None else None
+        for ligne in _lignes_prestations(dossier, prestations_automatiques(dossier)):
+            if ligne.occurrence_id is not None and ligne.occurrence_id not in actives_seances:
+                continue
+            if identifiants_choisis is not None and ligne.occurrence_id not in identifiants_choisis:
+                continue
+            if (ligne.occurrence_id, ligne.libelle, ligne.quantite) not in prestations_facturees:
+                lignes.append(ligne)
         lien = ""
     elements = list(AFacturer.objects.select_for_update().filter(dossier=dossier, facture__isnull=True))
     if not lignes and not elements:

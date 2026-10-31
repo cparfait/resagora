@@ -4,7 +4,7 @@ la liste blanche de la façade (facade/facade/routes.py), sinon elle reste injoi
 
 from django.urls import path
 
-from . import catalogue, vues_comptes, vues_documents, vues_dossiers, vues_finances, vues_publiques, vues_usagers
+from . import catalogue, vues_comptes, vues_documents, vues_dossiers, vues_finances, vues_materiel, vues_publiques, vues_usagers
 
 urlpatterns = [
     # Public
@@ -53,6 +53,8 @@ urlpatterns = [
     path("dossiers/<int:pk>/occurrences/<int:seance>/annuler", vues_dossiers.VueAnnulerSeance.as_view()),
     path("dossiers/<int:pk>/messages", vues_dossiers.VueMessagesDossier.as_view()),
     path("dossiers/<int:pk>/pieces", vues_dossiers.VuePiecesDossier.as_view()),
+    path("dossiers/<int:pk>/materiel", vues_materiel.VueMaterielDossier.as_view()),
+    path("materiel", vues_materiel.VueMaterielPortail.as_view()),
     path("dossiers/<int:pk>/documents", vues_documents.VueDocumentsDossier.as_view()),
     path("dossiers/<int:pk>/documents/<int:document>/fichier", vues_documents.VueFichierDocument.as_view()),
     path("dossiers/<int:pk>/documents/<int:document>/signature", vues_documents.VueSignatureDocument.as_view()),

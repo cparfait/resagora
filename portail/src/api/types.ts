@@ -171,6 +171,7 @@ export interface Seance {
 
 export interface ReservationDossier {
   id: number;
+  espace: number;
   espace_nom: string;
   site_nom: string;
   description: string;
@@ -203,6 +204,35 @@ export interface Dossier {
   observations?: string;
   creneaux?: Creneau[];
   reservations?: ReservationDossier[];
+  materiel_demande?: MaterielDemande[];
+  materiel?: PretPortail[];
+}
+
+/** Matériel proposé en ligne sur le site d'un équipement (MAT-02) : quantité maximale en état, aucun montant. */
+export interface MaterielPropose {
+  id: number;
+  libelle: string;
+  description: string;
+  unite: string;
+  maximum: number;
+}
+
+export interface MaterielDemande {
+  materiel: number;
+  quantite: number;
+}
+
+export interface PretPortail {
+  id: number;
+  materiel: string;
+  unite: string;
+  quantite: number;
+  debut: string;
+  fin: string;
+  reservation: number | null;
+  statut: string;
+  statut_libelle: string;
+  motif: string;
 }
 
 export interface DocumentPortail {

@@ -6,6 +6,8 @@
 > Commandes utiles sous Windows : `backend/.venv/Scripts/python -m pytest` (tests API, base 127.0.0.1:55432),
 > `docker compose -f deploy/dev/compose.yaml --profile outils run --rm outils make preparer lint test`,
 > e2e : `cd e2e && PLAYWRIGHT_BROWSERS_PATH=../.playwright npx playwright test`.
+> Toute nouvelle migration de données de référence (rôles, modèles de messages…) s'ajoute à `apps/noyau/amorcage.py` :
+> le test de concurrence RG-01 vide la base de test, qui est ensuite réamorcée à partir de cette liste.
 
 ## Lot 0 — Socle
 
@@ -140,6 +142,29 @@ Critère de sortie (reconstitué) :
 
 **Lot 4 terminé le 2026-10-31.**
 
+## Lot 5 — Matériel
+
+Exigences : MAT-01 à MAT-05.
+
+| Étape | Contenu | Exigences | État |
+| --- | --- | --- | --- |
+| 5.1 | Catalogue (mobile, fixe, consommable), valeur de référence et prestation fixées par l'ordonnateur, stocks par site et espace | MAT-01 | fait |
+| 5.2 | Prêts séance par séance rattachés aux dossiers, disponibilité au pic d'engagement, demandes du portail (étape 2 et dossier), suivi des déplacements, refus, annulations | MAT-02 | fait |
+| 5.3 | Sorties, retours partiels et définitifs, manquants signalés et réglés, consommables, transferts, pertes, inventaire, journal immuable, état exportable, matériel à remettre dans l'application des gardiens | MAT-03 | fait |
+| 5.4 | Contrôles périodiques, alertes hebdomadaires, contrôle non conforme mettant hors service ; pannes et remise en service | MAT-04, MAT-05 | fait |
+| 5.5 | Facturation séance par séance (devis, facture, avoirs), caution bloquée par le matériel non rendu, back-office et portail, démonstration, e2e + axe, revues (2 bloquants et 12 majeurs corrigés, D-055 à D-060) | — | fait |
+
+Critère de sortie (reconstitué) :
+- [x] un matériel se crée, s'affecte à un espace ou un site, entre en stock (R5-01) ;
+- [x] 20 tables demandées quand 15 sont disponibles : refus lisible, au back-office comme sur le portail (R5-02) ;
+- [x] retour de 18 tables sur 20 : 2 manquantes retirées du stock, signalées, la caution attend la décision (R5-03) ;
+- [x] un contrôle périodique dépassé apparaît en alerte ; un contrôle non conforme met hors service (R5-04) ;
+- [x] un matériel en panne n'est plus réservable ; les prêts touchés sont signalés (R5-05) ;
+- [x] prêts facturés séance par séance, avoirs et devis périmés cohérents ; droits rôle × périmètre testés ;
+- [x] e2e et axe sans violation ; revues sécurité et métier traitées.
+
+**Lot 5 terminé le 2026-10-31.**
+
 ## Journal
 
 - 2026-10-31 — Démarrage. Cahier des charges absent (D-001), référentiel reconstitué.
@@ -151,3 +176,4 @@ Critère de sortie (reconstitué) :
 - 2026-10-31 — Lot 3 et revues : facturation depuis le devis, avoirs ligne à ligne, barème cohérent, lots Ciril annulables, cautions restituables après état des lieux, immuabilité renforcée en base, IBAN réservé à l'ordonnateur et contrôlé, neutralisation des formules dans les exports.
 - 2026-10-31 — Lot 4 : personnel (besoins, trames, règles, absences, compteurs, iCal, planning PDF), API mobile options A et B, PWA hors ligne chiffrée ; 14 tests mobile, parcours e2e en mode avion.
 - 2026-10-31 — Revues lot 4 : moteur de besoins (jour de rattachement, séances réalisées, vacations existantes), contrôles des trames et des horaires, compteurs au prorata et astreintes à part, saisies terrain bornées, cautions bloquées par des dégâts intermédiaires, appareils à autoriser, connexion sans oracle, code de déverrouillage local (PBKDF2 600 000), photos mobiles en quarantaine DMZ (option B). Types Node épinglés pour le typage des parcours e2e.
+- 2026-10-31 — Lot 5 et revues : prêts séance par séance qui suivent les séances (déplacement, annulation, refus), facturation et avoirs par séance, caution bloquée par les manquants, consommables cumulés, équipement fixe limité à son espace, prix fixés par l'ordonnateur, pannes réservées aux rôles habilités. Amorçage des données de référence complété (cause des pertes de données sur base de test réutilisée).

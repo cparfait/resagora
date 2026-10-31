@@ -43,7 +43,7 @@ from ..models import (
 LECTURE_ECRITURE = {"lecture": "lire_personnel", "ecriture": "planifier_personnel"}
 
 
-class HabilitationSerializer(serializers.ModelSerializer):
+class HabilitationAgentSerializer(serializers.ModelSerializer):
     type_libelle = serializers.CharField(source="type.libelle", read_only=True)
     valide = serializers.SerializerMethodField()
 
@@ -56,7 +56,7 @@ class HabilitationSerializer(serializers.ModelSerializer):
 
 
 class AgentSerializer(serializers.ModelSerializer):
-    habilitations = HabilitationSerializer(many=True, read_only=True)
+    habilitations = HabilitationAgentSerializer(many=True, read_only=True)
     sites_noms = serializers.SerializerMethodField()
 
     class Meta:
@@ -115,7 +115,7 @@ class VueAgents(VuePerimetre):
 
 class VueHabilitations(VuePerimetre):
     queryset = HabilitationAgent.objects.select_related("type", "agent")
-    serializer_class = HabilitationSerializer
+    serializer_class = HabilitationAgentSerializer
     chemin_site = "agent__sites"
     actions_requises = {"lecture": "lire_personnel", "ecriture": "gerer_agents"}
     filterset_fields = ["agent", "type"]

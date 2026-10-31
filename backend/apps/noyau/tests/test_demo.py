@@ -43,5 +43,12 @@ def test_jeu_de_demonstration_complet_et_coherent(monkeypatch, modeles_documents
     assert Agent.objects.filter(identifiant_ad__regex=r"^gardien0[1-8]$").count() == 8
     assert Vacation.objects.filter(statut="planifiee").count() > 20 and Besoin.objects.exists()
     assert Absence.objects.exists() and Vacation.objects.filter(statut="a_pourvoir").exists()
+    # Lot 5 : catalogue, stocks par site, prêts des locations dont un retour avec manquants, panne, contrôle dépassé.
+    from apps.materiel import services as materiel
+    from apps.materiel.models import Panne, ReservationMateriel, Stock
+
+    assert Stock.objects.filter(materiel__code="table-pliante").count() == 2
+    assert ReservationMateriel.objects.filter(manquants=2).exists() and Panne.objects.filter(statut="ouverte").exists()
+    assert materiel.controles_en_retard(Stock.objects.select_related("materiel"))
     with pytest.raises(CommandError):
         call_command("charger_demo")

@@ -10,7 +10,7 @@ from django.db import transaction
 from django.db.models import QuerySet
 from django.http import FileResponse, HttpResponse
 from django.utils import timezone
-from drf_spectacular.utils import extend_schema
+from drf_spectacular.utils import extend_schema, extend_schema_serializer
 from rest_framework import serializers, status
 from rest_framework.decorators import action
 from rest_framework.exceptions import NotFound
@@ -276,6 +276,7 @@ class LigneSerializer(serializers.ModelSerializer):
         ]
 
 
+@extend_schema_serializer(component_name="PieceComptable")
 class PieceSerializer(serializers.ModelSerializer):
     lignes = LigneSerializer(many=True, read_only=True)
     usager_nom = serializers.CharField(source="usager.nom", read_only=True)

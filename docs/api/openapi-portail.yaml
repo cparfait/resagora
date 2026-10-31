@@ -3,13 +3,142 @@ info:
   title: API métier — équipements sportifs et associatifs de Châtillon
   version: 1.0.0
 paths:
+  /api/mobile/auth/connexion:
+    post:
+      operationId: mobile_auth_connexion_create
+      description: |-
+        Compte de l'annuaire et rôle « gardien » ; second facteur exigé en option B ou si l'agent l'a activé. Tout refus
+        antérieur au code TOTP reçoit la même réponse (pas d'oracle sur le mot de passe) ; en option B, le certificat
+        d'appareil est vérifié avant l'annuaire et seul le compte de cet appareil peut s'y connecter.
+      tags:
+      - mobile
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ConnexionMobileRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ConnexionMobileRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ConnexionMobileRequest'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+  /api/mobile/auth/deconnexion:
+    post:
+      operationId: mobile_auth_deconnexion_create
+      tags:
+      - mobile
+      responses:
+        '204':
+          description: No response body
+  /api/mobile/auth/totp:
+    post:
+      operationId: mobile_auth_totp_create
+      tags:
+      - mobile
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DefiMobileRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/DefiMobileRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/DefiMobileRequest'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+  /api/mobile/paquet:
+    get:
+      operationId: mobile_paquet_retrieve
+      tags:
+      - mobile
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+  /api/mobile/photos:
+    post:
+      operationId: mobile_photos_create
+      description: Photos compressées sur l'appareil, envoyées avant la saisie qui
+        les cite ; idempotent.
+      tags:
+      - mobile
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PhotoRequest'
+        required: true
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+  /api/mobile/saisies:
+    post:
+      operationId: mobile_saisies_create
+      tags:
+      - mobile
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SaisiesRequest'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+  /api/mobile/sante:
+    get:
+      operationId: mobile_sante_retrieve
+      description: Appel léger qui confirme le réseau avant l'envoi de la file (MOB-05).
+      tags:
+      - mobile
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
   /api/portail/accessibilite:
     get:
-      operationId: accessibilite_retrieve
+      operationId: portail_accessibilite_retrieve
       description: 'POR-09 : éléments variables des pages réglementaires (déclaration
         d''accessibilité, durées de conservation).'
       tags:
-      - accessibilite
+      - portail
       responses:
         '200':
           content:
@@ -20,11 +149,38 @@ paths:
           description: ''
   /api/portail/auth/confirmation-courriel:
     post:
-      operationId: auth_confirmation_courriel_create
+      operationId: portail_auth_confirmation_courriel_create
       description: 'Base des vues publiques du portail : pas d''authentification,
         débit limité.'
       tags:
-      - auth
+      - portail
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/JetonRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/JetonRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/JetonRequest'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+  /api/portail/auth/confirmation-nouvelle-adresse:
+    post:
+      operationId: portail_auth_confirmation_nouvelle_adresse_create
+      description: 'Base des vues publiques du portail : pas d''authentification,
+        débit limité.'
+      tags:
+      - portail
       requestBody:
         content:
           application/json:
@@ -47,11 +203,11 @@ paths:
           description: ''
   /api/portail/auth/connexion:
     post:
-      operationId: auth_connexion_create
+      operationId: portail_auth_connexion_create
       description: 'Base des vues publiques du portail : pas d''authentification,
         débit limité.'
       tags:
-      - auth
+      - portail
       requestBody:
         content:
           application/json:
@@ -74,21 +230,21 @@ paths:
           description: ''
   /api/portail/auth/deconnexion:
     post:
-      operationId: auth_deconnexion_create
+      operationId: portail_auth_deconnexion_create
       description: Base des vues réservées à un contact connecté (jeton de session
         relayé par la façade).
       tags:
-      - auth
+      - portail
       responses:
         '204':
           description: No response body
   /api/portail/auth/inscription:
     post:
-      operationId: auth_inscription_create
+      operationId: portail_auth_inscription_create
       description: 'Base des vues publiques du portail : pas d''authentification,
         débit limité.'
       tags:
-      - auth
+      - portail
       requestBody:
         content:
           application/json:
@@ -111,11 +267,11 @@ paths:
           description: ''
   /api/portail/auth/invitation:
     post:
-      operationId: auth_invitation_create
+      operationId: portail_auth_invitation_create
       description: 'Base des vues publiques du portail : pas d''authentification,
         débit limité.'
       tags:
-      - auth
+      - portail
       requestBody:
         content:
           application/json:
@@ -138,11 +294,11 @@ paths:
           description: ''
   /api/portail/auth/mot-de-passe-oublie:
     post:
-      operationId: auth_mot_de_passe_oublie_create
+      operationId: portail_auth_mot_de_passe_oublie_create
       description: 'Base des vues publiques du portail : pas d''authentification,
         débit limité.'
       tags:
-      - auth
+      - portail
       requestBody:
         content:
           application/json:
@@ -165,11 +321,11 @@ paths:
           description: ''
   /api/portail/auth/reinitialisation:
     post:
-      operationId: auth_reinitialisation_create
+      operationId: portail_auth_reinitialisation_create
       description: 'Base des vues publiques du portail : pas d''authentification,
         débit limité.'
       tags:
-      - auth
+      - portail
       requestBody:
         content:
           application/json:
@@ -192,11 +348,11 @@ paths:
           description: ''
   /api/portail/auth/totp:
     post:
-      operationId: auth_totp_create
+      operationId: portail_auth_totp_create
       description: 'Base des vues publiques du portail : pas d''authentification,
         débit limité.'
       tags:
-      - auth
+      - portail
       requestBody:
         content:
           application/json:
@@ -219,11 +375,11 @@ paths:
           description: ''
   /api/portail/campagnes:
     get:
-      operationId: campagnes_retrieve
+      operationId: portail_campagnes_retrieve
       description: Base des vues réservées à un contact connecté (jeton de session
         relayé par la façade).
       tags:
-      - campagnes
+      - portail
       responses:
         '200':
           content:
@@ -234,7 +390,7 @@ paths:
           description: ''
   /api/portail/campagnes/{id}/demandes:
     post:
-      operationId: campagnes_demandes_create
+      operationId: portail_campagnes_demandes_create
       description: Base des vues réservées à un contact connecté (jeton de session
         relayé par la façade).
       parameters:
@@ -244,7 +400,7 @@ paths:
           type: integer
         required: true
       tags:
-      - campagnes
+      - portail
       requestBody:
         content:
           application/json:
@@ -267,7 +423,7 @@ paths:
           description: ''
   /api/portail/catalogue/espaces:
     get:
-      operationId: catalogue_espaces_list
+      operationId: portail_catalogue_espaces_list
       description: 'Base des vues publiques du portail : pas d''authentification,
         débit limité.'
       parameters:
@@ -296,7 +452,7 @@ paths:
         schema:
           type: integer
       tags:
-      - catalogue
+      - portail
       responses:
         '200':
           content:
@@ -306,7 +462,7 @@ paths:
           description: ''
   /api/portail/catalogue/espaces/{id}:
     get:
-      operationId: catalogue_espaces_retrieve
+      operationId: portail_catalogue_espaces_retrieve
       description: 'Base des vues publiques du portail : pas d''authentification,
         débit limité.'
       parameters:
@@ -316,7 +472,7 @@ paths:
           type: integer
         required: true
       tags:
-      - catalogue
+      - portail
       responses:
         '200':
           content:
@@ -326,7 +482,7 @@ paths:
           description: ''
   /api/portail/catalogue/espaces/{id}/documents/{document}:
     get:
-      operationId: catalogue_espaces_documents_retrieve
+      operationId: portail_catalogue_espaces_documents_retrieve
       description: Règlement, plan ou consignes d'un espace publié (REF-08).
       parameters:
       - in: path
@@ -340,13 +496,13 @@ paths:
           type: integer
         required: true
       tags:
-      - catalogue
+      - portail
       responses:
         '200':
           description: No response body
   /api/portail/catalogue/espaces/{id}/photos/{photo}:
     get:
-      operationId: catalogue_espaces_photos_retrieve
+      operationId: portail_catalogue_espaces_photos_retrieve
       description: 'Photo d''un espace publié (affichée dans la page : `inline`).'
       parameters:
       - in: path
@@ -360,17 +516,17 @@ paths:
           type: integer
         required: true
       tags:
-      - catalogue
+      - portail
       responses:
         '200':
           description: No response body
   /api/portail/catalogue/familles:
     get:
-      operationId: catalogue_familles_list
+      operationId: portail_catalogue_familles_list
       description: 'Base des vues publiques du portail : pas d''authentification,
         débit limité.'
       tags:
-      - catalogue
+      - portail
       responses:
         '200':
           content:
@@ -382,11 +538,11 @@ paths:
           description: ''
   /api/portail/catalogue/sites:
     get:
-      operationId: catalogue_sites_list
+      operationId: portail_catalogue_sites_list
       description: 'Base des vues publiques du portail : pas d''authentification,
         débit limité.'
       tags:
-      - catalogue
+      - portail
       responses:
         '200':
           content:
@@ -396,13 +552,28 @@ paths:
                 items:
                   $ref: '#/components/schemas/SitePublic'
           description: ''
-  /api/portail/compte:
+  /api/portail/cautions:
     get:
-      operationId: compte_retrieve
+      operationId: portail_cautions_retrieve
       description: Base des vues réservées à un contact connecté (jeton de session
         relayé par la façade).
       tags:
-      - compte
+      - portail
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+  /api/portail/compte:
+    get:
+      operationId: portail_compte_retrieve
+      description: Base des vues réservées à un contact connecté (jeton de session
+        relayé par la façade).
+      tags:
+      - portail
       responses:
         '200':
           content:
@@ -412,11 +583,11 @@ paths:
                 additionalProperties: {}
           description: ''
     patch:
-      operationId: compte_partial_update
+      operationId: portail_compte_partial_update
       description: Base des vues réservées à un contact connecté (jeton de session
         relayé par la façade).
       tags:
-      - compte
+      - portail
       requestBody:
         content:
           application/json:
@@ -436,13 +607,40 @@ paths:
                 type: object
                 additionalProperties: {}
           description: ''
+  /api/portail/compte/courriel:
+    post:
+      operationId: portail_compte_courriel_create
+      description: 'Changement d''adresse : confirmé par la nouvelle adresse, signalé
+        à l''ancienne.'
+      tags:
+      - portail
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChangementCourrielRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ChangementCourrielRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ChangementCourrielRequest'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
   /api/portail/compte/export:
     get:
-      operationId: compte_export_retrieve
+      operationId: portail_compte_export_retrieve
       description: 'USR-06 : export des données personnelles du contact et des structures
         qu''il représente.'
       tags:
-      - compte
+      - portail
       responses:
         '200':
           content:
@@ -453,11 +651,11 @@ paths:
           description: ''
   /api/portail/compte/mot-de-passe:
     post:
-      operationId: compte_mot_de_passe_create
+      operationId: portail_compte_mot_de_passe_create
       description: Base des vues réservées à un contact connecté (jeton de session
         relayé par la façade).
       tags:
-      - compte
+      - portail
       requestBody:
         content:
           application/json:
@@ -480,10 +678,10 @@ paths:
           description: ''
   /api/portail/compte/preferences:
     get:
-      operationId: compte_preferences_retrieve
+      operationId: portail_compte_preferences_retrieve
       description: 'COM-04 : préférences de notification du contact connecté.'
       tags:
-      - compte
+      - portail
       responses:
         '200':
           content:
@@ -492,10 +690,10 @@ paths:
                 $ref: '#/components/schemas/Preferences'
           description: ''
     patch:
-      operationId: compte_preferences_partial_update
+      operationId: portail_compte_preferences_partial_update
       description: 'COM-04 : préférences de notification du contact connecté.'
       tags:
-      - compte
+      - portail
       requestBody:
         content:
           application/json:
@@ -507,6 +705,32 @@ paths:
           multipart/form-data:
             schema:
               $ref: '#/components/schemas/PatchedPreferencesRequest'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Preferences'
+          description: ''
+  /api/portail/compte/preferences/telephone:
+    post:
+      operationId: portail_compte_preferences_telephone_create
+      description: 'COM-05 : confirmation du numéro de mobile par le code reçu ; «
+        renvoyer » en demande un nouveau.'
+      tags:
+      - portail
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CodeTelephoneRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/CodeTelephoneRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CodeTelephoneRequest'
+        required: true
       responses:
         '200':
           content:
@@ -516,11 +740,11 @@ paths:
           description: ''
   /api/portail/compte/totp:
     get:
-      operationId: compte_totp_retrieve
+      operationId: portail_compte_totp_retrieve
       description: Base des vues réservées à un contact connecté (jeton de session
         relayé par la façade).
       tags:
-      - compte
+      - portail
       responses:
         '200':
           content:
@@ -530,22 +754,22 @@ paths:
                 additionalProperties: {}
           description: ''
     post:
-      operationId: compte_totp_create
+      operationId: portail_compte_totp_create
       description: Base des vues réservées à un contact connecté (jeton de session
         relayé par la façade).
       tags:
-      - compte
+      - portail
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CodeRequest'
+              $ref: '#/components/schemas/ActivationTotpRequest'
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/CodeRequest'
+              $ref: '#/components/schemas/ActivationTotpRequest'
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/CodeRequest'
+              $ref: '#/components/schemas/ActivationTotpRequest'
         required: true
       responses:
         '200':
@@ -556,11 +780,11 @@ paths:
                 additionalProperties: {}
           description: ''
     delete:
-      operationId: compte_totp_destroy
+      operationId: portail_compte_totp_destroy
       description: Base des vues réservées à un contact connecté (jeton de session
         relayé par la façade).
       tags:
-      - compte
+      - portail
       responses:
         '200':
           content:
@@ -571,7 +795,7 @@ paths:
           description: ''
   /api/portail/disponibilites:
     get:
-      operationId: disponibilites_retrieve
+      operationId: portail_disponibilites_retrieve
       description: 'Occupations d''un espace sur une période, sans aucun nom ni objet
         : « occupé », « demandé », « fermé ».'
       parameters:
@@ -588,7 +812,7 @@ paths:
         schema:
           type: integer
       tags:
-      - disponibilites
+      - portail
       responses:
         '200':
           content:
@@ -599,11 +823,11 @@ paths:
           description: ''
   /api/portail/dossiers:
     get:
-      operationId: dossiers_retrieve
+      operationId: portail_dossiers_retrieve
       description: Base des vues réservées à un contact connecté (jeton de session
         relayé par la façade).
       tags:
-      - dossiers
+      - portail
       responses:
         '200':
           content:
@@ -613,11 +837,11 @@ paths:
                 additionalProperties: {}
           description: ''
     post:
-      operationId: dossiers_create
+      operationId: portail_dossiers_create
       description: Base des vues réservées à un contact connecté (jeton de session
         relayé par la façade).
       tags:
-      - dossiers
+      - portail
       requestBody:
         content:
           application/json:
@@ -640,7 +864,7 @@ paths:
           description: ''
   /api/portail/dossiers/{id}:
     get:
-      operationId: dossiers_retrieve_2
+      operationId: portail_dossiers_retrieve_2
       description: Base des vues réservées à un contact connecté (jeton de session
         relayé par la façade).
       parameters:
@@ -650,7 +874,7 @@ paths:
           type: integer
         required: true
       tags:
-      - dossiers
+      - portail
       responses:
         '200':
           content:
@@ -660,7 +884,7 @@ paths:
                 additionalProperties: {}
           description: ''
     patch:
-      operationId: dossiers_partial_update
+      operationId: portail_dossiers_partial_update
       description: Base des vues réservées à un contact connecté (jeton de session
         relayé par la façade).
       parameters:
@@ -670,7 +894,7 @@ paths:
           type: integer
         required: true
       tags:
-      - dossiers
+      - portail
       requestBody:
         content:
           application/json:
@@ -691,7 +915,7 @@ paths:
                 additionalProperties: {}
           description: ''
     delete:
-      operationId: dossiers_destroy
+      operationId: portail_dossiers_destroy
       description: Abandon d'un brouillon (rien n'a été réservé).
       parameters:
       - in: path
@@ -700,13 +924,13 @@ paths:
           type: integer
         required: true
       tags:
-      - dossiers
+      - portail
       responses:
         '204':
           description: No response body
   /api/portail/dossiers/{id}/annuler:
     post:
-      operationId: dossiers_annuler_create
+      operationId: portail_dossiers_annuler_create
       description: 'POR-05, PLA-10 : l''usager annule sa demande ou ses réservations
         à venir (tardive selon le délai).'
       parameters:
@@ -716,7 +940,7 @@ paths:
           type: integer
         required: true
       tags:
-      - dossiers
+      - portail
       requestBody:
         content:
           application/json:
@@ -737,9 +961,35 @@ paths:
                 type: object
                 additionalProperties: {}
           description: ''
+  /api/portail/dossiers/{id}/devis/{devis}/accepter:
+    post:
+      operationId: portail_dossiers_devis_accepter_create
+      description: 'TAR-04 : le devis est accepté en ligne par un contact habilité
+        à engager la structure.'
+      parameters:
+      - in: path
+        name: devis
+        schema:
+          type: integer
+        required: true
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - portail
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
   /api/portail/dossiers/{id}/documents:
     get:
-      operationId: dossiers_documents_retrieve
+      operationId: portail_dossiers_documents_retrieve
       description: Base des vues réservées à un contact connecté (jeton de session
         relayé par la façade).
       parameters:
@@ -749,7 +999,7 @@ paths:
           type: integer
         required: true
       tags:
-      - dossiers
+      - portail
       responses:
         '200':
           content:
@@ -760,7 +1010,7 @@ paths:
           description: ''
   /api/portail/dossiers/{id}/documents/{document}/fichier:
     get:
-      operationId: dossiers_documents_fichier_retrieve
+      operationId: portail_dossiers_documents_fichier_retrieve
       description: 'DOC-07 : téléchargement contrôlé ; un autre usager obtient 404
         (R2-27).'
       parameters:
@@ -775,7 +1025,7 @@ paths:
           type: integer
         required: true
       tags:
-      - dossiers
+      - portail
       responses:
         '200':
           content:
@@ -786,7 +1036,7 @@ paths:
           description: ''
   /api/portail/dossiers/{id}/documents/{document}/scan-signe:
     post:
-      operationId: dossiers_documents_scan_signe_create
+      operationId: portail_dossiers_documents_scan_signe_create
       description: 'SIG-05 : l''usager dépose le document imprimé, signé et numérisé
         (PDF).'
       parameters:
@@ -801,7 +1051,7 @@ paths:
           type: integer
         required: true
       tags:
-      - dossiers
+      - portail
       requestBody:
         content:
           multipart/form-data:
@@ -818,7 +1068,7 @@ paths:
           description: ''
   /api/portail/dossiers/{id}/documents/{document}/signature:
     get:
-      operationId: dossiers_documents_signature_retrieve
+      operationId: portail_dossiers_documents_signature_retrieve
       description: 'POR-10 : lien de signature du contact connecté, s''il est le signataire
         attendu.'
       parameters:
@@ -833,7 +1083,7 @@ paths:
           type: integer
         required: true
       tags:
-      - dossiers
+      - portail
       responses:
         '200':
           content:
@@ -844,7 +1094,7 @@ paths:
           description: ''
   /api/portail/dossiers/{id}/envoyer:
     post:
-      operationId: dossiers_envoyer_create
+      operationId: portail_dossiers_envoyer_create
       description: Base des vues réservées à un contact connecté (jeton de session
         relayé par la façade).
       parameters:
@@ -854,7 +1104,7 @@ paths:
           type: integer
         required: true
       tags:
-      - dossiers
+      - portail
       responses:
         '200':
           content:
@@ -863,9 +1113,42 @@ paths:
                 type: object
                 additionalProperties: {}
           description: ''
+  /api/portail/dossiers/{id}/materiel:
+    post:
+      operationId: portail_dossiers_materiel_create
+      description: Demande de matériel sur un dossier envoyé, pour une de ses réservations
+        en cours.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - portail
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PretPortailRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PretPortailRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PretPortailRequest'
+        required: true
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
   /api/portail/dossiers/{id}/messages:
     get:
-      operationId: dossiers_messages_retrieve
+      operationId: portail_dossiers_messages_retrieve
       description: Base des vues réservées à un contact connecté (jeton de session
         relayé par la façade).
       parameters:
@@ -875,7 +1158,7 @@ paths:
           type: integer
         required: true
       tags:
-      - dossiers
+      - portail
       responses:
         '200':
           content:
@@ -885,7 +1168,7 @@ paths:
                 additionalProperties: {}
           description: ''
     post:
-      operationId: dossiers_messages_create
+      operationId: portail_dossiers_messages_create
       description: Base des vues réservées à un contact connecté (jeton de session
         relayé par la façade).
       parameters:
@@ -895,7 +1178,7 @@ paths:
           type: integer
         required: true
       tags:
-      - dossiers
+      - portail
       requestBody:
         content:
           application/json:
@@ -918,7 +1201,7 @@ paths:
           description: ''
   /api/portail/dossiers/{id}/occurrences/{seance}/annuler:
     post:
-      operationId: dossiers_occurrences_annuler_create
+      operationId: portail_dossiers_occurrences_annuler_create
       description: Base des vues réservées à un contact connecté (jeton de session
         relayé par la façade).
       parameters:
@@ -933,7 +1216,7 @@ paths:
           type: integer
         required: true
       tags:
-      - dossiers
+      - portail
       requestBody:
         content:
           application/json:
@@ -956,7 +1239,7 @@ paths:
           description: ''
   /api/portail/dossiers/{id}/pieces:
     post:
-      operationId: dossiers_pieces_create
+      operationId: portail_dossiers_pieces_create
       description: 'Étape 3 : dépôt des pièces demandées pour la structure du dossier
         (POR-06).'
       parameters:
@@ -966,7 +1249,7 @@ paths:
           type: integer
         required: true
       tags:
-      - dossiers
+      - portail
       requestBody:
         content:
           multipart/form-data:
@@ -981,13 +1264,69 @@ paths:
                 type: object
                 additionalProperties: {}
           description: ''
-  /api/portail/notifications:
+  /api/portail/factures:
     get:
-      operationId: notifications_retrieve
+      operationId: portail_factures_retrieve
       description: Base des vues réservées à un contact connecté (jeton de session
         relayé par la façade).
       tags:
-      - notifications
+      - portail
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+  /api/portail/factures/{id}/fichier:
+    get:
+      operationId: portail_factures_fichier_retrieve
+      description: Base des vues réservées à un contact connecté (jeton de session
+        relayé par la façade).
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - portail
+      responses:
+        '200':
+          content:
+            application/pdf:
+              schema:
+                type: string
+                format: binary
+          description: ''
+  /api/portail/materiel:
+    get:
+      operationId: portail_materiel_retrieve
+      description: Catalogue du matériel proposé sur le site d'un espace (quantité
+        en état, sans détail du stock).
+      parameters:
+      - in: query
+        name: espace
+        schema:
+          type: integer
+      tags:
+      - portail
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+  /api/portail/notifications:
+    get:
+      operationId: portail_notifications_retrieve
+      description: Base des vues réservées à un contact connecté (jeton de session
+        relayé par la façade).
+      tags:
+      - portail
       responses:
         '200':
           content:
@@ -998,7 +1337,7 @@ paths:
           description: ''
   /api/portail/notifications/{id}/lue:
     post:
-      operationId: notifications_lue_create
+      operationId: portail_notifications_lue_create
       description: Base des vues réservées à un contact connecté (jeton de session
         relayé par la façade).
       parameters:
@@ -1008,16 +1347,43 @@ paths:
           type: integer
         required: true
       tags:
-      - notifications
+      - portail
       responses:
         '204':
           description: No response body
   /api/portail/pieces-exigees:
     get:
-      operationId: pieces_exigees_retrieve
+      operationId: portail_pieces_exigees_retrieve
       description: Pièces demandées pour une structure et leur état (POR-06, USR-03).
       tags:
-      - pieces-exigees
+      - portail
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+  /api/portail/simulation-tarif:
+    post:
+      operationId: portail_simulation_tarif_create
+      description: 'TAR-11 : estimation publique, sans réduction personnelle (une
+        gratuité éventuelle figure sur le devis).'
+      tags:
+      - portail
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SimulationRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/SimulationRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/SimulationRequest'
+        required: true
       responses:
         '200':
           content:
@@ -1028,10 +1394,10 @@ paths:
           description: ''
   /api/portail/types-demande:
     get:
-      operationId: types_demande_retrieve
+      operationId: portail_types_demande_retrieve
       description: Types de demande proposés en ligne à une structure (POR-04).
       tags:
-      - types-demande
+      - portail
       responses:
         '200':
           content:
@@ -1042,11 +1408,11 @@ paths:
           description: ''
   /api/portail/usagers:
     get:
-      operationId: usagers_retrieve
+      operationId: portail_usagers_retrieve
       description: Base des vues réservées à un contact connecté (jeton de session
         relayé par la façade).
       tags:
-      - usagers
+      - portail
       responses:
         '200':
           content:
@@ -1057,7 +1423,7 @@ paths:
           description: ''
   /api/portail/usagers/{id}:
     get:
-      operationId: usagers_retrieve_2
+      operationId: portail_usagers_retrieve_2
       description: Base des vues réservées à un contact connecté (jeton de session
         relayé par la façade).
       parameters:
@@ -1067,7 +1433,7 @@ paths:
           type: integer
         required: true
       tags:
-      - usagers
+      - portail
       responses:
         '200':
           content:
@@ -1077,7 +1443,7 @@ paths:
                 additionalProperties: {}
           description: ''
     patch:
-      operationId: usagers_partial_update
+      operationId: portail_usagers_partial_update
       description: Base des vues réservées à un contact connecté (jeton de session
         relayé par la façade).
       parameters:
@@ -1087,7 +1453,7 @@ paths:
           type: integer
         required: true
       tags:
-      - usagers
+      - portail
       requestBody:
         content:
           application/json:
@@ -1109,9 +1475,9 @@ paths:
           description: ''
   /api/portail/usagers/{id}/contacts:
     get:
-      operationId: usagers_contacts_retrieve
-      description: Contacts d'une structure ; le contact principal en ajoute et peut
-        les inviter sur le portail.
+      operationId: portail_usagers_contacts_retrieve
+      description: Le contact principal voit les coordonnées des autres contacts ;
+        les autres, leur nom et leur rôle.
       parameters:
       - in: path
         name: id
@@ -1119,7 +1485,7 @@ paths:
           type: integer
         required: true
       tags:
-      - usagers
+      - portail
       responses:
         '200':
           content:
@@ -1129,7 +1495,7 @@ paths:
                 additionalProperties: {}
           description: ''
     post:
-      operationId: usagers_contacts_create
+      operationId: portail_usagers_contacts_create
       description: Contacts d'une structure ; le contact principal en ajoute et peut
         les inviter sur le portail.
       parameters:
@@ -1139,7 +1505,7 @@ paths:
           type: integer
         required: true
       tags:
-      - usagers
+      - portail
       requestBody:
         content:
           application/json:
@@ -1160,9 +1526,113 @@ paths:
                 type: object
                 additionalProperties: {}
           description: ''
+  /api/portail/usagers/{id}/contacts/{contact_id}:
+    patch:
+      operationId: portail_usagers_contacts_partial_update
+      description: 'POR-01 : le contact principal modifie le rôle d''un contact ou
+        le retire de la structure (pas lui-même).'
+      parameters:
+      - in: path
+        name: contact_id
+        schema:
+          type: integer
+        required: true
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - portail
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedModificationContactRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedModificationContactRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedModificationContactRequest'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+    delete:
+      operationId: portail_usagers_contacts_destroy
+      description: 'POR-01 : le contact principal modifie le rôle d''un contact ou
+        le retire de la structure (pas lui-même).'
+      parameters:
+      - in: path
+        name: contact_id
+        schema:
+          type: integer
+        required: true
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - portail
+      responses:
+        '204':
+          description: No response body
+  /api/portail/usagers/{id}/documents:
+    get:
+      operationId: portail_usagers_documents_retrieve
+      description: 'POR-05 : documents rattachés à la structure sans dossier (avis
+        de fermeture, attestation annuelle).'
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - portail
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+  /api/portail/usagers/{id}/documents/{document}/fichier:
+    get:
+      operationId: portail_usagers_documents_fichier_retrieve
+      description: Base des vues réservées à un contact connecté (jeton de session
+        relayé par la façade).
+      parameters:
+      - in: path
+        name: document
+        schema:
+          type: integer
+        required: true
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - portail
+      responses:
+        '200':
+          content:
+            application/pdf:
+              schema:
+                type: string
+                format: binary
+          description: ''
   /api/portail/usagers/{id}/pieces:
     get:
-      operationId: usagers_pieces_retrieve
+      operationId: portail_usagers_pieces_retrieve
       description: Base des vues réservées à un contact connecté (jeton de session
         relayé par la façade).
       parameters:
@@ -1172,7 +1642,7 @@ paths:
           type: integer
         required: true
       tags:
-      - usagers
+      - portail
       responses:
         '200':
           content:
@@ -1182,7 +1652,7 @@ paths:
                 additionalProperties: {}
           description: ''
     post:
-      operationId: usagers_pieces_create
+      operationId: portail_usagers_pieces_create
       description: Base des vues réservées à un contact connecté (jeton de session
         relayé par la façade).
       parameters:
@@ -1192,7 +1662,7 @@ paths:
           type: integer
         required: true
       tags:
-      - usagers
+      - portail
       requestBody:
         content:
           multipart/form-data:
@@ -1209,7 +1679,7 @@ paths:
           description: ''
   /api/portail/usagers/{id}/pieces/{piece}/fichier:
     get:
-      operationId: usagers_pieces_fichier_retrieve
+      operationId: portail_usagers_pieces_fichier_retrieve
       description: Base des vues réservées à un contact connecté (jeton de session
         relayé par la façade).
       parameters:
@@ -1224,7 +1694,7 @@ paths:
           type: integer
         required: true
       tags:
-      - usagers
+      - portail
       responses:
         '200':
           content:
@@ -1235,11 +1705,11 @@ paths:
           description: ''
   /api/portail/webhooks/docuseal:
     post:
-      operationId: webhooks_docuseal_create
+      operationId: portail_webhooks_docuseal_create
       description: 'SIG-02 : la façade a vérifié le secret ; l''API ne retient que
         l''identifiant et relit l''état chez DocuSeal.'
       tags:
-      - webhooks
+      - portail
       requestBody:
         content:
           application/json:
@@ -1256,9 +1726,54 @@ paths:
           description: ''
 components:
   schemas:
+    ActivationTotpRequest:
+      type: object
+      properties:
+        code:
+          type: string
+          minLength: 1
+          maxLength: 10
+        mot_de_passe:
+          type: string
+          minLength: 1
+          maxLength: 256
+      required:
+      - code
+      - mot_de_passe
     BlankEnum:
       enum:
       - ''
+    CategorieEnum:
+      enum:
+      - association_locale
+      - association
+      - ecole
+      - entreprise
+      - particulier
+      - autre_collectivite
+      type: string
+      description: |-
+        * `association_locale` - association_locale
+        * `association` - association
+        * `ecole` - ecole
+        * `entreprise` - entreprise
+        * `particulier` - particulier
+        * `autre_collectivite` - autre_collectivite
+    ChangementCourrielRequest:
+      type: object
+      properties:
+        nouveau:
+          type: string
+          format: email
+          minLength: 1
+          maxLength: 254
+        mot_de_passe:
+          type: string
+          minLength: 1
+          maxLength: 256
+      required:
+      - mot_de_passe
+      - nouveau
     ChangementMotDePasseRequest:
       type: object
       properties:
@@ -1279,7 +1794,7 @@ components:
       - Monsieur
       type: string
       description: "* `` - \n* `Madame` - Madame\n* `Monsieur` - Monsieur"
-    CodeRequest:
+    CodeTelephoneRequest:
       type: object
       properties:
         code:
@@ -1288,6 +1803,28 @@ components:
           maxLength: 10
       required:
       - code
+    ConnexionMobileRequest:
+      type: object
+      properties:
+        identifiant:
+          type: string
+          minLength: 1
+          maxLength: 150
+        mot_de_passe:
+          type: string
+          minLength: 1
+          maxLength: 256
+        appareil:
+          type: string
+          default: ''
+          maxLength: 120
+        appareil_id:
+          type: string
+          format: uuid
+          nullable: true
+      required:
+      - identifiant
+      - mot_de_passe
     ConnexionRequest:
       type: object
       properties:
@@ -1368,6 +1905,20 @@ components:
       - espace
       - heure_debut
       - heure_fin
+    DefiMobileRequest:
+      type: object
+      properties:
+        defi:
+          type: string
+          minLength: 1
+          maxLength: 64
+        code:
+          type: string
+          minLength: 1
+          maxLength: 10
+      required:
+      - code
+      - defi
     DefiRequest:
       type: object
       properties:
@@ -1554,6 +2105,19 @@ components:
         * `FR` - FR
         * `SA` - SA
         * `SU` - SU
+    MaterielDemandeRequest:
+      type: object
+      properties:
+        materiel:
+          type: integer
+          minimum: 1
+        quantite:
+          type: integer
+          maximum: 9999
+          minimum: 1
+      required:
+      - materiel
+      - quantite
     MessageRequest:
       type: object
       properties:
@@ -1672,6 +2236,16 @@ components:
         telephone:
           type: string
           maxLength: 20
+    PatchedModificationContactRequest:
+      type: object
+      properties:
+        role:
+          $ref: '#/components/schemas/RoleEnum'
+        peut_signer:
+          type: boolean
+        telephone:
+          type: string
+          maxLength: 20
     PatchedModificationDossierRequest:
       type: object
       properties:
@@ -1700,6 +2274,11 @@ components:
           items:
             $ref: '#/components/schemas/CreneauRequest'
           maxItems: 10
+        materiel:
+          type: array
+          items:
+            $ref: '#/components/schemas/MaterielDemandeRequest'
+          maxItems: 20
     PatchedPreferencesRequest:
       type: object
       properties:
@@ -1743,6 +2322,18 @@ components:
             maxLength: 254
           - type: string
             maxLength: 0
+    PhotoRequest:
+      type: object
+      properties:
+        uuid:
+          type: string
+          format: uuid
+        fichier:
+          type: string
+          format: binary
+      required:
+      - fichier
+      - uuid
     Preferences:
       type: object
       properties:
@@ -1752,12 +2343,38 @@ components:
         telephone_sms:
           type: string
           maxLength: 20
+        telephone_confirme:
+          type: boolean
+          readOnly: true
         rappels:
           type: boolean
           title: Rappel la veille des séances
         informations:
           type: boolean
           title: Informations générales de la Ville
+      required:
+      - telephone_confirme
+    PretPortailRequest:
+      type: object
+      properties:
+        reservation:
+          type: integer
+          minimum: 1
+        materiel:
+          type: integer
+          minimum: 1
+        quantite:
+          type: integer
+          maximum: 9999
+          minimum: 1
+        commentaire:
+          type: string
+          default: ''
+          maxLength: 300
+      required:
+      - materiel
+      - quantite
+      - reservation
     ReinitialisationRequest:
       type: object
       properties:
@@ -1808,6 +2425,17 @@ components:
         * `directeur` - directeur
         * `responsable` - responsable
         * `autre` - autre
+    SaisiesRequest:
+      type: object
+      properties:
+        saisies:
+          type: array
+          items:
+            type: object
+            additionalProperties: {}
+          maxItems: 200
+      required:
+      - saisies
     ScanPortailRequest:
       type: object
       properties:
@@ -1816,6 +2444,32 @@ components:
           format: binary
       required:
       - fichier
+    SimulationRequest:
+      type: object
+      properties:
+        espace:
+          type: integer
+          minimum: 1
+        date:
+          type: string
+          format: date
+        heure_debut:
+          type: string
+          format: time
+        heure_fin:
+          type: string
+          format: time
+        categorie:
+          $ref: '#/components/schemas/CategorieEnum'
+        resident:
+          type: boolean
+          default: true
+      required:
+      - categorie
+      - date
+      - espace
+      - heure_debut
+      - heure_fin
     SitePublic:
       type: object
       properties:
