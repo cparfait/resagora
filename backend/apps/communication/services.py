@@ -57,18 +57,26 @@ def notifier(
             continue
         creees.append(
             Notification.objects.create(
-                modele=modele, destinataire=contact.courriel, contact=contact, usager=usager,
+                modele=modele,
+                destinataire=contact.courriel,
+                contact=contact,
+                usager=usager,
                 sujet=rendre(modele.sujet, {**contexte_complet, "contact": contact}),
                 corps=rendre(modele.corps, {**contexte_complet, "contact": contact}),
-                objet_type=objet._meta.label_lower if objet is not None else "", objet_id=str(objet.pk) if objet is not None else "",
+                objet_type=objet._meta.label_lower if objet is not None else "",
+                objet_id=str(objet.pk) if objet is not None else "",
                 groupe=groupe,
             )
         )
     for adresse in courriels:
         creees.append(
             Notification.objects.create(
-                modele=modele, destinataire=adresse, sujet=rendre(modele.sujet, contexte_complet), corps=rendre(modele.corps, contexte_complet),
-                objet_type=objet._meta.label_lower if objet is not None else "", objet_id=str(objet.pk) if objet is not None else "",
+                modele=modele,
+                destinataire=adresse,
+                sujet=rendre(modele.sujet, contexte_complet),
+                corps=rendre(modele.corps, contexte_complet),
+                objet_type=objet._meta.label_lower if objet is not None else "",
+                objet_id=str(objet.pk) if objet is not None else "",
                 groupe=groupe,
             )
         )
@@ -101,7 +109,10 @@ def envoyer(notification: Notification) -> bool:
     notification.tentatives += 1
     try:
         message = EmailMessage(
-            subject=notification.sujet, body=notification.corps, from_email=settings.DEFAULT_FROM_EMAIL, to=[notification.destinataire]
+            subject=notification.sujet,
+            body=notification.corps,
+            from_email=settings.DEFAULT_FROM_EMAIL,
+            to=[notification.destinataire],
         )
         message.send(fail_silently=False)
     except Exception as erreur:

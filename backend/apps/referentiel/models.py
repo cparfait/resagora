@@ -158,7 +158,12 @@ class PhotoEspace(models.Model):
 class DocumentEspace(models.Model):
     """Règlement intérieur, plan, consignes de sécurité rattachés à un espace (REF-08)."""
 
-    NATURES = [("reglement", "Règlement intérieur"), ("plan", "Plan d'accès"), ("securite", "Consignes de sécurité"), ("autre", "Autre")]
+    NATURES = [
+        ("reglement", "Règlement intérieur"),
+        ("plan", "Plan d'accès"),
+        ("securite", "Consignes de sécurité"),
+        ("autre", "Autre"),
+    ]
     espace = models.ForeignKey(Espace, on_delete=models.CASCADE, related_name="documents")
     nature = models.CharField(max_length=20, choices=NATURES, default="reglement")
     titre = models.CharField(max_length=200)
@@ -276,4 +281,4 @@ class Fermeture(models.Model):
     def espaces_concernes(self) -> list[Espace]:
         if self.espace is not None:
             return [self.espace, *self.espace.descendants()]
-        return list(Espace.objects.filter(batiment__site_id=self.site_id))
+        return list(Espace.objects.filter(batiment__site_id=self.site_id or 0))

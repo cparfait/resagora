@@ -36,7 +36,9 @@ class Notification(models.Model):
     destinataire = models.CharField(max_length=254)
     contact = models.ForeignKey("usagers.Contact", null=True, blank=True, on_delete=models.SET_NULL, related_name="notifications")
     usager = models.ForeignKey("usagers.Usager", null=True, blank=True, on_delete=models.SET_NULL, related_name="notifications")
-    agent = models.ForeignKey("habilitations.Utilisateur", null=True, blank=True, on_delete=models.SET_NULL, related_name="notifications")
+    agent = models.ForeignKey(
+        "habilitations.Utilisateur", null=True, blank=True, on_delete=models.SET_NULL, related_name="notifications"
+    )
     sujet = models.CharField(max_length=250)
     corps = models.TextField()
     objet_type = models.CharField(max_length=80, blank=True, default="")

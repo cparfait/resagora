@@ -54,25 +54,37 @@ def test_pla04_recurrence_exclut_vacances_zone_c_et_feries(espace):
 
 
 def test_pla04_changement_d_heure_d_octobre(espace):
-    r = reserver(espace, date(2026, 10, 20), "18:00", "20:00", recurrence=MARDIS_SAISON, date_fin=date(2026, 11, 3), exclure_vacances=False)
+    r = reserver(
+        espace, date(2026, 10, 20), "18:00", "20:00", recurrence=MARDIS_SAISON, date_fin=date(2026, 11, 3), exclure_vacances=False
+    )
     debuts = list(r.occurrences.values_list("debut", flat=True))
     assert [timezone.localtime(d, PARIS).hour for d in debuts] == [18, 18, 18]
     assert [d.astimezone(UTC).hour for d in debuts] == [16, 17, 17]  # passage à l'heure d'hiver le 25 octobre
 
 
 def test_pla04_creneau_de_nuit_et_exdates(espace):
-    plages = generer_plages(Reservation(
-        espace=espace, date_debut=date(2026, 9, 4), date_fin=date(2026, 9, 25), heure_debut=paris(2026, 1, 1, 22).time(),
-        heure_fin=paris(2026, 1, 1, 1).time(), recurrence="FREQ=WEEKLY;BYDAY=FR", exclure_vacances=False, exclure_feries=False,
-        exdates=[date(2026, 9, 11)],
-    ))
+    plages = generer_plages(
+        Reservation(
+            espace=espace,
+            date_debut=date(2026, 9, 4),
+            date_fin=date(2026, 9, 25),
+            heure_debut=paris(2026, 1, 1, 22).time(),
+            heure_fin=paris(2026, 1, 1, 1).time(),
+            recurrence="FREQ=WEEKLY;BYDAY=FR",
+            exclure_vacances=False,
+            exclure_feries=False,
+            exdates=[date(2026, 9, 11)],
+        )
+    )
     assert len(plages) == 3 and all(f - d == timedelta(hours=3) for d, f in plages)
 
 
 def test_pla04_description_lisible(espace):
     saison_2026()
     r = reserver(espace, date(2026, 9, 1), "18:00", "20:30", recurrence=MARDIS_SAISON, date_fin=date(2027, 6, 29))
-    assert decrire(r).startswith("tous les mardis de 18 h à 20 h 30, hors vacances scolaires et jours fériés, du 1 septembre 2026")
+    assert decrire(r).startswith(
+        "tous les mardis de 18 h à 20 h 30, hors vacances scolaires et jours fériés, du 1 septembre 2026"
+    )
 
 
 def test_pla04_regle_inconnue_refusee(espace):
@@ -82,14 +94,30 @@ def test_pla04_regle_inconnue_refusee(espace):
 
 def test_pla04_modifier_cette_seance_les_suivantes_ou_la_serie(espace):
     gestionnaire = agent("gestionnaire")
-    r = valider_systeme(reserver(espace, date(2026, 11, 3), "18:00", "20:00", recurrence=MARDIS_SAISON, date_fin=date(2026, 12, 15), exclure_vacances=False))
+    r = valider_systeme(
+        reserver(
+            espace,
+            date(2026, 11, 3),
+            "18:00",
+            "20:00",
+            recurrence=MARDIS_SAISON,
+            date_fin=date(2026, 12, 15),
+            exclure_vacances=False,
+        )
+    )
     seances = list(r.occurrences.order_by("debut"))
-    services.deplacer_occurrence(seances[0], acteur=gestionnaire, espace=espace, debut=paris(2026, 11, 4, 18), fin=paris(2026, 11, 4, 20))
-    suite = services.modifier_suivantes(seances[3], acteur=gestionnaire, heure_debut=paris(2026, 1, 1, 19).time(), heure_fin=paris(2026, 1, 1, 21).time())
+    services.deplacer_occurrence(
+        seances[0], acteur=gestionnaire, espace=espace, debut=paris(2026, 11, 4, 18), fin=paris(2026, 11, 4, 20)
+    )
+    suite = services.modifier_suivantes(
+        seances[3], acteur=gestionnaire, heure_debut=paris(2026, 1, 1, 19).time(), heure_fin=paris(2026, 1, 1, 21).time()
+    )
     r.refresh_from_db()
     assert r.date_fin == date(2026, 11, 23) and r.occurrences.count() == 3
     assert all(timezone.localtime(o.debut, PARIS).hour == 19 for o in suite.occurrences.all())
-    services.modifier_serie(suite, acteur=gestionnaire, heure_debut=paris(2026, 1, 1, 17).time(), heure_fin=paris(2026, 1, 1, 18).time())
+    services.modifier_serie(
+        suite, acteur=gestionnaire, heure_debut=paris(2026, 1, 1, 17).time(), heure_fin=paris(2026, 1, 1, 18).time()
+    )
     assert all(timezone.localtime(o.debut, PARIS).hour == 17 for o in suite.occurrences.all())
     assert timezone.localtime(Occurrence.objects.get(pk=seances[0].pk).debut, PARIS).day == 4
 
@@ -176,7 +204,9 @@ def test_rg01_deux_validations_simultanees_une_seule_reussit():
 
 
 def test_ref03_demande_hors_horaires_refusee(espace):
-    HoraireOuverture.objects.create(espace=espace, jour_semaine=1, debut=paris(2026, 1, 1, 8).time(), fin=paris(2026, 1, 1, 22).time())
+    HoraireOuverture.objects.create(
+        espace=espace, jour_semaine=1, debut=paris(2026, 1, 1, 8).time(), fin=paris(2026, 1, 1, 22).time()
+    )
     with pytest.raises(ErreurValidation) as erreur:
         reserver(espace, date(2026, 11, 10), "21:00", "23:00")
     assert erreur.value.code == "hors_horaires"
@@ -211,7 +241,9 @@ def test_rg06_confirmation_sans_pieces_valides_refusee(espace):
     from apps.noyau.models import Fichier
 
     for type_piece in TypePiece.objects.filter(types_usager__contains=["association"], obligatoire=True):
-        fichier = Fichier.objects.create(nom_origine="p.pdf", type_mime="application/pdf", taille=1, sha256="0" * 64, chemin=f"x/{type_piece.code}")
+        fichier = Fichier.objects.create(
+            nom_origine="p.pdf", type_mime="application/pdf", taille=1, sha256="0" * 64, chemin=f"x/{type_piece.code}"
+        )
         PieceJustificative.objects.create(usager=usager, type_piece=type_piece, fichier=fichier, statut="valide")
     assert services.confirmer(r, acteur=gestionnaire).statut == "confirmee"
 
@@ -239,7 +271,9 @@ def test_pla06_refus_motive_et_notifie(espace, django_capture_on_commit_callback
 
 def test_rg07_option_relancee_puis_liberee(espace, django_capture_on_commit_callbacks):
     with freeze_time("2026-11-01 09:00"):
-        r = services.mettre_en_option(reserver(espace, date(2026, 12, 10), "18:00", "20:00"), acteur=agent("gestionnaire"), jours=7)
+        r = services.mettre_en_option(
+            reserver(espace, date(2026, 12, 10), "18:00", "20:00"), acteur=agent("gestionnaire"), jours=7
+        )
     with freeze_time("2026-11-06 09:00"), django_capture_on_commit_callbacks(execute=True):
         assert services.traiter_options() == {"relancees": 1, "liberees": 0}
         assert services.traiter_options() == {"relancees": 0, "liberees": 0}
@@ -256,18 +290,26 @@ def test_rg07_option_relancee_puis_liberee(espace, django_capture_on_commit_call
 def test_pla10_annulation_tardive_par_l_usager(espace):
     with freeze_time("2026-11-09 10:00"):
         r = valider_systeme(reserver(espace, date(2026, 11, 10), "18:00", "20:00"))
-        occurrence = services.annuler_occurrence(r.occurrences.get(), acteur="contact du portail", motif="Match reporté", par_usager=True)
+        occurrence = services.annuler_occurrence(
+            r.occurrences.get(), acteur="contact du portail", motif="Match reporté", par_usager=True
+        )
     assert occurrence.annulation_tardive and not occurrence.verrous.exists()
     with freeze_time("2026-11-01 10:00"):
         autre = valider_systeme(reserver(espace, date(2026, 11, 20), "18:00", "20:00"))
-        assert not services.annuler_occurrence(autre.occurrences.get(), acteur="portail", motif="x", par_usager=True).annulation_tardive
+        assert not services.annuler_occurrence(
+            autre.occurrences.get(), acteur="portail", motif="x", par_usager=True
+        ).annulation_tardive
 
 
 def test_pla09_liste_d_attente_prevenue_a_la_liberation(espace, django_capture_on_commit_callbacks):
     with freeze_time("2026-11-01 10:00"):
         occupant = valider_systeme(reserver(espace, date(2026, 11, 20), "18:00", "20:00"))
         attente = services.inscrire_liste_attente(
-            acteur="portail", espace=espace, debut=paris(2026, 11, 20, 18), fin=paris(2026, 11, 20, 20), usager=usager_avec_contact()
+            acteur="portail",
+            espace=espace,
+            debut=paris(2026, 11, 20, 18),
+            fin=paris(2026, 11, 20, 20),
+            usager=usager_avec_contact(),
         )
         with django_capture_on_commit_callbacks(execute=True):
             services.annuler_occurrence(occupant.occurrences.get(), acteur=agent("gestionnaire"), motif="Désistement")
@@ -298,7 +340,12 @@ def test_pla07_alternatives_proposees_en_cas_de_conflit(espace):
         propositions = services.alternatives(espace, paris(2026, 11, 10, 18), paris(2026, 11, 10, 20))
     assert len(propositions) == 3
     assert any(p["espace"] == voisin.pk for p in propositions) or all(p["espace"] == espace.pk for p in propositions)
-    assert all(not services.conflits(espace if p["espace"] == espace.pk else voisin, *(timezone.datetime.fromisoformat(p[k]) for k in ("debut", "fin"))) for p in propositions)
+    assert all(
+        not services.conflits(
+            espace if p["espace"] == espace.pk else voisin, *(timezone.datetime.fromisoformat(p[k]) for k in ("debut", "fin"))
+        )
+        for p in propositions
+    )
 
 
 def test_pla12_priorite_municipale_deplace_et_notifie(espace, django_capture_on_commit_callbacks):
@@ -306,10 +353,18 @@ def test_pla12_priorite_municipale_deplace_et_notifie(espace, django_capture_on_
     with freeze_time("2026-11-01 10:00"):
         club = valider_systeme(reserver(espace, date(2026, 11, 14), "14:00", "18:00"))
         seance = club.occurrences.get()
-        ville = reserver(espace, date(2026, 11, 14), "10:00", "19:00", usager=UsagerFabrique(type="service_municipal", nom="Service des sports"))
+        ville = reserver(
+            espace,
+            date(2026, 11, 14),
+            "10:00",
+            "19:00",
+            usager=UsagerFabrique(type="service_municipal", nom="Service des sports"),
+        )
         with django_capture_on_commit_callbacks(execute=True):
             services.imposer_priorite_municipale(
-                ville, acteur=agent("gestionnaire"), motif="Forum des associations",
+                ville,
+                acteur=agent("gestionnaire"),
+                motif="Forum des associations",
                 deplacements={seance.pk: (autre_salle, paris(2026, 11, 14, 14), paris(2026, 11, 14, 18))},
             )
     seance.refresh_from_db()
@@ -321,13 +376,27 @@ def test_pla12_priorite_municipale_deplace_et_notifie(espace, django_capture_on_
 
 def test_pla12_reservee_aux_services_municipaux(espace):
     with pytest.raises(ErreurMetier):
-        services.imposer_priorite_municipale(reserver(espace, date(2026, 11, 14), "10:00", "12:00"), acteur=agent("gestionnaire"), motif="x")
+        services.imposer_priorite_municipale(
+            reserver(espace, date(2026, 11, 14), "10:00", "12:00"), acteur=agent("gestionnaire"), motif="x"
+        )
 
 
 def test_ref06_fermeture_signale_les_seances_et_previent_les_usagers(espace, django_capture_on_commit_callbacks):
     with freeze_time("2026-11-01 10:00"):
-        r = valider_systeme(reserver(espace, date(2026, 11, 3), "18:00", "20:00", recurrence=MARDIS_SAISON, date_fin=date(2026, 11, 24), exclure_vacances=False))
-        fermeture = Fermeture.objects.create(espace=espace, debut=paris(2026, 11, 9, 0), fin=paris(2026, 11, 18, 0), motif="Réfection du sol")
+        r = valider_systeme(
+            reserver(
+                espace,
+                date(2026, 11, 3),
+                "18:00",
+                "20:00",
+                recurrence=MARDIS_SAISON,
+                date_fin=date(2026, 11, 24),
+                exclure_vacances=False,
+            )
+        )
+        fermeture = Fermeture.objects.create(
+            espace=espace, debut=paris(2026, 11, 9, 0), fin=paris(2026, 11, 18, 0), motif="Réfection du sol"
+        )
         with django_capture_on_commit_callbacks(execute=True):
             touchees = services.enregistrer_fermeture(fermeture, acteur=agent("gestionnaire"))
     assert len(touchees) == 2 and all("Réfection" in o.signalement for o in touchees)

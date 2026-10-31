@@ -7,7 +7,7 @@ Toutes les transitions passent par ce module : contrôle des droits (rôle × p�
 from __future__ import annotations
 
 import logging
-from collections.abc import Iterable
+from collections.abc import Iterable, Mapping
 from dataclasses import dataclass, field
 from datetime import date, datetime, time, timedelta
 from typing import Any
@@ -28,7 +28,7 @@ from apps.referentiel.models import Espace, Fermeture, HoraireOuverture
 from apps.usagers.models import Contact, Usager
 
 from . import conditions
-from .models import STATUTS_BLOQUANTS, Dossier, ListeAttente, Occurrence, Reservation, TypeReservation, Verrou
+from .models import STATUTS, STATUTS_BLOQUANTS, Dossier, ListeAttente, Occurrence, Reservation, TypeReservation, Verrou
 from .recurrence import PARIS, generer_plages, valider_regle
 
 journal = logging.getLogger(__name__)
@@ -58,8 +58,13 @@ class Conflit:
 
     def en_dict(self) -> dict[str, Any]:
         return {
-            "occurrence": self.occurrence_id, "reservation": self.reservation_id, "dossier": self.dossier, "usager": self.usager,
-            "espace": self.espace, "debut": self.debut.isoformat(), "fin": self.fin.isoformat(),
+            "occurrence": self.occurrence_id,
+            "reservation": self.reservation_id,
+            "dossier": self.dossier,
+            "usager": self.usager,
+            "espace": self.espace,
+            "debut": self.debut.isoformat(),
+            "fin": self.fin.isoformat(),
         }
 
 
@@ -78,7 +83,7 @@ def _texte_date(instant: datetime) -> str:
 def _verifier_transition(reservation: Reservation, cible: str) -> None:
     if cible not in TRANSITIONS[reservation.statut]:
         raise ErreurMetier(
-            f"Passage impossible de « {reservation.get_statut_display()} » à « {dict(Reservation._meta.get_field('statut').choices)[cible]} ».",
+            f"Passage impossible de « {reservation.get_statut_display()} » à « {dict(STATUTS)[cible]} ».",
             code="transition_interdite",
         )
 
@@ -131,7 +136,15 @@ def conflits(espace: Espace, debut: datetime, fin: datetime, exclure: Iterable[i
             retenus = list(verrous)
         for v in retenus:
             o = v.occurrence
-            trouves[o.pk] = Conflit(o.pk, o.reservation_id, o.reservation.dossier.numero, o.reservation.dossier.usager.nom, o.espace.nom, o.debut, o.fin)
+            trouves[o.pk] = Conflit(
+                o.pk,
+                o.reservation_id,
+                o.reservation.dossier.numero,
+                o.reservation.dossier.usager.nom,
+                o.espace.nom,
+                o.debut,
+                o.fin,
+            )
     return sorted(trouves.values(), key=lambda c: c.debut)
 
 
@@ -147,13 +160,19 @@ def poser_verrous(occurrence: Occurrence) -> None:
     if trouves:
         raise ErreurMetier(
             f"Créneau déjà occupé le {_texte_date(occurrence.debut)} ({trouves[0].usager}, dossier {trouves[0].dossier}).",
-            code="conflit", details={"conflits": [c.en_dict() for c in trouves]},
+            code="conflit",
+            details={"conflits": [c.en_dict() for c in trouves]},
         )
     plage = DateTimeTZRange(occurrence.debut, occurrence.fin, "[)")
     try:
         with transaction.atomic():
             for feuille in feuilles:
-                Verrou.objects.create(occurrence=occurrence, feuille=feuille, plage=plage, partage=feuille.partageable and feuille.pk == occurrence.espace_id)
+                Verrou.objects.create(
+                    occurrence=occurrence,
+                    feuille=feuille,
+                    plage=plage,
+                    partage=feuille.partageable and feuille.pk == occurrence.espace_id,
+                )
     except IntegrityError as erreur:
         raise ErreurMetier(
             f"Créneau pris à l'instant par une autre validation ({_texte_date(occurrence.debut)}). Rechargez le planning.",
@@ -168,7 +187,9 @@ def retirer_verrous(occurrence: Occurrence) -> None:
 # --- Création et récurrences --------------------------------------------------------------------
 
 
-def apercu(espace: Espace, plages_ou_reservation: Reservation | list[tuple[datetime, datetime]], exclure: Iterable[int] = ()) -> Apercu:
+def apercu(
+    espace: Espace, plages_ou_reservation: Reservation | list[tuple[datetime, datetime]], exclure: Iterable[int] = ()
+) -> Apercu:
     plages = generer_plages(plages_ou_reservation) if isinstance(plages_ou_reservation, Reservation) else plages_ou_reservation
     resultat = Apercu(plages)
     for debut, fin in plages:
@@ -182,15 +203,27 @@ def apercu(espace: Espace, plages_ou_reservation: Reservation | list[tuple[datet
 
 @transaction.atomic
 def creer_dossier(
-    *, acteur: Any, usager: Usager, type_reservation: TypeReservation, objet: str, contact: Contact | None = None,
-    origine: str = "guichet", **champs: Any,
+    *,
+    acteur: Any,
+    usager: Usager,
+    type_reservation: TypeReservation,
+    objet: str,
+    contact: Contact | None = None,
+    origine: str = "guichet",
+    **champs: Any,
 ) -> Dossier:
     if usager.statut in {"suspendu", "anonymise"}:
         raise ErreurMetier("Cet usager ne peut pas déposer de demande (compte suspendu).", code="usager_suspendu")
     annee = timezone.localdate().year
     dossier = Dossier.objects.create(
-        numero=numero("D", annee), usager=usager, type_reservation=type_reservation, objet=objet, contact=contact, origine=origine,
-        cree_par=acteur if hasattr(acteur, "habilitations") else None, depose_le=None if champs.get("brouillon") else timezone.now(),
+        numero=numero("D", annee),
+        usager=usager,
+        type_reservation=type_reservation,
+        objet=objet,
+        contact=contact,
+        origine=origine,
+        cree_par=acteur if hasattr(acteur, "habilitations") else None,
+        depose_le=None if champs.get("brouillon") else timezone.now(),
         **champs,
     )
     journaliser("creer_dossier", dossier, apres=instantane(dossier), acteur=acteur)
@@ -202,33 +235,59 @@ def _valider_creneau(espace: Espace, reservation: Reservation, forcer_horaires: 
         raise ErreurValidation("Cet espace n'est pas réservable.", code="espace_inactif")
     plages = generer_plages(reservation)
     if not plages:
-        raise ErreurValidation("Aucune séance : vérifiez la période, les jours et les exclusions (vacances, fériés).", code="aucune_occurrence")
+        raise ErreurValidation(
+            "Aucune séance : vérifiez la période, les jours et les exclusions (vacances, fériés).", code="aucune_occurrence"
+        )
     duree_max = int(parametre("reservations.duree_max_minutes"))
     for debut, fin in plages:
         if reservation.recurrence and (fin - debut).total_seconds() / 60 > duree_max:
             raise ErreurValidation("Durée de séance supérieure au maximum autorisé.", code="duree_excessive")
         if not forcer_horaires and not dans_les_horaires(espace, debut, fin):
-            raise ErreurValidation(f"Le {_texte_date(debut)} est en dehors des horaires d'ouverture de {espace.nom}.", code="hors_horaires")
+            raise ErreurValidation(
+                f"Le {_texte_date(debut)} est en dehors des horaires d'ouverture de {espace.nom}.", code="hors_horaires"
+            )
     return plages
 
 
 @transaction.atomic
 def ajouter_reservation(
-    dossier: Dossier, *, acteur: Any, espace: Espace, date_debut: date, date_fin: date, heure_debut: time, heure_fin: time,
-    recurrence: str = "", exclure_vacances: bool = True, exclure_feries: bool = True, exdates: list[date] | None = None,
+    dossier: Dossier,
+    *,
+    acteur: Any,
+    espace: Espace,
+    date_debut: date,
+    date_fin: date,
+    heure_debut: time,
+    heure_fin: time,
+    recurrence: str = "",
+    exclure_vacances: bool = True,
+    exclure_feries: bool = True,
+    exdates: list[date] | None = None,
     forcer_horaires: bool = False,
 ) -> Reservation:
     """PLA-04 : la réservation est créée en « demande » ; ses occurrences sont matérialisées sans verrou (RG-02)."""
     if acteur != SYSTEME and hasattr(acteur, "habilitations"):
         exiger(acteur, "creer_reservation", espace)
     reservation = Reservation(
-        dossier=dossier, espace=espace, date_debut=date_debut, date_fin=date_fin, heure_debut=heure_debut, heure_fin=heure_fin,
-        recurrence=valider_regle(recurrence), exclure_vacances=exclure_vacances, exclure_feries=exclure_feries, exdates=exdates or [],
+        dossier=dossier,
+        espace=espace,
+        date_debut=date_debut,
+        date_fin=date_fin,
+        heure_debut=heure_debut,
+        heure_fin=heure_fin,
+        recurrence=valider_regle(recurrence),
+        exclure_vacances=exclure_vacances,
+        exclure_feries=exclure_feries,
+        exdates=exdates or [],
     )
     plages = _valider_creneau(espace, reservation, forcer_horaires)
     reservation.save()
-    Occurrence.objects.bulk_create([Occurrence(reservation=reservation, espace=espace, debut=d, fin=f, statut="demande") for d, f in plages])
-    journaliser("ajouter_reservation", reservation, apres={**instantane(reservation), "occurrences": len(plages)}, acteur=acteur)
+    Occurrence.objects.bulk_create(
+        [Occurrence(reservation=reservation, espace=espace, debut=d, fin=f, statut="demande") for d, f in plages]
+    )
+    journaliser(
+        "ajouter_reservation", reservation, apres={**(instantane(reservation) or {}), "occurrences": len(plages)}, acteur=acteur
+    )
     return reservation
 
 
@@ -246,7 +305,9 @@ def rematerialiser(reservation: Reservation, a_partir: datetime | None = None) -
     existantes = {o.debut for o in reservation.occurrences.all()}
     for debut, fin in generer_plages(reservation):
         if debut >= a_partir and debut not in existantes:
-            occurrence = Occurrence.objects.create(reservation=reservation, espace=reservation.espace, debut=debut, fin=fin, statut=reservation.statut)
+            occurrence = Occurrence.objects.create(
+                reservation=reservation, espace=reservation.espace, debut=debut, fin=fin, statut=reservation.statut
+            )
             poser_verrous(occurrence)
 
 
@@ -254,7 +315,11 @@ def rematerialiser(reservation: Reservation, a_partir: datetime | None = None) -
 
 
 def _verrouiller(reservation: Reservation) -> Reservation:
-    return Reservation.objects.select_for_update().select_related("dossier__usager", "dossier__type_reservation", "espace__batiment").get(pk=reservation.pk)
+    return (
+        Reservation.objects.select_for_update()
+        .select_related("dossier__usager", "dossier__type_reservation", "espace__batiment")
+        .get(pk=reservation.pk)
+    )
 
 
 def _contexte(reservation: Reservation, **autres: Any) -> dict[str, Any]:
@@ -276,7 +341,13 @@ def _changer_statut(reservation: Reservation, statut: str, acteur: Any, **champs
         setattr(reservation, cle, valeur)
     reservation.save()
     reservation.occurrences.exclude(statut__in=["annulee", "realisee", "cloturee"]).update(statut=statut)
-    journaliser(f"reservation_{statut}", reservation, avant=avant, apres={"statut": statut, **{k: str(v) for k, v in champs.items()}}, acteur=acteur)
+    journaliser(
+        f"reservation_{statut}",
+        reservation,
+        avant=avant,
+        apres={"statut": statut, **{k: str(v) for k, v in champs.items()}},
+        acteur=acteur,
+    )
     return reservation
 
 
@@ -296,11 +367,18 @@ def valider(reservation: Reservation, *, acteur: Any) -> Reservation:
     reservation = _verrouiller(reservation)
     exiger(acteur, "valider_reservation", reservation)
     _verifier_transition(reservation, "validee")
-    _changer_statut(reservation, "validee", acteur, valide_par=acteur if hasattr(acteur, "habilitations") else None, valide_le=timezone.now())
+    _changer_statut(
+        reservation, "validee", acteur, valide_par=acteur if hasattr(acteur, "habilitations") else None, valide_le=timezone.now()
+    )
     for occurrence in reservation.occurrences.filter(statut="validee"):
         poser_verrous(occurrence)
     manques = conditions.conditions_manquantes(reservation)
-    notifier("reservation_validee", _contexte(reservation, conditions="; ".join(manques)), usager=reservation.dossier.usager, objet=reservation)
+    notifier(
+        "reservation_validee",
+        _contexte(reservation, conditions="; ".join(manques)),
+        usager=reservation.dossier.usager,
+        objet=reservation,
+    )
     return reservation
 
 
@@ -312,7 +390,12 @@ def refuser(reservation: Reservation, *, acteur: Any, motif: str, alternatives: 
         raise ErreurValidation("Le refus doit être motivé.", code="motif_requis")
     _verifier_transition(reservation, "refusee")
     _changer_statut(reservation, "refusee", acteur, motif_refus=motif.strip())
-    notifier("reservation_refusee", _contexte(reservation, motif=motif, alternatives=alternatives), usager=reservation.dossier.usager, objet=reservation)
+    notifier(
+        "reservation_refusee",
+        _contexte(reservation, motif=motif, alternatives=alternatives),
+        usager=reservation.dossier.usager,
+        objet=reservation,
+    )
     return reservation
 
 
@@ -324,7 +407,9 @@ def confirmer(reservation: Reservation, *, acteur: Any) -> Reservation:
     _verifier_transition(reservation, "confirmee")
     manques = conditions.conditions_manquantes(reservation)
     if manques:
-        raise ErreurMetier("Confirmation impossible : " + " ; ".join(manques) + ".", code="conditions_non_remplies", details={"manques": manques})
+        raise ErreurMetier(
+            "Confirmation impossible : " + " ; ".join(manques) + ".", code="conditions_non_remplies", details={"manques": manques}
+        )
     _changer_statut(reservation, "confirmee", acteur, confirme_le=timezone.now())
     notifier("reservation_confirmee", _contexte(reservation), usager=reservation.dossier.usager, objet=reservation)
     return reservation
@@ -335,7 +420,9 @@ def est_tardive(occurrence: Occurrence, instant: datetime | None = None) -> bool
     return occurrence.debut - instant < timedelta(hours=int(parametre("annulation.delai_tardif_heures")))
 
 
-def _annuler_occurrence(occurrence: Occurrence, motif: str, par_usager: bool, acteur: Any, notifier_usager: bool = True) -> Occurrence:
+def _annuler_occurrence(
+    occurrence: Occurrence, motif: str, par_usager: bool, acteur: Any, notifier_usager: bool = True
+) -> Occurrence:
     tardive = par_usager and est_tardive(occurrence)
     avant = {"statut": occurrence.statut}
     occurrence.statut = "annulee"
@@ -345,12 +432,20 @@ def _annuler_occurrence(occurrence: Occurrence, motif: str, par_usager: bool, ac
     occurrence.annulee_par_usager = par_usager
     occurrence.save()
     retirer_verrous(occurrence)
-    journaliser("annuler_occurrence", occurrence, avant=avant, apres={"motif": motif, "tardive": tardive, "par_usager": par_usager}, acteur=acteur)
+    journaliser(
+        "annuler_occurrence",
+        occurrence,
+        avant=avant,
+        apres={"motif": motif, "tardive": tardive, "par_usager": par_usager},
+        acteur=acteur,
+    )
     proposer_liste_attente(occurrence)
     if notifier_usager and not par_usager:
         notifier(
-            "occurrence_annulee", {"date": _texte_date(occurrence.debut), "espace": occurrence.espace.nom, "motif": motif},
-            usager=occurrence.reservation.dossier.usager, objet=occurrence,
+            "occurrence_annulee",
+            {"date": _texte_date(occurrence.debut), "espace": occurrence.espace.nom, "motif": motif},
+            usager=occurrence.reservation.dossier.usager,
+            objet=occurrence,
         )
     return occurrence
 
@@ -358,7 +453,11 @@ def _annuler_occurrence(occurrence: Occurrence, motif: str, par_usager: bool, ac
 @transaction.atomic
 def annuler_occurrence(occurrence: Occurrence, *, acteur: Any, motif: str, par_usager: bool = False) -> Occurrence:
     """PLA-10 : annulation d'une séance ; tardive (RG-08) si l'usager annule dans le délai paramétré."""
-    occurrence = Occurrence.objects.select_for_update().select_related("reservation__dossier__usager", "espace__batiment").get(pk=occurrence.pk)
+    occurrence = (
+        Occurrence.objects.select_for_update()
+        .select_related("reservation__dossier__usager", "espace__batiment")
+        .get(pk=occurrence.pk)
+    )
     if hasattr(acteur, "habilitations"):
         exiger(acteur, "annuler_reservation", occurrence)
     if occurrence.statut in {"annulee", "realisee", "cloturee", "refusee"}:
@@ -377,7 +476,9 @@ def annuler(reservation: Reservation, *, acteur: Any, motif: str, par_usager: bo
     _verifier_transition(reservation, "annulee")
     if not motif.strip():
         raise ErreurValidation("Indiquez le motif de l'annulation.", code="motif_requis")
-    for occurrence in reservation.occurrences.filter(debut__gte=timezone.now()).exclude(statut__in=["annulee", "realisee", "cloturee"]):
+    for occurrence in reservation.occurrences.filter(debut__gte=timezone.now()).exclude(
+        statut__in=["annulee", "realisee", "cloturee"]
+    ):
         _annuler_occurrence(occurrence, motif.strip(), par_usager, acteur, notifier_usager=False)
     reservation.statut = "annulee"
     reservation.motif_annulation = motif.strip()
@@ -386,13 +487,19 @@ def annuler(reservation: Reservation, *, acteur: Any, motif: str, par_usager: bo
     reservation.save()
     journaliser("annuler_reservation", reservation, apres={"motif": motif, "par_usager": par_usager}, acteur=acteur)
     if not par_usager:
-        notifier("occurrence_annulee", {"date": reservation.description, "espace": reservation.espace.nom, "motif": motif},
-                 usager=reservation.dossier.usager, objet=reservation)
+        notifier(
+            "occurrence_annulee",
+            {"date": reservation.description, "espace": reservation.espace.nom, "motif": motif},
+            usager=reservation.dossier.usager,
+            objet=reservation,
+        )
     return reservation
 
 
 @transaction.atomic
-def saisir_presence(occurrence: Occurrence, *, acteur: Any, presence: str, debut_reel: datetime | None = None, fin_reel: datetime | None = None) -> Occurrence:
+def saisir_presence(
+    occurrence: Occurrence, *, acteur: Any, presence: str, debut_reel: datetime | None = None, fin_reel: datetime | None = None
+) -> Occurrence:
     """PLA-11 : présence et heures réelles ; une séance passée validée ou confirmée devient « réalisée »."""
     occurrence = Occurrence.objects.select_for_update().get(pk=occurrence.pk)
     if hasattr(acteur, "habilitations"):
@@ -434,7 +541,9 @@ def marquer_realisees() -> int:
 
 
 @transaction.atomic
-def deplacer_occurrence(occurrence: Occurrence, *, acteur: Any, espace: Espace, debut: datetime, fin: datetime, forcer_horaires: bool = False) -> Occurrence:
+def deplacer_occurrence(
+    occurrence: Occurrence, *, acteur: Any, espace: Espace, debut: datetime, fin: datetime, forcer_horaires: bool = False
+) -> Occurrence:
     """PLA-02 / « cette séance seulement » : contrôle de conflit côté serveur puis déplacement."""
     occurrence = Occurrence.objects.select_for_update().select_related("reservation__dossier", "espace").get(pk=occurrence.pk)
     exiger(acteur, "valider_reservation", occurrence)
@@ -454,7 +563,13 @@ def deplacer_occurrence(occurrence: Occurrence, *, acteur: Any, espace: Espace, 
     occurrence.signalement = ""
     occurrence.save()
     poser_verrous(occurrence)
-    journaliser("deplacer_occurrence", occurrence, avant=avant, apres={"espace": espace.pk, "debut": debut.isoformat(), "fin": fin.isoformat()}, acteur=acteur)
+    journaliser(
+        "deplacer_occurrence",
+        occurrence,
+        avant=avant,
+        apres={"espace": espace.pk, "debut": debut.isoformat(), "fin": fin.isoformat()},
+        acteur=acteur,
+    )
     return occurrence
 
 
@@ -511,7 +626,13 @@ def modifier_suivantes(occurrence: Occurrence, *, acteur: Any, **changements: An
     for debut, fin in generer_plages(suite):
         nouvelle = Occurrence.objects.create(reservation=suite, espace=suite.espace, debut=debut, fin=fin, statut=suite.statut)
         poser_verrous(nouvelle)
-    journaliser("modifier_suivantes", suite, avant={"reservation_origine": origine.pk, "jour": jour.isoformat()}, apres=instantane(suite), acteur=acteur)
+    journaliser(
+        "modifier_suivantes",
+        suite,
+        avant={"reservation_origine": origine.pk, "jour": jour.isoformat()},
+        apres=instantane(suite),
+        acteur=acteur,
+    )
     return suite
 
 
@@ -523,7 +644,9 @@ def traiter_options(maintenant: datetime | None = None) -> dict[str, int]:
     maintenant = maintenant or timezone.now()
     delai = timedelta(days=int(parametre("options.relance_jours_avant")))
     bilan = {"relancees": 0, "liberees": 0}
-    for reservation in Reservation.objects.filter(statut="option", option_relancee_le__isnull=True, option_expire_le__lte=maintenant + delai):
+    for reservation in Reservation.objects.filter(
+        statut="option", option_relancee_le__isnull=True, option_expire_le__lte=maintenant + delai
+    ):
         with transaction.atomic():
             r = _verrouiller(reservation)
             if r.statut != "option" or r.option_relancee_le is not None:
@@ -532,10 +655,13 @@ def traiter_options(maintenant: datetime | None = None) -> dict[str, int]:
             if r.option_expire_le and r.option_expire_le <= maintenant:
                 r.option_expire_le = maintenant + timedelta(days=1)  # délai de grâce après une relance tardive
             r.save(update_fields=["option_relancee_le", "option_expire_le"])
-            notifier("option_relance", _contexte(r, expire_le=_texte_date(r.option_expire_le)), usager=r.dossier.usager, objet=r)
-            journaliser("relancer_option", r, apres={"expire_le": r.option_expire_le.isoformat()}, acteur=SYSTEME)
+            expiration = r.option_expire_le or maintenant
+            notifier("option_relance", _contexte(r, expire_le=_texte_date(expiration)), usager=r.dossier.usager, objet=r)
+            journaliser("relancer_option", r, apres={"expire_le": expiration.isoformat()}, acteur=SYSTEME)
             bilan["relancees"] += 1
-    for reservation in Reservation.objects.filter(statut="option", option_relancee_le__isnull=False, option_expire_le__lte=maintenant):
+    for reservation in Reservation.objects.filter(
+        statut="option", option_relancee_le__isnull=False, option_expire_le__lte=maintenant
+    ):
         with transaction.atomic():
             r = _verrouiller(reservation)
             if r.statut != "option":
@@ -550,7 +676,9 @@ def traiter_options(maintenant: datetime | None = None) -> dict[str, int]:
 
 
 @transaction.atomic
-def inscrire_liste_attente(*, acteur: Any, espace: Espace, debut: datetime, fin: datetime, usager: Usager, contact: Contact | None = None) -> ListeAttente:
+def inscrire_liste_attente(
+    *, acteur: Any, espace: Espace, debut: datetime, fin: datetime, usager: Usager, contact: Contact | None = None
+) -> ListeAttente:
     if hasattr(acteur, "habilitations"):
         exiger(acteur, "creer_reservation", espace)
     inscription = ListeAttente.objects.create(espace=espace, debut=debut, fin=fin, usager=usager, contact=contact)
@@ -571,8 +699,11 @@ def proposer_liste_attente(occurrence: Occurrence) -> ListeAttente | None:
             inscription.notifie_le = timezone.now()
             inscription.save(update_fields=["statut", "notifie_le"])
             notifier(
-                "liste_attente_place", {"espace": inscription.espace.nom, "date": _texte_date(inscription.debut)},
-                usager=inscription.usager, contacts=[inscription.contact] if inscription.contact else [], objet=inscription,
+                "liste_attente_place",
+                {"espace": inscription.espace.nom, "date": _texte_date(inscription.debut)},
+                usager=inscription.usager,
+                contacts=[inscription.contact] if inscription.contact else [],
+                objet=inscription,
             )
             return inscription
     return None
@@ -589,14 +720,24 @@ def alternatives(espace: Espace, debut: datetime, fin: datetime, nombre: int = 3
 
     def essayer(e: Espace, d: datetime, raison: str) -> None:
         f = d + duree
-        if len(propositions) < nombre and d > timezone.now() and not conflits(e, d, f) and dans_les_horaires(e, d, f) and not fermetures_touchant(e, d, f).exists():
+        if (
+            len(propositions) < nombre
+            and d > timezone.now()
+            and not conflits(e, d, f)
+            and dans_les_horaires(e, d, f)
+            and not fermetures_touchant(e, d, f).exists()
+        ):
             cle = (e.pk, d)
             if all((p["espace"], p["debut"]) != (e.pk, d.isoformat()) for p in propositions) and cle:
-                propositions.append({"espace": e.pk, "espace_nom": e.nom, "debut": d.isoformat(), "fin": f.isoformat(), "raison": raison})
+                propositions.append(
+                    {"espace": e.pk, "espace_nom": e.nom, "debut": d.isoformat(), "fin": f.isoformat(), "raison": raison}
+                )
 
     for decalage in (30, -30, 60, -60, 90, -90, 120, -120):
         essayer(espace, debut + timedelta(minutes=decalage), "même espace, autre horaire")
-    voisins = Espace.objects.filter(famille=espace.famille, batiment__site=espace.batiment.site, actif=True).exclude(pk__in=espace.ids_lies())
+    voisins = Espace.objects.filter(famille=espace.famille, batiment__site=espace.batiment.site, actif=True).exclude(
+        pk__in=espace.ids_lies()
+    )
     for voisin in voisins:
         essayer(voisin, debut, "autre espace de même type sur le site")
     for semaines in (1, 2, 3):
@@ -629,9 +770,15 @@ def enregistrer_fermeture(fermeture: Fermeture, *, acteur: Any) -> list[Occurren
         usager = occurrences[0].reservation.dossier.usager
         notifier(
             "fermeture_exceptionnelle",
-            {"lieu": lieu, "debut": _texte_date(fermeture.debut), "fin": _texte_date(fermeture.fin), "motif": fermeture.motif,
-             "seances": "\n".join(f"- {o.espace.nom}, {_texte_date(o.debut)}" for o in occurrences)},
-            usager=usager, objet=fermeture,
+            {
+                "lieu": lieu,
+                "debut": _texte_date(fermeture.debut),
+                "fin": _texte_date(fermeture.fin),
+                "motif": fermeture.motif,
+                "seances": "\n".join(f"- {o.espace.nom}, {_texte_date(o.debut)}" for o in occurrences),
+            },
+            usager=usager,
+            objet=fermeture,
         )
     journaliser("enregistrer_fermeture", fermeture, apres={"occurrences_touchees": len(touchees)}, acteur=acteur)
     return touchees
@@ -642,20 +789,28 @@ def enregistrer_fermeture(fermeture: Fermeture, *, acteur: Any) -> list[Occurren
 
 @transaction.atomic
 def imposer_priorite_municipale(
-    reservation: Reservation, *, acteur: Any, motif: str, deplacements: dict[int, tuple[Espace, datetime, datetime] | None] | None = None,
+    reservation: Reservation,
+    *,
+    acteur: Any,
+    motif: str,
+    deplacements: Mapping[int, tuple[Espace, datetime, datetime] | None] | None = None,
 ) -> Reservation:
     """Valide une réservation de la Ville en déplaçant (ou annulant sans frais) les séances qui la gênent."""
     reservation = _verrouiller(reservation)
     exiger(acteur, "deplacer_priorite", reservation)
     if reservation.dossier.usager.type != "service_municipal":
-        raise ErreurMetier("La priorité municipale ne s'applique qu'aux réservations des services de la Ville.", code="non_municipal")
+        raise ErreurMetier(
+            "La priorité municipale ne s'applique qu'aux réservations des services de la Ville.", code="non_municipal"
+        )
     if not motif.strip():
         raise ErreurValidation("Indiquez la manifestation ou le motif.", code="motif_requis")
     deplacements = deplacements or {}
     a_traiter: dict[int, Occurrence] = {}
     for occurrence in reservation.occurrences.exclude(statut__in=["annulee", "refusee"]):
         for conflit in conflits(occurrence.espace, occurrence.debut, occurrence.fin, exclure=[occurrence.pk]):
-            a_traiter[conflit.occurrence_id] = Occurrence.objects.select_related("reservation__dossier__usager", "espace").get(pk=conflit.occurrence_id)
+            a_traiter[conflit.occurrence_id] = Occurrence.objects.select_related("reservation__dossier__usager", "espace").get(
+                pk=conflit.occurrence_id
+            )
     for identifiant, gene in a_traiter.items():
         cible = deplacements.get(identifiant)
         ancien = _texte_date(gene.debut)
@@ -667,8 +822,16 @@ def imposer_priorite_municipale(
             _annuler_occurrence(gene, f"Priorité municipale : {motif}", par_usager=False, acteur=acteur, notifier_usager=False)
             nouveau = ""
         notifier(
-            "priorite_municipale", {"manifestation": reservation.dossier.objet, "date": ancien, "espace": gene.espace.nom, "nouveau": nouveau, "motif": motif},
-            usager=gene.reservation.dossier.usager, objet=gene,
+            "priorite_municipale",
+            {
+                "manifestation": reservation.dossier.objet,
+                "date": ancien,
+                "espace": gene.espace.nom,
+                "nouveau": nouveau,
+                "motif": motif,
+            },
+            usager=gene.reservation.dossier.usager,
+            objet=gene,
         )
     if reservation.statut in {"demande", "en_instruction", "option"}:
         _changer_statut(reservation, "validee", acteur, valide_par=acteur, valide_le=timezone.now())

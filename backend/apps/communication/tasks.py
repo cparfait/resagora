@@ -27,7 +27,9 @@ def envoyer_notification(identifiant: int) -> bool:
 def relancer_echecs() -> int:
     """Reprise périodique des envois en échec (serveur SMTP momentanément indisponible)."""
     nombre = 0
-    for identifiant in Notification.objects.filter(statut__in=["a_envoyer", "echec"], tentatives__lt=6).values_list("pk", flat=True)[:500]:
+    for identifiant in Notification.objects.filter(statut__in=["a_envoyer", "echec"], tentatives__lt=6).values_list(
+        "pk", flat=True
+    )[:500]:
         envoyer_notification.delay(identifiant)
         nombre += 1
     return nombre

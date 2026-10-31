@@ -13,12 +13,14 @@ MODELES: dict[str, tuple[str, str, str]] = {
         "Réservation validée",
         "Votre réservation {{ dossier.numero }} est validée",
         "Bonjour {{ contact.prenom }},\n\nVotre demande « {{ dossier.objet }} » est validée pour {{ reservation.espace.nom }} : "
-        "{{ reservation.description }}.\n{% if conditions %}Pour la confirmer, il reste à : {{ conditions }}.{% endif %}" + SIGNATURE,
+        "{{ reservation.description }}.\n{% if conditions %}Pour la confirmer, il reste à : {{ conditions }}.{% endif %}"
+        + SIGNATURE,
     ),
     "reservation_confirmee": (
         "Réservation confirmée",
         "Votre réservation {{ dossier.numero }} est confirmée",
-        "Bonjour {{ contact.prenom }},\n\nVotre réservation de {{ reservation.espace.nom }} ({{ reservation.description }}) est confirmée." + SIGNATURE,
+        "Bonjour {{ contact.prenom }},\n\nVotre réservation de {{ reservation.espace.nom }} ({{ reservation.description }}) est confirmée."
+        + SIGNATURE,
     ),
     "reservation_refusee": (
         "Demande refusée",
@@ -54,7 +56,8 @@ MODELES: dict[str, tuple[str, str, str]] = {
         "Déplacement pour une manifestation municipale",
         "Modification de votre créneau du {{ date }}",
         "Bonjour {{ contact.prenom }},\n\nPour permettre « {{ manifestation }} », votre créneau du {{ date }} ({{ espace }}) "
-        "{% if nouveau %}est déplacé : {{ nouveau }}.{% else %}est annulé, sans frais.{% endif %}\nMotif : {{ motif }}" + SIGNATURE,
+        "{% if nouveau %}est déplacé : {{ nouveau }}.{% else %}est annulé, sans frais.{% endif %}\nMotif : {{ motif }}"
+        + SIGNATURE,
     ),
     "liste_attente_place": (
         "Créneau libéré (liste d'attente)",

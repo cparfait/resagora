@@ -53,4 +53,8 @@ def _pieces_manquantes(reservation: Reservation) -> str | None:
     return "fournir des pièces justificatives valides : " + ", ".join(p.libelle for p in manquantes)
 
 
-enregistrer(Condition("pieces", "Dossier complet (pièces justificatives)", lambda r: r.dossier.type_reservation.exige_pieces, _pieces_manquantes))
+enregistrer(
+    Condition(
+        "pieces", "Dossier complet (pièces justificatives)", lambda r: r.dossier.type_reservation.exige_pieces, _pieces_manquantes
+    )
+)

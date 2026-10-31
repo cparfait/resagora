@@ -106,7 +106,9 @@ def usager_avec_contact(**champs: object) -> Usager:
 
 def saison_2026(vacances: bool = True) -> Saison:
     """Saison 2026-2027 avec les vacances de la zone C (académie de Versailles) publiées en open data."""
-    saison, _ = Saison.objects.get_or_create(nom="2026-2027", defaults={"debut": _dt.date(2026, 9, 1), "fin": _dt.date(2027, 6, 30), "active": True})
+    saison, _ = Saison.objects.get_or_create(
+        nom="2026-2027", defaults={"debut": _dt.date(2026, 9, 1), "fin": _dt.date(2027, 6, 30), "active": True}
+    )
     if vacances and not saison.periodes.exists():
         for libelle, debut, fin in [
             ("Vacances de la Toussaint", _dt.date(2026, 10, 17), _dt.date(2026, 11, 1)),
@@ -115,5 +117,7 @@ def saison_2026(vacances: bool = True) -> Saison:
             ("Vacances de Printemps", _dt.date(2027, 4, 3), _dt.date(2027, 4, 18)),
             ("Pont de l'Ascension", _dt.date(2027, 5, 7), _dt.date(2027, 5, 7)),
         ]:
-            PeriodeCalendrier.objects.create(saison=saison, nature="vacances", libelle=libelle, debut=debut, fin=fin, source="import", zone="Zone C")
+            PeriodeCalendrier.objects.create(
+                saison=saison, nature="vacances", libelle=libelle, debut=debut, fin=fin, source="import", zone="Zone C"
+            )
     return saison

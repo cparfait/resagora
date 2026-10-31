@@ -44,22 +44,40 @@ def alertes_expiration(jour: date | None = None) -> QuerySet[PieceJustificative]
 
 
 @transaction.atomic
-def deposer_piece(usager: Usager, type_piece: TypePiece, nom: str, contenu: bytes, *, acteur: Any, portail: bool = False,
-                  valide_jusqu_au: date | None = None, controle_facade: str = "", empreinte_facade: str = "") -> PieceJustificative:
+def deposer_piece(
+    usager: Usager,
+    type_piece: TypePiece,
+    nom: str,
+    contenu: bytes,
+    *,
+    acteur: Any,
+    portail: bool = False,
+    valide_jusqu_au: date | None = None,
+    controle_facade: str = "",
+    empreinte_facade: str = "",
+) -> PieceJustificative:
     if usager.type not in type_piece.types_usager:
         raise ErreurValidation("Cette pièce n'est pas demandée pour ce type d'usager.", code="piece_non_demandee")
-    fichier = fichiers.enregistrer(nom, contenu, depose_par=str(acteur), controle_facade=controle_facade, empreinte_facade=empreinte_facade)
+    fichier = fichiers.enregistrer(
+        nom, contenu, depose_par=str(acteur), controle_facade=controle_facade, empreinte_facade=empreinte_facade
+    )
     if valide_jusqu_au is None and type_piece.validite_mois:
         valide_jusqu_au = timezone.localdate() + timedelta(days=30 * type_piece.validite_mois)
     piece = PieceJustificative.objects.create(
-        usager=usager, type_piece=type_piece, fichier=fichier, valide_jusqu_au=valide_jusqu_au, depose_par_portail=portail,
+        usager=usager,
+        type_piece=type_piece,
+        fichier=fichier,
+        valide_jusqu_au=valide_jusqu_au,
+        depose_par_portail=portail,
     )
     journaliser("deposer_piece", piece, apres={"type": type_piece.code, "fichier": fichier.sha256}, acteur=acteur)
     return piece
 
 
 @transaction.atomic
-def verifier_piece(piece: PieceJustificative, *, acteur: Any, valide: bool, motif: str = "", valide_jusqu_au: date | None = None) -> PieceJustificative:
+def verifier_piece(
+    piece: PieceJustificative, *, acteur: Any, valide: bool, motif: str = "", valide_jusqu_au: date | None = None
+) -> PieceJustificative:
     if not valide and not motif.strip():
         raise ErreurValidation("Indiquez le motif du refus de la pièce.", code="motif_requis")
     piece = PieceJustificative.objects.select_for_update().get(pk=piece.pk)
@@ -128,6 +146,10 @@ def rechercher(qs: QuerySet[Usager], texte: str) -> QuerySet[Usager]:
     if not texte:
         return qs
     return qs.filter(
-        Q(nom__unaccent__icontains=texte) | Q(sigle__icontains=texte) | Q(siret__startswith=texte) | Q(rna__iexact=texte)
-        | Q(rattachements__contact__nom__unaccent__icontains=texte) | Q(rattachements__contact__courriel__iexact=texte)
+        Q(nom__unaccent__icontains=texte)
+        | Q(sigle__icontains=texte)
+        | Q(siret__startswith=texte)
+        | Q(rna__iexact=texte)
+        | Q(rattachements__contact__nom__unaccent__icontains=texte)
+        | Q(rattachements__contact__courriel__iexact=texte)
     ).distinct()

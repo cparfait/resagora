@@ -31,7 +31,12 @@ def normaliser_commune(nom: str) -> str:
 
 
 class Usager(models.Model):
-    STATUTS = [("en_attente", "En attente de validation"), ("valide", "Validé"), ("suspendu", "Suspendu"), ("anonymise", "Anonymisé")]
+    STATUTS = [
+        ("en_attente", "En attente de validation"),
+        ("valide", "Validé"),
+        ("suspendu", "Suspendu"),
+        ("anonymise", "Anonymisé"),
+    ]
 
     type = models.CharField(max_length=20, choices=TYPES_USAGER)
     nom = models.CharField("nom ou raison sociale", max_length=200)
@@ -97,8 +102,13 @@ class Contact(models.Model):
 
 class Rattachement(models.Model):
     ROLES = [
-        ("president", "Président(e)"), ("tresorier", "Trésorier(ère)"), ("secretaire", "Secrétaire"),
-        ("referent", "Référent(e)"), ("directeur", "Directeur(trice)"), ("responsable", "Responsable"), ("autre", "Autre"),
+        ("president", "Président(e)"),
+        ("tresorier", "Trésorier(ère)"),
+        ("secretaire", "Secrétaire"),
+        ("referent", "Référent(e)"),
+        ("directeur", "Directeur(trice)"),
+        ("responsable", "Responsable"),
+        ("autre", "Autre"),
     ]
     usager = models.ForeignKey(Usager, on_delete=models.CASCADE, related_name="rattachements")
     contact = models.ForeignKey(Contact, on_delete=models.CASCADE, related_name="rattachements")

@@ -61,8 +61,12 @@ class Campagne(models.Model):
     """Campagne annuelle d'attribution des créneaux (PLA-05)."""
 
     STATUTS = [
-        ("preparation", "En préparation"), ("ouverte", "Ouverte aux demandes"), ("instruction", "En instruction"),
-        ("commission", "En commission"), ("attribuee", "Attribuée"), ("close", "Close"),
+        ("preparation", "En préparation"),
+        ("ouverte", "Ouverte aux demandes"),
+        ("instruction", "En instruction"),
+        ("commission", "En commission"),
+        ("attribuee", "Attribuée"),
+        ("close", "Close"),
     ]
     saison = models.ForeignKey("referentiel.Saison", on_delete=models.PROTECT, related_name="campagnes")
     nom = models.CharField(max_length=150)
@@ -109,9 +113,10 @@ class Dossier(models.Model):
     def __str__(self) -> str:
         return f"{self.numero} — {self.objet}"
 
-    def sites_concernes(self) -> set[int]:
-        sites = set(self.reservations.values_list("espace__batiment__site_id", flat=True))
-        return {s for s in sites if s is not None}
+    def sites_concernes(self) -> set[int] | None:
+        """Sites de ses réservations ; un dossier encore vide est rattaché à son seul créateur (filtre des listes)."""
+        sites = {s for s in self.reservations.values_list("espace__batiment__site_id", flat=True) if s is not None}
+        return sites or None
 
     @property
     def statut(self) -> str:
@@ -232,7 +237,12 @@ class Verrou(models.Model):
 class ListeAttente(models.Model):
     """Inscription en liste d'attente sur un créneau occupé (PLA-09)."""
 
-    STATUTS = [("attente", "En attente"), ("proposee", "Place proposée"), ("satisfaite", "Satisfaite"), ("abandonnee", "Abandonnée")]
+    STATUTS = [
+        ("attente", "En attente"),
+        ("proposee", "Place proposée"),
+        ("satisfaite", "Satisfaite"),
+        ("abandonnee", "Abandonnée"),
+    ]
     espace = models.ForeignKey("referentiel.Espace", on_delete=models.CASCADE, related_name="listes_attente")
     debut = models.DateTimeField()
     fin = models.DateTimeField()
@@ -255,13 +265,21 @@ class ListeAttente(models.Model):
 class VueEnregistree(models.Model):
     """Vue du planning enregistrée par un agent : mode, filtres, coloration (PLA-03)."""
 
-    MODES = [("jour", "Jour"), ("semaine", "Semaine"), ("mois", "Mois"), ("chronologie", "Chronologie par espace"),
-             ("multi_sites", "Occupation multi-sites"), ("liste", "Liste")]
+    MODES = [
+        ("jour", "Jour"),
+        ("semaine", "Semaine"),
+        ("mois", "Mois"),
+        ("chronologie", "Chronologie par espace"),
+        ("multi_sites", "Occupation multi-sites"),
+        ("liste", "Liste"),
+    ]
     agent = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="vues_planning")
     nom = models.CharField(max_length=100)
     mode = models.CharField(max_length=15, choices=MODES, default="semaine")
     filtres = models.JSONField(default=dict, blank=True)
-    coloration = models.CharField(max_length=15, choices=[("statut", "Par statut"), ("type_usager", "Par type d'usager")], default="statut")
+    coloration = models.CharField(
+        max_length=15, choices=[("statut", "Par statut"), ("type_usager", "Par type d'usager")], default="statut"
+    )
     par_defaut = models.BooleanField(default=False)
 
     class Meta:

@@ -15,14 +15,33 @@ SYSTEME = services.SYSTEME
 
 
 def reserver(
-    espace: Espace, jour: date, debut: str, fin: str, *, usager: Usager | None = None, acteur: Any = SYSTEME,
-    type_code: str = "ponctuelle", recurrence: str = "", date_fin: date | None = None, statut: str = "demande", **champs: Any,
+    espace: Espace,
+    jour: date,
+    debut: str,
+    fin: str,
+    *,
+    usager: Usager | None = None,
+    acteur: Any = SYSTEME,
+    type_code: str = "ponctuelle",
+    recurrence: str = "",
+    date_fin: date | None = None,
+    statut: str = "demande",
+    **champs: Any,
 ) -> Reservation:
     usager = usager or usager_avec_contact()
-    dossier = services.creer_dossier(acteur=acteur, usager=usager, type_reservation=TypeReservation.objects.get(code=type_code), objet="Entraînement")
+    dossier = services.creer_dossier(
+        acteur=acteur, usager=usager, type_reservation=TypeReservation.objects.get(code=type_code), objet="Entraînement"
+    )
     reservation = services.ajouter_reservation(
-        dossier, acteur=acteur, espace=espace, date_debut=jour, date_fin=date_fin or jour, heure_debut=time.fromisoformat(debut),
-        heure_fin=time.fromisoformat(fin), recurrence=recurrence, **champs,
+        dossier,
+        acteur=acteur,
+        espace=espace,
+        date_debut=jour,
+        date_fin=date_fin or jour,
+        heure_debut=time.fromisoformat(debut),
+        heure_fin=time.fromisoformat(fin),
+        recurrence=recurrence,
+        **champs,
     )
     if statut == "validee":
         reservation = valider_systeme(reservation)

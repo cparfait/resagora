@@ -168,7 +168,14 @@ SPECTACULAR_SETTINGS = {
     "SERVE_PERMISSIONS": ["rest_framework.permissions.IsAuthenticated"],
     "SERVE_AUTHENTICATION": ["apps.habilitations.authentification.SessionAgentAuthentication"],
     "COMPONENT_SPLIT_REQUEST": True,
-    "ENUM_NAME_OVERRIDES": {},
+    "ENUM_NAME_OVERRIDES": {
+        "StatutReservationEnum": "apps.reservations.models.STATUTS",
+        "StatutCampagneEnum": "apps.reservations.models.Campagne.STATUTS",
+        "StatutUsagerEnum": "apps.usagers.models.Usager.STATUTS",
+        "StatutPieceEnum": "apps.usagers.models.PieceJustificative.STATUTS",
+        "StatutListeAttenteEnum": "apps.reservations.models.ListeAttente.STATUTS",
+        "TypeUsagerEnum": "apps.usagers.models.TYPES_USAGER",
+    },
 }
 
 # Annuaire Active Directory (SEC-02, ADM-06). Paramètres réels : voir docs/a-brancher.md.
@@ -212,13 +219,16 @@ MAILERS = {
         },
     }
 }
-DEFAULT_FROM_EMAIL = os.environ.get("COURRIEL_EXPEDITEUR", "Équipements sportifs — Ville de Châtillon <equipements@chatillon.test>")
+DEFAULT_FROM_EMAIL = os.environ.get(
+    "COURRIEL_EXPEDITEUR", "Équipements sportifs — Ville de Châtillon <equipements@chatillon.test>"
+)
 PORTAIL_URL = os.environ.get("PORTAIL_URL", "https://equipements.chatillon.test")
 BACKOFFICE_URL = os.environ.get("BACKOFFICE_URL", "https://equipements.chatillon.local")
 
 # Calendrier national (ADM-01)
 URL_CALENDRIER_SCOLAIRE = os.environ.get(
-    "URL_CALENDRIER_SCOLAIRE", "https://data.education.gouv.fr/api/explore/v2.1/catalog/datasets/fr-en-calendrier-scolaire/records"
+    "URL_CALENDRIER_SCOLAIRE",
+    "https://data.education.gouv.fr/api/explore/v2.1/catalog/datasets/fr-en-calendrier-scolaire/records",
 )
 URL_JOURS_FERIES = os.environ.get("URL_JOURS_FERIES", "https://calendrier.api.gouv.fr/jours-feries/metropole/{annee}.json")
 

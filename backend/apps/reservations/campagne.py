@@ -63,7 +63,9 @@ def _reconduction(reservation: Reservation) -> bool:
     if saison is None:
         return False
     return Reservation.objects.filter(
-        dossier__usager=reservation.dossier.usager, espace=reservation.espace, statut__in=["validee", "confirmee", "realisee", "cloturee"],
+        dossier__usager=reservation.dossier.usager,
+        espace=reservation.espace,
+        statut__in=["validee", "confirmee", "realisee", "cloturee"],
         dossier__saison__fin__lt=saison.debut,
     ).exists()
 
@@ -76,8 +78,9 @@ def _cle_tri(reservation: Reservation, debut: datetime) -> tuple[int, int, datet
 def analyser(campagne: Campagne) -> list[GroupeConcurrent]:
     """Groupes de demandes qui se disputent au moins une séance, triés par proposition d'arbitrage."""
     demandes = list(
-        Reservation.objects.filter(dossier__campagne=campagne, statut__in=["demande", "en_instruction"])
-        .select_related("dossier__usager", "dossier__saison", "espace")
+        Reservation.objects.filter(dossier__campagne=campagne, statut__in=["demande", "en_instruction"]).select_related(
+            "dossier__usager", "dossier__saison", "espace"
+        )
     )
     occupations: dict[int, list[tuple[datetime, datetime]]] = {r.pk: generer_plages(r) for r in demandes}
     feuilles = {r.pk: {f.pk for f in r.espace.feuilles()} for r in demandes}
@@ -109,15 +112,22 @@ def analyser(campagne: Campagne) -> list[GroupeConcurrent]:
         for m in membres:
             debut = occupations[m.pk][0][0]
             en_conflit = any(
-                feuilles[m.pk] & feuilles[a.pk] and any(da < fb and db < fa for da, fa in occupations[m.pk] for db, fb in occupations[a.pk])
+                feuilles[m.pk] & feuilles[a.pk]
+                and any(da < fb and db < fa for da, fa in occupations[m.pk] for db, fb in occupations[a.pk])
                 for a in attribues
             )
             if not en_conflit:
                 attribues.append(m)
             groupe.candidats.append(
                 Candidat(
-                    m.pk, m.dossier.numero, m.dossier.usager.nom, categorie_priorite(m.dossier.usager, debut), rang_priorite(m.dossier.usager, debut),
-                    _reconduction(m), m.dossier.depose_le, "refuser" if en_conflit else "attribuer",
+                    m.pk,
+                    m.dossier.numero,
+                    m.dossier.usager.nom,
+                    categorie_priorite(m.dossier.usager, debut),
+                    rang_priorite(m.dossier.usager, debut),
+                    _reconduction(m),
+                    m.dossier.depose_le,
+                    "refuser" if en_conflit else "attribuer",
                 )
             )
         groupes.append(groupe)
@@ -129,7 +139,9 @@ def changer_statut(campagne: Campagne, statut: str, *, acteur: Any) -> Campagne:
     campagne = Campagne.objects.select_for_update().get(pk=campagne.pk)
     exiger(acteur, "arbitrer_campagne" if statut in {"attribuee", "close"} else "gerer_campagne", campagne)
     if statut not in TRANSITIONS_CAMPAGNE[campagne.statut]:
-        raise ErreurMetier(f"La campagne ne peut pas passer de « {campagne.get_statut_display()} » à ce statut.", code="transition_interdite")
+        raise ErreurMetier(
+            f"La campagne ne peut pas passer de « {campagne.get_statut_display()} » à ce statut.", code="transition_interdite"
+        )
     avant = campagne.statut
     campagne.statut = statut
     campagne.save(update_fields=["statut"])
@@ -151,7 +163,10 @@ def attribuer(campagne: Campagne, decisions: dict[int, dict[str, str]], *, acteu
     exiger(acteur, "arbitrer_campagne", campagne)
     if campagne.statut != "commission":
         raise ErreurMetier("Les attributions se font quand la campagne est en commission.", code="campagne_hors_commission")
-    reservations = {r.pk: r for r in Reservation.objects.filter(dossier__campagne=campagne, pk__in=list(decisions)).select_related("dossier__usager")}
+    reservations = {
+        r.pk: r
+        for r in Reservation.objects.filter(dossier__campagne=campagne, pk__in=list(decisions)).select_related("dossier__usager")
+    }
     if set(decisions) - set(reservations):
         raise ErreurValidation("Certaines demandes n'appartiennent pas à cette campagne.", code="hors_campagne")
     recap: dict[int, dict[str, list[str]]] = defaultdict(lambda: {"attribues": [], "refuses": []})
@@ -168,7 +183,9 @@ def attribuer(campagne: Campagne, decisions: dict[int, dict[str, str]], *, acteu
         else:
             motif = (decision.get("motif") or "").strip()
             if not motif:
-                raise ErreurValidation(f"Motif obligatoire pour le refus de la demande {reservation.dossier.numero}.", code="motif_requis")
+                raise ErreurValidation(
+                    f"Motif obligatoire pour le refus de la demande {reservation.dossier.numero}.", code="motif_requis"
+                )
             services._changer_statut(reservation, "refusee", acteur, motif_refus=motif)
             recap[reservation.dossier.usager_id]["refuses"].append(f"{texte} (motif : {motif})")
             bilan["refusees"] += 1
@@ -176,8 +193,13 @@ def attribuer(campagne: Campagne, decisions: dict[int, dict[str, str]], *, acteu
     for usager_id, lignes in recap.items():
         notifier(
             "campagne_attribution",
-            {"saison": campagne.saison.nom, "attribues": "\n".join(lignes["attribues"]) or "aucun", "refuses": "\n".join(lignes["refuses"])},
-            usager=usagers[usager_id], objet=campagne,
+            {
+                "saison": campagne.saison.nom,
+                "attribues": "\n".join(lignes["attribues"]) or "aucun",
+                "refuses": "\n".join(lignes["refuses"]),
+            },
+            usager=usagers[usager_id],
+            objet=campagne,
         )
     journaliser("campagne_attribution", campagne, apres=bilan, acteur=acteur)
     return bilan

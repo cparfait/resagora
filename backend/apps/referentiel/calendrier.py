@@ -119,7 +119,9 @@ def periodes_depuis_open_data(enregistrements: list[dict[str, Any]]) -> list[Per
 
 
 @transaction.atomic
-def importer_saison(saison: Saison, client: ClientCalendrier | None = None, fichier: Path | None = None, acteur: Any = None) -> int:
+def importer_saison(
+    saison: Saison, client: ClientCalendrier | None = None, fichier: Path | None = None, acteur: Any = None
+) -> int:
     """Remplace les vacances et jours fériés importés de la saison ; les fermetures saisies sont conservées."""
     client = client or ClientCalendrier()
     if fichier is not None:
@@ -129,15 +131,24 @@ def importer_saison(saison: Saison, client: ClientCalendrier | None = None, fich
     saison.periodes.filter(source__in=["import", "calcul"]).delete()
     nombre = 0
     for periode in vacances:
+        if periode.fin < saison.debut or periode.debut > saison.fin:
+            continue
         PeriodeCalendrier.objects.create(
-            saison=saison, nature="vacances", libelle=periode.libelle, debut=periode.debut, fin=periode.fin,
-            source="import", zone=parametre("calendrier.zone"),
+            saison=saison,
+            nature="vacances",
+            libelle=periode.libelle,
+            debut=periode.debut,
+            fin=periode.fin,
+            source="import",
+            zone=parametre("calendrier.zone"),
         )
         nombre += 1
     for annee in range(saison.debut.year, saison.fin.year + 1):
         for jour, libelle in client.feries(annee).items():
             if saison.debut <= jour <= saison.fin:
-                PeriodeCalendrier.objects.create(saison=saison, nature="ferie", libelle=libelle, debut=jour, fin=jour, source="calcul")
+                PeriodeCalendrier.objects.create(
+                    saison=saison, nature="ferie", libelle=libelle, debut=jour, fin=jour, source="calcul"
+                )
                 nombre += 1
     journaliser("importer_calendrier", saison, apres={"periodes": nombre}, acteur=acteur)
     return nombre
@@ -160,4 +171,6 @@ def est_vacances(jour: date) -> bool:
 
 
 def est_ferie(jour: date) -> bool:
-    return PeriodeCalendrier.objects.filter(nature="ferie", debut__lte=jour, fin__gte=jour).exists() or jour in feries_calcules(jour.year)
+    return PeriodeCalendrier.objects.filter(nature="ferie", debut__lte=jour, fin__gte=jour).exists() or jour in feries_calcules(
+        jour.year
+    )

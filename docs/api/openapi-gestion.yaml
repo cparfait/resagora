@@ -8,6 +8,8 @@ paths:
       operationId: gestion_admin_actions_retrieve
       tags:
       - gestion
+      security:
+      - sessionAgent: []
       responses:
         '200':
           content:
@@ -50,6 +52,8 @@ paths:
           type: integer
       tags:
       - gestion
+      security:
+      - sessionAgent: []
       responses:
         '200':
           content:
@@ -74,6 +78,8 @@ paths:
           multipart/form-data:
             schema:
               $ref: '#/components/schemas/UtilisateurRequest'
+      security:
+      - sessionAgent: []
       responses:
         '201':
           content:
@@ -95,6 +101,8 @@ paths:
         required: true
       tags:
       - gestion
+      security:
+      - sessionAgent: []
       responses:
         '200':
           content:
@@ -126,6 +134,8 @@ paths:
           multipart/form-data:
             schema:
               $ref: '#/components/schemas/PatchedUtilisateurRequest'
+      security:
+      - sessionAgent: []
       responses:
         '200':
           content:
@@ -147,6 +157,8 @@ paths:
         required: true
       tags:
       - gestion
+      security:
+      - sessionAgent: []
       responses:
         '200':
           content:
@@ -174,6 +186,8 @@ paths:
           type: integer
       tags:
       - gestion
+      security:
+      - sessionAgent: []
       responses:
         '200':
           content:
@@ -199,6 +213,8 @@ paths:
             schema:
               $ref: '#/components/schemas/GroupeADRequest'
         required: true
+      security:
+      - sessionAgent: []
       responses:
         '201':
           content:
@@ -220,6 +236,8 @@ paths:
         required: true
       tags:
       - gestion
+      security:
+      - sessionAgent: []
       responses:
         '200':
           content:
@@ -252,6 +270,8 @@ paths:
             schema:
               $ref: '#/components/schemas/GroupeADRequest'
         required: true
+      security:
+      - sessionAgent: []
       responses:
         '200':
           content:
@@ -283,6 +303,8 @@ paths:
           multipart/form-data:
             schema:
               $ref: '#/components/schemas/PatchedGroupeADRequest'
+      security:
+      - sessionAgent: []
       responses:
         '200':
           content:
@@ -303,6 +325,8 @@ paths:
         required: true
       tags:
       - gestion
+      security:
+      - sessionAgent: []
       responses:
         '204':
           description: No response body
@@ -348,6 +372,8 @@ paths:
           type: integer
       tags:
       - gestion
+      security:
+      - sessionAgent: []
       responses:
         '200':
           content:
@@ -373,6 +399,8 @@ paths:
             schema:
               $ref: '#/components/schemas/HabilitationRequest'
         required: true
+      security:
+      - sessionAgent: []
       responses:
         '201':
           content:
@@ -394,6 +422,8 @@ paths:
         required: true
       tags:
       - gestion
+      security:
+      - sessionAgent: []
       responses:
         '200':
           content:
@@ -426,6 +456,8 @@ paths:
             schema:
               $ref: '#/components/schemas/HabilitationRequest'
         required: true
+      security:
+      - sessionAgent: []
       responses:
         '200':
           content:
@@ -457,6 +489,8 @@ paths:
           multipart/form-data:
             schema:
               $ref: '#/components/schemas/PatchedHabilitationRequest'
+      security:
+      - sessionAgent: []
       responses:
         '200':
           content:
@@ -477,6 +511,8 @@ paths:
         required: true
       tags:
       - gestion
+      security:
+      - sessionAgent: []
       responses:
         '204':
           description: No response body
@@ -500,6 +536,8 @@ paths:
           type: integer
       tags:
       - gestion
+      security:
+      - sessionAgent: []
       responses:
         '200':
           content:
@@ -525,6 +563,8 @@ paths:
             schema:
               $ref: '#/components/schemas/PerimetreRequest'
         required: true
+      security:
+      - sessionAgent: []
       responses:
         '201':
           content:
@@ -546,6 +586,8 @@ paths:
         required: true
       tags:
       - gestion
+      security:
+      - sessionAgent: []
       responses:
         '200':
           content:
@@ -578,6 +620,8 @@ paths:
             schema:
               $ref: '#/components/schemas/PerimetreRequest'
         required: true
+      security:
+      - sessionAgent: []
       responses:
         '200':
           content:
@@ -609,6 +653,8 @@ paths:
           multipart/form-data:
             schema:
               $ref: '#/components/schemas/PatchedPerimetreRequest'
+      security:
+      - sessionAgent: []
       responses:
         '200':
           content:
@@ -629,6 +675,8 @@ paths:
         required: true
       tags:
       - gestion
+      security:
+      - sessionAgent: []
       responses:
         '204':
           description: No response body
@@ -652,6 +700,8 @@ paths:
           type: integer
       tags:
       - gestion
+      security:
+      - sessionAgent: []
       responses:
         '200':
           content:
@@ -677,6 +727,8 @@ paths:
             schema:
               $ref: '#/components/schemas/RoleRequest'
         required: true
+      security:
+      - sessionAgent: []
       responses:
         '201':
           content:
@@ -698,6 +750,8 @@ paths:
         required: true
       tags:
       - gestion
+      security:
+      - sessionAgent: []
       responses:
         '200':
           content:
@@ -730,6 +784,8 @@ paths:
             schema:
               $ref: '#/components/schemas/RoleRequest'
         required: true
+      security:
+      - sessionAgent: []
       responses:
         '200':
           content:
@@ -761,6 +817,8 @@ paths:
           multipart/form-data:
             schema:
               $ref: '#/components/schemas/PatchedRoleRequest'
+      security:
+      - sessionAgent: []
       responses:
         '200':
           content:
@@ -781,6 +839,8 @@ paths:
         required: true
       tags:
       - gestion
+      security:
+      - sessionAgent: []
       responses:
         '204':
           description: No response body
@@ -836,6 +896,8 @@ paths:
           type: integer
       tags:
       - gestion
+      security:
+      - sessionAgent: []
       responses:
         '200':
           content:
@@ -856,6 +918,8 @@ paths:
         required: true
       tags:
       - gestion
+      security:
+      - sessionAgent: []
       responses:
         '200':
           content:
@@ -868,6 +932,8 @@ paths:
       operationId: gestion_audit_journal_export_retrieve
       tags:
       - gestion
+      security:
+      - sessionAgent: []
       responses:
         '200':
           content:
@@ -880,6 +946,8 @@ paths:
       operationId: gestion_audit_journal_verification_retrieve
       tags:
       - gestion
+      security:
+      - sessionAgent: []
       responses:
         '200':
           content:
@@ -907,6 +975,8 @@ paths:
             schema:
               $ref: '#/components/schemas/ConnexionRequest'
         required: true
+      security:
+      - sessionAgent: []
       responses:
         '200':
           content:
@@ -927,6 +997,8 @@ paths:
       operationId: gestion_auth_deconnexion_create
       tags:
       - gestion
+      security:
+      - sessionAgent: []
       responses:
         '204':
           description: No response body
@@ -949,6 +1021,8 @@ paths:
             schema:
               $ref: '#/components/schemas/CodeTotpRequest'
         required: true
+      security:
+      - sessionAgent: []
       responses:
         '200':
           content:
@@ -961,6 +1035,8 @@ paths:
       operationId: gestion_auth_totp_enrolement_retrieve
       tags:
       - gestion
+      security:
+      - sessionAgent: []
       responses:
         '200':
           content:
@@ -984,6 +1060,8 @@ paths:
             schema:
               $ref: '#/components/schemas/CodeTotpRequest'
         required: true
+      security:
+      - sessionAgent: []
       responses:
         '200':
           content:
@@ -1010,6 +1088,8 @@ paths:
             schema:
               $ref: '#/components/schemas/JetonEnrolementRequest'
         required: true
+      security:
+      - sessionAgent: []
       responses:
         '200':
           content:
@@ -1024,12 +1104,56 @@ paths:
         l''API refuse.'
       tags:
       - gestion
+      security:
+      - sessionAgent: []
       responses:
         '200':
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Moi'
+          description: ''
+  /api/gestion/parametres:
+    get:
+      operationId: gestion_parametres_list
+      tags:
+      - gestion
+      security:
+      - sessionAgent: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Parametre'
+          description: ''
+    patch:
+      operationId: gestion_parametres_partial_update
+      tags:
+      - gestion
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedModificationRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedModificationRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedModificationRequest'
+      security:
+      - sessionAgent: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Parametre'
           description: ''
   /api/gestion/referentiel/batiments:
     get:
@@ -1059,6 +1183,8 @@ paths:
           type: integer
       tags:
       - gestion
+      security:
+      - sessionAgent: []
       responses:
         '200':
           content:
@@ -1084,6 +1210,8 @@ paths:
             schema:
               $ref: '#/components/schemas/BatimentRequest'
         required: true
+      security:
+      - sessionAgent: []
       responses:
         '201':
           content:
@@ -1105,6 +1233,8 @@ paths:
         required: true
       tags:
       - gestion
+      security:
+      - sessionAgent: []
       responses:
         '200':
           content:
@@ -1137,6 +1267,8 @@ paths:
             schema:
               $ref: '#/components/schemas/BatimentRequest'
         required: true
+      security:
+      - sessionAgent: []
       responses:
         '200':
           content:
@@ -1168,6 +1300,8 @@ paths:
           multipart/form-data:
             schema:
               $ref: '#/components/schemas/PatchedBatimentRequest'
+      security:
+      - sessionAgent: []
       responses:
         '200':
           content:
@@ -1188,9 +1322,163 @@ paths:
         required: true
       tags:
       - gestion
+      security:
+      - sessionAgent: []
       responses:
         '204':
           description: No response body
+  /api/gestion/referentiel/documents:
+    get:
+      operationId: gestion_referentiel_documents_list
+      description: '`chemin_site` : chemin ORM vers le site de l''objet (None = objet
+        transversal).'
+      parameters:
+      - in: query
+        name: espace
+        schema:
+          type: integer
+      - name: page
+        required: false
+        in: query
+        description: Un numéro de page de l'ensemble des résultats.
+        schema:
+          type: integer
+      - name: taille
+        required: false
+        in: query
+        description: Nombre de résultats à retourner par page.
+        schema:
+          type: integer
+      tags:
+      - gestion
+      security:
+      - sessionAgent: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedDocumentList'
+          description: ''
+    post:
+      operationId: gestion_referentiel_documents_create
+      description: '`chemin_site` : chemin ORM vers le site de l''objet (None = objet
+        transversal).'
+      tags:
+      - gestion
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/DepotRequest'
+        required: true
+      security:
+      - sessionAgent: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Document'
+          description: ''
+  /api/gestion/referentiel/documents/{id}:
+    get:
+      operationId: gestion_referentiel_documents_retrieve
+      description: '`chemin_site` : chemin ORM vers le site de l''objet (None = objet
+        transversal).'
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un(une) valeur entière unique identifiant ce(cette) document
+          espace.
+        required: true
+      tags:
+      - gestion
+      security:
+      - sessionAgent: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Document'
+          description: ''
+    patch:
+      operationId: gestion_referentiel_documents_partial_update
+      description: '`chemin_site` : chemin ORM vers le site de l''objet (None = objet
+        transversal).'
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un(une) valeur entière unique identifiant ce(cette) document
+          espace.
+        required: true
+      tags:
+      - gestion
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedDocumentRequest'
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedDocumentRequest'
+      security:
+      - sessionAgent: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Document'
+          description: ''
+    delete:
+      operationId: gestion_referentiel_documents_destroy
+      description: '`chemin_site` : chemin ORM vers le site de l''objet (None = objet
+        transversal).'
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un(une) valeur entière unique identifiant ce(cette) document
+          espace.
+        required: true
+      tags:
+      - gestion
+      security:
+      - sessionAgent: []
+      responses:
+        '204':
+          description: No response body
+  /api/gestion/referentiel/documents/{id}/fichier:
+    get:
+      operationId: gestion_referentiel_documents_fichier_retrieve
+      description: '`chemin_site` : chemin ORM vers le site de l''objet (None = objet
+        transversal).'
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un(une) valeur entière unique identifiant ce(cette) document
+          espace.
+        required: true
+      tags:
+      - gestion
+      security:
+      - sessionAgent: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Document'
+          description: ''
   /api/gestion/referentiel/espaces:
     get:
       operationId: gestion_referentiel_espaces_list
@@ -1239,6 +1527,8 @@ paths:
           type: integer
       tags:
       - gestion
+      security:
+      - sessionAgent: []
       responses:
         '200':
           content:
@@ -1264,6 +1554,8 @@ paths:
             schema:
               $ref: '#/components/schemas/EspaceRequest'
         required: true
+      security:
+      - sessionAgent: []
       responses:
         '201':
           content:
@@ -1285,6 +1577,8 @@ paths:
         required: true
       tags:
       - gestion
+      security:
+      - sessionAgent: []
       responses:
         '200':
           content:
@@ -1317,6 +1611,8 @@ paths:
             schema:
               $ref: '#/components/schemas/EspaceRequest'
         required: true
+      security:
+      - sessionAgent: []
       responses:
         '200':
           content:
@@ -1348,6 +1644,8 @@ paths:
           multipart/form-data:
             schema:
               $ref: '#/components/schemas/PatchedEspaceRequest'
+      security:
+      - sessionAgent: []
       responses:
         '200':
           content:
@@ -1368,6 +1666,8 @@ paths:
         required: true
       tags:
       - gestion
+      security:
+      - sessionAgent: []
       responses:
         '204':
           description: No response body
@@ -1391,6 +1691,8 @@ paths:
           type: integer
       tags:
       - gestion
+      security:
+      - sessionAgent: []
       responses:
         '200':
           content:
@@ -1416,6 +1718,8 @@ paths:
             schema:
               $ref: '#/components/schemas/FamilleEspaceRequest'
         required: true
+      security:
+      - sessionAgent: []
       responses:
         '201':
           content:
@@ -1437,6 +1741,8 @@ paths:
         required: true
       tags:
       - gestion
+      security:
+      - sessionAgent: []
       responses:
         '200':
           content:
@@ -1469,6 +1775,8 @@ paths:
             schema:
               $ref: '#/components/schemas/FamilleEspaceRequest'
         required: true
+      security:
+      - sessionAgent: []
       responses:
         '200':
           content:
@@ -1500,6 +1808,8 @@ paths:
           multipart/form-data:
             schema:
               $ref: '#/components/schemas/PatchedFamilleEspaceRequest'
+      security:
+      - sessionAgent: []
       responses:
         '200':
           content:
@@ -1520,9 +1830,804 @@ paths:
         required: true
       tags:
       - gestion
+      security:
+      - sessionAgent: []
       responses:
         '204':
           description: No response body
+  /api/gestion/referentiel/fermetures:
+    get:
+      operationId: gestion_referentiel_fermetures_list
+      description: '`chemin_site` : chemin ORM vers le site de l''objet (None = objet
+        transversal).'
+      parameters:
+      - in: query
+        name: espace
+        schema:
+          type: integer
+      - name: page
+        required: false
+        in: query
+        description: Un numéro de page de l'ensemble des résultats.
+        schema:
+          type: integer
+      - in: query
+        name: site
+        schema:
+          type: integer
+      - name: taille
+        required: false
+        in: query
+        description: Nombre de résultats à retourner par page.
+        schema:
+          type: integer
+      tags:
+      - gestion
+      security:
+      - sessionAgent: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedFermetureList'
+          description: ''
+    post:
+      operationId: gestion_referentiel_fermetures_create
+      description: '`chemin_site` : chemin ORM vers le site de l''objet (None = objet
+        transversal).'
+      tags:
+      - gestion
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FermetureRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/FermetureRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/FermetureRequest'
+        required: true
+      security:
+      - sessionAgent: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Fermeture'
+          description: ''
+  /api/gestion/referentiel/fermetures/{id}:
+    get:
+      operationId: gestion_referentiel_fermetures_retrieve
+      description: '`chemin_site` : chemin ORM vers le site de l''objet (None = objet
+        transversal).'
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un(une) valeur entière unique identifiant ce(cette) fermeture.
+        required: true
+      tags:
+      - gestion
+      security:
+      - sessionAgent: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Fermeture'
+          description: ''
+    delete:
+      operationId: gestion_referentiel_fermetures_destroy
+      description: '`chemin_site` : chemin ORM vers le site de l''objet (None = objet
+        transversal).'
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un(une) valeur entière unique identifiant ce(cette) fermeture.
+        required: true
+      tags:
+      - gestion
+      security:
+      - sessionAgent: []
+      responses:
+        '204':
+          description: No response body
+  /api/gestion/referentiel/horaires:
+    get:
+      operationId: gestion_referentiel_horaires_list
+      description: '`chemin_site` : chemin ORM vers le site de l''objet (None = objet
+        transversal).'
+      parameters:
+      - in: query
+        name: espace
+        schema:
+          type: integer
+      - in: query
+        name: jour_semaine
+        schema:
+          type: integer
+          enum:
+          - 0
+          - 1
+          - 2
+          - 3
+          - 4
+          - 5
+          - 6
+        description: |-
+          * `0` - lundi
+          * `1` - mardi
+          * `2` - mercredi
+          * `3` - jeudi
+          * `4` - vendredi
+          * `5` - samedi
+          * `6` - dimanche
+      - in: query
+        name: saison
+        schema:
+          type: integer
+      tags:
+      - gestion
+      security:
+      - sessionAgent: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Horaire'
+          description: ''
+    post:
+      operationId: gestion_referentiel_horaires_create
+      description: '`chemin_site` : chemin ORM vers le site de l''objet (None = objet
+        transversal).'
+      tags:
+      - gestion
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/HoraireRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/HoraireRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/HoraireRequest'
+        required: true
+      security:
+      - sessionAgent: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Horaire'
+          description: ''
+  /api/gestion/referentiel/horaires/{id}:
+    get:
+      operationId: gestion_referentiel_horaires_retrieve
+      description: '`chemin_site` : chemin ORM vers le site de l''objet (None = objet
+        transversal).'
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un(une) valeur entière unique identifiant ce(cette) horaire ouverture.
+        required: true
+      tags:
+      - gestion
+      security:
+      - sessionAgent: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Horaire'
+          description: ''
+    put:
+      operationId: gestion_referentiel_horaires_update
+      description: '`chemin_site` : chemin ORM vers le site de l''objet (None = objet
+        transversal).'
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un(une) valeur entière unique identifiant ce(cette) horaire ouverture.
+        required: true
+      tags:
+      - gestion
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/HoraireRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/HoraireRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/HoraireRequest'
+        required: true
+      security:
+      - sessionAgent: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Horaire'
+          description: ''
+    patch:
+      operationId: gestion_referentiel_horaires_partial_update
+      description: '`chemin_site` : chemin ORM vers le site de l''objet (None = objet
+        transversal).'
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un(une) valeur entière unique identifiant ce(cette) horaire ouverture.
+        required: true
+      tags:
+      - gestion
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedHoraireRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedHoraireRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedHoraireRequest'
+      security:
+      - sessionAgent: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Horaire'
+          description: ''
+    delete:
+      operationId: gestion_referentiel_horaires_destroy
+      description: '`chemin_site` : chemin ORM vers le site de l''objet (None = objet
+        transversal).'
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un(une) valeur entière unique identifiant ce(cette) horaire ouverture.
+        required: true
+      tags:
+      - gestion
+      security:
+      - sessionAgent: []
+      responses:
+        '204':
+          description: No response body
+  /api/gestion/referentiel/periodes:
+    get:
+      operationId: gestion_referentiel_periodes_list
+      description: '`chemin_site` : chemin ORM vers le site de l''objet (None = objet
+        transversal).'
+      parameters:
+      - in: query
+        name: nature
+        schema:
+          type: string
+          enum:
+          - ferie
+          - fermeture_ville
+          - vacances
+        description: |-
+          * `vacances` - Vacances scolaires
+          * `ferie` - Jour férié
+          * `fermeture_ville` - Fermeture générale de la Ville
+      - in: query
+        name: saison
+        schema:
+          type: integer
+      tags:
+      - gestion
+      security:
+      - sessionAgent: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Periode'
+          description: ''
+    post:
+      operationId: gestion_referentiel_periodes_create
+      description: '`chemin_site` : chemin ORM vers le site de l''objet (None = objet
+        transversal).'
+      tags:
+      - gestion
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PeriodeRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PeriodeRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PeriodeRequest'
+        required: true
+      security:
+      - sessionAgent: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Periode'
+          description: ''
+  /api/gestion/referentiel/periodes/{id}:
+    get:
+      operationId: gestion_referentiel_periodes_retrieve
+      description: '`chemin_site` : chemin ORM vers le site de l''objet (None = objet
+        transversal).'
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un(une) valeur entière unique identifiant ce(cette) periode calendrier.
+        required: true
+      tags:
+      - gestion
+      security:
+      - sessionAgent: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Periode'
+          description: ''
+    put:
+      operationId: gestion_referentiel_periodes_update
+      description: '`chemin_site` : chemin ORM vers le site de l''objet (None = objet
+        transversal).'
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un(une) valeur entière unique identifiant ce(cette) periode calendrier.
+        required: true
+      tags:
+      - gestion
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PeriodeRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PeriodeRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PeriodeRequest'
+        required: true
+      security:
+      - sessionAgent: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Periode'
+          description: ''
+    patch:
+      operationId: gestion_referentiel_periodes_partial_update
+      description: '`chemin_site` : chemin ORM vers le site de l''objet (None = objet
+        transversal).'
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un(une) valeur entière unique identifiant ce(cette) periode calendrier.
+        required: true
+      tags:
+      - gestion
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedPeriodeRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedPeriodeRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedPeriodeRequest'
+      security:
+      - sessionAgent: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Periode'
+          description: ''
+    delete:
+      operationId: gestion_referentiel_periodes_destroy
+      description: '`chemin_site` : chemin ORM vers le site de l''objet (None = objet
+        transversal).'
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un(une) valeur entière unique identifiant ce(cette) periode calendrier.
+        required: true
+      tags:
+      - gestion
+      security:
+      - sessionAgent: []
+      responses:
+        '204':
+          description: No response body
+  /api/gestion/referentiel/photos:
+    get:
+      operationId: gestion_referentiel_photos_list
+      description: '`chemin_site` : chemin ORM vers le site de l''objet (None = objet
+        transversal).'
+      parameters:
+      - in: query
+        name: espace
+        schema:
+          type: integer
+      - name: page
+        required: false
+        in: query
+        description: Un numéro de page de l'ensemble des résultats.
+        schema:
+          type: integer
+      - name: taille
+        required: false
+        in: query
+        description: Nombre de résultats à retourner par page.
+        schema:
+          type: integer
+      tags:
+      - gestion
+      security:
+      - sessionAgent: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedPhotoList'
+          description: ''
+    post:
+      operationId: gestion_referentiel_photos_create
+      description: '`chemin_site` : chemin ORM vers le site de l''objet (None = objet
+        transversal).'
+      tags:
+      - gestion
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/DepotRequest'
+        required: true
+      security:
+      - sessionAgent: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Photo'
+          description: ''
+  /api/gestion/referentiel/photos/{id}:
+    get:
+      operationId: gestion_referentiel_photos_retrieve
+      description: '`chemin_site` : chemin ORM vers le site de l''objet (None = objet
+        transversal).'
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un(une) valeur entière unique identifiant ce(cette) photo espace.
+        required: true
+      tags:
+      - gestion
+      security:
+      - sessionAgent: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Photo'
+          description: ''
+    patch:
+      operationId: gestion_referentiel_photos_partial_update
+      description: '`chemin_site` : chemin ORM vers le site de l''objet (None = objet
+        transversal).'
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un(une) valeur entière unique identifiant ce(cette) photo espace.
+        required: true
+      tags:
+      - gestion
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedPhotoRequest'
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedPhotoRequest'
+      security:
+      - sessionAgent: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Photo'
+          description: ''
+    delete:
+      operationId: gestion_referentiel_photos_destroy
+      description: '`chemin_site` : chemin ORM vers le site de l''objet (None = objet
+        transversal).'
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un(une) valeur entière unique identifiant ce(cette) photo espace.
+        required: true
+      tags:
+      - gestion
+      security:
+      - sessionAgent: []
+      responses:
+        '204':
+          description: No response body
+  /api/gestion/referentiel/photos/{id}/fichier:
+    get:
+      operationId: gestion_referentiel_photos_fichier_retrieve
+      description: '`chemin_site` : chemin ORM vers le site de l''objet (None = objet
+        transversal).'
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un(une) valeur entière unique identifiant ce(cette) photo espace.
+        required: true
+      tags:
+      - gestion
+      security:
+      - sessionAgent: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Photo'
+          description: ''
+  /api/gestion/referentiel/saisons:
+    get:
+      operationId: gestion_referentiel_saisons_list
+      description: '`chemin_site` : chemin ORM vers le site de l''objet (None = objet
+        transversal).'
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: Un numéro de page de l'ensemble des résultats.
+        schema:
+          type: integer
+      - name: taille
+        required: false
+        in: query
+        description: Nombre de résultats à retourner par page.
+        schema:
+          type: integer
+      tags:
+      - gestion
+      security:
+      - sessionAgent: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedSaisonList'
+          description: ''
+    post:
+      operationId: gestion_referentiel_saisons_create
+      description: '`chemin_site` : chemin ORM vers le site de l''objet (None = objet
+        transversal).'
+      tags:
+      - gestion
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SaisonRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/SaisonRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/SaisonRequest'
+        required: true
+      security:
+      - sessionAgent: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Saison'
+          description: ''
+  /api/gestion/referentiel/saisons/{id}:
+    get:
+      operationId: gestion_referentiel_saisons_retrieve
+      description: '`chemin_site` : chemin ORM vers le site de l''objet (None = objet
+        transversal).'
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un(une) valeur entière unique identifiant ce(cette) saison.
+        required: true
+      tags:
+      - gestion
+      security:
+      - sessionAgent: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Saison'
+          description: ''
+    put:
+      operationId: gestion_referentiel_saisons_update
+      description: '`chemin_site` : chemin ORM vers le site de l''objet (None = objet
+        transversal).'
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un(une) valeur entière unique identifiant ce(cette) saison.
+        required: true
+      tags:
+      - gestion
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SaisonRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/SaisonRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/SaisonRequest'
+        required: true
+      security:
+      - sessionAgent: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Saison'
+          description: ''
+    patch:
+      operationId: gestion_referentiel_saisons_partial_update
+      description: '`chemin_site` : chemin ORM vers le site de l''objet (None = objet
+        transversal).'
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un(une) valeur entière unique identifiant ce(cette) saison.
+        required: true
+      tags:
+      - gestion
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedSaisonRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedSaisonRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedSaisonRequest'
+      security:
+      - sessionAgent: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Saison'
+          description: ''
+    delete:
+      operationId: gestion_referentiel_saisons_destroy
+      description: '`chemin_site` : chemin ORM vers le site de l''objet (None = objet
+        transversal).'
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un(une) valeur entière unique identifiant ce(cette) saison.
+        required: true
+      tags:
+      - gestion
+      security:
+      - sessionAgent: []
+      responses:
+        '204':
+          description: No response body
+  /api/gestion/referentiel/saisons/{id}/importer-calendrier:
+    post:
+      operationId: gestion_referentiel_saisons_importer_calendrier_create
+      description: 'ADM-01 : vacances de la zone et jours fériés de la saison depuis
+        les données nationales.'
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un(une) valeur entière unique identifiant ce(cette) saison.
+        required: true
+      tags:
+      - gestion
+      security:
+      - sessionAgent: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
   /api/gestion/referentiel/sites:
     get:
       operationId: gestion_referentiel_sites_list
@@ -1547,6 +2652,8 @@ paths:
           type: integer
       tags:
       - gestion
+      security:
+      - sessionAgent: []
       responses:
         '200':
           content:
@@ -1572,6 +2679,8 @@ paths:
             schema:
               $ref: '#/components/schemas/SiteRequest'
         required: true
+      security:
+      - sessionAgent: []
       responses:
         '201':
           content:
@@ -1593,6 +2702,8 @@ paths:
         required: true
       tags:
       - gestion
+      security:
+      - sessionAgent: []
       responses:
         '200':
           content:
@@ -1625,6 +2736,8 @@ paths:
             schema:
               $ref: '#/components/schemas/SiteRequest'
         required: true
+      security:
+      - sessionAgent: []
       responses:
         '200':
           content:
@@ -1656,6 +2769,8 @@ paths:
           multipart/form-data:
             schema:
               $ref: '#/components/schemas/PatchedSiteRequest'
+      security:
+      - sessionAgent: []
       responses:
         '200':
           content:
@@ -1676,11 +2791,2600 @@ paths:
         required: true
       tags:
       - gestion
+      security:
+      - sessionAgent: []
       responses:
         '204':
           description: No response body
+  /api/gestion/reservations/campagnes:
+    get:
+      operationId: gestion_reservations_campagnes_list
+      description: '`chemin_site` : chemin ORM vers le site de l''objet (None = objet
+        transversal).'
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: Un numéro de page de l'ensemble des résultats.
+        schema:
+          type: integer
+      - name: taille
+        required: false
+        in: query
+        description: Nombre de résultats à retourner par page.
+        schema:
+          type: integer
+      tags:
+      - gestion
+      security:
+      - sessionAgent: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedCampagneList'
+          description: ''
+    post:
+      operationId: gestion_reservations_campagnes_create
+      description: '`chemin_site` : chemin ORM vers le site de l''objet (None = objet
+        transversal).'
+      tags:
+      - gestion
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CampagneRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/CampagneRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CampagneRequest'
+        required: true
+      security:
+      - sessionAgent: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Campagne'
+          description: ''
+  /api/gestion/reservations/campagnes/{id}:
+    get:
+      operationId: gestion_reservations_campagnes_retrieve
+      description: '`chemin_site` : chemin ORM vers le site de l''objet (None = objet
+        transversal).'
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un(une) valeur entière unique identifiant ce(cette) campagne.
+        required: true
+      tags:
+      - gestion
+      security:
+      - sessionAgent: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Campagne'
+          description: ''
+    put:
+      operationId: gestion_reservations_campagnes_update
+      description: '`chemin_site` : chemin ORM vers le site de l''objet (None = objet
+        transversal).'
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un(une) valeur entière unique identifiant ce(cette) campagne.
+        required: true
+      tags:
+      - gestion
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CampagneRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/CampagneRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CampagneRequest'
+        required: true
+      security:
+      - sessionAgent: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Campagne'
+          description: ''
+    patch:
+      operationId: gestion_reservations_campagnes_partial_update
+      description: '`chemin_site` : chemin ORM vers le site de l''objet (None = objet
+        transversal).'
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un(une) valeur entière unique identifiant ce(cette) campagne.
+        required: true
+      tags:
+      - gestion
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedCampagneRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedCampagneRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedCampagneRequest'
+      security:
+      - sessionAgent: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Campagne'
+          description: ''
+    delete:
+      operationId: gestion_reservations_campagnes_destroy
+      description: '`chemin_site` : chemin ORM vers le site de l''objet (None = objet
+        transversal).'
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un(une) valeur entière unique identifiant ce(cette) campagne.
+        required: true
+      tags:
+      - gestion
+      security:
+      - sessionAgent: []
+      responses:
+        '204':
+          description: No response body
+  /api/gestion/reservations/campagnes/{id}/analyse:
+    get:
+      operationId: gestion_reservations_campagnes_analyse_retrieve
+      description: Demandes concurrentes et proposition d'arbitrage RG-03.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un(une) valeur entière unique identifiant ce(cette) campagne.
+        required: true
+      tags:
+      - gestion
+      security:
+      - sessionAgent: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+  /api/gestion/reservations/campagnes/{id}/attribution:
+    post:
+      operationId: gestion_reservations_campagnes_attribution_create
+      description: '`chemin_site` : chemin ORM vers le site de l''objet (None = objet
+        transversal).'
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un(une) valeur entière unique identifiant ce(cette) campagne.
+        required: true
+      tags:
+      - gestion
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AttributionRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/AttributionRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/AttributionRequest'
+        required: true
+      security:
+      - sessionAgent: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+  /api/gestion/reservations/campagnes/{id}/statut:
+    post:
+      operationId: gestion_reservations_campagnes_statut_create
+      description: '`chemin_site` : chemin ORM vers le site de l''objet (None = objet
+        transversal).'
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un(une) valeur entière unique identifiant ce(cette) campagne.
+        required: true
+      tags:
+      - gestion
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StatutCampagneRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/StatutCampagneRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/StatutCampagneRequest'
+        required: true
+      security:
+      - sessionAgent: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Campagne'
+          description: ''
+  /api/gestion/reservations/dossiers:
+    get:
+      operationId: gestion_reservations_dossiers_list
+      description: '`chemin_site` : chemin ORM vers le site de l''objet (None = objet
+        transversal).'
+      parameters:
+      - in: query
+        name: campagne
+        schema:
+          type: integer
+      - in: query
+        name: origine
+        schema:
+          type: string
+          enum:
+          - campagne
+          - guichet
+          - portail
+          - ville
+        description: |-
+          * `guichet` - Guichet
+          * `portail` - Portail
+          * `campagne` - Campagne annuelle
+          * `ville` - Service municipal
+      - name: page
+        required: false
+        in: query
+        description: Un numéro de page de l'ensemble des résultats.
+        schema:
+          type: integer
+      - in: query
+        name: recherche
+        schema:
+          type: string
+      - in: query
+        name: saison
+        schema:
+          type: integer
+      - in: query
+        name: site
+        schema:
+          type: integer
+      - in: query
+        name: statut
+        schema:
+          type: string
+      - name: taille
+        required: false
+        in: query
+        description: Nombre de résultats à retourner par page.
+        schema:
+          type: integer
+      - in: query
+        name: type_reservation
+        schema:
+          type: integer
+      - in: query
+        name: usager
+        schema:
+          type: integer
+      tags:
+      - gestion
+      security:
+      - sessionAgent: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedDossierList'
+          description: ''
+    post:
+      operationId: gestion_reservations_dossiers_create
+      description: '`chemin_site` : chemin ORM vers le site de l''objet (None = objet
+        transversal).'
+      tags:
+      - gestion
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DossierRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/DossierRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/DossierRequest'
+        required: true
+      security:
+      - sessionAgent: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Dossier'
+          description: ''
+  /api/gestion/reservations/dossiers/{id}:
+    get:
+      operationId: gestion_reservations_dossiers_retrieve
+      description: '`chemin_site` : chemin ORM vers le site de l''objet (None = objet
+        transversal).'
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un(une) valeur entière unique identifiant ce(cette) dossier.
+        required: true
+      tags:
+      - gestion
+      security:
+      - sessionAgent: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Dossier'
+          description: ''
+    patch:
+      operationId: gestion_reservations_dossiers_partial_update
+      description: '`chemin_site` : chemin ORM vers le site de l''objet (None = objet
+        transversal).'
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un(une) valeur entière unique identifiant ce(cette) dossier.
+        required: true
+      tags:
+      - gestion
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedDossierRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedDossierRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedDossierRequest'
+      security:
+      - sessionAgent: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Dossier'
+          description: ''
+  /api/gestion/reservations/dossiers/{id}/apercu:
+    post:
+      operationId: gestion_reservations_dossiers_apercu_create
+      description: Séances générées et conflits avant enregistrement (PLA-04, PLA-07).
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un(une) valeur entière unique identifiant ce(cette) dossier.
+        required: true
+      tags:
+      - gestion
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NouvelleReservationRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/NouvelleReservationRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/NouvelleReservationRequest'
+        required: true
+      security:
+      - sessionAgent: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Apercu'
+          description: ''
+  /api/gestion/reservations/dossiers/{id}/reservations:
+    post:
+      operationId: gestion_reservations_dossiers_reservations_create
+      description: '`chemin_site` : chemin ORM vers le site de l''objet (None = objet
+        transversal).'
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un(une) valeur entière unique identifiant ce(cette) dossier.
+        required: true
+      tags:
+      - gestion
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NouvelleReservationRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/NouvelleReservationRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/NouvelleReservationRequest'
+        required: true
+      security:
+      - sessionAgent: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Reservation'
+          description: ''
+  /api/gestion/reservations/liste-attente:
+    get:
+      operationId: gestion_reservations_liste_attente_list
+      description: '`chemin_site` : chemin ORM vers le site de l''objet (None = objet
+        transversal).'
+      parameters:
+      - in: query
+        name: espace
+        schema:
+          type: integer
+      - name: page
+        required: false
+        in: query
+        description: Un numéro de page de l'ensemble des résultats.
+        schema:
+          type: integer
+      - in: query
+        name: statut
+        schema:
+          type: string
+          enum:
+          - abandonnee
+          - attente
+          - proposee
+          - satisfaite
+        description: |-
+          * `attente` - En attente
+          * `proposee` - Place proposée
+          * `satisfaite` - Satisfaite
+          * `abandonnee` - Abandonnée
+      - name: taille
+        required: false
+        in: query
+        description: Nombre de résultats à retourner par page.
+        schema:
+          type: integer
+      - in: query
+        name: usager
+        schema:
+          type: integer
+      tags:
+      - gestion
+      security:
+      - sessionAgent: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedListeAttenteList'
+          description: ''
+    post:
+      operationId: gestion_reservations_liste_attente_create
+      description: '`chemin_site` : chemin ORM vers le site de l''objet (None = objet
+        transversal).'
+      tags:
+      - gestion
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ListeAttenteRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ListeAttenteRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ListeAttenteRequest'
+        required: true
+      security:
+      - sessionAgent: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListeAttente'
+          description: ''
+  /api/gestion/reservations/liste-attente/{id}:
+    get:
+      operationId: gestion_reservations_liste_attente_retrieve
+      description: '`chemin_site` : chemin ORM vers le site de l''objet (None = objet
+        transversal).'
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un(une) valeur entière unique identifiant ce(cette) liste attente.
+        required: true
+      tags:
+      - gestion
+      security:
+      - sessionAgent: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListeAttente'
+          description: ''
+    delete:
+      operationId: gestion_reservations_liste_attente_destroy
+      description: '`chemin_site` : chemin ORM vers le site de l''objet (None = objet
+        transversal).'
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un(une) valeur entière unique identifiant ce(cette) liste attente.
+        required: true
+      tags:
+      - gestion
+      security:
+      - sessionAgent: []
+      responses:
+        '204':
+          description: No response body
+  /api/gestion/reservations/planning:
+    get:
+      operationId: gestion_reservations_planning_list
+      description: 'PLA-01 : séances d''une période pour les vues jour, semaine, mois,
+        chronologie, multi-sites et liste.'
+      parameters:
+      - in: query
+        name: debut
+        schema:
+          type: string
+      - in: query
+        name: espace
+        schema:
+          type: string
+      - in: query
+        name: famille
+        schema:
+          type: string
+      - in: query
+        name: fin
+        schema:
+          type: string
+      - in: query
+        name: site
+        schema:
+          type: string
+      - in: query
+        name: statut
+        schema:
+          type: string
+      - in: query
+        name: type_usager
+        schema:
+          type: string
+      tags:
+      - gestion
+      security:
+      - sessionAgent: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SeancePlanning'
+          description: ''
+  /api/gestion/reservations/reservations:
+    get:
+      operationId: gestion_reservations_reservations_list
+      description: '`chemin_site` : chemin ORM vers le site de l''objet (None = objet
+        transversal).'
+      parameters:
+      - in: query
+        name: dossier
+        schema:
+          type: integer
+      - in: query
+        name: dossier__campagne
+        schema:
+          type: integer
+      - in: query
+        name: dossier__usager
+        schema:
+          type: integer
+      - in: query
+        name: espace
+        schema:
+          type: integer
+      - name: page
+        required: false
+        in: query
+        description: Un numéro de page de l'ensemble des résultats.
+        schema:
+          type: integer
+      - in: query
+        name: statut
+        schema:
+          type: string
+          enum:
+          - annulee
+          - cloturee
+          - confirmee
+          - demande
+          - en_instruction
+          - option
+          - realisee
+          - refusee
+          - validee
+        description: |-
+          * `demande` - Demande
+          * `en_instruction` - En instruction
+          * `option` - Option
+          * `validee` - Validée
+          * `confirmee` - Confirmée
+          * `realisee` - Réalisée
+          * `cloturee` - Clôturée
+          * `refusee` - Refusée
+          * `annulee` - Annulée
+      - name: taille
+        required: false
+        in: query
+        description: Nombre de résultats à retourner par page.
+        schema:
+          type: integer
+      tags:
+      - gestion
+      security:
+      - sessionAgent: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedReservationList'
+          description: ''
+    post:
+      operationId: gestion_reservations_reservations_create
+      description: '`chemin_site` : chemin ORM vers le site de l''objet (None = objet
+        transversal).'
+      tags:
+      - gestion
+      security:
+      - sessionAgent: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Reservation'
+          description: ''
+  /api/gestion/reservations/reservations/{id}:
+    get:
+      operationId: gestion_reservations_reservations_retrieve
+      description: '`chemin_site` : chemin ORM vers le site de l''objet (None = objet
+        transversal).'
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un(une) valeur entière unique identifiant ce(cette) reservation.
+        required: true
+      tags:
+      - gestion
+      security:
+      - sessionAgent: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Reservation'
+          description: ''
+  /api/gestion/reservations/reservations/{id}/alternatives:
+    get:
+      operationId: gestion_reservations_reservations_alternatives_list
+      description: '`chemin_site` : chemin ORM vers le site de l''objet (None = objet
+        transversal).'
+      parameters:
+      - in: query
+        name: dossier
+        schema:
+          type: integer
+      - in: query
+        name: dossier__campagne
+        schema:
+          type: integer
+      - in: query
+        name: dossier__usager
+        schema:
+          type: integer
+      - in: query
+        name: espace
+        schema:
+          type: integer
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un(une) valeur entière unique identifiant ce(cette) reservation.
+        required: true
+      - name: page
+        required: false
+        in: query
+        description: Un numéro de page de l'ensemble des résultats.
+        schema:
+          type: integer
+      - in: query
+        name: statut
+        schema:
+          type: string
+          enum:
+          - annulee
+          - cloturee
+          - confirmee
+          - demande
+          - en_instruction
+          - option
+          - realisee
+          - refusee
+          - validee
+        description: |-
+          * `demande` - Demande
+          * `en_instruction` - En instruction
+          * `option` - Option
+          * `validee` - Validée
+          * `confirmee` - Confirmée
+          * `realisee` - Réalisée
+          * `cloturee` - Clôturée
+          * `refusee` - Refusée
+          * `annulee` - Annulée
+      - name: taille
+        required: false
+        in: query
+        description: Nombre de résultats à retourner par page.
+        schema:
+          type: integer
+      tags:
+      - gestion
+      security:
+      - sessionAgent: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedAlternativeList'
+          description: ''
+  /api/gestion/reservations/reservations/{id}/annuler:
+    post:
+      operationId: gestion_reservations_reservations_annuler_create
+      description: '`chemin_site` : chemin ORM vers le site de l''objet (None = objet
+        transversal).'
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un(une) valeur entière unique identifiant ce(cette) reservation.
+        required: true
+      tags:
+      - gestion
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MotifRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/MotifRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/MotifRequest'
+        required: true
+      security:
+      - sessionAgent: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Reservation'
+          description: ''
+  /api/gestion/reservations/reservations/{id}/cloturer:
+    post:
+      operationId: gestion_reservations_reservations_cloturer_create
+      description: '`chemin_site` : chemin ORM vers le site de l''objet (None = objet
+        transversal).'
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un(une) valeur entière unique identifiant ce(cette) reservation.
+        required: true
+      tags:
+      - gestion
+      security:
+      - sessionAgent: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Reservation'
+          description: ''
+  /api/gestion/reservations/reservations/{id}/confirmer:
+    post:
+      operationId: gestion_reservations_reservations_confirmer_create
+      description: '`chemin_site` : chemin ORM vers le site de l''objet (None = objet
+        transversal).'
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un(une) valeur entière unique identifiant ce(cette) reservation.
+        required: true
+      tags:
+      - gestion
+      security:
+      - sessionAgent: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Reservation'
+          description: ''
+  /api/gestion/reservations/reservations/{id}/instruire:
+    post:
+      operationId: gestion_reservations_reservations_instruire_create
+      description: '`chemin_site` : chemin ORM vers le site de l''objet (None = objet
+        transversal).'
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un(une) valeur entière unique identifiant ce(cette) reservation.
+        required: true
+      tags:
+      - gestion
+      security:
+      - sessionAgent: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Reservation'
+          description: ''
+  /api/gestion/reservations/reservations/{id}/modifier-serie:
+    post:
+      operationId: gestion_reservations_reservations_modifier_serie_create
+      description: '`chemin_site` : chemin ORM vers le site de l''objet (None = objet
+        transversal).'
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un(une) valeur entière unique identifiant ce(cette) reservation.
+        required: true
+      tags:
+      - gestion
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ModificationSerieRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ModificationSerieRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ModificationSerieRequest'
+      security:
+      - sessionAgent: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Reservation'
+          description: ''
+  /api/gestion/reservations/reservations/{id}/option:
+    post:
+      operationId: gestion_reservations_reservations_option_create
+      description: '`chemin_site` : chemin ORM vers le site de l''objet (None = objet
+        transversal).'
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un(une) valeur entière unique identifiant ce(cette) reservation.
+        required: true
+      tags:
+      - gestion
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OptionRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/OptionRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/OptionRequest'
+      security:
+      - sessionAgent: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Reservation'
+          description: ''
+  /api/gestion/reservations/reservations/{id}/priorite-municipale:
+    post:
+      operationId: gestion_reservations_reservations_priorite_municipale_create
+      description: '`chemin_site` : chemin ORM vers le site de l''objet (None = objet
+        transversal).'
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un(une) valeur entière unique identifiant ce(cette) reservation.
+        required: true
+      tags:
+      - gestion
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PrioriteMunicipaleRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PrioriteMunicipaleRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PrioriteMunicipaleRequest'
+        required: true
+      security:
+      - sessionAgent: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Reservation'
+          description: ''
+  /api/gestion/reservations/reservations/{id}/refuser:
+    post:
+      operationId: gestion_reservations_reservations_refuser_create
+      description: '`chemin_site` : chemin ORM vers le site de l''objet (None = objet
+        transversal).'
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un(une) valeur entière unique identifiant ce(cette) reservation.
+        required: true
+      tags:
+      - gestion
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RefusRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/RefusRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/RefusRequest'
+        required: true
+      security:
+      - sessionAgent: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Reservation'
+          description: ''
+  /api/gestion/reservations/reservations/{id}/valider:
+    post:
+      operationId: gestion_reservations_reservations_valider_create
+      description: '`chemin_site` : chemin ORM vers le site de l''objet (None = objet
+        transversal).'
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un(une) valeur entière unique identifiant ce(cette) reservation.
+        required: true
+      tags:
+      - gestion
+      security:
+      - sessionAgent: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Reservation'
+          description: ''
+  /api/gestion/reservations/seances:
+    get:
+      operationId: gestion_reservations_seances_list
+      description: '`chemin_site` : chemin ORM vers le site de l''objet (None = objet
+        transversal).'
+      parameters:
+      - in: query
+        name: debut
+        schema:
+          type: string
+          format: date-time
+      - in: query
+        name: espace
+        schema:
+          type: integer
+      - in: query
+        name: fin
+        schema:
+          type: string
+          format: date-time
+      - name: page
+        required: false
+        in: query
+        description: Un numéro de page de l'ensemble des résultats.
+        schema:
+          type: integer
+      - in: query
+        name: presence
+        schema:
+          type: string
+          enum:
+          - absent_non_signale
+          - absent_signale
+          - present
+        description: |-
+          * `present` - Présent
+          * `absent_signale` - Absence signalée
+          * `absent_non_signale` - Absence non signalée
+      - in: query
+        name: reservation
+        schema:
+          type: integer
+      - in: query
+        name: signalees
+        schema:
+          type: boolean
+      - in: query
+        name: statut
+        schema:
+          type: string
+          enum:
+          - annulee
+          - cloturee
+          - confirmee
+          - demande
+          - en_instruction
+          - option
+          - realisee
+          - refusee
+          - validee
+        description: |-
+          * `demande` - Demande
+          * `en_instruction` - En instruction
+          * `option` - Option
+          * `validee` - Validée
+          * `confirmee` - Confirmée
+          * `realisee` - Réalisée
+          * `cloturee` - Clôturée
+          * `refusee` - Refusée
+          * `annulee` - Annulée
+      - name: taille
+        required: false
+        in: query
+        description: Nombre de résultats à retourner par page.
+        schema:
+          type: integer
+      tags:
+      - gestion
+      security:
+      - sessionAgent: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedOccurrenceList'
+          description: ''
+    post:
+      operationId: gestion_reservations_seances_create
+      description: '`chemin_site` : chemin ORM vers le site de l''objet (None = objet
+        transversal).'
+      tags:
+      - gestion
+      security:
+      - sessionAgent: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Occurrence'
+          description: ''
+  /api/gestion/reservations/seances/{id}:
+    get:
+      operationId: gestion_reservations_seances_retrieve
+      description: '`chemin_site` : chemin ORM vers le site de l''objet (None = objet
+        transversal).'
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un(une) valeur entière unique identifiant ce(cette) occurrence.
+        required: true
+      tags:
+      - gestion
+      security:
+      - sessionAgent: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Occurrence'
+          description: ''
+  /api/gestion/reservations/seances/{id}/annuler:
+    post:
+      operationId: gestion_reservations_seances_annuler_create
+      description: '`chemin_site` : chemin ORM vers le site de l''objet (None = objet
+        transversal).'
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un(une) valeur entière unique identifiant ce(cette) occurrence.
+        required: true
+      tags:
+      - gestion
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MotifRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/MotifRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/MotifRequest'
+        required: true
+      security:
+      - sessionAgent: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Occurrence'
+          description: ''
+  /api/gestion/reservations/seances/{id}/controle-deplacement:
+    post:
+      operationId: gestion_reservations_seances_controle_deplacement_create
+      description: 'PLA-02 : contrôle côté serveur avant validation visuelle du glisser-déposer.'
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un(une) valeur entière unique identifiant ce(cette) occurrence.
+        required: true
+      tags:
+      - gestion
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeplacementRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/DeplacementRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/DeplacementRequest'
+        required: true
+      security:
+      - sessionAgent: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Controle'
+          description: ''
+  /api/gestion/reservations/seances/{id}/deplacer:
+    post:
+      operationId: gestion_reservations_seances_deplacer_create
+      description: '`chemin_site` : chemin ORM vers le site de l''objet (None = objet
+        transversal).'
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un(une) valeur entière unique identifiant ce(cette) occurrence.
+        required: true
+      tags:
+      - gestion
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeplacementRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/DeplacementRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/DeplacementRequest'
+        required: true
+      security:
+      - sessionAgent: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Occurrence'
+          description: ''
+  /api/gestion/reservations/seances/{id}/modifier-suivantes:
+    post:
+      operationId: gestion_reservations_seances_modifier_suivantes_create
+      description: '`chemin_site` : chemin ORM vers le site de l''objet (None = objet
+        transversal).'
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un(une) valeur entière unique identifiant ce(cette) occurrence.
+        required: true
+      tags:
+      - gestion
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ModificationSerieRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ModificationSerieRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ModificationSerieRequest'
+      security:
+      - sessionAgent: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Reservation'
+          description: ''
+  /api/gestion/reservations/seances/{id}/presence:
+    post:
+      operationId: gestion_reservations_seances_presence_create
+      description: '`chemin_site` : chemin ORM vers le site de l''objet (None = objet
+        transversal).'
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un(une) valeur entière unique identifiant ce(cette) occurrence.
+        required: true
+      tags:
+      - gestion
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PresenceRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PresenceRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PresenceRequest'
+        required: true
+      security:
+      - sessionAgent: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Occurrence'
+          description: ''
+  /api/gestion/reservations/types:
+    get:
+      operationId: gestion_reservations_types_list
+      description: '`chemin_site` : chemin ORM vers le site de l''objet (None = objet
+        transversal).'
+      tags:
+      - gestion
+      security:
+      - sessionAgent: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TypeReservation'
+          description: ''
+    post:
+      operationId: gestion_reservations_types_create
+      description: '`chemin_site` : chemin ORM vers le site de l''objet (None = objet
+        transversal).'
+      tags:
+      - gestion
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TypeReservationRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/TypeReservationRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/TypeReservationRequest'
+        required: true
+      security:
+      - sessionAgent: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TypeReservation'
+          description: ''
+  /api/gestion/reservations/types/{id}:
+    get:
+      operationId: gestion_reservations_types_retrieve
+      description: '`chemin_site` : chemin ORM vers le site de l''objet (None = objet
+        transversal).'
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un(une) valeur entière unique identifiant ce(cette) type reservation.
+        required: true
+      tags:
+      - gestion
+      security:
+      - sessionAgent: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TypeReservation'
+          description: ''
+    put:
+      operationId: gestion_reservations_types_update
+      description: '`chemin_site` : chemin ORM vers le site de l''objet (None = objet
+        transversal).'
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un(une) valeur entière unique identifiant ce(cette) type reservation.
+        required: true
+      tags:
+      - gestion
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TypeReservationRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/TypeReservationRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/TypeReservationRequest'
+        required: true
+      security:
+      - sessionAgent: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TypeReservation'
+          description: ''
+    patch:
+      operationId: gestion_reservations_types_partial_update
+      description: '`chemin_site` : chemin ORM vers le site de l''objet (None = objet
+        transversal).'
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un(une) valeur entière unique identifiant ce(cette) type reservation.
+        required: true
+      tags:
+      - gestion
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedTypeReservationRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedTypeReservationRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedTypeReservationRequest'
+      security:
+      - sessionAgent: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TypeReservation'
+          description: ''
+    delete:
+      operationId: gestion_reservations_types_destroy
+      description: '`chemin_site` : chemin ORM vers le site de l''objet (None = objet
+        transversal).'
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un(une) valeur entière unique identifiant ce(cette) type reservation.
+        required: true
+      tags:
+      - gestion
+      security:
+      - sessionAgent: []
+      responses:
+        '204':
+          description: No response body
+  /api/gestion/reservations/vues:
+    get:
+      operationId: gestion_reservations_vues_list
+      description: 'PLA-03 : vues du planning propres à chaque agent.'
+      tags:
+      - gestion
+      security:
+      - sessionAgent: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/VueEnregistree'
+          description: ''
+    post:
+      operationId: gestion_reservations_vues_create
+      description: 'PLA-03 : vues du planning propres à chaque agent.'
+      tags:
+      - gestion
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VueEnregistreeRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/VueEnregistreeRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/VueEnregistreeRequest'
+        required: true
+      security:
+      - sessionAgent: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VueEnregistree'
+          description: ''
+  /api/gestion/reservations/vues/{id}:
+    get:
+      operationId: gestion_reservations_vues_retrieve
+      description: 'PLA-03 : vues du planning propres à chaque agent.'
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un(une) valeur entière unique identifiant ce(cette) vue enregistree.
+        required: true
+      tags:
+      - gestion
+      security:
+      - sessionAgent: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VueEnregistree'
+          description: ''
+    put:
+      operationId: gestion_reservations_vues_update
+      description: 'PLA-03 : vues du planning propres à chaque agent.'
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un(une) valeur entière unique identifiant ce(cette) vue enregistree.
+        required: true
+      tags:
+      - gestion
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VueEnregistreeRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/VueEnregistreeRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/VueEnregistreeRequest'
+        required: true
+      security:
+      - sessionAgent: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VueEnregistree'
+          description: ''
+    patch:
+      operationId: gestion_reservations_vues_partial_update
+      description: 'PLA-03 : vues du planning propres à chaque agent.'
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un(une) valeur entière unique identifiant ce(cette) vue enregistree.
+        required: true
+      tags:
+      - gestion
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedVueEnregistreeRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedVueEnregistreeRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedVueEnregistreeRequest'
+      security:
+      - sessionAgent: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VueEnregistree'
+          description: ''
+    delete:
+      operationId: gestion_reservations_vues_destroy
+      description: 'PLA-03 : vues du planning propres à chaque agent.'
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un(une) valeur entière unique identifiant ce(cette) vue enregistree.
+        required: true
+      tags:
+      - gestion
+      security:
+      - sessionAgent: []
+      responses:
+        '204':
+          description: No response body
+  /api/gestion/usagers/contacts:
+    get:
+      operationId: gestion_usagers_contacts_list
+      description: '`chemin_site` : chemin ORM vers le site de l''objet (None = objet
+        transversal).'
+      parameters:
+      - in: query
+        name: courriel
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: Un numéro de page de l'ensemble des résultats.
+        schema:
+          type: integer
+      - name: taille
+        required: false
+        in: query
+        description: Nombre de résultats à retourner par page.
+        schema:
+          type: integer
+      tags:
+      - gestion
+      security:
+      - sessionAgent: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedContactList'
+          description: ''
+    post:
+      operationId: gestion_usagers_contacts_create
+      description: '`chemin_site` : chemin ORM vers le site de l''objet (None = objet
+        transversal).'
+      tags:
+      - gestion
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ContactRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ContactRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ContactRequest'
+        required: true
+      security:
+      - sessionAgent: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Contact'
+          description: ''
+  /api/gestion/usagers/contacts/{id}:
+    get:
+      operationId: gestion_usagers_contacts_retrieve
+      description: '`chemin_site` : chemin ORM vers le site de l''objet (None = objet
+        transversal).'
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un(une) valeur entière unique identifiant ce(cette) contact.
+        required: true
+      tags:
+      - gestion
+      security:
+      - sessionAgent: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Contact'
+          description: ''
+    patch:
+      operationId: gestion_usagers_contacts_partial_update
+      description: '`chemin_site` : chemin ORM vers le site de l''objet (None = objet
+        transversal).'
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un(une) valeur entière unique identifiant ce(cette) contact.
+        required: true
+      tags:
+      - gestion
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedContactRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedContactRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedContactRequest'
+      security:
+      - sessionAgent: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Contact'
+          description: ''
+  /api/gestion/usagers/pieces:
+    get:
+      operationId: gestion_usagers_pieces_list
+      description: '`chemin_site` : chemin ORM vers le site de l''objet (None = objet
+        transversal).'
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: Un numéro de page de l'ensemble des résultats.
+        schema:
+          type: integer
+      - in: query
+        name: statut
+        schema:
+          type: string
+          enum:
+          - a_verifier
+          - refuse
+          - valide
+        description: |-
+          * `a_verifier` - À vérifier
+          * `valide` - Valide
+          * `refuse` - Refusée
+      - name: taille
+        required: false
+        in: query
+        description: Nombre de résultats à retourner par page.
+        schema:
+          type: integer
+      - in: query
+        name: type_piece
+        schema:
+          type: integer
+      - in: query
+        name: usager
+        schema:
+          type: integer
+      tags:
+      - gestion
+      security:
+      - sessionAgent: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedPieceList'
+          description: ''
+    post:
+      operationId: gestion_usagers_pieces_create
+      description: '`chemin_site` : chemin ORM vers le site de l''objet (None = objet
+        transversal).'
+      tags:
+      - gestion
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/DepotPieceRequest'
+        required: true
+      security:
+      - sessionAgent: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Piece'
+          description: ''
+  /api/gestion/usagers/pieces/{id}:
+    get:
+      operationId: gestion_usagers_pieces_retrieve
+      description: '`chemin_site` : chemin ORM vers le site de l''objet (None = objet
+        transversal).'
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un(une) valeur entière unique identifiant ce(cette) piece justificative.
+        required: true
+      tags:
+      - gestion
+      security:
+      - sessionAgent: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Piece'
+          description: ''
+  /api/gestion/usagers/pieces/{id}/fichier:
+    get:
+      operationId: gestion_usagers_pieces_fichier_retrieve
+      description: '`chemin_site` : chemin ORM vers le site de l''objet (None = objet
+        transversal).'
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un(une) valeur entière unique identifiant ce(cette) piece justificative.
+        required: true
+      tags:
+      - gestion
+      security:
+      - sessionAgent: []
+      responses:
+        '200':
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+          description: ''
+  /api/gestion/usagers/pieces/{id}/verifier:
+    post:
+      operationId: gestion_usagers_pieces_verifier_create
+      description: '`chemin_site` : chemin ORM vers le site de l''objet (None = objet
+        transversal).'
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un(une) valeur entière unique identifiant ce(cette) piece justificative.
+        required: true
+      tags:
+      - gestion
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VerificationPieceRequest'
+        required: true
+      security:
+      - sessionAgent: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Piece'
+          description: ''
+  /api/gestion/usagers/pieces/alertes:
+    get:
+      operationId: gestion_usagers_pieces_alertes_list
+      description: 'USR-03 : pièces expirées ou qui expirent dans le délai d''alerte.'
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: Un numéro de page de l'ensemble des résultats.
+        schema:
+          type: integer
+      - in: query
+        name: statut
+        schema:
+          type: string
+          enum:
+          - a_verifier
+          - refuse
+          - valide
+        description: |-
+          * `a_verifier` - À vérifier
+          * `valide` - Valide
+          * `refuse` - Refusée
+      - name: taille
+        required: false
+        in: query
+        description: Nombre de résultats à retourner par page.
+        schema:
+          type: integer
+      - in: query
+        name: type_piece
+        schema:
+          type: integer
+      - in: query
+        name: usager
+        schema:
+          type: integer
+      tags:
+      - gestion
+      security:
+      - sessionAgent: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedPieceList'
+          description: ''
+  /api/gestion/usagers/rattachements:
+    get:
+      operationId: gestion_usagers_rattachements_list
+      description: '`chemin_site` : chemin ORM vers le site de l''objet (None = objet
+        transversal).'
+      parameters:
+      - in: query
+        name: contact
+        schema:
+          type: integer
+      - name: page
+        required: false
+        in: query
+        description: Un numéro de page de l'ensemble des résultats.
+        schema:
+          type: integer
+      - name: taille
+        required: false
+        in: query
+        description: Nombre de résultats à retourner par page.
+        schema:
+          type: integer
+      - in: query
+        name: usager
+        schema:
+          type: integer
+      tags:
+      - gestion
+      security:
+      - sessionAgent: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedRattachementList'
+          description: ''
+    post:
+      operationId: gestion_usagers_rattachements_create
+      description: '`chemin_site` : chemin ORM vers le site de l''objet (None = objet
+        transversal).'
+      tags:
+      - gestion
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RattachementRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/RattachementRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/RattachementRequest'
+        required: true
+      security:
+      - sessionAgent: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Rattachement'
+          description: ''
+  /api/gestion/usagers/rattachements/{id}:
+    get:
+      operationId: gestion_usagers_rattachements_retrieve
+      description: '`chemin_site` : chemin ORM vers le site de l''objet (None = objet
+        transversal).'
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un(une) valeur entière unique identifiant ce(cette) rattachement.
+        required: true
+      tags:
+      - gestion
+      security:
+      - sessionAgent: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Rattachement'
+          description: ''
+    put:
+      operationId: gestion_usagers_rattachements_update
+      description: '`chemin_site` : chemin ORM vers le site de l''objet (None = objet
+        transversal).'
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un(une) valeur entière unique identifiant ce(cette) rattachement.
+        required: true
+      tags:
+      - gestion
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RattachementRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/RattachementRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/RattachementRequest'
+        required: true
+      security:
+      - sessionAgent: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Rattachement'
+          description: ''
+    patch:
+      operationId: gestion_usagers_rattachements_partial_update
+      description: '`chemin_site` : chemin ORM vers le site de l''objet (None = objet
+        transversal).'
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un(une) valeur entière unique identifiant ce(cette) rattachement.
+        required: true
+      tags:
+      - gestion
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedRattachementRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedRattachementRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedRattachementRequest'
+      security:
+      - sessionAgent: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Rattachement'
+          description: ''
+    delete:
+      operationId: gestion_usagers_rattachements_destroy
+      description: '`chemin_site` : chemin ORM vers le site de l''objet (None = objet
+        transversal).'
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un(une) valeur entière unique identifiant ce(cette) rattachement.
+        required: true
+      tags:
+      - gestion
+      security:
+      - sessionAgent: []
+      responses:
+        '204':
+          description: No response body
+  /api/gestion/usagers/types-pieces:
+    get:
+      operationId: gestion_usagers_types_pieces_list
+      description: '`chemin_site` : chemin ORM vers le site de l''objet (None = objet
+        transversal).'
+      tags:
+      - gestion
+      security:
+      - sessionAgent: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TypePiece'
+          description: ''
+    post:
+      operationId: gestion_usagers_types_pieces_create
+      description: '`chemin_site` : chemin ORM vers le site de l''objet (None = objet
+        transversal).'
+      tags:
+      - gestion
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TypePieceRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/TypePieceRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/TypePieceRequest'
+        required: true
+      security:
+      - sessionAgent: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TypePiece'
+          description: ''
+  /api/gestion/usagers/types-pieces/{id}:
+    get:
+      operationId: gestion_usagers_types_pieces_retrieve
+      description: '`chemin_site` : chemin ORM vers le site de l''objet (None = objet
+        transversal).'
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un(une) valeur entière unique identifiant ce(cette) type piece.
+        required: true
+      tags:
+      - gestion
+      security:
+      - sessionAgent: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TypePiece'
+          description: ''
+    put:
+      operationId: gestion_usagers_types_pieces_update
+      description: '`chemin_site` : chemin ORM vers le site de l''objet (None = objet
+        transversal).'
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un(une) valeur entière unique identifiant ce(cette) type piece.
+        required: true
+      tags:
+      - gestion
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TypePieceRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/TypePieceRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/TypePieceRequest'
+        required: true
+      security:
+      - sessionAgent: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TypePiece'
+          description: ''
+    patch:
+      operationId: gestion_usagers_types_pieces_partial_update
+      description: '`chemin_site` : chemin ORM vers le site de l''objet (None = objet
+        transversal).'
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un(une) valeur entière unique identifiant ce(cette) type piece.
+        required: true
+      tags:
+      - gestion
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedTypePieceRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedTypePieceRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedTypePieceRequest'
+      security:
+      - sessionAgent: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TypePiece'
+          description: ''
+    delete:
+      operationId: gestion_usagers_types_pieces_destroy
+      description: '`chemin_site` : chemin ORM vers le site de l''objet (None = objet
+        transversal).'
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un(une) valeur entière unique identifiant ce(cette) type piece.
+        required: true
+      tags:
+      - gestion
+      security:
+      - sessionAgent: []
+      responses:
+        '204':
+          description: No response body
+  /api/gestion/usagers/usagers:
+    get:
+      operationId: gestion_usagers_usagers_list
+      description: '`chemin_site` : chemin ORM vers le site de l''objet (None = objet
+        transversal).'
+      parameters:
+      - in: query
+        name: conventionne
+        schema:
+          type: boolean
+      - in: query
+        name: local
+        schema:
+          type: boolean
+      - name: page
+        required: false
+        in: query
+        description: Un numéro de page de l'ensemble des résultats.
+        schema:
+          type: integer
+      - in: query
+        name: recherche
+        schema:
+          type: string
+      - in: query
+        name: resident
+        schema:
+          type: boolean
+      - in: query
+        name: statut
+        schema:
+          type: string
+          enum:
+          - anonymise
+          - en_attente
+          - suspendu
+          - valide
+        description: |-
+          * `en_attente` - En attente de validation
+          * `valide` - Validé
+          * `suspendu` - Suspendu
+          * `anonymise` - Anonymisé
+      - name: taille
+        required: false
+        in: query
+        description: Nombre de résultats à retourner par page.
+        schema:
+          type: integer
+      - in: query
+        name: type
+        schema:
+          type: string
+          enum:
+          - association
+          - autre_collectivite
+          - ecole
+          - entreprise
+          - particulier
+          - service_municipal
+        description: |-
+          * `association` - Association
+          * `ecole` - École ou établissement scolaire
+          * `entreprise` - Entreprise ou comité social et économique
+          * `particulier` - Particulier
+          * `service_municipal` - Service municipal
+          * `autre_collectivite` - Autre collectivité ou organisme public
+      tags:
+      - gestion
+      security:
+      - sessionAgent: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedUsagerList'
+          description: ''
+    post:
+      operationId: gestion_usagers_usagers_create
+      description: '`chemin_site` : chemin ORM vers le site de l''objet (None = objet
+        transversal).'
+      tags:
+      - gestion
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UsagerRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/UsagerRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/UsagerRequest'
+        required: true
+      security:
+      - sessionAgent: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Usager'
+          description: ''
+  /api/gestion/usagers/usagers/{id}:
+    get:
+      operationId: gestion_usagers_usagers_retrieve
+      description: '`chemin_site` : chemin ORM vers le site de l''objet (None = objet
+        transversal).'
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un(une) valeur entière unique identifiant ce(cette) usager.
+        required: true
+      tags:
+      - gestion
+      security:
+      - sessionAgent: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Usager'
+          description: ''
+    patch:
+      operationId: gestion_usagers_usagers_partial_update
+      description: '`chemin_site` : chemin ORM vers le site de l''objet (None = objet
+        transversal).'
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un(une) valeur entière unique identifiant ce(cette) usager.
+        required: true
+      tags:
+      - gestion
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedUsagerRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedUsagerRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedUsagerRequest'
+      security:
+      - sessionAgent: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Usager'
+          description: ''
+  /api/gestion/usagers/usagers/{id}/historique:
+    get:
+      operationId: gestion_usagers_usagers_historique_retrieve
+      description: 'USR-05 : dossiers et bilan d''occupation de l''usager.'
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un(une) valeur entière unique identifiant ce(cette) usager.
+        required: true
+      tags:
+      - gestion
+      security:
+      - sessionAgent: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+  /api/gestion/usagers/usagers/types:
+    get:
+      operationId: gestion_usagers_usagers_types_retrieve
+      description: '`chemin_site` : chemin ORM vers le site de l''objet (None = objet
+        transversal).'
+      tags:
+      - gestion
+      security:
+      - sessionAgent: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
 components:
   schemas:
+    Alternative:
+      type: object
+      properties:
+        espace:
+          type: integer
+        espace_nom:
+          type: string
+        debut:
+          type: string
+          format: date-time
+        fin:
+          type: string
+          format: date-time
+        raison:
+          type: string
+      required:
+      - debut
+      - espace
+      - espace_nom
+      - fin
+      - raison
+    Apercu:
+      type: object
+      properties:
+        seances:
+          type: array
+          items:
+            type: object
+            additionalProperties: {}
+        conflits:
+          type: array
+          items:
+            $ref: '#/components/schemas/Conflit'
+        hors_horaires:
+          type: array
+          items:
+            type: string
+            format: date-time
+        fermetures:
+          type: array
+          items:
+            type: string
+            format: date-time
+        description:
+          type: string
+      required:
+      - conflits
+      - description
+      - fermetures
+      - hors_horaires
+      - seances
+    AttributionRequest:
+      type: object
+      properties:
+        decisions:
+          type: object
+          additionalProperties:
+            $ref: '#/components/schemas/DecisionRequest'
+      required:
+      - decisions
     Batiment:
       type: object
       properties:
@@ -1732,6 +5436,80 @@ components:
       required:
       - nom
       - site
+    Campagne:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        saison:
+          type: integer
+        saison_nom:
+          type: string
+          readOnly: true
+        nom:
+          type: string
+          maxLength: 150
+        ouverture:
+          type: string
+          format: date
+        cloture:
+          type: string
+          format: date
+        date_commission:
+          type: string
+          format: date
+          nullable: true
+        statut:
+          allOf:
+          - $ref: '#/components/schemas/StatutCampagneEnum'
+          readOnly: true
+        sites:
+          type: array
+          items:
+            type: integer
+          description: 'Vide : tous les sites.'
+        nombre_demandes:
+          type: integer
+          readOnly: true
+      required:
+      - cloture
+      - id
+      - nom
+      - nombre_demandes
+      - ouverture
+      - saison
+      - saison_nom
+      - statut
+    CampagneRequest:
+      type: object
+      properties:
+        saison:
+          type: integer
+        nom:
+          type: string
+          minLength: 1
+          maxLength: 150
+        ouverture:
+          type: string
+          format: date
+        cloture:
+          type: string
+          format: date
+        date_commission:
+          type: string
+          format: date
+          nullable: true
+        sites:
+          type: array
+          items:
+            type: integer
+          description: 'Vide : tous les sites.'
+      required:
+      - cloture
+      - nom
+      - ouverture
+      - saison
     CodeTotpRequest:
       type: object
       properties:
@@ -1741,6 +5519,41 @@ components:
           pattern: ^\s*\d{3}\s?\d{3}\s*$
       required:
       - code
+    ColorationEnum:
+      enum:
+      - statut
+      - type_usager
+      type: string
+      description: |-
+        * `statut` - Par statut
+        * `type_usager` - Par type d'usager
+    Conflit:
+      type: object
+      properties:
+        occurrence:
+          type: integer
+        reservation:
+          type: integer
+        dossier:
+          type: string
+        usager:
+          type: string
+        espace:
+          type: string
+        debut:
+          type: string
+          format: date-time
+        fin:
+          type: string
+          format: date-time
+      required:
+      - debut
+      - dossier
+      - espace
+      - fin
+      - occurrence
+      - reservation
+      - usager
     ConnexionRequest:
       type: object
       properties:
@@ -1755,6 +5568,333 @@ components:
       required:
       - identifiant
       - mot_de_passe
+    Contact:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        civilite:
+          type: string
+          maxLength: 10
+        prenom:
+          type: string
+          maxLength: 100
+        nom:
+          type: string
+          maxLength: 100
+        courriel:
+          type: string
+          format: email
+          maxLength: 254
+        telephone:
+          type: string
+          maxLength: 20
+        rattachements:
+          type: array
+          items:
+            $ref: '#/components/schemas/Rattachement'
+          readOnly: true
+      required:
+      - courriel
+      - id
+      - nom
+      - prenom
+      - rattachements
+    ContactRequest:
+      type: object
+      properties:
+        civilite:
+          type: string
+          maxLength: 10
+        prenom:
+          type: string
+          minLength: 1
+          maxLength: 100
+        nom:
+          type: string
+          minLength: 1
+          maxLength: 100
+        courriel:
+          type: string
+          format: email
+          minLength: 1
+          maxLength: 254
+        telephone:
+          type: string
+          maxLength: 20
+      required:
+      - courriel
+      - nom
+      - prenom
+    Controle:
+      type: object
+      properties:
+        possible:
+          type: boolean
+        hors_horaires:
+          type: boolean
+        fermeture:
+          type: boolean
+        conflits:
+          type: array
+          items:
+            $ref: '#/components/schemas/Conflit'
+        alternatives:
+          type: array
+          items:
+            $ref: '#/components/schemas/Alternative'
+      required:
+      - alternatives
+      - conflits
+      - fermeture
+      - hors_horaires
+      - possible
+    DecisionEnum:
+      enum:
+      - attribuer
+      - refuser
+      type: string
+      description: |-
+        * `attribuer` - attribuer
+        * `refuser` - refuser
+    DecisionRequest:
+      type: object
+      properties:
+        decision:
+          $ref: '#/components/schemas/DecisionEnum'
+        motif:
+          type: string
+          default: ''
+          maxLength: 300
+      required:
+      - decision
+    DeplacementRequest:
+      type: object
+      properties:
+        espace:
+          type: integer
+        debut:
+          type: string
+          format: date-time
+        fin:
+          type: string
+          format: date-time
+        forcer_horaires:
+          type: boolean
+          default: false
+      required:
+      - debut
+      - espace
+      - fin
+    DepotNatureEnum:
+      enum:
+      - reglement
+      - plan
+      - securite
+      - autre
+      type: string
+      description: |-
+        * `reglement` - reglement
+        * `plan` - plan
+        * `securite` - securite
+        * `autre` - autre
+    DepotPieceRequest:
+      type: object
+      properties:
+        usager:
+          type: integer
+        type_piece:
+          type: integer
+        fichier:
+          type: string
+          format: binary
+        valide_jusqu_au:
+          type: string
+          format: date
+          nullable: true
+      required:
+      - fichier
+      - type_piece
+      - usager
+    DepotRequest:
+      type: object
+      properties:
+        espace:
+          type: integer
+        fichier:
+          type: string
+          format: binary
+        description:
+          type: string
+          minLength: 1
+          default: ''
+          maxLength: 250
+        titre:
+          type: string
+          minLength: 1
+          default: ''
+          maxLength: 200
+        nature:
+          allOf:
+          - $ref: '#/components/schemas/DepotNatureEnum'
+          default: reglement
+        public:
+          type: boolean
+          default: true
+        ordre:
+          type: integer
+          default: 0
+      required:
+      - espace
+      - fichier
+    Document:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        espace:
+          type: integer
+        nature:
+          $ref: '#/components/schemas/DocumentNatureEnum'
+        titre:
+          type: string
+          maxLength: 200
+        public:
+          type: boolean
+          description: Téléchargeable depuis le portail.
+        nom_fichier:
+          type: string
+          readOnly: true
+      required:
+      - espace
+      - id
+      - nom_fichier
+      - titre
+    DocumentNatureEnum:
+      enum:
+      - reglement
+      - plan
+      - securite
+      - autre
+      type: string
+      description: |-
+        * `reglement` - Règlement intérieur
+        * `plan` - Plan d'accès
+        * `securite` - Consignes de sécurité
+        * `autre` - Autre
+    Dossier:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        numero:
+          type: string
+          readOnly: true
+        usager:
+          type: integer
+        usager_nom:
+          type: string
+          readOnly: true
+        usager_type:
+          type: string
+          readOnly: true
+        contact:
+          type: integer
+          nullable: true
+        type_reservation:
+          type: integer
+        type_reservation_libelle:
+          type: string
+          readOnly: true
+        objet:
+          type: string
+          maxLength: 250
+        activite:
+          type: string
+          maxLength: 150
+        effectif:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+        saison:
+          type: integer
+          nullable: true
+        campagne:
+          type: integer
+          nullable: true
+        origine:
+          allOf:
+          - $ref: '#/components/schemas/OrigineEnum'
+          readOnly: true
+        observations:
+          type: string
+        statut:
+          type: string
+          readOnly: true
+        cree_le:
+          type: string
+          format: date-time
+          readOnly: true
+        depose_le:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        reservations:
+          type: array
+          items:
+            $ref: '#/components/schemas/Reservation'
+          readOnly: true
+      required:
+      - cree_le
+      - depose_le
+      - id
+      - numero
+      - objet
+      - origine
+      - reservations
+      - statut
+      - type_reservation
+      - type_reservation_libelle
+      - usager
+      - usager_nom
+      - usager_type
+    DossierRequest:
+      type: object
+      properties:
+        usager:
+          type: integer
+        contact:
+          type: integer
+          nullable: true
+        type_reservation:
+          type: integer
+        objet:
+          type: string
+          minLength: 1
+          maxLength: 250
+        activite:
+          type: string
+          maxLength: 150
+        effectif:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+        saison:
+          type: integer
+          nullable: true
+        campagne:
+          type: integer
+          nullable: true
+        observations:
+          type: string
+      required:
+      - objet
+      - type_reservation
+      - usager
     Enrolement:
       type: object
       properties:
@@ -1993,6 +6133,65 @@ components:
       required:
       - code
       - libelle
+    Fermeture:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        site:
+          type: integer
+          nullable: true
+        espace:
+          type: integer
+          nullable: true
+        debut:
+          type: string
+          format: date-time
+        fin:
+          type: string
+          format: date-time
+        motif:
+          type: string
+          maxLength: 250
+        cree_le:
+          type: string
+          format: date-time
+          readOnly: true
+        seances_touchees:
+          type: integer
+          readOnly: true
+          default: 0
+      required:
+      - cree_le
+      - debut
+      - fin
+      - id
+      - motif
+      - seances_touchees
+    FermetureRequest:
+      type: object
+      properties:
+        site:
+          type: integer
+          nullable: true
+        espace:
+          type: integer
+          nullable: true
+        debut:
+          type: string
+          format: date-time
+        fin:
+          type: string
+          format: date-time
+        motif:
+          type: string
+          minLength: 1
+          maxLength: 250
+      required:
+      - debut
+      - fin
+      - motif
     GroupeAD:
       type: object
       properties:
@@ -2130,6 +6329,64 @@ components:
       description: |-
         * `ad` - Groupe AD
         * `manuel` - Attribution manuelle
+    Horaire:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        espace:
+          type: integer
+        saison:
+          type: integer
+          nullable: true
+        jour_semaine:
+          allOf:
+          - $ref: '#/components/schemas/JourSemaineEnum'
+          minimum: 0
+          maximum: 32767
+        debut:
+          type: string
+          format: time
+        fin:
+          type: string
+          format: time
+        pendant_vacances:
+          type: boolean
+          description: Plage valable aussi pendant les vacances scolaires.
+      required:
+      - debut
+      - espace
+      - fin
+      - id
+      - jour_semaine
+    HoraireRequest:
+      type: object
+      properties:
+        espace:
+          type: integer
+        saison:
+          type: integer
+          nullable: true
+        jour_semaine:
+          allOf:
+          - $ref: '#/components/schemas/JourSemaineEnum'
+          minimum: 0
+          maximum: 32767
+        debut:
+          type: string
+          format: time
+        fin:
+          type: string
+          format: time
+        pendant_vacances:
+          type: boolean
+          description: Plage valable aussi pendant les vacances scolaires.
+      required:
+      - debut
+      - espace
+      - fin
+      - jour_semaine
     JetonEnrolementRequest:
       type: object
       properties:
@@ -2150,6 +6407,24 @@ components:
       required:
       - expire_le
       - jeton_enrolement
+    JourSemaineEnum:
+      enum:
+      - 0
+      - 1
+      - 2
+      - 3
+      - 4
+      - 5
+      - 6
+      type: integer
+      description: |-
+        * `0` - lundi
+        * `1` - mardi
+        * `2` - mercredi
+        * `3` - jeudi
+        * `4` - vendredi
+        * `5` - samedi
+        * `6` - dimanche
     JournalAudit:
       type: object
       properties:
@@ -2195,6 +6470,118 @@ components:
       - empreinte
       - horodatage
       - id
+    ListeAttente:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        espace:
+          type: integer
+        espace_nom:
+          type: string
+          readOnly: true
+        debut:
+          type: string
+          format: date-time
+        fin:
+          type: string
+          format: date-time
+        usager:
+          type: integer
+        usager_nom:
+          type: string
+          readOnly: true
+        contact:
+          type: integer
+          nullable: true
+        statut:
+          allOf:
+          - $ref: '#/components/schemas/StatutListeAttenteEnum'
+          readOnly: true
+        cree_le:
+          type: string
+          format: date-time
+          readOnly: true
+        notifie_le:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+      required:
+      - cree_le
+      - debut
+      - espace
+      - espace_nom
+      - fin
+      - id
+      - notifie_le
+      - statut
+      - usager
+      - usager_nom
+    ListeAttenteRequest:
+      type: object
+      properties:
+        espace:
+          type: integer
+        debut:
+          type: string
+          format: date-time
+        fin:
+          type: string
+          format: date-time
+        usager:
+          type: integer
+        contact:
+          type: integer
+          nullable: true
+      required:
+      - debut
+      - espace
+      - fin
+      - usager
+    ModeEnum:
+      enum:
+      - jour
+      - semaine
+      - mois
+      - chronologie
+      - multi_sites
+      - liste
+      type: string
+      description: |-
+        * `jour` - Jour
+        * `semaine` - Semaine
+        * `mois` - Mois
+        * `chronologie` - Chronologie par espace
+        * `multi_sites` - Occupation multi-sites
+        * `liste` - Liste
+    ModificationSerieRequest:
+      type: object
+      properties:
+        espace:
+          type: integer
+        heure_debut:
+          type: string
+          format: time
+        heure_fin:
+          type: string
+          format: time
+        date_fin:
+          type: string
+          format: date
+        recurrence:
+          type: string
+          maxLength: 200
+        exclure_vacances:
+          type: boolean
+        exclure_feries:
+          type: boolean
+        exdates:
+          type: array
+          items:
+            type: string
+            format: date
     Moi:
       type: object
       properties:
@@ -2229,6 +6616,198 @@ components:
       - id
       - identifiant
       - nom_affiche
+    MotifRequest:
+      type: object
+      properties:
+        motif:
+          type: string
+          minLength: 1
+          maxLength: 300
+      required:
+      - motif
+    NouvelleReservationRequest:
+      type: object
+      properties:
+        espace:
+          type: integer
+        date_debut:
+          type: string
+          format: date
+        date_fin:
+          type: string
+          format: date
+        heure_debut:
+          type: string
+          format: time
+        heure_fin:
+          type: string
+          format: time
+        recurrence:
+          type: string
+          default: ''
+          maxLength: 200
+        exclure_vacances:
+          type: boolean
+          default: true
+        exclure_feries:
+          type: boolean
+          default: true
+        exdates:
+          type: array
+          items:
+            type: string
+            format: date
+        forcer_horaires:
+          type: boolean
+          default: false
+      required:
+      - date_debut
+      - date_fin
+      - espace
+      - heure_debut
+      - heure_fin
+    Occurrence:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        reservation:
+          type: integer
+          readOnly: true
+        espace:
+          type: integer
+          readOnly: true
+        espace_nom:
+          type: string
+          readOnly: true
+        debut:
+          type: string
+          format: date-time
+          readOnly: true
+        fin:
+          type: string
+          format: date-time
+          readOnly: true
+        statut:
+          allOf:
+          - $ref: '#/components/schemas/StatutReservationEnum'
+          readOnly: true
+        bloquante:
+          type: boolean
+          readOnly: true
+        presence:
+          allOf:
+          - $ref: '#/components/schemas/OccurrencePresenceEnum'
+          readOnly: true
+        debut_reel:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        fin_reel:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        annulee_le:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        motif_annulation:
+          type: string
+          readOnly: true
+        annulation_tardive:
+          type: boolean
+          readOnly: true
+        annulee_par_usager:
+          type: boolean
+          readOnly: true
+        signalement:
+          type: string
+          readOnly: true
+          description: Fermeture ou conflit à traiter (REF-06).
+        debut_origine:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+          description: Avant déplacement.
+        modifiee_individuellement:
+          type: boolean
+          readOnly: true
+      required:
+      - annulation_tardive
+      - annulee_le
+      - annulee_par_usager
+      - bloquante
+      - debut
+      - debut_origine
+      - debut_reel
+      - espace
+      - espace_nom
+      - fin
+      - fin_reel
+      - id
+      - modifiee_individuellement
+      - motif_annulation
+      - presence
+      - reservation
+      - signalement
+      - statut
+    OccurrencePresenceEnum:
+      enum:
+      - present
+      - absent_signale
+      - absent_non_signale
+      type: string
+      description: |-
+        * `present` - Présent
+        * `absent_signale` - Absence signalée
+        * `absent_non_signale` - Absence non signalée
+    OptionRequest:
+      type: object
+      properties:
+        jours:
+          type: integer
+          maximum: 60
+          minimum: 1
+    OrigineEnum:
+      enum:
+      - guichet
+      - portail
+      - campagne
+      - ville
+      type: string
+      description: |-
+        * `guichet` - Guichet
+        * `portail` - Portail
+        * `campagne` - Campagne annuelle
+        * `ville` - Service municipal
+    PaginatedAlternativeList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Alternative'
     PaginatedBatimentList:
       type: object
       required:
@@ -2252,6 +6831,98 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Batiment'
+    PaginatedCampagneList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Campagne'
+    PaginatedContactList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Contact'
+    PaginatedDocumentList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Document'
+    PaginatedDossierList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Dossier'
     PaginatedEspaceList:
       type: object
       required:
@@ -2298,6 +6969,29 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/FamilleEspace'
+    PaginatedFermetureList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Fermeture'
     PaginatedGroupeADList:
       type: object
       required:
@@ -2367,6 +7061,52 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/JournalAudit'
+    PaginatedListeAttenteList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/ListeAttente'
+    PaginatedOccurrenceList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Occurrence'
     PaginatedPerimetreList:
       type: object
       required:
@@ -2390,6 +7130,98 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Perimetre'
+    PaginatedPhotoList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Photo'
+    PaginatedPieceList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Piece'
+    PaginatedRattachementList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Rattachement'
+    PaginatedReservationList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Reservation'
     PaginatedRoleList:
       type: object
       required:
@@ -2413,6 +7245,29 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Role'
+    PaginatedSaisonList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Saison'
     PaginatedSiteList:
       type: object
       required:
@@ -2436,6 +7291,29 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Site'
+    PaginatedUsagerList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Usager'
     PaginatedUtilisateurList:
       type: object
       required:
@@ -2459,6 +7337,26 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Utilisateur'
+    Parametre:
+      type: object
+      properties:
+        cle:
+          type: string
+        libelle:
+          type: string
+        groupe:
+          type: string
+        aide:
+          type: string
+        valeur: {}
+        defaut: {}
+      required:
+      - aide
+      - cle
+      - defaut
+      - groupe
+      - libelle
+      - valeur
     PatchedBatimentRequest:
       type: object
       properties:
@@ -2478,6 +7376,95 @@ components:
           maxLength: 3
         actif:
           type: boolean
+    PatchedCampagneRequest:
+      type: object
+      properties:
+        saison:
+          type: integer
+        nom:
+          type: string
+          minLength: 1
+          maxLength: 150
+        ouverture:
+          type: string
+          format: date
+        cloture:
+          type: string
+          format: date
+        date_commission:
+          type: string
+          format: date
+          nullable: true
+        sites:
+          type: array
+          items:
+            type: integer
+          description: 'Vide : tous les sites.'
+    PatchedContactRequest:
+      type: object
+      properties:
+        civilite:
+          type: string
+          maxLength: 10
+        prenom:
+          type: string
+          minLength: 1
+          maxLength: 100
+        nom:
+          type: string
+          minLength: 1
+          maxLength: 100
+        courriel:
+          type: string
+          format: email
+          minLength: 1
+          maxLength: 254
+        telephone:
+          type: string
+          maxLength: 20
+    PatchedDocumentRequest:
+      type: object
+      properties:
+        espace:
+          type: integer
+        nature:
+          $ref: '#/components/schemas/DocumentNatureEnum'
+        titre:
+          type: string
+          minLength: 1
+          maxLength: 200
+        public:
+          type: boolean
+          description: Téléchargeable depuis le portail.
+    PatchedDossierRequest:
+      type: object
+      properties:
+        usager:
+          type: integer
+        contact:
+          type: integer
+          nullable: true
+        type_reservation:
+          type: integer
+        objet:
+          type: string
+          minLength: 1
+          maxLength: 250
+        activite:
+          type: string
+          maxLength: 150
+        effectif:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+        saison:
+          type: integer
+          nullable: true
+        campagne:
+          type: integer
+          nullable: true
+        observations:
+          type: string
     PatchedEspaceRequest:
       type: object
       properties:
@@ -2595,6 +7582,34 @@ components:
           type: string
           format: date
           nullable: true
+    PatchedHoraireRequest:
+      type: object
+      properties:
+        espace:
+          type: integer
+        saison:
+          type: integer
+          nullable: true
+        jour_semaine:
+          allOf:
+          - $ref: '#/components/schemas/JourSemaineEnum'
+          minimum: 0
+          maximum: 32767
+        debut:
+          type: string
+          format: time
+        fin:
+          type: string
+          format: time
+        pendant_vacances:
+          type: boolean
+          description: Plage valable aussi pendant les vacances scolaires.
+    PatchedModificationRequest:
+      type: object
+      properties:
+        valeurs:
+          type: object
+          additionalProperties: {}
     PatchedPerimetreRequest:
       type: object
       properties:
@@ -2608,6 +7623,55 @@ components:
           type: array
           items:
             type: integer
+    PatchedPeriodeRequest:
+      type: object
+      properties:
+        saison:
+          type: integer
+        nature:
+          $ref: '#/components/schemas/PeriodeNatureEnum'
+        libelle:
+          type: string
+          minLength: 1
+          maxLength: 150
+        debut:
+          type: string
+          format: date
+        fin:
+          type: string
+          format: date
+          description: Incluse.
+        zone:
+          type: string
+          maxLength: 20
+    PatchedPhotoRequest:
+      type: object
+      properties:
+        espace:
+          type: integer
+        description:
+          type: string
+          minLength: 1
+          title: Description (texte alternatif)
+          maxLength: 250
+        ordre:
+          type: integer
+          maximum: 32767
+          minimum: 0
+    PatchedRattachementRequest:
+      type: object
+      properties:
+        usager:
+          type: integer
+        contact:
+          type: integer
+        role:
+          $ref: '#/components/schemas/RoleEnum'
+        principal:
+          type: boolean
+        peut_signer:
+          type: boolean
+          description: Signe les conventions au nom de l'usager.
     PatchedRoleRequest:
       type: object
       properties:
@@ -2630,6 +7694,21 @@ components:
           type: boolean
           description: 'Double authentification obligatoire (administration, régie
             : SEC-03).'
+    PatchedSaisonRequest:
+      type: object
+      properties:
+        nom:
+          type: string
+          minLength: 1
+          maxLength: 40
+        debut:
+          type: string
+          format: date
+        fin:
+          type: string
+          format: date
+        active:
+          type: boolean
     PatchedSiteRequest:
       type: object
       properties:
@@ -2656,6 +7735,117 @@ components:
           maxLength: 20
         actif:
           type: boolean
+    PatchedTypePieceRequest:
+      type: object
+      properties:
+        code:
+          type: string
+          minLength: 1
+          maxLength: 40
+          pattern: ^[-a-zA-Z0-9_]+$
+        libelle:
+          type: string
+          minLength: 1
+          maxLength: 150
+        description:
+          type: string
+        types_usager:
+          type: array
+          items:
+            $ref: '#/components/schemas/TypeUsagerEnum'
+        obligatoire:
+          type: boolean
+        validite_mois:
+          type: integer
+          maximum: 32767
+          minimum: 0
+          nullable: true
+          description: 'Vide : pas d''expiration.'
+    PatchedTypeReservationRequest:
+      type: object
+      properties:
+        code:
+          type: string
+          minLength: 1
+          maxLength: 40
+          pattern: ^[-a-zA-Z0-9_]+$
+        libelle:
+          type: string
+          minLength: 1
+          maxLength: 120
+        exige_pieces:
+          type: boolean
+          title: Pièces justificatives valides
+        exige_convention:
+          type: boolean
+          title: Convention ou contrat signé
+        exige_acompte:
+          type: boolean
+          title: Acompte payé
+        exige_caution:
+          type: boolean
+          title: Caution reçue
+        ordre:
+          type: integer
+          maximum: 32767
+          minimum: 0
+    PatchedUsagerRequest:
+      type: object
+      properties:
+        type:
+          $ref: '#/components/schemas/TypeUsagerEnum'
+        nom:
+          type: string
+          minLength: 1
+          title: Nom ou raison sociale
+          maxLength: 200
+        sigle:
+          type: string
+          maxLength: 40
+        siret:
+          type: string
+          maxLength: 14
+        rna:
+          type: string
+          title: Numéro RNA
+          maxLength: 10
+        adresse:
+          type: string
+          maxLength: 250
+        code_postal:
+          type: string
+          maxLength: 5
+        commune:
+          type: string
+          maxLength: 80
+        telephone:
+          type: string
+          maxLength: 20
+        courriel:
+          oneOf:
+          - type: string
+            format: email
+            maxLength: 254
+          - type: string
+            maxLength: 0
+        local:
+          type: boolean
+          title: Association locale
+          description: Siège sur la commune (priorité RG-03).
+        conventionne:
+          type: boolean
+          title: Conventionné(e) avec la Ville
+        convention_reference:
+          type: string
+          maxLength: 100
+        convention_fin:
+          type: string
+          format: date
+          nullable: true
+        statut:
+          $ref: '#/components/schemas/StatutUsagerEnum'
+        observations:
+          type: string
     PatchedUtilisateurRequest:
       type: object
       properties:
@@ -2664,6 +7854,20 @@ components:
           title: Actif
           description: Précise si l’utilisateur doit être considéré comme actif. Décochez
             ceci plutôt que de supprimer le compte.
+    PatchedVueEnregistreeRequest:
+      type: object
+      properties:
+        nom:
+          type: string
+          minLength: 1
+          maxLength: 100
+        mode:
+          $ref: '#/components/schemas/ModeEnum'
+        filtres: {}
+        coloration:
+          $ref: '#/components/schemas/ColorationEnum'
+        par_defaut:
+          type: boolean
     Perimetre:
       type: object
       properties:
@@ -2697,6 +7901,388 @@ components:
             type: integer
       required:
       - nom
+    Periode:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        saison:
+          type: integer
+        nature:
+          $ref: '#/components/schemas/PeriodeNatureEnum'
+        libelle:
+          type: string
+          maxLength: 150
+        debut:
+          type: string
+          format: date
+        fin:
+          type: string
+          format: date
+          description: Incluse.
+        zone:
+          type: string
+          maxLength: 20
+        source:
+          allOf:
+          - $ref: '#/components/schemas/PeriodeSourceEnum'
+          readOnly: true
+      required:
+      - debut
+      - fin
+      - id
+      - libelle
+      - nature
+      - saison
+      - source
+    PeriodeNatureEnum:
+      enum:
+      - vacances
+      - ferie
+      - fermeture_ville
+      type: string
+      description: |-
+        * `vacances` - Vacances scolaires
+        * `ferie` - Jour férié
+        * `fermeture_ville` - Fermeture générale de la Ville
+    PeriodeRequest:
+      type: object
+      properties:
+        saison:
+          type: integer
+        nature:
+          $ref: '#/components/schemas/PeriodeNatureEnum'
+        libelle:
+          type: string
+          minLength: 1
+          maxLength: 150
+        debut:
+          type: string
+          format: date
+        fin:
+          type: string
+          format: date
+          description: Incluse.
+        zone:
+          type: string
+          maxLength: 20
+      required:
+      - debut
+      - fin
+      - libelle
+      - nature
+      - saison
+    PeriodeSourceEnum:
+      enum:
+      - import
+      - calcul
+      - saisie
+      type: string
+      description: |-
+        * `import` - Open data Éducation nationale
+        * `calcul` - Calcul des jours fériés
+        * `saisie` - Saisie
+    Photo:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        espace:
+          type: integer
+        description:
+          type: string
+          title: Description (texte alternatif)
+          maxLength: 250
+        ordre:
+          type: integer
+          maximum: 32767
+          minimum: 0
+      required:
+      - description
+      - espace
+      - id
+    Piece:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        usager:
+          type: integer
+        usager_nom:
+          type: string
+          readOnly: true
+        type_piece:
+          type: integer
+        type_libelle:
+          type: string
+          readOnly: true
+        nom_fichier:
+          type: string
+          readOnly: true
+        valide_du:
+          type: string
+          format: date
+          nullable: true
+        valide_jusqu_au:
+          type: string
+          format: date
+          nullable: true
+        statut:
+          allOf:
+          - $ref: '#/components/schemas/StatutPieceEnum'
+          readOnly: true
+        motif_refus:
+          type: string
+          readOnly: true
+        verifie_le:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        depose_le:
+          type: string
+          format: date-time
+          readOnly: true
+        depose_par_portail:
+          type: boolean
+          readOnly: true
+      required:
+      - depose_le
+      - depose_par_portail
+      - id
+      - motif_refus
+      - nom_fichier
+      - statut
+      - type_libelle
+      - type_piece
+      - usager
+      - usager_nom
+      - verifie_le
+    PresencePresenceEnum:
+      enum:
+      - present
+      - absent_signale
+      - absent_non_signale
+      type: string
+      description: |-
+        * `present` - present
+        * `absent_signale` - absent_signale
+        * `absent_non_signale` - absent_non_signale
+    PresenceRequest:
+      type: object
+      properties:
+        presence:
+          $ref: '#/components/schemas/PresencePresenceEnum'
+        debut_reel:
+          type: string
+          format: date-time
+          nullable: true
+        fin_reel:
+          type: string
+          format: date-time
+          nullable: true
+      required:
+      - presence
+    PrioriteMunicipaleRequest:
+      type: object
+      properties:
+        motif:
+          type: string
+          minLength: 1
+          maxLength: 300
+        deplacements:
+          type: object
+          additionalProperties:
+            $ref: '#/components/schemas/DeplacementRequest'
+      required:
+      - motif
+    Rattachement:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        usager:
+          type: integer
+        usager_nom:
+          type: string
+          readOnly: true
+        contact:
+          type: integer
+        contact_nom:
+          type: string
+          readOnly: true
+        contact_courriel:
+          type: string
+          readOnly: true
+        role:
+          $ref: '#/components/schemas/RoleEnum'
+        principal:
+          type: boolean
+        peut_signer:
+          type: boolean
+          description: Signe les conventions au nom de l'usager.
+      required:
+      - contact
+      - contact_courriel
+      - contact_nom
+      - id
+      - usager
+      - usager_nom
+    RattachementRequest:
+      type: object
+      properties:
+        usager:
+          type: integer
+        contact:
+          type: integer
+        role:
+          $ref: '#/components/schemas/RoleEnum'
+        principal:
+          type: boolean
+        peut_signer:
+          type: boolean
+          description: Signe les conventions au nom de l'usager.
+      required:
+      - contact
+      - usager
+    RefusRequest:
+      type: object
+      properties:
+        motif:
+          type: string
+          minLength: 1
+          maxLength: 300
+        alternatives:
+          type: string
+          default: ''
+          maxLength: 500
+      required:
+      - motif
+    Reservation:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        dossier:
+          type: integer
+          readOnly: true
+        espace:
+          type: integer
+          readOnly: true
+        espace_nom:
+          type: string
+          readOnly: true
+        site_nom:
+          type: string
+          readOnly: true
+        statut:
+          allOf:
+          - $ref: '#/components/schemas/StatutReservationEnum'
+          readOnly: true
+        recurrence:
+          type: string
+          readOnly: true
+          title: Règle de récurrence (RFC 5545)
+        description:
+          type: string
+          readOnly: true
+        date_debut:
+          type: string
+          format: date
+          readOnly: true
+        date_fin:
+          type: string
+          format: date
+          readOnly: true
+        heure_debut:
+          type: string
+          format: time
+          readOnly: true
+        heure_fin:
+          type: string
+          format: time
+          readOnly: true
+        exclure_vacances:
+          type: boolean
+          readOnly: true
+        exclure_feries:
+          type: boolean
+          readOnly: true
+        exdates:
+          type: array
+          items:
+            type: string
+            format: date
+          readOnly: true
+        option_expire_le:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        option_relancee_le:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        motif_refus:
+          type: string
+          readOnly: true
+        motif_annulation:
+          type: string
+          readOnly: true
+        annulee_le:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        valide_le:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        confirme_le:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        nombre_occurrences:
+          type: integer
+          readOnly: true
+        conditions_manquantes:
+          type: array
+          items:
+            type: string
+          readOnly: true
+      required:
+      - annulee_le
+      - conditions_manquantes
+      - confirme_le
+      - date_debut
+      - date_fin
+      - description
+      - dossier
+      - espace
+      - espace_nom
+      - exclure_feries
+      - exclure_vacances
+      - exdates
+      - heure_debut
+      - heure_fin
+      - id
+      - motif_annulation
+      - motif_refus
+      - nombre_occurrences
+      - option_expire_le
+      - option_relancee_le
+      - recurrence
+      - site_nom
+      - statut
+      - valide_le
     Role:
       type: object
       properties:
@@ -2723,6 +8309,24 @@ components:
       - code
       - id
       - libelle
+    RoleEnum:
+      enum:
+      - president
+      - tresorier
+      - secretaire
+      - referent
+      - directeur
+      - responsable
+      - autre
+      type: string
+      description: |-
+        * `president` - Président(e)
+        * `tresorier` - Trésorier(ère)
+        * `secretaire` - Secrétaire
+        * `referent` - Référent(e)
+        * `directeur` - Directeur(trice)
+        * `responsable` - Responsable
+        * `autre` - Autre
     RoleRequest:
       type: object
       properties:
@@ -2748,6 +8352,95 @@ components:
       required:
       - code
       - libelle
+    Saison:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        nom:
+          type: string
+          maxLength: 40
+        debut:
+          type: string
+          format: date
+        fin:
+          type: string
+          format: date
+        active:
+          type: boolean
+      required:
+      - debut
+      - fin
+      - id
+      - nom
+    SaisonRequest:
+      type: object
+      properties:
+        nom:
+          type: string
+          minLength: 1
+          maxLength: 40
+        debut:
+          type: string
+          format: date
+        fin:
+          type: string
+          format: date
+        active:
+          type: boolean
+      required:
+      - debut
+      - fin
+      - nom
+    SeancePlanning:
+      type: object
+      properties:
+        id:
+          type: integer
+        reservation:
+          type: integer
+        dossier:
+          type: integer
+        numero:
+          type: string
+        objet:
+          type: string
+        usager:
+          type: string
+        type_usager:
+          type: string
+        espace:
+          type: integer
+        espace_nom:
+          type: string
+        site:
+          type: integer
+        debut:
+          type: string
+          format: date-time
+        fin:
+          type: string
+          format: date-time
+        statut:
+          type: string
+        signalement:
+          type: string
+      required:
+      - debut
+      - dossier
+      - espace
+      - espace_nom
+      - fin
+      - id
+      - numero
+      - objet
+      - reservation
+      - signalement
+      - site
+      - statut
+      - type_usager
+      - usager
     Site:
       type: object
       properties:
@@ -2808,6 +8501,384 @@ components:
       required:
       - code
       - nom
+    StatutCampagneEnum:
+      enum:
+      - preparation
+      - ouverte
+      - instruction
+      - commission
+      - attribuee
+      - close
+      type: string
+      description: |-
+        * `preparation` - En préparation
+        * `ouverte` - Ouverte aux demandes
+        * `instruction` - En instruction
+        * `commission` - En commission
+        * `attribuee` - Attribuée
+        * `close` - Close
+    StatutCampagneRequest:
+      type: object
+      properties:
+        statut:
+          $ref: '#/components/schemas/StatutCampagneStatutEnum'
+      required:
+      - statut
+    StatutCampagneStatutEnum:
+      enum:
+      - preparation
+      - ouverte
+      - instruction
+      - commission
+      - attribuee
+      - close
+      type: string
+      description: |-
+        * `preparation` - preparation
+        * `ouverte` - ouverte
+        * `instruction` - instruction
+        * `commission` - commission
+        * `attribuee` - attribuee
+        * `close` - close
+    StatutListeAttenteEnum:
+      enum:
+      - attente
+      - proposee
+      - satisfaite
+      - abandonnee
+      type: string
+      description: |-
+        * `attente` - En attente
+        * `proposee` - Place proposée
+        * `satisfaite` - Satisfaite
+        * `abandonnee` - Abandonnée
+    StatutPieceEnum:
+      enum:
+      - a_verifier
+      - valide
+      - refuse
+      type: string
+      description: |-
+        * `a_verifier` - À vérifier
+        * `valide` - Valide
+        * `refuse` - Refusée
+    StatutReservationEnum:
+      enum:
+      - demande
+      - en_instruction
+      - option
+      - validee
+      - confirmee
+      - realisee
+      - cloturee
+      - refusee
+      - annulee
+      type: string
+      description: |-
+        * `demande` - Demande
+        * `en_instruction` - En instruction
+        * `option` - Option
+        * `validee` - Validée
+        * `confirmee` - Confirmée
+        * `realisee` - Réalisée
+        * `cloturee` - Clôturée
+        * `refusee` - Refusée
+        * `annulee` - Annulée
+    StatutUsagerEnum:
+      enum:
+      - en_attente
+      - valide
+      - suspendu
+      - anonymise
+      type: string
+      description: |-
+        * `en_attente` - En attente de validation
+        * `valide` - Validé
+        * `suspendu` - Suspendu
+        * `anonymise` - Anonymisé
+    TypePiece:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        code:
+          type: string
+          maxLength: 40
+          pattern: ^[-a-zA-Z0-9_]+$
+        libelle:
+          type: string
+          maxLength: 150
+        description:
+          type: string
+        types_usager:
+          type: array
+          items:
+            $ref: '#/components/schemas/TypeUsagerEnum'
+        obligatoire:
+          type: boolean
+        validite_mois:
+          type: integer
+          maximum: 32767
+          minimum: 0
+          nullable: true
+          description: 'Vide : pas d''expiration.'
+      required:
+      - code
+      - id
+      - libelle
+    TypePieceRequest:
+      type: object
+      properties:
+        code:
+          type: string
+          minLength: 1
+          maxLength: 40
+          pattern: ^[-a-zA-Z0-9_]+$
+        libelle:
+          type: string
+          minLength: 1
+          maxLength: 150
+        description:
+          type: string
+        types_usager:
+          type: array
+          items:
+            $ref: '#/components/schemas/TypeUsagerEnum'
+        obligatoire:
+          type: boolean
+        validite_mois:
+          type: integer
+          maximum: 32767
+          minimum: 0
+          nullable: true
+          description: 'Vide : pas d''expiration.'
+      required:
+      - code
+      - libelle
+    TypeReservation:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        code:
+          type: string
+          maxLength: 40
+          pattern: ^[-a-zA-Z0-9_]+$
+        libelle:
+          type: string
+          maxLength: 120
+        exige_pieces:
+          type: boolean
+          title: Pièces justificatives valides
+        exige_convention:
+          type: boolean
+          title: Convention ou contrat signé
+        exige_acompte:
+          type: boolean
+          title: Acompte payé
+        exige_caution:
+          type: boolean
+          title: Caution reçue
+        ordre:
+          type: integer
+          maximum: 32767
+          minimum: 0
+      required:
+      - code
+      - id
+      - libelle
+    TypeReservationRequest:
+      type: object
+      properties:
+        code:
+          type: string
+          minLength: 1
+          maxLength: 40
+          pattern: ^[-a-zA-Z0-9_]+$
+        libelle:
+          type: string
+          minLength: 1
+          maxLength: 120
+        exige_pieces:
+          type: boolean
+          title: Pièces justificatives valides
+        exige_convention:
+          type: boolean
+          title: Convention ou contrat signé
+        exige_acompte:
+          type: boolean
+          title: Acompte payé
+        exige_caution:
+          type: boolean
+          title: Caution reçue
+        ordre:
+          type: integer
+          maximum: 32767
+          minimum: 0
+      required:
+      - code
+      - libelle
+    TypeUsagerEnum:
+      enum:
+      - association
+      - ecole
+      - entreprise
+      - particulier
+      - service_municipal
+      - autre_collectivite
+      type: string
+      description: |-
+        * `association` - Association
+        * `ecole` - École ou établissement scolaire
+        * `entreprise` - Entreprise ou comité social et économique
+        * `particulier` - Particulier
+        * `service_municipal` - Service municipal
+        * `autre_collectivite` - Autre collectivité ou organisme public
+    Usager:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        type:
+          $ref: '#/components/schemas/TypeUsagerEnum'
+        type_libelle:
+          type: string
+          readOnly: true
+        nom:
+          type: string
+          title: Nom ou raison sociale
+          maxLength: 200
+        sigle:
+          type: string
+          maxLength: 40
+        siret:
+          type: string
+          maxLength: 14
+        rna:
+          type: string
+          title: Numéro RNA
+          maxLength: 10
+        adresse:
+          type: string
+          maxLength: 250
+        code_postal:
+          type: string
+          maxLength: 5
+        commune:
+          type: string
+          maxLength: 80
+        telephone:
+          type: string
+          maxLength: 20
+        courriel:
+          oneOf:
+          - type: string
+            format: email
+            maxLength: 254
+          - type: string
+            maxLength: 0
+        resident:
+          type: boolean
+          readOnly: true
+          description: 'Calculé : siège ou domicile sur la commune (tarif résident).'
+        local:
+          type: boolean
+          title: Association locale
+          description: Siège sur la commune (priorité RG-03).
+        conventionne:
+          type: boolean
+          title: Conventionné(e) avec la Ville
+        convention_reference:
+          type: string
+          maxLength: 100
+        convention_fin:
+          type: string
+          format: date
+          nullable: true
+        statut:
+          $ref: '#/components/schemas/StatutUsagerEnum'
+        observations:
+          type: string
+        cree_le:
+          type: string
+          format: date-time
+          readOnly: true
+        rattachements:
+          type: array
+          items:
+            $ref: '#/components/schemas/Rattachement'
+          readOnly: true
+      required:
+      - cree_le
+      - id
+      - nom
+      - rattachements
+      - resident
+      - type
+      - type_libelle
+    UsagerRequest:
+      type: object
+      properties:
+        type:
+          $ref: '#/components/schemas/TypeUsagerEnum'
+        nom:
+          type: string
+          minLength: 1
+          title: Nom ou raison sociale
+          maxLength: 200
+        sigle:
+          type: string
+          maxLength: 40
+        siret:
+          type: string
+          maxLength: 14
+        rna:
+          type: string
+          title: Numéro RNA
+          maxLength: 10
+        adresse:
+          type: string
+          maxLength: 250
+        code_postal:
+          type: string
+          maxLength: 5
+        commune:
+          type: string
+          maxLength: 80
+        telephone:
+          type: string
+          maxLength: 20
+        courriel:
+          oneOf:
+          - type: string
+            format: email
+            maxLength: 254
+          - type: string
+            maxLength: 0
+        local:
+          type: boolean
+          title: Association locale
+          description: Siège sur la commune (priorité RG-03).
+        conventionne:
+          type: boolean
+          title: Conventionné(e) avec la Ville
+        convention_reference:
+          type: string
+          maxLength: 100
+        convention_fin:
+          type: string
+          format: date
+          nullable: true
+        statut:
+          $ref: '#/components/schemas/StatutUsagerEnum'
+        observations:
+          type: string
+      required:
+      - nom
+      - type
     Utilisateur:
       type: object
       properties:
@@ -2907,3 +8978,58 @@ components:
       - anomalies
       - entrees_verifiees
       - integre
+    VerificationPieceRequest:
+      type: object
+      properties:
+        valide:
+          type: boolean
+        motif:
+          type: string
+          default: ''
+          maxLength: 250
+        valide_jusqu_au:
+          type: string
+          format: date
+          nullable: true
+      required:
+      - valide
+    VueEnregistree:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        nom:
+          type: string
+          maxLength: 100
+        mode:
+          $ref: '#/components/schemas/ModeEnum'
+        filtres: {}
+        coloration:
+          $ref: '#/components/schemas/ColorationEnum'
+        par_defaut:
+          type: boolean
+      required:
+      - id
+      - nom
+    VueEnregistreeRequest:
+      type: object
+      properties:
+        nom:
+          type: string
+          minLength: 1
+          maxLength: 100
+        mode:
+          $ref: '#/components/schemas/ModeEnum'
+        filtres: {}
+        coloration:
+          $ref: '#/components/schemas/ColorationEnum'
+        par_defaut:
+          type: boolean
+      required:
+      - nom
+  securitySchemes:
+    sessionAgent:
+      type: apiKey
+      in: cookie
+      name: __Host-session-agent

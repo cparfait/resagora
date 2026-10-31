@@ -1,0 +1,243 @@
+"""API de gestion des usagers, contacts et pièces (USR-01 à USR-05)."""
+
+from __future__ import annotations
+
+from typing import Any
+
+import django_filters
+from django.db.models import QuerySet
+from django.http import FileResponse
+from drf_spectacular.utils import extend_schema
+from rest_framework import serializers, status
+from rest_framework.decorators import action
+from rest_framework.parsers import JSONParser, MultiPartParser
+from rest_framework.request import Request
+from rest_framework.response import Response
+
+from apps.habilitations.authentification import agent_courant
+from apps.noyau import fichiers
+from apps.noyau.api import VuePerimetre
+from apps.noyau.exceptions import ErreurValidation
+
+from .. import services
+from ..models import TYPES_USAGER, Contact, PieceJustificative, Rattachement, TypePiece, Usager
+
+LECTURE_ECRITURE = {"lecture": "lire_usager", "ecriture": "gerer_usager"}
+
+
+class RattachementSerializer(serializers.ModelSerializer):
+    contact_nom = serializers.CharField(source="contact.__str__", read_only=True)
+    contact_courriel = serializers.CharField(source="contact.courriel", read_only=True)
+    usager_nom = serializers.CharField(source="usager.nom", read_only=True)
+
+    class Meta:
+        model = Rattachement
+        fields = ["id", "usager", "usager_nom", "contact", "contact_nom", "contact_courriel", "role", "principal", "peut_signer"]
+
+
+class UsagerSerializer(serializers.ModelSerializer):
+    rattachements = RattachementSerializer(many=True, read_only=True)
+    type_libelle = serializers.CharField(source="get_type_display", read_only=True)
+
+    class Meta:
+        model = Usager
+        fields = [
+            "id",
+            "type",
+            "type_libelle",
+            "nom",
+            "sigle",
+            "siret",
+            "rna",
+            "adresse",
+            "code_postal",
+            "commune",
+            "telephone",
+            "courriel",
+            "resident",
+            "local",
+            "conventionne",
+            "convention_reference",
+            "convention_fin",
+            "statut",
+            "observations",
+            "cree_le",
+            "rattachements",
+        ]
+        read_only_fields = ["resident", "cree_le", "rattachements"]
+
+    def validate_siret(self, valeur: str) -> str:
+        valeur = valeur.replace(" ", "")
+        if valeur and (len(valeur) != 14 or not valeur.isdigit()):
+            raise serializers.ValidationError("Le SIRET comporte 14 chiffres.")
+        return valeur
+
+    def validate_rna(self, valeur: str) -> str:
+        valeur = valeur.strip().upper()
+        if valeur and not (len(valeur) == 10 and valeur[0] == "W" and valeur[1:].isdigit()):
+            raise serializers.ValidationError("Le numéro RNA a la forme W123456789.")
+        return valeur
+
+
+class ContactSerializer(serializers.ModelSerializer):
+    rattachements = RattachementSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Contact
+        fields = ["id", "civilite", "prenom", "nom", "courriel", "telephone", "rattachements"]
+
+
+class TypePieceSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = TypePiece
+        fields = ["id", "code", "libelle", "description", "types_usager", "obligatoire", "validite_mois"]
+
+
+class PieceSerializer(serializers.ModelSerializer):
+    type_libelle = serializers.CharField(source="type_piece.libelle", read_only=True)
+    usager_nom = serializers.CharField(source="usager.nom", read_only=True)
+    nom_fichier = serializers.CharField(source="fichier.nom_origine", read_only=True)
+
+    class Meta:
+        model = PieceJustificative
+        fields = [
+            "id",
+            "usager",
+            "usager_nom",
+            "type_piece",
+            "type_libelle",
+            "nom_fichier",
+            "valide_du",
+            "valide_jusqu_au",
+            "statut",
+            "motif_refus",
+            "verifie_le",
+            "depose_le",
+            "depose_par_portail",
+        ]
+        read_only_fields = ["statut", "motif_refus", "verifie_le", "depose_le", "depose_par_portail"]
+
+
+class DepotPieceSerializer(serializers.Serializer):
+    usager = serializers.PrimaryKeyRelatedField(queryset=Usager.objects.exclude(statut="anonymise"))
+    type_piece = serializers.PrimaryKeyRelatedField(queryset=TypePiece.objects.all())
+    fichier = serializers.FileField()
+    valide_jusqu_au = serializers.DateField(required=False, allow_null=True)
+
+
+class VerificationPieceSerializer(serializers.Serializer):
+    valide = serializers.BooleanField()
+    motif = serializers.CharField(required=False, allow_blank=True, default="", max_length=250)
+    valide_jusqu_au = serializers.DateField(required=False, allow_null=True)
+
+
+class FiltreUsagers(django_filters.FilterSet):
+    recherche = django_filters.CharFilter(method="filtrer")
+
+    class Meta:
+        model = Usager
+        fields = ["type", "statut", "conventionne", "local", "resident"]
+
+    def filtrer(self, qs: QuerySet[Usager], nom: str, valeur: str) -> QuerySet[Usager]:
+        return services.rechercher(qs, valeur)
+
+
+class VueUsagers(VuePerimetre):
+    queryset = Usager.objects.exclude(statut="anonymise").prefetch_related("rattachements__contact")
+    serializer_class = UsagerSerializer
+    actions_requises = {**LECTURE_ECRITURE, "historique": "lire_usager", "types": "lire_usager"}
+    filterset_class = FiltreUsagers
+    http_method_names = ["get", "post", "patch", "head", "options"]
+
+    @extend_schema(responses={200: dict})
+    @action(detail=True, methods=["get"])
+    def historique(self, request: Request, pk: str | None = None) -> Response:
+        """USR-05 : dossiers et bilan d'occupation de l'usager."""
+        donnees = services.historique(self.get_object())
+        return Response(
+            {
+                **{k: v for k, v in donnees.items() if k != "dossiers"},
+                "dossiers": [
+                    {"id": d.pk, "numero": d.numero, "objet": d.objet, "statut": d.statut, "cree_le": d.cree_le}
+                    for d in donnees["dossiers"][:200]
+                ],
+            }
+        )
+
+    @extend_schema(responses={200: dict})
+    @action(detail=False, methods=["get"])
+    def types(self, request: Request) -> Response:
+        return Response(dict(TYPES_USAGER))
+
+
+class VueContacts(VuePerimetre):
+    queryset = Contact.objects.filter(anonymise_le__isnull=True).prefetch_related("rattachements__usager")
+    serializer_class = ContactSerializer
+    actions_requises = LECTURE_ECRITURE
+    filterset_fields = ["courriel"]
+    http_method_names = ["get", "post", "patch", "head", "options"]
+
+
+class VueRattachements(VuePerimetre):
+    queryset = Rattachement.objects.select_related("usager", "contact")
+    serializer_class = RattachementSerializer
+    actions_requises = LECTURE_ECRITURE
+    filterset_fields = ["usager", "contact"]
+
+
+class VueTypesPieces(VuePerimetre):
+    queryset = TypePiece.objects.all()
+    serializer_class = TypePieceSerializer
+    actions_requises = {"lecture": "lire_usager", "ecriture": "gerer_parametres"}
+    pagination_class = None
+
+
+class VuePieces(VuePerimetre):
+    queryset = PieceJustificative.objects.select_related("usager", "type_piece", "fichier")
+    serializer_class = PieceSerializer
+    actions_requises = {
+        **LECTURE_ECRITURE,
+        "create": "gerer_usager",
+        "verifier": "gerer_usager",
+        "fichier": "lire_usager",
+        "alertes": "lire_usager",
+    }
+    filterset_fields = ["usager", "type_piece", "statut"]
+    http_method_names = ["get", "post", "head", "options"]
+    parser_classes = [MultiPartParser]
+
+    @extend_schema(request={"multipart/form-data": DepotPieceSerializer}, responses=PieceSerializer)
+    def create(self, request: Request, *args: Any, **kwargs: Any) -> Response:
+        donnees = DepotPieceSerializer(data=request.data)
+        donnees.is_valid(raise_exception=True)
+        televerse = donnees.validated_data["fichier"]
+        if televerse.size > fichiers.TAILLE_MAX:
+            raise ErreurValidation("Le fichier est trop volumineux.", code="fichier_trop_gros")
+        piece = services.deposer_piece(
+            donnees.validated_data["usager"],
+            donnees.validated_data["type_piece"],
+            televerse.name,
+            televerse.read(),
+            acteur=agent_courant(request),
+            valide_jusqu_au=donnees.validated_data.get("valide_jusqu_au"),
+        )
+        return Response(PieceSerializer(piece).data, status=status.HTTP_201_CREATED)
+
+    @extend_schema(request=VerificationPieceSerializer, responses=PieceSerializer)
+    @action(detail=True, methods=["post"], parser_classes=[JSONParser])
+    def verifier(self, request: Request, pk: str | None = None) -> Response:
+        donnees = VerificationPieceSerializer(data=request.data)
+        donnees.is_valid(raise_exception=True)
+        piece = services.verifier_piece(self.get_object(), acteur=agent_courant(request), **donnees.validated_data)
+        return Response(PieceSerializer(piece).data)
+
+    @extend_schema(responses={(200, "application/octet-stream"): bytes})
+    @action(detail=True, methods=["get"])
+    def fichier(self, request: Request, pk: str | None = None) -> FileResponse:
+        return fichiers.reponse_telechargement(self.get_object().fichier)
+
+    @extend_schema(responses=PieceSerializer(many=True))
+    @action(detail=False, methods=["get"])
+    def alertes(self, request: Request) -> Response:
+        """USR-03 : pièces expirées ou qui expirent dans le délai d'alerte."""
+        return Response(PieceSerializer(services.alertes_expiration()[:500], many=True).data)

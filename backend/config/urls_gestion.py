@@ -5,6 +5,7 @@ from drf_spectacular.views import SpectacularAPIView
 from rest_framework.routers import SimpleRouter
 
 from apps.audit.api import VueJournalAudit
+from apps.noyau.api_parametres import VueParametres
 from apps.noyau.views import sante
 
 routeur = SimpleRouter(trailing_slash=False)
@@ -13,6 +14,9 @@ routeur.register("audit/journal", VueJournalAudit, basename="journal-audit")
 gestion = [
     path("", include("apps.habilitations.api.urls")),
     path("", include("apps.referentiel.api.urls")),
+    path("", include("apps.usagers.api.urls")),
+    path("", include("apps.reservations.api.urls")),
+    path("parametres", VueParametres.as_view(), name="parametres"),
     *routeur.urls,
 ]
 

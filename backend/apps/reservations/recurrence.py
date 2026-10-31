@@ -23,7 +23,9 @@ if TYPE_CHECKING:
 PARIS = ZoneInfo("Europe/Paris")
 JOURS = {"MO": "lundi", "TU": "mardi", "WE": "mercredi", "TH": "jeudi", "FR": "vendredi", "SA": "samedi", "SU": "dimanche"}
 MAX_OCCURRENCES = 400
-REGLE_AUTORISEE = re.compile(r"^(FREQ=(DAILY|WEEKLY|MONTHLY))(;(INTERVAL=\d{1,2}|BYDAY=(\+?-?\d?(MO|TU|WE|TH|FR|SA|SU),?)+|UNTIL=\d{8}(T\d{6}Z?)?|COUNT=\d{1,3}|BYMONTHDAY=-?\d{1,2}|WKST=(MO|SU)))*$")
+REGLE_AUTORISEE = re.compile(
+    r"^(FREQ=(DAILY|WEEKLY|MONTHLY))(;(INTERVAL=\d{1,2}|BYDAY=(\+?-?\d?(MO|TU|WE|TH|FR|SA|SU),?)+|UNTIL=\d{8}(T\d{6}Z?)?|COUNT=\d{1,3}|BYMONTHDAY=-?\d{1,2}|WKST=(MO|SU)))*$"
+)
 
 
 def heure(t: time) -> str:
@@ -33,7 +35,9 @@ def heure(t: time) -> str:
 def valider_regle(regle: str) -> str:
     regle = regle.strip().upper().removeprefix("RRULE:")
     if regle and not REGLE_AUTORISEE.match(regle):
-        raise ErreurValidation("Règle de récurrence non reconnue (FREQ, INTERVAL, BYDAY, UNTIL ou COUNT).", code="recurrence_invalide")
+        raise ErreurValidation(
+            "Règle de récurrence non reconnue (FREQ, INTERVAL, BYDAY, UNTIL ou COUNT).", code="recurrence_invalide"
+        )
     return regle
 
 
@@ -85,7 +89,9 @@ def generer_plages(reservation: Reservation) -> list[tuple[datetime, datetime]]:
             continue
         plages.append(plage_locale(instant.date(), reservation.heure_debut, reservation.heure_fin))
         if len(plages) > MAX_OCCURRENCES:
-            raise ErreurValidation(f"Plus de {MAX_OCCURRENCES} séances : réduisez la période ou la fréquence.", code="trop_d_occurrences")
+            raise ErreurValidation(
+                f"Plus de {MAX_OCCURRENCES} séances : réduisez la période ou la fréquence.", code="trop_d_occurrences"
+            )
     return plages
 
 
@@ -110,7 +116,11 @@ def decrire(reservation: Reservation) -> str:
         texte = "tous les jours" if intervalle == 1 else f"tous les {intervalle} jours"
     else:
         texte = "tous les mois" if intervalle == 1 else f"tous les {intervalle} mois"
-    exclusions = [e for e, actif in (("vacances scolaires", reservation.exclure_vacances), ("jours fériés", reservation.exclure_feries)) if actif]
+    exclusions = [
+        e
+        for e, actif in (("vacances scolaires", reservation.exclure_vacances), ("jours fériés", reservation.exclure_feries))
+        if actif
+    ]
     hors = f", hors {' et '.join(exclusions)}" if exclusions else ""
     periode = f", du {date_format(reservation.date_debut, 'j F Y')} au {date_format(reservation.date_fin, 'j F Y')}"
     return f"{texte} {horaires}{hors}{periode}"
