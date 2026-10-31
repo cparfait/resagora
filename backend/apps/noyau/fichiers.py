@@ -14,6 +14,7 @@ import secrets
 import socket
 import struct
 from pathlib import Path
+from urllib.parse import quote
 
 from django.conf import settings
 from django.http import FileResponse
@@ -142,7 +143,7 @@ def lire(fichier: Fichier) -> bytes:
 def reponse_telechargement(fichier: Fichier, en_ligne: bool = False) -> FileResponse:
     reponse = FileResponse(iter([lire(fichier)]), content_type=fichier.type_mime)
     disposition = "inline" if en_ligne else "attachment"
-    nom_ascii = fichier.nom_origine.encode("ascii", "ignore").decode() or "document"
-    reponse["Content-Disposition"] = f'{disposition}; filename="{nom_ascii}"'
+    nom_ascii = fichier.nom_origine.encode("ascii", "ignore").decode().replace('"', "") or "document"
+    reponse["Content-Disposition"] = f"{disposition}; filename=\"{nom_ascii}\"; filename*=UTF-8''{quote(fichier.nom_origine)}"
     reponse["X-Content-Type-Options"] = "nosniff"
     return reponse

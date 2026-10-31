@@ -10,8 +10,9 @@ from django.db.models import Q, QuerySet
 from django.utils import timezone
 
 from apps.audit.services import journaliser
+from apps.habilitations.services import exiger
 from apps.noyau import fichiers
-from apps.noyau.exceptions import ErreurValidation
+from apps.noyau.exceptions import ErreurMetier, ErreurValidation
 from apps.noyau.parametres import parametre
 
 from .models import PieceJustificative, TypePiece, Usager
@@ -69,6 +70,7 @@ def deposer_piece(
         fichier=fichier,
         valide_jusqu_au=valide_jusqu_au,
         depose_par_portail=portail,
+        deposee_par=acteur if hasattr(acteur, "habilitations") else None,
     )
     journaliser("deposer_piece", piece, apres={"type": type_piece.code, "fichier": fichier.sha256}, acteur=acteur)
     return piece
@@ -81,6 +83,15 @@ def verifier_piece(
     if not valide and not motif.strip():
         raise ErreurValidation("Indiquez le motif du refus de la pièce.", code="motif_requis")
     piece = PieceJustificative.objects.select_for_update().get(pk=piece.pk)
+    if (
+        valide
+        and parametre("pieces.double_controle")
+        and piece.deposee_par_id is not None
+        and piece.deposee_par_id == getattr(acteur, "pk", None)
+    ):
+        raise ErreurMetier(
+            "Une autre personne doit valider la pièce que vous avez déposée (double contrôle).", code="double_controle"
+        )
     piece.statut = "valide" if valide else "refuse"
     piece.motif_refus = "" if valide else motif.strip()
     if valide_jusqu_au is not None:
@@ -126,12 +137,15 @@ def rang_priorite(usager: Usager, debut: datetime) -> int:
     return ordre.index(categorie) if categorie in ordre else len(ordre)
 
 
-def historique(usager: Usager) -> dict[str, Any]:
-    """Dossiers et occupations de l'usager (USR-05)."""
+def historique(usager: Usager, sites: set[int] | None = None) -> dict[str, Any]:
+    """Dossiers et occupations de l'usager (USR-05), limités aux sites lisibles par l'agent (RG-14)."""
     from apps.reservations.models import Dossier, Occurrence
 
     dossiers = Dossier.objects.filter(usager=usager).order_by("-cree_le")
     occupations = Occurrence.objects.filter(reservation__dossier__usager=usager)
+    if sites is not None:
+        dossiers = dossiers.filter(reservations__espace__batiment__site__in=sites).distinct()
+        occupations = occupations.filter(espace__batiment__site__in=sites)
     return {
         "dossiers": dossiers,
         "occurrences_total": occupations.count(),
@@ -139,6 +153,32 @@ def historique(usager: Usager) -> dict[str, Any]:
         "occurrences_annulees": occupations.filter(statut="annulee").count(),
         "absences_non_signalees": occupations.filter(presence="absent_non_signale").count(),
     }
+
+
+STATUTS_MANUELS = {"valide", "suspendu"}
+
+
+@transaction.atomic
+def changer_statut(usager: Usager, cible: str, *, depuis: set[str], acteur: Any, motif: str = "") -> Usager:
+    """Validation, suspension et réactivation d'un usager : action dédiée, droit `valider_compte_usager`.
+
+    L'anonymisation ne passe jamais par ici (service RGPD dédié, droit `anonymiser_usager`).
+    """
+    exiger(acteur, "valider_compte_usager")
+    if cible not in STATUTS_MANUELS:
+        raise ErreurValidation("Statut non modifiable par cette action.", code="statut_invalide")
+    usager = Usager.objects.select_for_update().get(pk=usager.pk)
+    if usager.statut not in depuis:
+        raise ErreurMetier(f"Action impossible pour un usager « {usager.get_statut_display()} ».", code="transition_interdite")
+    if cible == "suspendu" and not motif.strip():
+        raise ErreurValidation("Indiquez le motif de la suspension.", code="motif_requis")
+    avant = usager.statut
+    usager.statut = cible
+    if cible == "suspendu":
+        usager.observations = f"{usager.observations}\nSuspension : {motif.strip()}".strip()
+    usager.save(update_fields=["statut", "observations"])
+    journaliser(f"usager_{cible}", usager, avant={"statut": avant}, apres={"statut": cible, "motif": motif}, acteur=acteur)
+    return usager
 
 
 def rechercher(qs: QuerySet[Usager], texte: str) -> QuerySet[Usager]:

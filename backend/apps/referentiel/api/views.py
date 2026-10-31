@@ -2,6 +2,10 @@
 
 from __future__ import annotations
 
+from typing import Any
+
+from django.db import transaction
+
 from apps.noyau.api import VuePerimetre
 
 from ..models import Batiment, Espace, FamilleEspace, Site
@@ -38,3 +42,25 @@ class VueEspaces(VuePerimetre):
     actions_requises = DROITS
     chemin_site = "batiment__site"
     filterset_fields = ["batiment", "batiment__site", "famille", "parent", "actif", "gardiennage_requis", "partageable"]
+
+    CHAMPS_HIERARCHIE = ("parent_id", "partageable", "capacite_simultanee")
+
+    def _recalculer(self, espaces: list[Espace]) -> None:
+        """REF-05 : un changement de hiérarchie ou de partage replace les verrous (RG-01) ; un conflit annule tout."""
+        from apps.reservations.services import recalculer_verrous
+
+        recalculer_verrous([e for e in espaces if e is not None])
+
+    def perform_create(self, serializer: Any) -> None:
+        with transaction.atomic():
+            super().perform_create(serializer)
+            if serializer.instance.parent_id:
+                self._recalculer([serializer.instance])
+
+    def perform_update(self, serializer: Any) -> None:
+        avant = {c: getattr(serializer.instance, c) for c in self.CHAMPS_HIERARCHIE}
+        ancien_parent = serializer.instance.parent
+        with transaction.atomic():
+            super().perform_update(serializer)
+            if any(getattr(serializer.instance, c) != v for c, v in avant.items()):
+                self._recalculer([serializer.instance, ancien_parent])

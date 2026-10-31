@@ -177,8 +177,21 @@ def test_pla02_deplacement_vers_un_espace_hors_perimetre_refuse(client_agent, co
 def test_pla10_annulation_et_presence_par_l_api(client_agent, contexte):
     with freeze_time("2026-11-01 10:00"):
         client = client_agent(contexte["gestionnaire_a"])
-        seance = valider_systeme(reserver(contexte["espace_a"], date(2026, 11, 10), "18:00", "20:00")).occurrences.get()
+        seance = valider_systeme(
+            reserver(contexte["espace_a"], date(2026, 11, 10), "18:00", "20:00", type_code="scolaire")
+        ).occurrences.get()
         assert client.post(f"/api/gestion/reservations/seances/{seance.pk}/annuler", {}, format="json").status_code == 400
+        tardive = valider_systeme(reserver(contexte["espace_a"], date(2026, 11, 2), "18:00", "20:00")).occurrences.get()
+        reponse = client.post(
+            f"/api/gestion/reservations/seances/{tardive.pk}/annuler",
+            {"motif": "L'association a appelé", "par_usager": True},
+            format="json",
+        )
+        assert reponse.status_code == 200 and reponse.json()["annulation_tardive"] is True
+        refus = client_agent(agent("gestionnaire", contexte["site_b"])).post(
+            f"/api/gestion/reservations/seances/{seance.pk}/annuler", {"motif": "Hors périmètre"}, format="json"
+        )
+        assert refus.status_code == 404
     with freeze_time("2026-11-11 10:00"):
         client = client_agent(contexte["gestionnaire_a"])
         reponse = client.post(f"/api/gestion/reservations/seances/{seance.pk}/presence", {"presence": "present"}, format="json")
@@ -258,7 +271,18 @@ def test_pla05_campagne_par_l_api(client_agent):
     assert Campagne.objects.get(pk=identifiant).statut == "commission"
 
 
+@freeze_time("2026-11-01 10:00")
 def test_pla09_inscription_liste_attente_par_l_api(client_agent, contexte):
+    corps = {
+        "espace": contexte["espace_a"].pk,
+        "debut": paris(2026, 11, 20, 18).isoformat(),
+        "fin": paris(2026, 11, 20, 20).isoformat(),
+        "usager": contexte["usager"].pk,
+    }
+    libre = client_agent(contexte["gestionnaire_a"]).post("/api/gestion/reservations/liste-attente", corps, format="json")
+    assert libre.status_code == 409 and libre.json()["code"] == "creneau_libre"
+    valider_systeme(reserver(contexte["espace_a"], date(2026, 11, 20), "18:00", "20:00"))
+    valider_systeme(reserver(contexte["espace_b"], date(2026, 11, 20), "18:00", "20:00"))
     corps = {
         "espace": contexte["espace_a"].pk,
         "debut": paris(2026, 11, 20, 18).isoformat(),

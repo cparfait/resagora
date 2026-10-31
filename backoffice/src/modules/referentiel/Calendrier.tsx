@@ -50,7 +50,7 @@ export default function Calendrier() {
         colonnes={[
           { cle: "nom", titre: "Saison", rendu: (s) => s.nom },
           { cle: "periode", titre: "Période", rendu: (s) => `du ${dateSimple(s.debut)} au ${dateSimple(s.fin)}` },
-          { cle: "active", titre: "État", rendu: (s) => (s.active ? <Badge libelle="Saison en cours" ton="succes" /> : <Badge libelle="Inactive" />) },
+          { cle: "active", titre: "État", rendu: (s) => (s.cloturee ? <Badge libelle="Close" ton="attention" /> : s.active ? <Badge libelle="Saison en cours" ton="succes" /> : <Badge libelle="Inactive" />) },
         ]}
         actionsLigne={(s) =>
           peut("gerer_parametres") ? (
@@ -64,6 +64,7 @@ export default function Calendrier() {
           { nom: "debut", libelle: "Début", type: "date", obligatoire: true },
           { nom: "fin", libelle: "Fin", type: "date", obligatoire: true },
           { nom: "active", libelle: "Saison en cours", type: "booleen" },
+          { nom: "cloturee", libelle: "Saison close (plus aucune création ni modification de réservation)", type: "booleen" },
         ]}
       />
       <section aria-labelledby="titre-periodes">

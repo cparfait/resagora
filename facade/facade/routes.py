@@ -59,6 +59,7 @@ ROUTES: list[Route] = [
     r("POST", "/api/portail/auth/confirmation-courriel", debit="inscription"),
     r("POST", "/api/portail/auth/mot-de-passe-oublie", debit="reinitialisation"),
     r("POST", "/api/portail/auth/reinitialisation", debit="reinitialisation"),
+    r("POST", "/api/portail/auth/invitation", debit="reinitialisation"),
     r("GET", "/api/portail/compte", session=True),
     r("PATCH", "/api/portail/compte", session=True),
     r("POST", "/api/portail/compte/mot-de-passe", session=True, debit="connexion"),
@@ -66,6 +67,8 @@ ROUTES: list[Route] = [
     r("POST", "/api/portail/compte/totp", session=True, debit="connexion"),
     r("DELETE", "/api/portail/compte/totp", session=True),
     r("GET", "/api/portail/compte/export", Nature.TELECHARGEMENT, session=True),
+    r("GET", "/api/portail/compte/preferences", session=True),
+    r("PATCH", "/api/portail/compte/preferences", session=True),
     # Usagers et contacts
     r("GET", "/api/portail/usagers", session=True),
     r("GET", "/api/portail/usagers/{id}", session=True),

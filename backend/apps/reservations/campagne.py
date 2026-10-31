@@ -20,7 +20,7 @@ from django.utils import timezone
 
 from apps.audit.services import journaliser
 from apps.communication.services import notifier
-from apps.habilitations.services import exiger
+from apps.habilitations.services import exiger, sites_autorises
 from apps.noyau.exceptions import ErreurMetier, ErreurValidation
 from apps.usagers.services import categorie_priorite, rang_priorite
 
@@ -75,13 +75,27 @@ def _cle_tri(reservation: Reservation, debut: datetime) -> tuple[int, int, datet
     return (rang_priorite(reservation.dossier.usager, debut), 0 if _reconduction(reservation) else 1, depose)
 
 
-def analyser(campagne: Campagne) -> list[GroupeConcurrent]:
-    """Groupes de demandes qui se disputent au moins une séance, triés par proposition d'arbitrage."""
-    demandes = list(
-        Reservation.objects.filter(dossier__campagne=campagne, statut__in=["demande", "en_instruction"]).select_related(
-            "dossier__usager", "dossier__saison", "espace"
-        )
-    )
+def demandes_de_la_campagne(campagne: Campagne, statuts: list[str] | None = None) -> Any:
+    """Réservations rattachées à la campagne, limitées à ses sites quand elle en a (RG-14)."""
+    qs = Reservation.objects.filter(dossier__campagne=campagne)
+    if statuts is not None:
+        qs = qs.filter(statut__in=statuts)
+    sites = campagne.sites_concernes()
+    if sites is not None:
+        qs = qs.filter(espace__batiment__site__in=sites)
+    return qs
+
+
+def analyser(campagne: Campagne, agent: Any = None) -> list[GroupeConcurrent]:
+    """Groupes de demandes qui se disputent au moins une séance, triés par proposition d'arbitrage.
+
+    Un agent ne voit que les demandes des sites qu'il peut lire."""
+    qs = demandes_de_la_campagne(campagne, ["demande", "en_instruction"])
+    if agent is not None:
+        sites = sites_autorises(agent, "lire_reservation")
+        if sites is not None:
+            qs = qs.filter(espace__batiment__site__in=sites)
+    demandes = list(qs.select_related("dossier__usager", "dossier__saison", "espace"))
     occupations: dict[int, list[tuple[datetime, datetime]]] = {r.pk: generer_plages(r) for r in demandes}
     feuilles = {r.pk: {f.pk for f in r.espace.feuilles()} for r in demandes}
     voisins: dict[int, set[int]] = defaultdict(set)
@@ -135,6 +149,24 @@ def analyser(campagne: Campagne) -> list[GroupeConcurrent]:
 
 
 @transaction.atomic
+def deposer(dossier: Any, campagne: Campagne, *, acteur: Any) -> Any:
+    """PLA-05 : rattache un dossier à une campagne ouverte (dates, saison et sites contrôlés)."""
+    saison = services._verifier_campagne(campagne, acteur, dossier.saison)
+    sites = campagne.sites_concernes()
+    hors = [
+        r
+        for r in dossier.reservations.select_related("espace__batiment")
+        if sites is not None and r.espace.batiment.site_id not in sites
+    ]
+    if hors:
+        raise ErreurValidation("Certains créneaux sont sur des sites hors de la campagne.", code="hors_campagne")
+    dossier.campagne, dossier.saison, dossier.origine = campagne, saison, "campagne"
+    dossier.save(update_fields=["campagne", "saison", "origine"])
+    journaliser("deposer_campagne", dossier, apres={"campagne": campagne.pk}, acteur=acteur)
+    return dossier
+
+
+@transaction.atomic
 def changer_statut(campagne: Campagne, statut: str, *, acteur: Any) -> Campagne:
     campagne = Campagne.objects.select_for_update().get(pk=campagne.pk)
     exiger(acteur, "arbitrer_campagne" if statut in {"attribuee", "close"} else "gerer_campagne", campagne)
@@ -146,7 +178,8 @@ def changer_statut(campagne: Campagne, statut: str, *, acteur: Any) -> Campagne:
     campagne.statut = statut
     campagne.save(update_fields=["statut"])
     if statut == "instruction":
-        for reservation in Reservation.objects.filter(dossier__campagne=campagne, statut="demande"):
+        for reservation in demandes_de_la_campagne(campagne, ["demande"]):
+            exiger(acteur, "instruire_reservation", reservation)
             services._changer_statut(reservation, "en_instruction", acteur)
     journaliser("campagne_statut", campagne, avant={"statut": avant}, apres={"statut": statut}, acteur=acteur)
     return campagne
@@ -165,16 +198,27 @@ def attribuer(campagne: Campagne, decisions: dict[int, dict[str, str]], *, acteu
         raise ErreurMetier("Les attributions se font quand la campagne est en commission.", code="campagne_hors_commission")
     reservations = {
         r.pk: r
-        for r in Reservation.objects.filter(dossier__campagne=campagne, pk__in=list(decisions)).select_related("dossier__usager")
+        for r in demandes_de_la_campagne(campagne)
+        .filter(pk__in=list(decisions))
+        .select_for_update()
+        .select_related("dossier__usager", "espace__batiment")
     }
     if set(decisions) - set(reservations):
         raise ErreurValidation("Certaines demandes n'appartiennent pas à cette campagne.", code="hors_campagne")
+    for reservation in reservations.values():
+        exiger(acteur, "arbitrer_campagne", reservation)
+        if reservation.statut not in {"demande", "en_instruction"}:
+            raise ErreurMetier(
+                f"La demande {reservation.dossier.numero} est « {reservation.get_statut_display()} » : elle ne s'arbitre plus.",
+                code="transition_interdite",
+            )
     recap: dict[int, dict[str, list[str]]] = defaultdict(lambda: {"attribues": [], "refuses": []})
     bilan = {"attribuees": 0, "refusees": 0}
     for identifiant, decision in sorted(decisions.items(), key=lambda d: d[1].get("decision") != "attribuer"):
         reservation = reservations[identifiant]
         texte = f"- {reservation.espace.nom} : {reservation.description}"
         if decision.get("decision") == "attribuer":
+            services._verifier_transition(reservation, "validee")
             services._changer_statut(reservation, "validee", acteur, valide_par=acteur, valide_le=timezone.now())
             for occurrence in reservation.occurrences.filter(statut="validee"):
                 services.poser_verrous(occurrence)
@@ -186,6 +230,9 @@ def attribuer(campagne: Campagne, decisions: dict[int, dict[str, str]], *, acteu
                 raise ErreurValidation(
                     f"Motif obligatoire pour le refus de la demande {reservation.dossier.numero}.", code="motif_requis"
                 )
+            services._verifier_transition(reservation, "refusee")
+            for occurrence in reservation.occurrences.all():
+                services.retirer_verrous(occurrence)
             services._changer_statut(reservation, "refusee", acteur, motif_refus=motif)
             recap[reservation.dossier.usager_id]["refuses"].append(f"{texte} (motif : {motif})")
             bilan["refusees"] += 1

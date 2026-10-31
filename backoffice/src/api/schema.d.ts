@@ -673,10 +673,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** @description `chemin_site` : chemin ORM vers le site de l'objet (None = objet transversal). */
+        /** @description Périodes du calendrier ; toute modification recalcule les séries de la saison (ADM-01, REF-06). */
         get: operations["gestion_referentiel_periodes_list"];
         put?: never;
-        /** @description `chemin_site` : chemin ORM vers le site de l'objet (None = objet transversal). */
+        /** @description Périodes du calendrier ; toute modification recalcule les séries de la saison (ADM-01, REF-06). */
         post: operations["gestion_referentiel_periodes_create"];
         delete?: never;
         options?: never;
@@ -691,16 +691,16 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** @description `chemin_site` : chemin ORM vers le site de l'objet (None = objet transversal). */
+        /** @description Périodes du calendrier ; toute modification recalcule les séries de la saison (ADM-01, REF-06). */
         get: operations["gestion_referentiel_periodes_retrieve"];
-        /** @description `chemin_site` : chemin ORM vers le site de l'objet (None = objet transversal). */
+        /** @description Périodes du calendrier ; toute modification recalcule les séries de la saison (ADM-01, REF-06). */
         put: operations["gestion_referentiel_periodes_update"];
         post?: never;
-        /** @description `chemin_site` : chemin ORM vers le site de l'objet (None = objet transversal). */
+        /** @description Périodes du calendrier ; toute modification recalcule les séries de la saison (ADM-01, REF-06). */
         delete: operations["gestion_referentiel_periodes_destroy"];
         options?: never;
         head?: never;
-        /** @description `chemin_site` : chemin ORM vers le site de l'objet (None = objet transversal). */
+        /** @description Périodes du calendrier ; toute modification recalcule les séries de la saison (ADM-01, REF-06). */
         patch: operations["gestion_referentiel_periodes_partial_update"];
         trace?: never;
     };
@@ -805,7 +805,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** @description ADM-01 : vacances de la zone et jours fériés de la saison depuis les données nationales. */
+        /** @description ADM-01 : vacances de la zone et jours fériés depuis les données nationales, ou depuis un export JSON déposé. */
         post: operations["gestion_referentiel_saisons_importer_calendrier_create"];
         delete?: never;
         options?: never;
@@ -976,7 +976,7 @@ export interface paths {
         patch: operations["gestion_reservations_dossiers_partial_update"];
         trace?: never;
     };
-    "/api/gestion/reservations/dossiers/{id}/apercu": {
+    "/api/gestion/reservations/dossiers/{id}/attester": {
         parameters: {
             query?: never;
             header?: never;
@@ -985,8 +985,8 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** @description Séances générées et conflits avant enregistrement (PLA-04, PLA-07). */
-        post: operations["gestion_reservations_dossiers_apercu_create"];
+        /** @description RG-06 : constat manuel d'une condition (ex. chèque de caution remis au guichet), motivé et tracé. */
+        post: operations["gestion_reservations_dossiers_attester_create"];
         delete?: never;
         options?: never;
         head?: never;
@@ -1004,6 +1004,23 @@ export interface paths {
         put?: never;
         /** @description `chemin_site` : chemin ORM vers le site de l'objet (None = objet transversal). */
         post: operations["gestion_reservations_dossiers_reservations_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gestion/reservations/dossiers/apercu": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description Séances générées et conflits d'un créneau, avant tout enregistrement (PLA-04, PLA-07). */
+        post: operations["gestion_reservations_dossiers_apercu_create"];
         delete?: never;
         options?: never;
         head?: never;
@@ -1715,6 +1732,57 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/gestion/usagers/usagers/{id}/reactiver": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description `chemin_site` : chemin ORM vers le site de l'objet (None = objet transversal). */
+        post: operations["gestion_usagers_usagers_reactiver_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gestion/usagers/usagers/{id}/suspendre": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description `chemin_site` : chemin ORM vers le site de l'objet (None = objet transversal). */
+        post: operations["gestion_usagers_usagers_suspendre_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gestion/usagers/usagers/{id}/valider": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description `chemin_site` : chemin ORM vers le site de l'objet (None = objet transversal). */
+        post: operations["gestion_usagers_usagers_valider_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/gestion/usagers/usagers/types": {
         parameters: {
             query?: never;
@@ -1745,6 +1813,14 @@ export interface components {
             fin: string;
             raison: string;
         };
+        AnnulationRequest: {
+            motif: string;
+            /**
+             * @description Annulation demandée par l'usager (tardive dans le délai paramétré, RG-08).
+             * @default false
+             */
+            par_usager: boolean;
+        };
         Apercu: {
             seances: {
                 [key: string]: unknown;
@@ -1753,6 +1829,10 @@ export interface components {
             hors_horaires: string[];
             fermetures: string[];
             description: string;
+        };
+        AttestationRequest: {
+            condition: components["schemas"]["ConditionEnum"];
+            motif: string;
         };
         AttributionRequest: {
             decisions: {
@@ -1816,6 +1896,14 @@ export interface components {
          * @enum {string}
          */
         ColorationEnum: "statut" | "type_usager";
+        /**
+         * @description * `pieces` - pieces
+         *     * `convention` - convention
+         *     * `acompte` - acompte
+         *     * `caution` - caution
+         * @enum {string}
+         */
+        ConditionEnum: "pieces" | "convention" | "acompte" | "caution";
         Conflit: {
             occurrence: number;
             reservation: number;
@@ -1875,6 +1963,8 @@ export interface components {
             fin: string;
             /** @default false */
             forcer_horaires: boolean;
+            /** @default  */
+            motif_forcage: string;
         };
         /**
          * @description * `reglement` - reglement
@@ -1945,6 +2035,8 @@ export interface components {
             readonly cree_le: string;
             /** Format: date-time */
             readonly depose_le: string | null;
+            /** @description RG-06 : conditions constatées hors application (ex. caution remise au guichet), avec agent, date et motif. */
+            readonly conditions_attestees: unknown;
             readonly reservations: components["schemas"]["Reservation"][];
         };
         DossierRequest: {
@@ -2249,7 +2341,7 @@ export interface components {
             double_authentification_validee: boolean;
             habilitations: components["schemas"]["HabilitationMoi"][];
         };
-        MotifRequest: {
+        MotifUsagerRequest: {
             motif: string;
         };
         NouvelleReservationRequest: {
@@ -2271,6 +2363,8 @@ export interface components {
             exdates?: string[];
             /** @default false */
             forcer_horaires: boolean;
+            /** @default  */
+            motif_forcage: string;
         };
         Occurrence: {
             readonly id: number;
@@ -2851,6 +2945,11 @@ export interface components {
             /** Format: date */
             fin?: string;
             active?: boolean;
+            /**
+             * Saison close
+             * @description Plus aucune réservation ne peut y être créée ni modifiée (bilan arrêté).
+             */
+            cloturee?: boolean;
         };
         PatchedSiteRequest: {
             code?: string;
@@ -2881,6 +2980,10 @@ export interface components {
             exige_acompte?: boolean;
             /** Caution reçue */
             exige_caution?: boolean;
+            /** Demandable sur le portail */
+            ouvert_portail?: boolean;
+            /** @description Vide : tous les types d'usagers (portail). */
+            types_usager?: string[];
             ordre?: number;
         };
         PatchedUsagerRequest: {
@@ -2906,7 +3009,6 @@ export interface components {
             convention_reference?: string;
             /** Format: date */
             convention_fin?: string | null;
-            statut?: components["schemas"]["StatutUsagerEnum"];
             observations?: string;
         };
         PatchedUtilisateurRequest: {
@@ -3117,6 +3219,11 @@ export interface components {
             /** Format: date */
             fin: string;
             active?: boolean;
+            /**
+             * Saison close
+             * @description Plus aucune réservation ne peut y être créée ni modifiée (bilan arrêté).
+             */
+            cloturee?: boolean;
         };
         SaisonRequest: {
             nom: string;
@@ -3125,6 +3232,11 @@ export interface components {
             /** Format: date */
             fin: string;
             active?: boolean;
+            /**
+             * Saison close
+             * @description Plus aucune réservation ne peut y être créée ni modifiée (bilan arrêté).
+             */
+            cloturee?: boolean;
         };
         SeancePlanning: {
             id: number;
@@ -3253,6 +3365,10 @@ export interface components {
             exige_acompte?: boolean;
             /** Caution reçue */
             exige_caution?: boolean;
+            /** Demandable sur le portail */
+            ouvert_portail?: boolean;
+            /** @description Vide : tous les types d'usagers (portail). */
+            types_usager?: string[];
             ordre?: number;
         };
         TypeReservationRequest: {
@@ -3266,6 +3382,10 @@ export interface components {
             exige_acompte?: boolean;
             /** Caution reçue */
             exige_caution?: boolean;
+            /** Demandable sur le portail */
+            ouvert_portail?: boolean;
+            /** @description Vide : tous les types d'usagers (portail). */
+            types_usager?: string[];
             ordre?: number;
         };
         /**
@@ -3305,7 +3425,7 @@ export interface components {
             convention_reference?: string;
             /** Format: date */
             convention_fin?: string | null;
-            statut?: components["schemas"]["StatutUsagerEnum"];
+            readonly statut: components["schemas"]["StatutUsagerEnum"];
             observations?: string;
             /** Format: date-time */
             readonly cree_le: string;
@@ -3334,7 +3454,6 @@ export interface components {
             convention_reference?: string;
             /** Format: date */
             convention_fin?: string | null;
-            statut?: components["schemas"]["StatutUsagerEnum"];
             observations?: string;
         };
         Utilisateur: {
@@ -5769,7 +5888,14 @@ export interface operations {
             };
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody?: {
+            content: {
+                "multipart/form-data": {
+                    /** Format: binary */
+                    fichier?: string;
+                };
+            };
+        };
         responses: {
             200: {
                 headers: {
@@ -6275,7 +6401,7 @@ export interface operations {
             };
         };
     };
-    gestion_reservations_dossiers_apercu_create: {
+    gestion_reservations_dossiers_attester_create: {
         parameters: {
             query?: never;
             header?: never;
@@ -6287,9 +6413,9 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["NouvelleReservationRequest"];
-                "application/x-www-form-urlencoded": components["schemas"]["NouvelleReservationRequest"];
-                "multipart/form-data": components["schemas"]["NouvelleReservationRequest"];
+                "application/json": components["schemas"]["AttestationRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["AttestationRequest"];
+                "multipart/form-data": components["schemas"]["AttestationRequest"];
             };
         };
         responses: {
@@ -6298,7 +6424,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["Apercu"];
+                    "application/json": components["schemas"]["Dossier"];
                 };
             };
         };
@@ -6327,6 +6453,31 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["Reservation"];
+                };
+            };
+        };
+    };
+    gestion_reservations_dossiers_apercu_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["NouvelleReservationRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["NouvelleReservationRequest"];
+                "multipart/form-data": components["schemas"]["NouvelleReservationRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Apercu"];
                 };
             };
         };
@@ -6595,9 +6746,9 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["MotifRequest"];
-                "application/x-www-form-urlencoded": components["schemas"]["MotifRequest"];
-                "multipart/form-data": components["schemas"]["MotifRequest"];
+                "application/json": components["schemas"]["AnnulationRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["AnnulationRequest"];
+                "multipart/form-data": components["schemas"]["AnnulationRequest"];
             };
         };
         responses: {
@@ -6911,9 +7062,9 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["MotifRequest"];
-                "application/x-www-form-urlencoded": components["schemas"]["MotifRequest"];
-                "multipart/form-data": components["schemas"]["MotifRequest"];
+                "application/json": components["schemas"]["AnnulationRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["AnnulationRequest"];
+                "multipart/form-data": components["schemas"]["AnnulationRequest"];
             };
         };
         responses: {
@@ -8014,6 +8165,78 @@ export interface operations {
                     "application/json": {
                         [key: string]: unknown;
                     };
+                };
+            };
+        };
+    };
+    gestion_usagers_usagers_reactiver_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) usager. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Usager"];
+                };
+            };
+        };
+    };
+    gestion_usagers_usagers_suspendre_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) usager. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MotifUsagerRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["MotifUsagerRequest"];
+                "multipart/form-data": components["schemas"]["MotifUsagerRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Usager"];
+                };
+            };
+        };
+    };
+    gestion_usagers_usagers_valider_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Un(une) valeur entière unique identifiant ce(cette) usager. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Usager"];
                 };
             };
         };

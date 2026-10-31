@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-from typing import Any
-
 from django.db import transaction
 from drf_spectacular.utils import extend_schema
 from rest_framework import serializers
@@ -17,7 +15,7 @@ from apps.habilitations.services import exiger
 
 from .exceptions import ErreurValidation
 from .models import Parametre
-from .parametres import DEFINITIONS, PAR_CLE, invalider, tous
+from .parametres import DEFINITIONS, invalider, tous, valider_valeur
 
 
 class ParametreSerializer(serializers.Serializer):
@@ -31,14 +29,6 @@ class ParametreSerializer(serializers.Serializer):
 
 class ModificationSerializer(serializers.Serializer):
     valeurs = serializers.DictField(child=serializers.JSONField())
-
-
-def _meme_type(defaut: Any, valeur: Any) -> bool:
-    if isinstance(defaut, bool):
-        return isinstance(valeur, bool)
-    if isinstance(defaut, int):
-        return isinstance(valeur, int) and not isinstance(valeur, bool) and valeur >= 0
-    return isinstance(valeur, type(defaut))
 
 
 class VueParametres(APIView):
@@ -69,11 +59,9 @@ class VueParametres(APIView):
         donnees.is_valid(raise_exception=True)
         erreurs = {}
         for cle, valeur in donnees.validated_data["valeurs"].items():
-            definition = PAR_CLE.get(cle)
-            if definition is None:
-                erreurs[cle] = ["Paramètre inconnu."]
-            elif not _meme_type(definition.defaut, valeur):
-                erreurs[cle] = [f"Valeur attendue du même type que la valeur par défaut ({type(definition.defaut).__name__})."]
+            message = valider_valeur(cle, valeur)
+            if message:
+                erreurs[cle] = [message]
         if erreurs:
             raise ErreurValidation("Certains paramètres sont invalides.", code="validation", details={"champs": erreurs})
         anciennes = tous()

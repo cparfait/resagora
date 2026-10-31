@@ -43,6 +43,10 @@ class TypeReservation(models.Model):
     exige_convention = models.BooleanField("convention ou contrat signé", default=False)
     exige_acompte = models.BooleanField("acompte payé", default=False)
     exige_caution = models.BooleanField("caution reçue", default=False)
+    ouvert_portail = models.BooleanField("demandable sur le portail", default=True)
+    types_usager = ArrayField(
+        models.CharField(max_length=20), default=list, blank=True, help_text="Vide : tous les types d'usagers (portail)."
+    )
     ordre = models.PositiveSmallIntegerField(default=0)
 
     ecriture_ville_entiere = True
@@ -87,6 +91,11 @@ class Campagne(models.Model):
         sites = {s.pk for s in self.sites.all()} if self.pk else set()
         return sites or None
 
+    @property
+    def ecriture_ville_entiere(self) -> bool:
+        """Une campagne « tous sites » ne se gère qu'avec un périmètre ville entière (RG-14)."""
+        return not self.pk or not self.sites.exists()
+
 
 class Dossier(models.Model):
     ORIGINES = [("guichet", "Guichet"), ("portail", "Portail"), ("campagne", "Campagne annuelle"), ("ville", "Service municipal")]
@@ -102,6 +111,15 @@ class Dossier(models.Model):
     origine = models.CharField(max_length=10, choices=ORIGINES, default="guichet")
     observations = models.TextField(blank=True, default="")
     brouillon = models.BooleanField(default=False, help_text="Demande du portail en cours de saisie (POR-04).")
+    brouillon_creneaux = models.JSONField(
+        default=list, blank=True, help_text="Créneaux saisis sur le portail, matérialisés à l'envoi de la demande (POR-04)."
+    )
+    brouillon_etape = models.PositiveSmallIntegerField(default=1)
+    conditions_attestees = models.JSONField(
+        default=dict,
+        blank=True,
+        help_text="RG-06 : conditions constatées hors application (ex. caution remise au guichet), avec agent, date et motif.",
+    )
     cree_par = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL, related_name="+")
     cree_le = models.DateTimeField(auto_now_add=True)
     depose_le = models.DateTimeField(null=True, blank=True)

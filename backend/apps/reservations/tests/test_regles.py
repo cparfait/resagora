@@ -302,26 +302,29 @@ def test_rg07_option_relancee_puis_liberee(espace, django_capture_on_commit_call
 def test_pla10_annulation_tardive_par_l_usager(espace):
     with freeze_time("2026-11-09 10:00"):
         r = valider_systeme(reserver(espace, date(2026, 11, 10), "18:00", "20:00"))
-        occurrence = services.annuler_occurrence(
-            r.occurrences.get(), acteur="contact du portail", motif="Match reporté", par_usager=True
-        )
+        contact = r.dossier.usager.rattachements.first().contact
+        occurrence = services.annuler_occurrence(r.occurrences.get(), acteur=contact, motif="Match reporté", par_usager=True)
     assert occurrence.annulation_tardive and not occurrence.verrous.exists()
+    with pytest.raises(AccesRefuse):
+        services.annuler_occurrence(r.occurrences.get(), acteur="portail", motif="x", par_usager=False)
     with freeze_time("2026-11-01 10:00"):
         autre = valider_systeme(reserver(espace, date(2026, 11, 20), "18:00", "20:00"))
         assert not services.annuler_occurrence(
-            autre.occurrences.get(), acteur="portail", motif="x", par_usager=True
+            autre.occurrences.get(), acteur=autre.dossier.usager.rattachements.first().contact, motif="x", par_usager=True
         ).annulation_tardive
 
 
 def test_pla09_liste_d_attente_prevenue_a_la_liberation(espace, django_capture_on_commit_callbacks):
     with freeze_time("2026-11-01 10:00"):
         occupant = valider_systeme(reserver(espace, date(2026, 11, 20), "18:00", "20:00"))
+        demandeur = usager_avec_contact()
         attente = services.inscrire_liste_attente(
-            acteur="portail",
+            acteur=demandeur.rattachements.first().contact,
             espace=espace,
             debut=paris(2026, 11, 20, 18),
             fin=paris(2026, 11, 20, 20),
-            usager=usager_avec_contact(),
+            usager=demandeur,
+            portail=True,
         )
         with django_capture_on_commit_callbacks(execute=True):
             services.annuler_occurrence(occupant.occurrences.get(), acteur=agent("gestionnaire"), motif="Désistement")
@@ -334,12 +337,25 @@ def test_pla09_liste_d_attente_prevenue_a_la_liberation(espace, django_capture_o
 
 def test_pla11_presence_et_absence_non_signalee(espace):
     with freeze_time("2026-11-01 10:00"):
-        r = valider_systeme(reserver(espace, date(2026, 11, 10), "18:00", "20:00"))
+        r = valider_systeme(reserver(espace, date(2026, 11, 10), "18:00", "20:00", type_code="scolaire"))
     with pytest.raises(ErreurMetier), freeze_time("2026-11-02 10:00"):
         services.saisir_presence(r.occurrences.get(), acteur=agent("gestionnaire"), presence="present")
     with freeze_time("2026-11-11 10:00"):
         o = services.saisir_presence(r.occurrences.get(), acteur=agent("gestionnaire"), presence="absent_non_signale")
     assert o.statut == "realisee" and o.presence == "absent_non_signale"
+
+
+def test_pla06_seance_validee_non_confirmee_reste_a_regulariser(espace):
+    """Une location validée mais jamais confirmée (RG-06) ne devient pas « réalisée » ni clôturable."""
+    with freeze_time("2026-11-01 10:00"):
+        r = valider_systeme(reserver(espace, date(2026, 11, 10), "18:00", "20:00", type_code="location"))
+    with freeze_time("2026-11-11 10:00"):
+        o = services.saisir_presence(r.occurrences.get(), acteur=agent("gestionnaire"), presence="present")
+        assert o.statut == "validee" and "sans confirmation" in o.signalement
+        assert services.marquer_realisees() == 0
+        with pytest.raises(ErreurMetier) as refus:
+            services.cloturer(r, acteur=agent("gestionnaire"))
+    assert refus.value.code == "conditions_non_remplies"
 
 
 # --- PLA-07 alternatives, PLA-12 priorité municipale, REF-06 fermeture --------------------------------

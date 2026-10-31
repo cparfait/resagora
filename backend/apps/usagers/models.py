@@ -161,6 +161,7 @@ class PieceJustificative(models.Model):
     verifie_le = models.DateTimeField(null=True, blank=True)
     depose_le = models.DateTimeField(auto_now_add=True)
     depose_par_portail = models.BooleanField(default=False)
+    deposee_par = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL, related_name="+")
 
     class Meta:
         ordering = ["usager", "type_piece", "-depose_le"]

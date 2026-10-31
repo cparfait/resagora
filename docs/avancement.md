@@ -49,7 +49,17 @@ Exigences : REF-03 à REF-08, USR-01 à USR-05, PLA-01 à PLA-12, ADM-01, ADM-02
 | 1.7 | Campagne annuelle : dépôt, instruction, arbitrage RG-03, commission, attribution en lot | PLA-05, RG-03 | fait |
 | 1.8 | Notifications électroniques (socle COM-01) | COM-01 | fait |
 | 1.9 | Back-office : usagers, dossiers, planning six vues, glisser-déposer contrôlé, vues enregistrées, campagne, calendrier, paramètres | PLA-01, PLA-02, PLA-03 | fait |
-| 1.10 | Jeu de démonstration, e2e du lot (planning six vues, demande → aperçu → validation, fiche usager), revues, critère de sortie | — | en cours (revues lancées) |
+| 1.10 | Jeu de démonstration, e2e du lot (planning six vues, demande → aperçu → validation, fiche usager), revues (4 bloquants et 20 majeurs corrigés, D-021 à D-028), critère de sortie | — | fait |
+
+Critère de sortie (reconstitué) :
+- [x] une demande se saisit, s'aperçoit (conflits, horaires, fermetures), se valide et se confirme selon les conditions RG-06 du type ;
+- [x] aucun chevauchement possible (contrainte d'exclusion PostgreSQL, validations concurrentes testées), espaces divisibles et partageables ;
+- [x] créneaux annuels hors vacances zone C et jours fériés, changement d'heure, modifications « cette séance / les suivantes / toute la série » sans perte d'historique ;
+- [x] campagne annuelle : dépôt, instruction, arbitrage RG-03, attribution en lot dans le périmètre de l'agent ;
+- [x] planning six vues accessible (axe sans violation), glisser-déposer contrôlé par l'API ;
+- [x] droits rôle × périmètre testés (autorisé, refusé, hors périmètre) ; revues sécurité et métier traitées.
+
+**Lot 1 terminé le 2026-10-31.**
 
 ## Journal
 
@@ -57,3 +67,4 @@ Exigences : REF-03 à REF-08, USR-01 à USR-05, PLA-01 à PLA-12, ADM-01, ADM-02
 - 2026-10-31 — Revues lot 0 : passage à python-ldap (ldap3 non maintenu), rôle PostgreSQL applicatif, HMAC + ancrage + purge du journal, verrouillage et réactivation TOTP, appariement objectGUID, séparation des tâches, routes DocuSeal restreintes. 109 tests API, 26 façade, 21 front, 4 e2e.
 - 2026-10-31 — Lot 0 : 61+ tests API, 19 tests façade, 21 tests front, 4 e2e (axe sans violation) ; pile LAN + DMZ en conteneurs, chaîne mTLS vérifiée.
 - 2026-10-31 — Lot 1 : 173 tests API, 28 tests front, 3 e2e lot 1 (axe sans violation) ; jeu de démonstration chargé (3 sites, 40 espaces, 63 créneaux annuels, locations) ; matrice lots 0–1 complète (49 exigences).
+- 2026-10-31 — Revues lot 1 : campagnes « tous sites » réservées à la ville entière, conditions RG-06 refusées par défaut avec constat manuel tracé, transitions de clôture et d'attribution contrôlées, grammaire RRULE bornée, fermetures et saisons closes contrôlées par l'API, historique des séances conservé, verrous recalculés quand la hiérarchie change, paramètres validés par schéma. 207 tests API (hors intégration), 28 tests front, 7 e2e.

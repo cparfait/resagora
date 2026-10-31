@@ -7,7 +7,7 @@ reste à 18 h après le changement d'heure d'octobre ou de mars.
 from __future__ import annotations
 
 import re
-from datetime import date, datetime, time, timedelta
+from datetime import UTC, date, datetime, time, timedelta
 from typing import TYPE_CHECKING
 from zoneinfo import ZoneInfo
 
@@ -23,21 +23,71 @@ if TYPE_CHECKING:
 PARIS = ZoneInfo("Europe/Paris")
 JOURS = {"MO": "lundi", "TU": "mardi", "WE": "mercredi", "TH": "jeudi", "FR": "vendredi", "SA": "samedi", "SU": "dimanche"}
 MAX_OCCURRENCES = 400
-REGLE_AUTORISEE = re.compile(
-    r"^(FREQ=(DAILY|WEEKLY|MONTHLY))(;(INTERVAL=\d{1,2}|BYDAY=(\+?-?\d?(MO|TU|WE|TH|FR|SA|SU),?)+|UNTIL=\d{8}(T\d{6}Z?)?|COUNT=\d{1,3}|BYMONTHDAY=-?\d{1,2}|WKST=(MO|SU)))*$"
-)
+JOUR = r"(MO|TU|WE|TH|FR|SA|SU)"
+JOUR_ORDINAL = re.compile(rf"^([+-]?[1-5])?{JOUR}$")
 
 
 def heure(t: time) -> str:
     return f"{t.hour} h" if t.minute == 0 else f"{t.hour} h {t.minute:02d}"
 
 
+def _refus(detail: str) -> ErreurValidation:
+    return ErreurValidation(f"Règle de récurrence non acceptée : {detail}", code="recurrence_invalide")
+
+
 def valider_regle(regle: str) -> str:
+    """Grammaire restreinte, dont chaque combinaison produit au moins une date par semestre.
+
+    Une règle qui ne produit jamais de date (`BYMONTHDAY=99`, février tous les douze mois…) ferait
+    itérer `dateutil` jusqu'à l'an 9999 : elle est refusée ici, avant tout calcul (déni de service).
+    FREQ=DAILY|WEEKLY|MONTHLY ; INTERVAL 1 à 52 (1 à 6 en mensuel) ; BYDAY jours simples, ou un jour
+    ordinal ±1 à 5 en mensuel ; BYMONTHDAY 1 à 31 ou -1 à -7 en mensuel ; UNTIL ou COUNT (1 à 400) ; WKST.
+    """
     regle = regle.strip().upper().removeprefix("RRULE:")
-    if regle and not REGLE_AUTORISEE.match(regle):
-        raise ErreurValidation(
-            "Règle de récurrence non reconnue (FREQ, INTERVAL, BYDAY, UNTIL ou COUNT).", code="recurrence_invalide"
-        )
+    if not regle:
+        return ""
+    if len(regle) > 200:
+        raise _refus("règle trop longue.")
+    parties: dict[str, str] = {}
+    for morceau in regle.split(";"):
+        cle, egal, valeur = morceau.partition("=")
+        if not egal or not valeur or cle in parties:
+            raise _refus(f"« {morceau} ».")
+        parties[cle] = valeur
+    inconnues = set(parties) - {"FREQ", "INTERVAL", "BYDAY", "BYMONTHDAY", "UNTIL", "COUNT", "WKST"}
+    if inconnues:
+        raise _refus("éléments non pris en charge : " + ", ".join(sorted(inconnues)) + ".")
+    frequence = parties.get("FREQ")
+    if frequence not in {"DAILY", "WEEKLY", "MONTHLY"}:
+        raise _refus("fréquence quotidienne, hebdomadaire ou mensuelle attendue.")
+    intervalle = parties.get("INTERVAL", "1")
+    maximum = 6 if frequence == "MONTHLY" else 52
+    if not intervalle.isdigit() or not 1 <= int(intervalle) <= maximum:
+        raise _refus(f"intervalle entre 1 et {maximum}.")
+    if "BYDAY" in parties:
+        jours = parties["BYDAY"].split(",")
+        if len(jours) > 7 or len(set(jours)) != len(jours):
+            raise _refus("jours de la semaine.")
+        for jour in jours:
+            correspondance = JOUR_ORDINAL.match(jour)
+            if correspondance is None:
+                raise _refus(f"jour « {jour} ».")
+            if correspondance.group(1) and (frequence != "MONTHLY" or len(jours) > 1):
+                raise _refus("un jour ordinal (ex. 1MO, -1FR) n'est admis qu'en mensuel, seul.")
+    if "BYMONTHDAY" in parties:
+        valeur = parties["BYMONTHDAY"]
+        if frequence != "MONTHLY" or "BYDAY" in parties or not re.fullmatch(r"-?\d{1,2}", valeur):
+            raise _refus("jour du mois admis seulement en mensuel, sans jour de semaine.")
+        if not (1 <= int(valeur) <= 31 or -7 <= int(valeur) <= -1):
+            raise _refus("jour du mois entre 1 et 31 (ou -1 à -7 depuis la fin du mois).")
+    if "UNTIL" in parties and "COUNT" in parties:
+        raise _refus("UNTIL et COUNT ne peuvent pas être combinés.")
+    if "UNTIL" in parties and not re.fullmatch(r"\d{8}(T\d{6}Z?)?", parties["UNTIL"]):
+        raise _refus("date de fin UNTIL (AAAAMMJJ).")
+    if "COUNT" in parties and (not parties["COUNT"].isdigit() or not 1 <= int(parties["COUNT"]) <= MAX_OCCURRENCES):
+        raise _refus(f"nombre de séances COUNT entre 1 et {MAX_OCCURRENCES}.")
+    if "WKST" in parties and parties["WKST"] not in {"MO", "SU"}:
+        raise _refus("WKST=MO ou WKST=SU.")
     return regle
 
 
@@ -62,12 +112,23 @@ def jours_exclus_pour(reservation: Reservation) -> set[date]:
     return exclus
 
 
+def _instant_local(jour: date, heure_locale: time) -> datetime:
+    """Instant d'heure de Paris ; une heure qui n'existe pas (passage à l'heure d'été) est refusée."""
+    instant = datetime.combine(jour, heure_locale, tzinfo=PARIS)
+    if instant.astimezone(UTC).astimezone(PARIS).replace(tzinfo=None) != instant.replace(tzinfo=None):
+        raise ErreurValidation(
+            f"{heure(heure_locale)} n'existe pas le {jour:%d/%m/%Y} (passage à l'heure d'été) : choisissez un autre horaire.",
+            code="heure_inexistante",
+        )
+    return instant
+
+
 def plage_locale(jour: date, debut: time, fin: time, jour_fin: date | None = None) -> tuple[datetime, datetime]:
     """Début et fin conscients du fuseau ; une fin avant le début désigne le lendemain (créneau de nuit)."""
-    d = datetime.combine(jour, debut, tzinfo=PARIS)
-    f = datetime.combine(jour_fin or jour, fin, tzinfo=PARIS)
+    d = _instant_local(jour, debut)
+    f = _instant_local(jour_fin or jour, fin)
     if f <= d:
-        f = datetime.combine((jour_fin or jour) + timedelta(days=1), fin, tzinfo=PARIS)
+        f = _instant_local((jour_fin or jour) + timedelta(days=1), fin)
     return d, f
 
 

@@ -2125,8 +2125,8 @@ paths:
   /api/gestion/referentiel/periodes:
     get:
       operationId: gestion_referentiel_periodes_list
-      description: '`chemin_site` : chemin ORM vers le site de l''objet (None = objet
-        transversal).'
+      description: Périodes du calendrier ; toute modification recalcule les séries
+        de la saison (ADM-01, REF-06).
       parameters:
       - in: query
         name: nature
@@ -2159,8 +2159,8 @@ paths:
           description: ''
     post:
       operationId: gestion_referentiel_periodes_create
-      description: '`chemin_site` : chemin ORM vers le site de l''objet (None = objet
-        transversal).'
+      description: Périodes du calendrier ; toute modification recalcule les séries
+        de la saison (ADM-01, REF-06).
       tags:
       - gestion
       requestBody:
@@ -2187,8 +2187,8 @@ paths:
   /api/gestion/referentiel/periodes/{id}:
     get:
       operationId: gestion_referentiel_periodes_retrieve
-      description: '`chemin_site` : chemin ORM vers le site de l''objet (None = objet
-        transversal).'
+      description: Périodes du calendrier ; toute modification recalcule les séries
+        de la saison (ADM-01, REF-06).
       parameters:
       - in: path
         name: id
@@ -2209,8 +2209,8 @@ paths:
           description: ''
     put:
       operationId: gestion_referentiel_periodes_update
-      description: '`chemin_site` : chemin ORM vers le site de l''objet (None = objet
-        transversal).'
+      description: Périodes du calendrier ; toute modification recalcule les séries
+        de la saison (ADM-01, REF-06).
       parameters:
       - in: path
         name: id
@@ -2243,8 +2243,8 @@ paths:
           description: ''
     patch:
       operationId: gestion_referentiel_periodes_partial_update
-      description: '`chemin_site` : chemin ORM vers le site de l''objet (None = objet
-        transversal).'
+      description: Périodes du calendrier ; toute modification recalcule les séries
+        de la saison (ADM-01, REF-06).
       parameters:
       - in: path
         name: id
@@ -2276,8 +2276,8 @@ paths:
           description: ''
     delete:
       operationId: gestion_referentiel_periodes_destroy
-      description: '`chemin_site` : chemin ORM vers le site de l''objet (None = objet
-        transversal).'
+      description: Périodes du calendrier ; toute modification recalcule les séries
+        de la saison (ADM-01, REF-06).
       parameters:
       - in: path
         name: id
@@ -2607,8 +2607,8 @@ paths:
   /api/gestion/referentiel/saisons/{id}/importer-calendrier:
     post:
       operationId: gestion_referentiel_saisons_importer_calendrier_create
-      description: 'ADM-01 : vacances de la zone et jours fériés de la saison depuis
-        les données nationales.'
+      description: 'ADM-01 : vacances de la zone et jours fériés depuis les données
+        nationales, ou depuis un export JSON déposé.'
       parameters:
       - in: path
         name: id
@@ -2618,6 +2618,15 @@ paths:
         required: true
       tags:
       - gestion
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                fichier:
+                  type: string
+                  format: binary
       security:
       - sessionAgent: []
       responses:
@@ -3208,10 +3217,11 @@ paths:
               schema:
                 $ref: '#/components/schemas/Dossier'
           description: ''
-  /api/gestion/reservations/dossiers/{id}/apercu:
+  /api/gestion/reservations/dossiers/{id}/attester:
     post:
-      operationId: gestion_reservations_dossiers_apercu_create
-      description: Séances générées et conflits avant enregistrement (PLA-04, PLA-07).
+      operationId: gestion_reservations_dossiers_attester_create
+      description: 'RG-06 : constat manuel d''une condition (ex. chèque de caution
+        remis au guichet), motivé et tracé.'
       parameters:
       - in: path
         name: id
@@ -3225,13 +3235,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/NouvelleReservationRequest'
+              $ref: '#/components/schemas/AttestationRequest'
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/NouvelleReservationRequest'
+              $ref: '#/components/schemas/AttestationRequest'
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/NouvelleReservationRequest'
+              $ref: '#/components/schemas/AttestationRequest'
         required: true
       security:
       - sessionAgent: []
@@ -3240,7 +3250,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Apercu'
+                $ref: '#/components/schemas/Dossier'
           description: ''
   /api/gestion/reservations/dossiers/{id}/reservations:
     post:
@@ -3276,6 +3286,34 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Reservation'
+          description: ''
+  /api/gestion/reservations/dossiers/apercu:
+    post:
+      operationId: gestion_reservations_dossiers_apercu_create
+      description: Séances générées et conflits d'un créneau, avant tout enregistrement
+        (PLA-04, PLA-07).
+      tags:
+      - gestion
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NouvelleReservationRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/NouvelleReservationRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/NouvelleReservationRequest'
+        required: true
+      security:
+      - sessionAgent: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Apercu'
           description: ''
   /api/gestion/reservations/liste-attente:
     get:
@@ -3643,13 +3681,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/MotifRequest'
+              $ref: '#/components/schemas/AnnulationRequest'
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/MotifRequest'
+              $ref: '#/components/schemas/AnnulationRequest'
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/MotifRequest'
+              $ref: '#/components/schemas/AnnulationRequest'
         required: true
       security:
       - sessionAgent: []
@@ -4033,13 +4071,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/MotifRequest'
+              $ref: '#/components/schemas/AnnulationRequest'
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/MotifRequest'
+              $ref: '#/components/schemas/AnnulationRequest'
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/MotifRequest'
+              $ref: '#/components/schemas/AnnulationRequest'
         required: true
       security:
       - sessionAgent: []
@@ -5306,6 +5344,87 @@ paths:
                 type: object
                 additionalProperties: {}
           description: ''
+  /api/gestion/usagers/usagers/{id}/reactiver:
+    post:
+      operationId: gestion_usagers_usagers_reactiver_create
+      description: '`chemin_site` : chemin ORM vers le site de l''objet (None = objet
+        transversal).'
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un(une) valeur entière unique identifiant ce(cette) usager.
+        required: true
+      tags:
+      - gestion
+      security:
+      - sessionAgent: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Usager'
+          description: ''
+  /api/gestion/usagers/usagers/{id}/suspendre:
+    post:
+      operationId: gestion_usagers_usagers_suspendre_create
+      description: '`chemin_site` : chemin ORM vers le site de l''objet (None = objet
+        transversal).'
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un(une) valeur entière unique identifiant ce(cette) usager.
+        required: true
+      tags:
+      - gestion
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MotifUsagerRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/MotifUsagerRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/MotifUsagerRequest'
+        required: true
+      security:
+      - sessionAgent: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Usager'
+          description: ''
+  /api/gestion/usagers/usagers/{id}/valider:
+    post:
+      operationId: gestion_usagers_usagers_valider_create
+      description: '`chemin_site` : chemin ORM vers le site de l''objet (None = objet
+        transversal).'
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un(une) valeur entière unique identifiant ce(cette) usager.
+        required: true
+      tags:
+      - gestion
+      security:
+      - sessionAgent: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Usager'
+          description: ''
   /api/gestion/usagers/usagers/types:
     get:
       operationId: gestion_usagers_usagers_types_retrieve
@@ -5346,6 +5465,20 @@ components:
       - espace_nom
       - fin
       - raison
+    AnnulationRequest:
+      type: object
+      properties:
+        motif:
+          type: string
+          minLength: 1
+          maxLength: 300
+        par_usager:
+          type: boolean
+          default: false
+          description: Annulation demandée par l'usager (tardive dans le délai paramétré,
+            RG-08).
+      required:
+      - motif
     Apercu:
       type: object
       properties:
@@ -5376,6 +5509,18 @@ components:
       - fermetures
       - hors_horaires
       - seances
+    AttestationRequest:
+      type: object
+      properties:
+        condition:
+          $ref: '#/components/schemas/ConditionEnum'
+        motif:
+          type: string
+          minLength: 1
+          maxLength: 300
+      required:
+      - condition
+      - motif
     AttributionRequest:
       type: object
       properties:
@@ -5527,6 +5672,18 @@ components:
       description: |-
         * `statut` - Par statut
         * `type_usager` - Par type d'usager
+    ConditionEnum:
+      enum:
+      - pieces
+      - convention
+      - acompte
+      - caution
+      type: string
+      description: |-
+        * `pieces` - pieces
+        * `convention` - convention
+        * `acompte` - acompte
+        * `caution` - caution
     Conflit:
       type: object
       properties:
@@ -5683,6 +5840,10 @@ components:
         forcer_horaires:
           type: boolean
           default: false
+        motif_forcage:
+          type: string
+          default: ''
+          maxLength: 250
       required:
       - debut
       - espace
@@ -5843,12 +6004,17 @@ components:
           format: date-time
           readOnly: true
           nullable: true
+        conditions_attestees:
+          readOnly: true
+          description: 'RG-06 : conditions constatées hors application (ex. caution
+            remise au guichet), avec agent, date et motif.'
         reservations:
           type: array
           items:
             $ref: '#/components/schemas/Reservation'
           readOnly: true
       required:
+      - conditions_attestees
       - cree_le
       - depose_le
       - id
@@ -6582,6 +6748,7 @@ components:
           items:
             type: string
             format: date
+          maxItems: 200
     Moi:
       type: object
       properties:
@@ -6616,13 +6783,13 @@ components:
       - id
       - identifiant
       - nom_affiche
-    MotifRequest:
+    MotifUsagerRequest:
       type: object
       properties:
         motif:
           type: string
           minLength: 1
-          maxLength: 300
+          maxLength: 250
       required:
       - motif
     NouvelleReservationRequest:
@@ -6657,9 +6824,14 @@ components:
           items:
             type: string
             format: date
+          maxItems: 200
         forcer_horaires:
           type: boolean
           default: false
+        motif_forcage:
+          type: string
+          default: ''
+          maxLength: 250
       required:
       - date_debut
       - date_fin
@@ -7709,6 +7881,11 @@ components:
           format: date
         active:
           type: boolean
+        cloturee:
+          type: boolean
+          title: Saison close
+          description: Plus aucune réservation ne peut y être créée ni modifiée (bilan
+            arrêté).
     PatchedSiteRequest:
       type: object
       properties:
@@ -7785,6 +7962,16 @@ components:
         exige_caution:
           type: boolean
           title: Caution reçue
+        ouvert_portail:
+          type: boolean
+          title: Demandable sur le portail
+        types_usager:
+          type: array
+          items:
+            type: string
+            minLength: 1
+            maxLength: 20
+          description: 'Vide : tous les types d''usagers (portail).'
         ordre:
           type: integer
           maximum: 32767
@@ -7842,8 +8029,6 @@ components:
           type: string
           format: date
           nullable: true
-        statut:
-          $ref: '#/components/schemas/StatutUsagerEnum'
         observations:
           type: string
     PatchedUtilisateurRequest:
@@ -8369,6 +8554,11 @@ components:
           format: date
         active:
           type: boolean
+        cloturee:
+          type: boolean
+          title: Saison close
+          description: Plus aucune réservation ne peut y être créée ni modifiée (bilan
+            arrêté).
       required:
       - debut
       - fin
@@ -8389,6 +8579,11 @@ components:
           format: date
         active:
           type: boolean
+        cloturee:
+          type: boolean
+          title: Saison close
+          description: Plus aucune réservation ne peut y être créée ni modifiée (bilan
+            arrêté).
       required:
       - debut
       - fin
@@ -8681,6 +8876,15 @@ components:
         exige_caution:
           type: boolean
           title: Caution reçue
+        ouvert_portail:
+          type: boolean
+          title: Demandable sur le portail
+        types_usager:
+          type: array
+          items:
+            type: string
+            maxLength: 20
+          description: 'Vide : tous les types d''usagers (portail).'
         ordre:
           type: integer
           maximum: 32767
@@ -8713,6 +8917,16 @@ components:
         exige_caution:
           type: boolean
           title: Caution reçue
+        ouvert_portail:
+          type: boolean
+          title: Demandable sur le portail
+        types_usager:
+          type: array
+          items:
+            type: string
+            minLength: 1
+            maxLength: 20
+          description: 'Vide : tous les types d''usagers (portail).'
         ordre:
           type: integer
           maximum: 32767
@@ -8799,7 +9013,9 @@ components:
           format: date
           nullable: true
         statut:
-          $ref: '#/components/schemas/StatutUsagerEnum'
+          allOf:
+          - $ref: '#/components/schemas/StatutUsagerEnum'
+          readOnly: true
         observations:
           type: string
         cree_le:
@@ -8817,6 +9033,7 @@ components:
       - nom
       - rattachements
       - resident
+      - statut
       - type
       - type_libelle
     UsagerRequest:
@@ -8872,8 +9089,6 @@ components:
           type: string
           format: date
           nullable: true
-        statut:
-          $ref: '#/components/schemas/StatutUsagerEnum'
         observations:
           type: string
       required:

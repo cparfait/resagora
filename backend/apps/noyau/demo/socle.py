@@ -265,6 +265,22 @@ def referentiel(bilan: Bilan) -> dict[str, Espace]:
     return espaces
 
 
+def _luhn_valide(numero: str) -> bool:
+    total = 0
+    for rang, chiffre in enumerate(reversed(numero)):
+        valeur = int(chiffre) * (2 if rang % 2 else 1)
+        total += valeur - 9 if valeur > 9 else valeur
+    return total % 10 == 0
+
+
+def siret_fictif() -> str:
+    """SIRET de démonstration volontairement invalide (clé de Luhn fausse) : jamais celui d'une entreprise réelle."""
+    while True:
+        numero = f"99{random.randint(10**11, 10**12 - 1)}"
+        if not _luhn_valide(numero):
+            return numero
+
+
 def saison(bilan: Bilan) -> Saison:
     s = Saison.objects.create(nom="2026-2027", debut=date(2026, 9, 1), fin=date(2027, 7, 3), active=True)
     donnees = json.loads((Path(__file__).parent / "calendrier-zone-c-2026-2027.json").read_text(encoding="utf-8"))
@@ -337,7 +353,7 @@ def usagers(bilan: Bilan, faux: Generateur) -> dict[str, list[Usager]]:
             Usager.objects.create(
                 type="entreprise",
                 nom=nom,
-                siret=f"{random.randint(10**13, 10**14 - 1)}",
+                siret=siret_fictif(),
                 commune="Montrouge",
                 code_postal="92120",
             )

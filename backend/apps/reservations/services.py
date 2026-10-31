@@ -20,15 +20,27 @@ from django.utils.formats import date_format
 
 from apps.audit.services import instantane, journaliser
 from apps.communication.services import notifier
+from apps.habilitations.models import Utilisateur
 from apps.habilitations.services import exiger
-from apps.noyau.exceptions import ErreurMetier, ErreurValidation
+from apps.noyau.exceptions import AccesRefuse, ErreurMetier, ErreurValidation
 from apps.noyau.numerotation import numero
 from apps.noyau.parametres import parametre
 from apps.referentiel.models import Espace, Fermeture, HoraireOuverture
 from apps.usagers.models import Contact, Usager
 
 from . import conditions
-from .models import STATUTS, STATUTS_BLOQUANTS, Dossier, ListeAttente, Occurrence, Reservation, TypeReservation, Verrou
+from .models import (
+    STATUTS,
+    STATUTS_ACTIFS,
+    STATUTS_BLOQUANTS,
+    Campagne,
+    Dossier,
+    ListeAttente,
+    Occurrence,
+    Reservation,
+    TypeReservation,
+    Verrou,
+)
 from .recurrence import PARIS, generer_plages, valider_regle
 
 journal = logging.getLogger(__name__)
@@ -80,6 +92,34 @@ def _texte_date(instant: datetime) -> str:
     return date_format(timezone.localtime(instant), "l j F Y à H\\hi")
 
 
+def controler(acteur: Any, action: str, objet: object | None = None, *, portail: bool = False) -> None:
+    """Contrôle explicite de l'acteur : agent (rôle × périmètre), tâche système, ou contact du portail
+    lorsque la vue portail a déjà vérifié que l'objet appartient à ses usagers (`portail=True`)."""
+    if acteur == SYSTEME:
+        return
+    if isinstance(acteur, Utilisateur):
+        exiger(acteur, action, objet)
+        return
+    if portail and isinstance(acteur, Contact):
+        return
+    raise AccesRefuse("Vous n'avez pas les droits pour cette action.", code="droits_insuffisants")
+
+
+def _verifier_saison_ouverte(reservation: Reservation) -> None:
+    from apps.referentiel.models import Saison
+
+    saison = reservation.dossier.saison if reservation.dossier_id and reservation.dossier.saison_id else None
+    if saison is not None and saison.cloturee:
+        closes = [saison]
+    else:
+        closes = list(Saison.objects.filter(cloturee=True, debut__lte=reservation.date_fin, fin__gte=reservation.date_debut))
+    if closes:
+        raise ErreurMetier(
+            f"La saison {closes[0].nom} est close : ses réservations ne peuvent plus être créées ni modifiées.",
+            code="saison_close",
+        )
+
+
 def _verifier_transition(reservation: Reservation, cible: str) -> None:
     if cible not in TRANSITIONS[reservation.statut]:
         raise ErreurMetier(
@@ -107,8 +147,11 @@ def dans_les_horaires(espace: Espace, debut: datetime, fin: datetime) -> bool:
     candidates = propres if propres.exists() else du_jour.filter(saison__isnull=True)
     if est_vacances(jour):
         candidates = candidates.filter(pendant_vacances=True)
-    fin_locale = local_fin.time() if local_fin.time() != time(0, 0) else time(23, 59, 59)
-    return any(h.debut <= local_debut.time() and fin_locale <= h.fin for h in candidates)
+    jusqua_minuit = local_fin.time() == time(0, 0)
+    return any(
+        h.debut <= local_debut.time() and (h.fin >= time(23, 59) if jusqua_minuit else local_fin.time() <= h.fin)
+        for h in candidates
+    )
 
 
 def fermetures_touchant(espace: Espace, debut: datetime, fin: datetime) -> QuerySet[Fermeture]:
@@ -128,10 +171,11 @@ def conflits(espace: Espace, debut: datetime, fin: datetime, exclure: Iterable[i
         verrous = Verrou.objects.filter(feuille=feuille, plage__overlap=plage).exclude(occurrence_id__in=list(exclure))
         verrous = verrous.select_related("occurrence__reservation__dossier__usager", "occurrence__espace")
         if feuille.partageable and feuille.pk == espace.pk:
-            exclusifs = [v for v in verrous if not v.partage]
-            if not exclusifs and verrous.count() < feuille.capacite_simultanee:
+            liste = list(verrous)
+            exclusifs = [v for v in liste if not v.partage]
+            if not exclusifs and _occupation_simultanee(liste, debut, fin) < feuille.capacite_simultanee:
                 continue
-            retenus = exclusifs or list(verrous)
+            retenus = exclusifs or liste
         else:
             retenus = list(verrous)
         for v in retenus:
@@ -146,6 +190,19 @@ def conflits(espace: Espace, debut: datetime, fin: datetime, exclure: Iterable[i
                 o.fin,
             )
     return sorted(trouves.values(), key=lambda c: c.debut)
+
+
+def _occupation_simultanee(verrous: list[Verrou], debut: datetime, fin: datetime) -> int:
+    """Nombre maximal d'occupations partagées simultanées sur [debut, fin) (REF-07)."""
+    evenements: list[tuple[datetime, int]] = []
+    for v in verrous:
+        evenements.append((max(v.plage.lower, debut), 1))
+        evenements.append((min(v.plage.upper, fin), -1))
+    courant = maximum = 0
+    for _instant, variation in sorted(evenements, key=lambda e: (e[0], e[1])):
+        courant += variation
+        maximum = max(maximum, courant)
+    return maximum
 
 
 def poser_verrous(occurrence: Occurrence) -> None:
@@ -214,6 +271,9 @@ def creer_dossier(
 ) -> Dossier:
     if usager.statut in {"suspendu", "anonymise"}:
         raise ErreurMetier("Cet usager ne peut pas déposer de demande (compte suspendu).", code="usager_suspendu")
+    _verifier_contact(usager, contact)
+    if champs.get("campagne") is not None:
+        champs["saison"] = _verifier_campagne(champs["campagne"], acteur, champs.get("saison"))
     annee = timezone.localdate().year
     dossier = Dossier.objects.create(
         numero=numero("D", annee),
@@ -230,23 +290,140 @@ def creer_dossier(
     return dossier
 
 
-def _valider_creneau(espace: Espace, reservation: Reservation, forcer_horaires: bool) -> list[tuple[datetime, datetime]]:
+def _verifier_contact(usager: Usager, contact: Contact | None) -> None:
+    if contact is not None and not usager.rattachements.filter(contact=contact).exists():
+        raise ErreurValidation("Ce contact n'est pas rattaché à l'usager.", code="contact_non_rattache")
+
+
+def _verifier_campagne(campagne: Campagne, acteur: Any, saison: Any = None) -> Any:
+    """PLA-05 : dépôt dans une campagne ouverte, dans ses dates, sur la saison de la campagne."""
+    if isinstance(acteur, Utilisateur):
+        exiger(acteur, "lire_reservation", campagne)
+    aujourd_hui = timezone.localdate()
+    if campagne.statut != "ouverte" or not campagne.ouverture <= aujourd_hui <= campagne.cloture:
+        raise ErreurValidation(f"La campagne « {campagne.nom} » n'est pas ouverte aux demandes.", code="campagne_fermee")
+    if saison is not None and saison != campagne.saison:
+        raise ErreurValidation("La saison du dossier doit être celle de la campagne.", code="saison_incoherente")
+    return campagne.saison
+
+
+CHAMPS_FIGES = {"usager", "type_reservation", "campagne", "saison"}
+
+
+@transaction.atomic
+def modifier_dossier(dossier: Dossier, *, acteur: Any, **champs: Any) -> Dossier:
+    """Modification d'un dossier : bénéficiaire, type, campagne et saison figés dès qu'une réservation
+    a dépassé l'instruction (RG-06 : les conditions dépendent du type et de l'usager)."""
+    dossier = Dossier.objects.select_for_update().get(pk=dossier.pk)
+    controler(acteur, "creer_reservation", dossier)
+    sensibles = {c for c in CHAMPS_FIGES & set(champs) if champs[c] != getattr(dossier, c)}
+    if sensibles:
+        avances = dossier.reservations.exclude(statut__in=["demande", "en_instruction", "refusee", "annulee"])
+        if avances.exists():
+            raise ErreurMetier(
+                "Usager, type, campagne et saison ne se modifient plus après la validation : annulez puis créez une nouvelle demande.",
+                code="dossier_fige",
+            )
+        if "type_reservation" in sensibles:
+            controler(acteur, "valider_reservation", dossier)
+    usager = champs.get("usager", dossier.usager)
+    _verifier_contact(usager, champs.get("contact", dossier.contact))
+    if "campagne" in sensibles and champs["campagne"] is not None:
+        champs["saison"] = _verifier_campagne(champs["campagne"], acteur, champs.get("saison"))
+    avant = instantane(dossier)
+    for cle, valeur in champs.items():
+        setattr(dossier, cle, valeur)
+    dossier.save()
+    journaliser("modifier_dossier", dossier, avant=avant, apres=instantane(dossier), acteur=acteur)
+    return dossier
+
+
+def _signalement_fermeture(espace: Espace, debut: datetime, fin: datetime) -> str:
+    fermeture = fermetures_touchant(espace, debut, fin).first()
+    return f"Fermeture : {fermeture.motif}" if fermeture else ""
+
+
+def _verifier_calendrier(reservation: Reservation) -> None:
+    """Sans calendrier importé, « hors vacances » ne pourrait pas être respecté (ADM-01)."""
+    from apps.referentiel.models import PeriodeCalendrier
+
+    from .recurrence import saisons_couvrant
+
+    if not reservation.recurrence or not reservation.exclure_vacances:
+        return
+    saisons: list[Any]
+    if reservation.dossier_id and reservation.dossier.saison_id:
+        saisons = [reservation.dossier.saison]
+    else:
+        saisons = saisons_couvrant(reservation.date_debut, reservation.date_fin)
+    sans_calendrier = [s for s in saisons if not PeriodeCalendrier.objects.filter(saison=s, nature="vacances").exists()]
+    if not saisons or sans_calendrier:
+        nom = f"la saison {sans_calendrier[0].nom}" if sans_calendrier else "ces dates (aucune saison)"
+        raise ErreurValidation(
+            f"Le calendrier scolaire de {nom} n'est pas importé : impossible d'exclure les vacances. "
+            "Importez-le (Référentiel → Saisons et calendrier) ou décochez « hors vacances ».",
+            code="calendrier_absent",
+        )
+
+
+def _valider_creneau(
+    espace: Espace, reservation: Reservation, forcer_horaires: bool, *, nouvelle: bool = True
+) -> list[tuple[datetime, datetime]]:
+    """Contrôles serveur d'un créneau (REF-03, REF-06, PLA-04) ; renvoie les plages retenues.
+
+    Les séances qui tombent pendant une fermeture exceptionnelle sont écartées d'une série (et
+    refusées pour une séance unique) ; le forçage des horaires est réservé à `valider_reservation`.
+    """
     if not espace.actif:
         raise ErreurValidation("Cet espace n'est pas réservable.", code="espace_inactif")
+    _verifier_saison_ouverte(reservation)
+    _verifier_calendrier(reservation)
     plages = generer_plages(reservation)
-    if not plages:
-        raise ErreurValidation(
-            "Aucune séance : vérifiez la période, les jours et les exclusions (vacances, fériés).", code="aucune_occurrence"
-        )
     duree_max = int(parametre("reservations.duree_max_minutes"))
+    aujourd_hui = timezone.localdate()
+    horizon_jours = int(parametre("reservations.horizon_max_jours"))
+    if nouvelle and reservation.date_fin > aujourd_hui + timedelta(days=horizon_jours):
+        raise ErreurValidation(f"Réservation trop lointaine : au plus {horizon_jours} jours à l'avance.", code="horizon_depasse")
+    if nouvelle and reservation.dossier_id and reservation.dossier.origine == "portail":
+        delai_jours = int(parametre("reservations.delai_min_demande_jours"))
+        if plages and _jour_local(plages[0][0]) < aujourd_hui + timedelta(days=delai_jours):
+            raise ErreurValidation(
+                f"Les demandes en ligne se font au moins {delai_jours} jours à l'avance. "
+                "Pour une demande plus urgente, contactez le service des équipements.",
+                code="delai_minimal",
+            )
+    retenues = []
     for debut, fin in plages:
-        if reservation.recurrence and (fin - debut).total_seconds() / 60 > duree_max:
-            raise ErreurValidation("Durée de séance supérieure au maximum autorisé.", code="duree_excessive")
+        if (fin - debut).total_seconds() / 60 > duree_max:
+            raise ErreurValidation(
+                f"Séance de plus de {duree_max // 60} heures : découpez la réservation en séances.", code="duree_excessive"
+            )
         if not forcer_horaires and not dans_les_horaires(espace, debut, fin):
             raise ErreurValidation(
                 f"Le {_texte_date(debut)} est en dehors des horaires d'ouverture de {espace.nom}.", code="hors_horaires"
             )
-    return plages
+        if fermetures_touchant(espace, debut, fin).exists():
+            if not reservation.recurrence:
+                raise ErreurValidation(
+                    f"{espace.nom} est fermé le {_texte_date(debut)} ({_signalement_fermeture(espace, debut, fin)}).",
+                    code="fermeture",
+                )
+            continue
+        retenues.append((debut, fin))
+    if not retenues:
+        raise ErreurValidation(
+            "Aucune séance : vérifiez la période, les jours et les exclusions (vacances, fériés, fermetures).",
+            code="aucune_occurrence",
+        )
+    return retenues
+
+
+def _autoriser_forcage(acteur: Any, espace: Espace, forcer_horaires: bool, motif_forcage: str) -> None:
+    if not forcer_horaires:
+        return
+    controler(acteur, "valider_reservation", espace)
+    if len(motif_forcage.strip()) < 5:
+        raise ErreurValidation("Indiquez le motif de la dérogation aux horaires d'ouverture.", code="motif_requis")
 
 
 @transaction.atomic
@@ -264,10 +441,14 @@ def ajouter_reservation(
     exclure_feries: bool = True,
     exdates: list[date] | None = None,
     forcer_horaires: bool = False,
+    motif_forcage: str = "",
+    portail: bool = False,
 ) -> Reservation:
     """PLA-04 : la réservation est créée en « demande » ; ses occurrences sont matérialisées sans verrou (RG-02)."""
-    if acteur != SYSTEME and hasattr(acteur, "habilitations"):
-        exiger(acteur, "creer_reservation", espace)
+    controler(acteur, "creer_reservation", espace, portail=portail)
+    if portail and forcer_horaires:
+        raise AccesRefuse("Dérogation impossible depuis le portail.", code="droits_insuffisants")
+    _autoriser_forcage(acteur, espace, forcer_horaires, motif_forcage)
     reservation = Reservation(
         dossier=dossier,
         espace=espace,
@@ -286,7 +467,14 @@ def ajouter_reservation(
         [Occurrence(reservation=reservation, espace=espace, debut=d, fin=f, statut="demande") for d, f in plages]
     )
     journaliser(
-        "ajouter_reservation", reservation, apres={**(instantane(reservation) or {}), "occurrences": len(plages)}, acteur=acteur
+        "ajouter_reservation",
+        reservation,
+        apres={
+            **(instantane(reservation) or {}),
+            "occurrences": len(plages),
+            **({"derogation_horaires": motif_forcage.strip()} if forcer_horaires else {}),
+        },
+        acteur=acteur,
     )
     return reservation
 
@@ -296,19 +484,59 @@ def _occurrences_modifiables(reservation: Reservation, a_partir: datetime | None
     return qs.filter(debut__gte=a_partir) if a_partir else qs
 
 
-def rematerialiser(reservation: Reservation, a_partir: datetime | None = None) -> None:
-    """Recalcule les occurrences futures non modifiées individuellement selon la règle courante."""
+def _jour_local(instant: datetime) -> date:
+    return timezone.localtime(instant, PARIS).date()
+
+
+def rematerialiser(reservation: Reservation, a_partir: datetime | None = None) -> list[Occurrence]:
+    """Recalcule les séances futures non modifiées individuellement selon la règle courante.
+
+    Les séances annulées, déplacées ou modifiées une à une sont conservées et leur jour d'origine
+    n'est pas recréé ; une séance qui tombe pendant une fermeture est créée avec un signalement.
+    Renvoie les séances qui n'ont pas pu prendre leur verrou (signalées, à traiter).
+    """
     a_partir = a_partir or timezone.now()
     for occurrence in _occurrences_modifiables(reservation, a_partir).filter(modifiee_individuellement=False):
         retirer_verrous(occurrence)
         occurrence.delete()
-    existantes = {o.debut for o in reservation.occurrences.all()}
+    jours_pris = {_jour_local(o.debut_origine or o.debut) for o in reservation.occurrences.all()}
+    en_conflit: list[Occurrence] = []
     for debut, fin in generer_plages(reservation):
-        if debut >= a_partir and debut not in existantes:
-            occurrence = Occurrence.objects.create(
-                reservation=reservation, espace=reservation.espace, debut=debut, fin=fin, statut=reservation.statut
-            )
-            poser_verrous(occurrence)
+        if debut < a_partir or _jour_local(debut) in jours_pris:
+            continue
+        occurrence = Occurrence.objects.create(
+            reservation=reservation,
+            espace=reservation.espace,
+            debut=debut,
+            fin=fin,
+            statut=reservation.statut,
+            signalement=_signalement_fermeture(reservation.espace, debut, fin),
+        )
+        if occurrence.signalement:
+            continue
+        try:
+            with transaction.atomic():
+                poser_verrous(occurrence)
+        except ErreurMetier as erreur:
+            occurrence.signalement = f"Conflit à traiter : {erreur.message}"[:300]
+            occurrence.save(update_fields=["signalement"])
+            en_conflit.append(occurrence)
+    return en_conflit
+
+
+def appliquer_calendrier(saison: Any, *, acteur: Any) -> int:
+    """ADM-01 : après un import du calendrier, les séries actives de la saison sont recalculées."""
+    nombre = 0
+    series = Reservation.objects.filter(
+        statut__in=STATUTS_ACTIFS, date_fin__gte=max(timezone.localdate(), saison.debut), date_debut__lte=saison.fin
+    ).exclude(recurrence="")
+    for reservation in series:
+        with transaction.atomic():
+            rematerialiser(_verrouiller(reservation))
+            nombre += 1
+    if nombre:
+        journaliser("appliquer_calendrier", saison, apres={"series_recalculees": nombre}, acteur=acteur)
+    return nombre
 
 
 # --- Transitions --------------------------------------------------------------------------------
@@ -371,6 +599,10 @@ def valider(reservation: Reservation, *, acteur: Any) -> Reservation:
         reservation, "validee", acteur, valide_par=acteur if hasattr(acteur, "habilitations") else None, valide_le=timezone.now()
     )
     for occurrence in reservation.occurrences.filter(statut="validee"):
+        signalement = _signalement_fermeture(occurrence.espace, occurrence.debut, occurrence.fin)
+        if signalement and occurrence.signalement != signalement:
+            occurrence.signalement = signalement
+            occurrence.save(update_fields=["signalement"])
         poser_verrous(occurrence)
     manques = conditions.conditions_manquantes(reservation)
     notifier(
@@ -458,8 +690,7 @@ def annuler_occurrence(occurrence: Occurrence, *, acteur: Any, motif: str, par_u
         .select_related("reservation__dossier__usager", "espace__batiment")
         .get(pk=occurrence.pk)
     )
-    if hasattr(acteur, "habilitations"):
-        exiger(acteur, "annuler_reservation", occurrence)
+    controler(acteur, "annuler_reservation", occurrence, portail=par_usager)
     if occurrence.statut in {"annulee", "realisee", "cloturee", "refusee"}:
         raise ErreurMetier("Cette séance ne peut plus être annulée.", code="transition_interdite")
     if not motif.strip():
@@ -471,8 +702,7 @@ def annuler_occurrence(occurrence: Occurrence, *, acteur: Any, motif: str, par_u
 def annuler(reservation: Reservation, *, acteur: Any, motif: str, par_usager: bool = False) -> Reservation:
     """Annule la réservation et toutes ses séances à venir."""
     reservation = _verrouiller(reservation)
-    if hasattr(acteur, "habilitations"):
-        exiger(acteur, "annuler_reservation", reservation)
+    controler(acteur, "annuler_reservation", reservation, portail=par_usager)
     _verifier_transition(reservation, "annulee")
     if not motif.strip():
         raise ErreurValidation("Indiquez le motif de l'annulation.", code="motif_requis")
@@ -496,14 +726,34 @@ def annuler(reservation: Reservation, *, acteur: Any, motif: str, par_usager: bo
     return reservation
 
 
+def realisation_possible(reservation: Reservation, statut: str) -> bool:
+    """Une séance passe à « réalisée » depuis « confirmée », ou depuis « validée » si le type de
+    réservation n'exige aucune condition de confirmation (RG-06)."""
+    if statut == "confirmee":
+        return True
+    if statut != "validee":
+        return False
+    type_reservation = reservation.dossier.type_reservation
+    return not (
+        type_reservation.exige_pieces
+        or type_reservation.exige_convention
+        or type_reservation.exige_acompte
+        or type_reservation.exige_caution
+    )
+
+
+SIGNAL_SANS_CONFIRMATION = "Séance passée sans confirmation : conditions RG-06 à régulariser"
+
+
 @transaction.atomic
 def saisir_presence(
     occurrence: Occurrence, *, acteur: Any, presence: str, debut_reel: datetime | None = None, fin_reel: datetime | None = None
 ) -> Occurrence:
-    """PLA-11 : présence et heures réelles ; une séance passée validée ou confirmée devient « réalisée »."""
-    occurrence = Occurrence.objects.select_for_update().get(pk=occurrence.pk)
-    if hasattr(acteur, "habilitations"):
-        exiger(acteur, "cloturer_reservation", occurrence)
+    """PLA-11 : présence et heures réelles ; la séance devient « réalisée » si sa réservation le permet."""
+    occurrence = (
+        Occurrence.objects.select_for_update().select_related("reservation__dossier__type_reservation").get(pk=occurrence.pk)
+    )
+    controler(acteur, "cloturer_reservation", occurrence)
     if presence not in {"present", "absent_signale", "absent_non_signale"}:
         raise ErreurValidation("Présence inconnue.", code="presence_invalide")
     if occurrence.statut not in {"validee", "confirmee", "realisee"}:
@@ -514,27 +764,52 @@ def saisir_presence(
         raise ErreurValidation("L'heure de fin réelle doit suivre l'heure de début.", code="heures_invalides")
     occurrence.presence = presence
     occurrence.debut_reel, occurrence.fin_reel = debut_reel, fin_reel
-    occurrence.statut = "realisee"
+    if occurrence.statut == "realisee" or realisation_possible(occurrence.reservation, occurrence.statut):
+        occurrence.statut = "realisee"
+    else:
+        occurrence.signalement = SIGNAL_SANS_CONFIRMATION
     occurrence.save()
-    journaliser("saisir_presence", occurrence, apres={"presence": presence}, acteur=acteur)
+    journaliser("saisir_presence", occurrence, apres={"presence": presence, "statut": occurrence.statut}, acteur=acteur)
     return occurrence
 
 
 @transaction.atomic
 def cloturer(reservation: Reservation, *, acteur: Any) -> Reservation:
+    """PLA-06 : clôture d'une réservation dont toutes les séances sont passées et réalisées ou annulées."""
     reservation = _verrouiller(reservation)
     exiger(acteur, "cloturer_reservation", reservation)
-    if reservation.occurrences.filter(fin__gt=timezone.now()).exclude(statut__in=["annulee"]).exists():
+    if reservation.statut not in {"validee", "confirmee", "realisee"}:
+        raise ErreurMetier(
+            f"Une réservation « {reservation.get_statut_display()} » ne se clôture pas.", code="transition_interdite"
+        )
+    if not realisation_possible(reservation, reservation.statut) and reservation.statut != "realisee":
+        raise ErreurMetier(
+            "Réservation non confirmée : les conditions de confirmation (RG-06) doivent être réunies avant la clôture.",
+            code="conditions_non_remplies",
+        )
+    if reservation.occurrences.filter(fin__gt=timezone.now()).exclude(statut="annulee").exists():
         raise ErreurMetier("Des séances sont encore à venir : clôture impossible.", code="seances_a_venir")
     reservation.occurrences.filter(statut__in=["validee", "confirmee"]).update(statut="realisee")
-    reservation.statut = "realisee"
+    if reservation.statut != "realisee":
+        _changer_statut(reservation, "realisee", acteur)
     _verifier_transition(reservation, "cloturee")
     return _changer_statut(reservation, "cloturee", acteur)
 
 
 def marquer_realisees() -> int:
-    """Tâche quotidienne : les séances passées validées ou confirmées deviennent réalisées."""
-    return Occurrence.objects.filter(fin__lt=timezone.now(), statut__in=["validee", "confirmee"]).update(statut="realisee")
+    """Tâche quotidienne : les séances passées deviennent réalisées si leur réservation le permet ;
+    les autres sont signalées (validées sans confirmation alors que le type l'exige)."""
+    nombre = 0
+    passees = Occurrence.objects.filter(fin__lt=timezone.now(), statut__in=["validee", "confirmee"]).select_related(
+        "reservation__dossier__type_reservation"
+    )
+    for occurrence in passees:
+        if realisation_possible(occurrence.reservation, occurrence.statut):
+            Occurrence.objects.filter(pk=occurrence.pk).update(statut="realisee")
+            nombre += 1
+        elif occurrence.signalement != SIGNAL_SANS_CONFIRMATION:
+            Occurrence.objects.filter(pk=occurrence.pk).update(signalement=SIGNAL_SANS_CONFIRMATION)
+    return nombre
 
 
 # --- Modifications : cette séance, celle-ci et les suivantes, toute la série (PLA-04) ---------------
@@ -542,18 +817,38 @@ def marquer_realisees() -> int:
 
 @transaction.atomic
 def deplacer_occurrence(
-    occurrence: Occurrence, *, acteur: Any, espace: Espace, debut: datetime, fin: datetime, forcer_horaires: bool = False
+    occurrence: Occurrence,
+    *,
+    acteur: Any,
+    espace: Espace,
+    debut: datetime,
+    fin: datetime,
+    forcer_horaires: bool = False,
+    motif_forcage: str = "",
+    notifier_usager: bool = True,
 ) -> Occurrence:
-    """PLA-02 / « cette séance seulement » : contrôle de conflit côté serveur puis déplacement."""
+    """PLA-02 / « cette séance seulement » : contrôles côté serveur (droits, horaires, fermeture,
+    conflit RG-01) puis déplacement ; l'usager est prévenu."""
     occurrence = Occurrence.objects.select_for_update().select_related("reservation__dossier", "espace").get(pk=occurrence.pk)
     exiger(acteur, "valider_reservation", occurrence)
     exiger(acteur, "valider_reservation", espace)
     if occurrence.statut in {"annulee", "realisee", "cloturee", "refusee"}:
         raise ErreurMetier("Cette séance ne peut plus être déplacée.", code="transition_interdite")
+    if forcer_horaires and motif_forcage != "priorité municipale" and len(motif_forcage.strip()) < 5:
+        raise ErreurValidation("Indiquez le motif de la dérogation aux horaires d'ouverture.", code="motif_requis")
     if fin <= debut:
         raise ErreurValidation("La fin doit suivre le début.", code="heures_invalides")
     if not forcer_horaires and not dans_les_horaires(espace, debut, fin):
         raise ErreurValidation("Nouveau créneau en dehors des horaires d'ouverture.", code="hors_horaires")
+    if fermetures_touchant(espace, debut, fin).exists():
+        raise ErreurValidation(
+            f"{espace.nom} est fermé à ce moment ({_signalement_fermeture(espace, debut, fin)}).", code="fermeture"
+        )
+    if (fin - debut).total_seconds() / 60 > int(parametre("reservations.duree_max_minutes")):
+        raise ErreurValidation("Séance trop longue.", code="duree_excessive")
+    _verifier_saison_ouverte(occurrence.reservation)
+    ancien = _texte_date(occurrence.debut)
+    ancien_espace = occurrence.espace.nom
     avant = {"espace": occurrence.espace_id, "debut": occurrence.debut.isoformat(), "fin": occurrence.fin.isoformat()}
     retirer_verrous(occurrence)
     if occurrence.debut_origine is None:
@@ -567,13 +862,27 @@ def deplacer_occurrence(
         "deplacer_occurrence",
         occurrence,
         avant=avant,
-        apres={"espace": espace.pk, "debut": debut.isoformat(), "fin": fin.isoformat()},
+        apres={"espace": espace.pk, "debut": debut.isoformat(), "fin": fin.isoformat(), "forcage": forcer_horaires},
         acteur=acteur,
     )
+    if notifier_usager:
+        notifier(
+            "seance_deplacee",
+            {"date": ancien, "espace": ancien_espace, "nouveau": f"{espace.nom}, {_texte_date(debut)}"},
+            usager=occurrence.reservation.dossier.usager,
+            objet=occurrence,
+        )
     return occurrence
 
 
 CHAMPS_SERIE = {"espace", "heure_debut", "heure_fin", "date_fin", "recurrence", "exclure_vacances", "exclure_feries", "exdates"}
+
+
+def _verifier_serie_modifiable(reservation: Reservation) -> None:
+    if reservation.statut not in STATUTS_ACTIFS:
+        raise ErreurMetier(
+            f"Une réservation « {reservation.get_statut_display()} » ne se modifie plus.", code="transition_interdite"
+        )
 
 
 @transaction.atomic
@@ -581,6 +890,7 @@ def modifier_serie(reservation: Reservation, *, acteur: Any, **changements: Any)
     """« Toute la série » : nouvelle règle appliquée aux séances futures non modifiées individuellement."""
     reservation = _verrouiller(reservation)
     exiger(acteur, "valider_reservation", reservation)
+    _verifier_serie_modifiable(reservation)
     inconnus = set(changements) - CHAMPS_SERIE
     if inconnus:
         raise ErreurValidation("Champs non modifiables : " + ", ".join(sorted(inconnus)), code="champs_invalides")
@@ -589,48 +899,73 @@ def modifier_serie(reservation: Reservation, *, acteur: Any, **changements: Any)
     avant = instantane(reservation)
     for cle, valeur in changements.items():
         setattr(reservation, cle, valider_regle(valeur) if cle == "recurrence" else valeur)
-    _valider_creneau(reservation.espace, reservation, forcer_horaires=False)
+    _valider_creneau(reservation.espace, reservation, forcer_horaires=False, nouvelle=False)
     reservation.save()
-    rematerialiser(reservation)
-    journaliser("modifier_serie", reservation, avant=avant, apres=instantane(reservation), acteur=acteur)
+    a_traiter = rematerialiser(reservation)
+    journaliser(
+        "modifier_serie",
+        reservation,
+        avant=avant,
+        apres={**(instantane(reservation) or {}), "seances_en_conflit": len(a_traiter)},
+        acteur=acteur,
+    )
     return reservation
+
+
+def _regle_sans_count(origine: Reservation) -> tuple[str, date]:
+    """« Celle-ci et les suivantes » : COUNT est remplacé par la date de la dernière séance prévue."""
+    regle = origine.recurrence
+    if "COUNT=" not in regle:
+        return regle, origine.date_fin
+    plages = generer_plages(origine)
+    fin = _jour_local(plages[-1][0]) if plages else origine.date_fin
+    parties = [p for p in regle.split(";") if not p.startswith("COUNT=")]
+    return ";".join(parties), fin
 
 
 @transaction.atomic
 def modifier_suivantes(occurrence: Occurrence, *, acteur: Any, **changements: Any) -> Reservation:
-    """« Celle-ci et les suivantes » : la série est coupée la veille ; une nouvelle réservation porte la suite."""
+    """« Celle-ci et les suivantes » : la série est coupée la veille ; une nouvelle réservation porte la suite.
+
+    Les séances déjà annulées (y compris tardivement, RG-08), réalisées ou modifiées une à une sont
+    rattachées à la suite et conservées telles quelles ; seules les autres sont recalculées.
+    """
     occurrence = Occurrence.objects.select_related("reservation").get(pk=occurrence.pk)
     origine = _verrouiller(occurrence.reservation)
     exiger(acteur, "valider_reservation", origine)
-    jour = timezone.localtime(occurrence.debut, PARIS).date()
+    _verifier_serie_modifiable(origine)
+    jour = _jour_local(occurrence.debut_origine or occurrence.debut)
     if jour <= origine.date_debut:
         return modifier_serie(origine, acteur=acteur, **changements)
+    for cle in changements:
+        if cle not in CHAMPS_SERIE:
+            raise ErreurValidation(f"Champ non modifiable : {cle}", code="champs_invalides")
+    if "espace" in changements:
+        exiger(acteur, "valider_reservation", changements["espace"])
     suite = Reservation.objects.get(pk=origine.pk)
     suite.pk = None
     suite._state.adding = True
     suite.date_debut = jour
+    suite.recurrence, suite.date_fin = _regle_sans_count(origine)
     for cle, valeur in changements.items():
-        if cle not in CHAMPS_SERIE:
-            raise ErreurValidation(f"Champ non modifiable : {cle}", code="champs_invalides")
         setattr(suite, cle, valider_regle(valeur) if cle == "recurrence" else valeur)
-    if "espace" in changements:
-        exiger(acteur, "valider_reservation", changements["espace"])
-    _valider_creneau(suite.espace, suite, forcer_horaires=False)
+    _valider_creneau(suite.espace, suite, forcer_horaires=False, nouvelle=False)
     origine.date_fin = jour - timedelta(days=1)
     origine.save()
+    suite.save()
     a_partir = datetime.combine(jour, time.min, tzinfo=PARIS)
-    for o in origine.occurrences.filter(debut__gte=a_partir).exclude(statut__in=["realisee", "cloturee"]):
+    conservees = Q(statut__in=["annulee", "realisee", "cloturee"]) | Q(modifiee_individuellement=True)
+    suivantes = origine.occurrences.filter(Q(debut__gte=a_partir) | Q(debut_origine__gte=a_partir))
+    deplacees = suivantes.filter(conservees).update(reservation=suite)
+    for o in suivantes.exclude(conservees):
         retirer_verrous(o)
         o.delete()
-    suite.save()
-    for debut, fin in generer_plages(suite):
-        nouvelle = Occurrence.objects.create(reservation=suite, espace=suite.espace, debut=debut, fin=fin, statut=suite.statut)
-        poser_verrous(nouvelle)
+    a_traiter = rematerialiser(suite, a_partir=a_partir)
     journaliser(
         "modifier_suivantes",
         suite,
         avant={"reservation_origine": origine.pk, "jour": jour.isoformat()},
-        apres=instantane(suite),
+        apres={**(instantane(suite) or {}), "seances_conservees": deplacees, "seances_en_conflit": len(a_traiter)},
         acteur=acteur,
     )
     return suite
@@ -667,6 +1002,9 @@ def traiter_options(maintenant: datetime | None = None) -> dict[str, int]:
             if r.statut != "option":
                 continue
             _changer_statut(r, "annulee", SYSTEME, motif_annulation="Option expirée après relance", annulee_le=maintenant)
+            r.occurrences.filter(statut="annulee", annulee_le__isnull=True).update(
+                annulee_le=maintenant, motif_annulation="Option expirée après relance"
+            )
             notifier("option_expiree", _contexte(r), usager=r.dossier.usager, objet=r)
             bilan["liberees"] += 1
     return bilan
@@ -677,10 +1015,23 @@ def traiter_options(maintenant: datetime | None = None) -> dict[str, int]:
 
 @transaction.atomic
 def inscrire_liste_attente(
-    *, acteur: Any, espace: Espace, debut: datetime, fin: datetime, usager: Usager, contact: Contact | None = None
+    *,
+    acteur: Any,
+    espace: Espace,
+    debut: datetime,
+    fin: datetime,
+    usager: Usager,
+    contact: Contact | None = None,
+    portail: bool = False,
 ) -> ListeAttente:
-    if hasattr(acteur, "habilitations"):
-        exiger(acteur, "creer_reservation", espace)
+    controler(acteur, "creer_reservation", espace, portail=portail)
+    if fin <= debut:
+        raise ErreurValidation("La fin doit suivre le début.", code="heures_invalides")
+    if debut <= timezone.now():
+        raise ErreurValidation("Le créneau est déjà passé.", code="creneau_passe")
+    _verifier_contact(usager, contact)
+    if not conflits(espace, debut, fin):
+        raise ErreurMetier("Ce créneau est libre : déposez directement une demande.", code="creneau_libre")
     inscription = ListeAttente.objects.create(espace=espace, debut=debut, fin=fin, usager=usager, contact=contact)
     journaliser("inscrire_liste_attente", inscription, acteur=acteur)
     return inscription
@@ -740,8 +1091,10 @@ def alternatives(espace: Espace, debut: datetime, fin: datetime, nombre: int = 3
     )
     for voisin in voisins:
         essayer(voisin, debut, "autre espace de même type sur le site")
+    local = timezone.localtime(debut, PARIS)
     for semaines in (1, 2, 3):
-        essayer(espace, debut + timedelta(weeks=semaines), "même créneau, semaine suivante")
+        jour = local.date() + timedelta(weeks=semaines)
+        essayer(espace, datetime.combine(jour, local.time(), tzinfo=PARIS), "même créneau, semaine suivante")
     return propositions
 
 
@@ -784,6 +1137,32 @@ def enregistrer_fermeture(fermeture: Fermeture, *, acteur: Any) -> list[Occurren
     return touchees
 
 
+# --- Hiérarchie des espaces (REF-05) -------------------------------------------------------------------
+
+
+def recalculer_verrous(espaces: Iterable[Espace]) -> int:
+    """Après un changement de hiérarchie ou de partage, les séances bloquantes à venir des espaces
+    concernés reprennent leurs verrous sur les nouvelles feuilles ; un conflit annule la modification."""
+    lies: set[int] = set()
+    for espace in espaces:
+        lies |= espace.ids_lies()
+    occurrences = list(
+        Occurrence.objects.filter(espace_id__in=lies, statut__in=STATUTS_BLOQUANTS, fin__gt=timezone.now())
+        .select_related("espace")
+        .order_by("debut")
+    )
+    Verrou.objects.filter(occurrence__in=occurrences).delete()
+    for occurrence in occurrences:
+        try:
+            poser_verrous(occurrence)
+        except ErreurMetier as erreur:
+            raise ErreurMetier(
+                f"Modification impossible : la nouvelle organisation des espaces crée un conflit ({erreur.message})",
+                code="conflit_hierarchie",
+            ) from erreur
+    return len(occurrences)
+
+
 # --- Priorité municipale (PLA-12) ----------------------------------------------------------------
 
 
@@ -816,7 +1195,16 @@ def imposer_priorite_municipale(
         ancien = _texte_date(gene.debut)
         if cible is not None:
             espace, debut, fin = cible
-            deplacer_occurrence(gene, acteur=acteur, espace=espace, debut=debut, fin=fin, forcer_horaires=True)
+            deplacer_occurrence(
+                gene,
+                acteur=acteur,
+                espace=espace,
+                debut=debut,
+                fin=fin,
+                forcer_horaires=True,
+                motif_forcage="priorité municipale",
+                notifier_usager=False,
+            )
             nouveau = f"{espace.nom}, {_texte_date(debut)}"
         else:
             _annuler_occurrence(gene, f"Priorité municipale : {motif}", par_usager=False, acteur=acteur, notifier_usager=False)

@@ -61,10 +61,9 @@ export default function Usagers() {
         { nom: "conventionne", libelle: "Conventionné avec la Ville", type: "booleen" },
         { nom: "convention_reference", libelle: "Référence de la convention", type: "texte" },
         { nom: "convention_fin", libelle: "Fin de la convention", type: "date" },
-        { nom: "statut", libelle: "Statut", type: "selection", options: STATUTS_USAGER },
         { nom: "observations", libelle: "Observations", type: "zone" },
       ]}
-      valeursInitiales={{ type: "association", statut: "valide", commune: "Châtillon", code_postal: "92320" }}
+      valeursInitiales={{ type: "association", commune: "Châtillon", code_postal: "92320" }}
       filtres={[
         { nom: "recherche", libelle: "Nom, SIRET, RNA, contact" },
         { nom: "type", libelle: "Type", options: TYPES },

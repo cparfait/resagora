@@ -7,6 +7,7 @@ la valeur effective via `parametre(cle)`.
 
 from __future__ import annotations
 
+import re
 from dataclasses import dataclass
 from typing import Any
 
@@ -22,6 +23,7 @@ class DefinitionParametre:
     defaut: Any
     groupe: str
     aide: str = ""
+    bornes: tuple[int, int] | None = None
 
 
 DEFINITIONS: list[DefinitionParametre] = [
@@ -78,8 +80,53 @@ DEFINITIONS: list[DefinitionParametre] = [
     DefinitionParametre(
         "pieces.alerte_jours_avant_expiration", "Alerte avant expiration d'une pièce (jours)", 30, "Usagers", "USR-03"
     ),
+    DefinitionParametre(
+        "pieces.double_controle",
+        "Double contrôle des pièces (l'agent qui dépose ne valide pas)",
+        True,
+        "Usagers",
+        "RG-06 : une pièce déposée au guichet est validée par un autre agent.",
+    ),
     DefinitionParametre("usagers.commune_residence", "Commune de résidence (tarif résident)", "Châtillon", "Usagers"),
     DefinitionParametre("rgpd.conservation_mois_inactivite", "Anonymisation après inactivité (mois)", 36, "Usagers", "USR-06"),
+    DefinitionParametre(
+        "rgpd.conservation_mois_dossiers_clos",
+        "Conservation des dossiers clos avant anonymisation des contacts (mois)",
+        60,
+        "Usagers",
+        "USR-06 : les pièces comptables restent conservées selon les règles de la comptabilité publique.",
+    ),
+    DefinitionParametre(
+        "rgpd.conservation_mois_pieces_expirees", "Suppression des pièces justificatives expirées (mois)", 12, "Usagers", "USR-06"
+    ),
+    # Portail
+    DefinitionParametre("portail.echecs_avant_verrou", "Échecs de connexion avant attente imposée", 5, "Portail", "SEC-04"),
+    DefinitionParametre(
+        "portail.verrou_minutes", "Attente imposée après les échecs (minutes, doublée à chaque récidive)", 1, "Portail", "SEC-04"
+    ),
+    DefinitionParametre("portail.verrou_max_minutes", "Attente maximale imposée (minutes)", 60, "Portail", "SEC-04"),
+    DefinitionParametre("portail.jeton_heures", "Durée maximale d'une session du portail (heures)", 12, "Portail", "SEC-04"),
+    DefinitionParametre(
+        "portail.reinitialisation_minutes",
+        "Validité du lien de réinitialisation du mot de passe (minutes)",
+        30,
+        "Portail",
+        "SEC-04",
+    ),
+    DefinitionParametre(
+        "portail.confirmation_heures",
+        "Validité du lien de confirmation de l'adresse électronique (heures)",
+        48,
+        "Portail",
+        "POR-01",
+    ),
+    DefinitionParametre(
+        "portail.service_courriel",
+        "Adresse du service des équipements (copie des nouveaux messages et comptes à valider)",
+        "equipements@chatillon.test",
+        "Portail",
+        "COM-02",
+    ),
     # Documents et signature
     DefinitionParametre("signature.expiration_jours", "Délai de signature électronique (jours)", 21, "Documents", "SIG-01"),
     DefinitionParametre(
@@ -146,6 +193,86 @@ DEFINITIONS: list[DefinitionParametre] = [
 ]
 
 PAR_CLE = {d.cle: d for d in DEFINITIONS}
+HEURE = re.compile(r"^([01]\d|2[0-3]):[0-5]\d$")
+BORNES_PAR_DEFAUT = (0, 10_000_000)
+BORNES = {
+    "options.duree_jours": (1, 90),
+    "options.relance_jours_avant": (0, 30),
+    "reservations.duree_max_minutes": (15, 7 * 24 * 60),
+    "reservations.delai_min_demande_jours": (0, 120),
+    "reservations.horizon_max_jours": (30, 1100),
+    "annulation.delai_tardif_heures": (0, 24 * 60),
+    "portail.echecs_avant_verrou": (3, 20),
+    "portail.verrou_minutes": (1, 60),
+    "portail.verrou_max_minutes": (1, 24 * 60),
+    "portail.jeton_heures": (1, 24),
+    "portail.reinitialisation_minutes": (5, 120),
+    "portail.confirmation_heures": (1, 168),
+    "acomptes.taux": (0, 10_000),
+    "signature.expiration_jours": (1, 90),
+    "signature.relance_jours_avant": (0, 30),
+}
+
+
+def _verifier_specifique(cle: str, valeur: Any) -> str | None:
+    if cle == "priorites.ordre":
+        attendu = set(PAR_CLE[cle].defaut)
+        if sorted(valeur) != sorted(attendu) or len(valeur) != len(attendu):
+            return "L'ordre doit reprendre une fois chacune des catégories : " + ", ".join(sorted(attendu)) + "."
+    elif cle == "temps_scolaire":
+        jours = valeur.get("jours")
+        if not isinstance(jours, list) or not all(isinstance(j, int) and 0 <= j <= 6 for j in jours):
+            return "« jours » : liste de jours 0 (lundi) à 6 (dimanche)."
+        if (
+            not all(isinstance(valeur.get(k), str) and HEURE.match(valeur[k]) for k in ("debut", "fin"))
+            or valeur["fin"] <= valeur["debut"]
+        ):
+            return "« debut » et « fin » au format HH:MM, fin après début."
+        if not isinstance(valeur.get("mercredi_matin"), bool):
+            return "« mercredi_matin » : vrai ou faux."
+    elif cle == "annulation.bareme":
+        if not valeur or not all(
+            isinstance(p, dict)
+            and isinstance(p.get("heures_avant"), int)
+            and p["heures_avant"] >= 0
+            and isinstance(p.get("taux"), int)
+            and 0 <= p["taux"] <= 10_000
+            for p in valeur
+        ):
+            return "Paliers {heures_avant ≥ 0, taux de 0 à 10000} attendus."
+        if not any(p["heures_avant"] == 0 for p in valeur):
+            return "Le barème doit comporter un palier à 0 heure."
+    elif cle == "personnel.nuit":
+        if not all(isinstance(valeur.get(k), str) and HEURE.match(valeur[k]) for k in ("debut", "fin")):
+            return "« debut » et « fin » au format HH:MM."
+    elif cle == "valorisation.date_depot_attestations":
+        if not re.fullmatch(r"(0[1-9]|[12]\d|3[01])-(0[1-9]|1[0-2])", valeur):
+            return "Format JJ-MM attendu."
+    elif isinstance(valeur, str) and not valeur.strip():
+        return "Valeur obligatoire."
+    return None
+
+
+def valider_valeur(cle: str, valeur: Any) -> str | None:
+    """Message d'erreur si la valeur ne convient pas au paramètre (type, bornes, structure), sinon None."""
+    definition = PAR_CLE.get(cle)
+    if definition is None:
+        return "Paramètre inconnu."
+    defaut = definition.defaut
+    if isinstance(defaut, bool):
+        if not isinstance(valeur, bool):
+            return "Vrai ou faux attendu."
+    elif isinstance(defaut, int):
+        if not isinstance(valeur, int) or isinstance(valeur, bool):
+            return "Nombre entier attendu."
+        minimum, maximum = definition.bornes or BORNES.get(cle, BORNES_PAR_DEFAUT)
+        if not minimum <= valeur <= maximum:
+            return f"Valeur entre {minimum} et {maximum} attendue."
+    elif not isinstance(valeur, type(defaut)):
+        return f"Valeur du même type que la valeur par défaut ({type(defaut).__name__}) attendue."
+    if isinstance(valeur, str) and len(valeur) > 250:
+        return "Texte trop long (250 caractères au plus)."
+    return _verifier_specifique(cle, valeur)
 
 
 def tous() -> dict[str, Any]:

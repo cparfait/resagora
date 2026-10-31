@@ -195,6 +195,9 @@ class Saison(models.Model):
     debut = models.DateField()
     fin = models.DateField()
     active = models.BooleanField(default=False)
+    cloturee = models.BooleanField(
+        "saison close", default=False, help_text="Plus aucune réservation ne peut y être créée ni modifiée (bilan arrêté)."
+    )
 
     class Meta:
         ordering = ["-debut"]

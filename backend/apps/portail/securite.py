@@ -23,3 +23,20 @@ class VuePublique(APIView):
     authentication_classes = ()
     permission_classes = (CanalPortail,)
     throttle_scope = "public"
+
+
+class VueContact(APIView):
+    """Base des vues réservées à un contact connecté (jeton de session relayé par la façade)."""
+
+    permission_classes = (CanalPortail,)
+    throttle_scope = "public"
+
+    def get_authenticators(self) -> list[Any]:
+        from .authentification import AuthentificationPortail
+
+        return [AuthentificationPortail()]
+
+    def get_permissions(self) -> list[Any]:
+        from .authentification import ContactConnecte
+
+        return [CanalPortail(), ContactConnecte()]

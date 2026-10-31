@@ -29,7 +29,7 @@ TAILLE_MAX_CALENDRIER = 1024 * 1024
 class SaisonSerializer(serializers.ModelSerializer):
     class Meta:
         model = Saison
-        fields = ["id", "nom", "debut", "fin", "active"]
+        fields = ["id", "nom", "debut", "fin", "active", "cloturee"]
 
 
 class PeriodeSerializer(serializers.ModelSerializer):
@@ -104,16 +104,43 @@ class VueSaisons(VuePerimetre):
             if depose.size is None or depose.size > TAILLE_MAX_CALENDRIER:
                 raise ErreurValidation("Le fichier du calendrier dépasse 1 Mo.")
             contenu = depose.read()
-        nombre = importer_saison(saison, fichier=contenu, acteur=agent_courant(request))
-        return Response({"periodes": nombre})
+        from apps.reservations.services import appliquer_calendrier
+
+        with transaction.atomic():
+            nombre = importer_saison(saison, fichier=contenu, acteur=agent_courant(request))
+            series = appliquer_calendrier(saison, acteur=agent_courant(request))
+        return Response({"periodes": nombre, "series_recalculees": series})
 
 
 class VuePeriodes(VuePerimetre):
+    """Périodes du calendrier ; toute modification recalcule les séries de la saison (ADM-01, REF-06)."""
+
     queryset = PeriodeCalendrier.objects.select_related("saison")
     serializer_class = PeriodeSerializer
     actions_requises = {"lecture": "lire_referentiel", "ecriture": "gerer_parametres"}
     filterset_fields = ["saison", "nature"]
     pagination_class = None
+
+    def _recalculer(self, saison: Saison) -> None:
+        from apps.reservations.services import appliquer_calendrier
+
+        appliquer_calendrier(saison, acteur=agent_courant(self.request))
+
+    def perform_create(self, serializer: Any) -> None:
+        with transaction.atomic():
+            super().perform_create(serializer)
+            self._recalculer(serializer.instance.saison)
+
+    def perform_update(self, serializer: Any) -> None:
+        with transaction.atomic():
+            super().perform_update(serializer)
+            self._recalculer(serializer.instance.saison)
+
+    def perform_destroy(self, instance: Any) -> None:
+        saison = instance.saison
+        with transaction.atomic():
+            super().perform_destroy(instance)
+            self._recalculer(saison)
 
 
 class VueHoraires(VuePerimetre):

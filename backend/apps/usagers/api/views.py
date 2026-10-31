@@ -14,7 +14,9 @@ from rest_framework.parsers import JSONParser, MultiPartParser
 from rest_framework.request import Request
 from rest_framework.response import Response
 
+from apps.audit.services import journaliser
 from apps.habilitations.authentification import agent_courant
+from apps.habilitations.services import peut, sites_autorises
 from apps.noyau import fichiers
 from apps.noyau.api import VuePerimetre
 from apps.noyau.exceptions import ErreurValidation
@@ -64,7 +66,18 @@ class UsagerSerializer(serializers.ModelSerializer):
             "cree_le",
             "rattachements",
         ]
-        read_only_fields = ["resident", "cree_le", "rattachements"]
+        read_only_fields = ["resident", "cree_le", "rattachements", "statut"]
+
+    def validate_type(self, valeur: str) -> str:
+        """Le type « service municipal » ouvre la priorité municipale (PLA-12) et le premier rang RG-03."""
+        actuel = getattr(self.instance, "type", None)
+        if "service_municipal" in {valeur, actuel} and valeur != actuel:
+            requete = self.context.get("request")
+            if requete is None or not peut(agent_courant(requete), "gerer_parametres"):
+                raise serializers.ValidationError(
+                    "Seule l'administration fonctionnelle peut classer un usager « service municipal »."
+                )
+        return valeur
 
     def validate_siret(self, valeur: str) -> str:
         valeur = valeur.replace(" ", "")
@@ -131,6 +144,10 @@ class VerificationPieceSerializer(serializers.Serializer):
     valide_jusqu_au = serializers.DateField(required=False, allow_null=True)
 
 
+class MotifUsagerSerializer(serializers.Serializer):
+    motif = serializers.CharField(max_length=250)
+
+
 class FiltreUsagers(django_filters.FilterSet):
     recherche = django_filters.CharFilter(method="filtrer")
 
@@ -145,15 +162,44 @@ class FiltreUsagers(django_filters.FilterSet):
 class VueUsagers(VuePerimetre):
     queryset = Usager.objects.exclude(statut="anonymise").prefetch_related("rattachements__contact")
     serializer_class = UsagerSerializer
-    actions_requises = {**LECTURE_ECRITURE, "historique": "lire_usager", "types": "lire_usager"}
+    actions_requises = {
+        **LECTURE_ECRITURE,
+        "historique": "lire_usager",
+        "types": "lire_usager",
+        "valider": "valider_compte_usager",
+        "suspendre": "valider_compte_usager",
+        "reactiver": "valider_compte_usager",
+    }
     filterset_class = FiltreUsagers
     http_method_names = ["get", "post", "patch", "head", "options"]
+
+    def _changer_statut(self, request: Request, cible: str, depuis: set[str], motif: str = "") -> Response:
+        usager = self.get_object()
+        services.changer_statut(usager, cible, depuis=depuis, acteur=agent_courant(request), motif=motif)
+        return Response(UsagerSerializer(Usager.objects.get(pk=usager.pk), context={"request": request}).data)
+
+    @extend_schema(request=None, responses=UsagerSerializer)
+    @action(detail=True, methods=["post"])
+    def valider(self, request: Request, pk: str | None = None) -> Response:
+        return self._changer_statut(request, "valide", {"en_attente"})
+
+    @extend_schema(request=MotifUsagerSerializer, responses=UsagerSerializer)
+    @action(detail=True, methods=["post"])
+    def suspendre(self, request: Request, pk: str | None = None) -> Response:
+        donnees = MotifUsagerSerializer(data=request.data)
+        donnees.is_valid(raise_exception=True)
+        return self._changer_statut(request, "suspendu", {"valide", "en_attente"}, donnees.validated_data["motif"])
+
+    @extend_schema(request=None, responses=UsagerSerializer)
+    @action(detail=True, methods=["post"])
+    def reactiver(self, request: Request, pk: str | None = None) -> Response:
+        return self._changer_statut(request, "valide", {"suspendu"})
 
     @extend_schema(responses={200: dict})
     @action(detail=True, methods=["get"])
     def historique(self, request: Request, pk: str | None = None) -> Response:
         """USR-05 : dossiers et bilan d'occupation de l'usager."""
-        donnees = services.historique(self.get_object())
+        donnees = services.historique(self.get_object(), sites=sites_autorises(agent_courant(request), "lire_reservation"))
         return Response(
             {
                 **{k: v for k, v in donnees.items() if k != "dossiers"},
@@ -234,7 +280,9 @@ class VuePieces(VuePerimetre):
     @extend_schema(responses={(200, "application/octet-stream"): bytes})
     @action(detail=True, methods=["get"])
     def fichier(self, request: Request, pk: str | None = None) -> FileResponse:
-        return fichiers.reponse_telechargement(self.get_object().fichier)
+        piece = self.get_object()
+        journaliser("telecharger_piece", piece, apres={"fichier": piece.fichier_id}, acteur=agent_courant(request))
+        return fichiers.reponse_telechargement(piece.fichier)
 
     @extend_schema(responses=PieceSerializer(many=True))
     @action(detail=False, methods=["get"])

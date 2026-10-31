@@ -19,9 +19,10 @@ from apps.audit.services import instantane, journaliser
 from apps.habilitations.authentification import agent_courant
 from apps.habilitations.services import exiger, peut, sites_autorises
 from apps.noyau.api import VuePerimetre
-from apps.noyau.exceptions import ErreurValidation
+from apps.noyau.exceptions import ErreurMetier, ErreurValidation
 
 from .. import campagne as services_campagne
+from .. import conditions as services_conditions
 from .. import services
 from ..models import Campagne, Dossier, ListeAttente, Occurrence, Reservation, TypeReservation, VueEnregistree
 from ..recurrence import decrire
@@ -72,7 +73,12 @@ class VueDossiers(VuePerimetre):
         "reservations__espace__batiment__site"
     )
     serializer_class = s.DossierSerializer
-    actions_requises = {**LECTURE_ECRITURE, "ajouter_reservation": "creer_reservation", "apercu": "creer_reservation"}
+    actions_requises = {
+        **LECTURE_ECRITURE,
+        "ajouter_reservation": "creer_reservation",
+        "apercu": "creer_reservation",
+        "attester": "valider_reservation",
+    }
     filterset_class = FiltreDossiers
     http_method_names = ["get", "post", "patch", "head", "options"]
 
@@ -83,6 +89,28 @@ class VueDossiers(VuePerimetre):
             self.request,
             action_requise,
         ).order_by("-cree_le")
+
+    def get_serializer_context(self) -> dict[str, Any]:
+        return {**super().get_serializer_context(), "liste": getattr(self, "action", "") == "list"}
+
+    def perform_update(self, serializer: Any) -> None:
+        serializer.instance = services.modifier_dossier(
+            serializer.instance, acteur=agent_courant(self.request), **serializer.validated_data
+        )
+
+    @extend_schema(request=s.AttestationSerializer, responses=s.DossierSerializer)
+    @action(detail=True, methods=["post"])
+    def attester(self, request: Request, pk: str | None = None) -> Response:
+        """RG-06 : constat manuel d'une condition (ex. chèque de caution remis au guichet), motivé et tracé."""
+        donnees = s.AttestationSerializer(data=request.data)
+        donnees.is_valid(raise_exception=True)
+        dossier = services_conditions.attester(
+            self.get_object(),
+            donnees.validated_data["condition"],
+            acteur=agent_courant(request),
+            motif=donnees.validated_data["motif"],
+        )
+        return Response(s.DossierSerializer(dossier, context=self.get_serializer_context()).data)
 
     def perform_create(self, serializer: Any) -> None:
         donnees = serializer.validated_data
@@ -111,8 +139,8 @@ class VueDossiers(VuePerimetre):
         """Séances générées et conflits d'un créneau, avant tout enregistrement (PLA-04, PLA-07)."""
         donnees = s.NouvelleReservationSerializer(data=request.data)
         donnees.is_valid(raise_exception=True)
-        champs = {k: v for k, v in donnees.validated_data.items() if k != "forcer_horaires"}
-        exiger(agent_courant(request), "lire_referentiel", champs["espace"])
+        champs = {k: v for k, v in donnees.validated_data.items() if k not in {"forcer_horaires", "motif_forcage"}}
+        exiger(agent_courant(request), "creer_reservation", champs["espace"])
         brouillon = Reservation(**champs)
         resultat = services.apercu(champs["espace"], brouillon)
         return Response(
@@ -185,14 +213,12 @@ class VueReservations(VuePerimetre):
     def confirmer(self, request: Request, pk: str | None = None) -> Response:
         return self._repondre(services.confirmer(self.get_object(), acteur=agent_courant(request)))
 
-    @extend_schema(request=s.MotifSerializer, responses=s.ReservationSerializer)
+    @extend_schema(request=s.AnnulationSerializer, responses=s.ReservationSerializer)
     @action(detail=True, methods=["post"])
     def annuler(self, request: Request, pk: str | None = None) -> Response:
-        donnees = s.MotifSerializer(data=request.data)
+        donnees = s.AnnulationSerializer(data=request.data)
         donnees.is_valid(raise_exception=True)
-        return self._repondre(
-            services.annuler(self.get_object(), acteur=agent_courant(request), motif=donnees.validated_data["motif"])
-        )
+        return self._repondre(services.annuler(self.get_object(), acteur=agent_courant(request), **donnees.validated_data))
 
     @extend_schema(request=None, responses=s.ReservationSerializer)
     @action(detail=True, methods=["post"])
@@ -268,7 +294,7 @@ class VueOccurrences(VuePerimetre):
         donnees = s.DeplacementSerializer(data=request.data)
         donnees.is_valid(raise_exception=True)
         espace, debut, fin = donnees.validated_data["espace"], donnees.validated_data["debut"], donnees.validated_data["fin"]
-        exiger(agent_courant(request), "lire_referentiel", espace)
+        exiger(agent_courant(request), "valider_reservation", espace)
         trouves = services.conflits(espace, debut, fin, exclure=[occurrence.pk])
         horaires = services.dans_les_horaires(espace, debut, fin)
         fermeture = services.fermetures_touchant(espace, debut, fin).exists()
@@ -298,14 +324,12 @@ class VueOccurrences(VuePerimetre):
         reservation = services.modifier_suivantes(self.get_object(), acteur=agent_courant(request), **donnees.validated_data)
         return Response(s.ReservationSerializer(reservation).data)
 
-    @extend_schema(request=s.MotifSerializer, responses=s.OccurrenceSerializer)
+    @extend_schema(request=s.AnnulationSerializer, responses=s.OccurrenceSerializer)
     @action(detail=True, methods=["post"])
     def annuler(self, request: Request, pk: str | None = None) -> Response:
-        donnees = s.MotifSerializer(data=request.data)
+        donnees = s.AnnulationSerializer(data=request.data)
         donnees.is_valid(raise_exception=True)
-        occurrence = services.annuler_occurrence(
-            self.get_object(), acteur=agent_courant(request), motif=donnees.validated_data["motif"]
-        )
+        occurrence = services.annuler_occurrence(self.get_object(), acteur=agent_courant(request), **donnees.validated_data)
         return Response(s.OccurrenceSerializer(occurrence).data)
 
     @extend_schema(request=s.PresenceSerializer, responses=s.OccurrenceSerializer)
@@ -322,6 +346,7 @@ class VuePlanning(APIView):
 
     actions_requises = {"get": "lire_reservation"}
     MAX_JOURS = 62
+    MAX_SEANCES = 5000
 
     @extend_schema(
         parameters=[OpenApiParameter(n, str) for n in ("debut", "fin", "site", "espace", "famille", "statut", "type_usager")],
@@ -333,8 +358,8 @@ class VuePlanning(APIView):
             fin = datetime.fromisoformat(request.query_params["fin"])
         except (KeyError, ValueError) as erreur:
             raise ErreurValidation("Indiquez debut et fin au format ISO 8601.", code="periode_invalide") from erreur
-        if timezone.is_naive(debut):
-            debut, fin = timezone.make_aware(debut), timezone.make_aware(fin)
+        debut = timezone.make_aware(debut) if timezone.is_naive(debut) else debut
+        fin = timezone.make_aware(fin) if timezone.is_naive(fin) else fin
         if fin <= debut or fin - debut > timedelta(days=self.MAX_JOURS):
             raise ErreurValidation(f"Période invalide (au plus {self.MAX_JOURS} jours).", code="periode_invalide")
         agent = agent_courant(request)
@@ -359,8 +384,11 @@ class VuePlanning(APIView):
             qs = qs.filter(reservation__dossier__usager__type__in=p["type_usager"].split(","))
         if p.get("annulees") != "1":
             qs = qs.exclude(statut="annulee")
-        lignes = qs.select_related("espace__batiment", "reservation__dossier__usager").order_by("debut")[:5000]
-        return Response(
+        lignes = list(
+            qs.select_related("espace__batiment", "reservation__dossier__usager").order_by("debut")[: self.MAX_SEANCES + 1]
+        )
+        tronque = len(lignes) > self.MAX_SEANCES
+        reponse = Response(
             [
                 {
                     "id": o.pk,
@@ -378,9 +406,12 @@ class VuePlanning(APIView):
                     "statut": o.statut,
                     "signalement": o.signalement,
                 }
-                for o in lignes
+                for o in lignes[: self.MAX_SEANCES]
             ]
         )
+        if tronque:
+            reponse["X-Planning-Tronque"] = str(self.MAX_SEANCES)
+        return reponse
 
 
 class VueCampagnes(VuePerimetre):
@@ -393,6 +424,11 @@ class VueCampagnes(VuePerimetre):
         "analyse": "lire_reservation",
         "attribution": "arbitrer_campagne",
     }
+
+    def perform_destroy(self, instance: Any) -> None:
+        if instance.statut != "preparation" or instance.dossiers.exists():
+            raise ErreurMetier("Seule une campagne en préparation et sans demande peut être supprimée.", code="campagne_engagee")
+        super().perform_destroy(instance)
 
     @extend_schema(request=s.StatutCampagneSerializer, responses=s.CampagneSerializer)
     @action(detail=True, methods=["post"])
@@ -408,7 +444,7 @@ class VueCampagnes(VuePerimetre):
     @action(detail=True, methods=["get"])
     def analyse(self, request: Request, pk: str | None = None) -> Response:
         """Demandes concurrentes et proposition d'arbitrage RG-03."""
-        groupes = services_campagne.analyser(self.get_object())
+        groupes = services_campagne.analyser(self.get_object(), agent=agent_courant(request))
         return Response(
             [
                 {

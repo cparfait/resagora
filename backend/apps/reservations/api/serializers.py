@@ -13,7 +13,18 @@ from ..models import Campagne, Dossier, ListeAttente, Occurrence, Reservation, T
 class TypeReservationSerializer(serializers.ModelSerializer):
     class Meta:
         model = TypeReservation
-        fields = ["id", "code", "libelle", "exige_pieces", "exige_convention", "exige_acompte", "exige_caution", "ordre"]
+        fields = [
+            "id",
+            "code",
+            "libelle",
+            "exige_pieces",
+            "exige_convention",
+            "exige_acompte",
+            "exige_caution",
+            "ouvert_portail",
+            "types_usager",
+            "ordre",
+        ]
 
 
 class OccurrenceSerializer(serializers.ModelSerializer):
@@ -86,7 +97,7 @@ class ReservationSerializer(serializers.ModelSerializer):
         return reservation.occurrences.exclude(statut="annulee").count()
 
     def get_conditions_manquantes(self, reservation: Reservation) -> list[str]:
-        if reservation.statut not in {"validee", "option", "en_instruction", "demande"}:
+        if self.context.get("liste") or reservation.statut not in {"validee", "option", "en_instruction", "demande"}:
             return []
         return conditions_manquantes(reservation)
 
@@ -100,8 +111,9 @@ class NouvelleReservationSerializer(serializers.Serializer):
     recurrence = serializers.CharField(required=False, allow_blank=True, default="", max_length=200)
     exclure_vacances = serializers.BooleanField(default=True)
     exclure_feries = serializers.BooleanField(default=True)
-    exdates = serializers.ListField(child=serializers.DateField(), required=False, default=list)
+    exdates = serializers.ListField(child=serializers.DateField(), required=False, default=list, max_length=200)
     forcer_horaires = serializers.BooleanField(default=False)
+    motif_forcage = serializers.CharField(required=False, allow_blank=True, default="", max_length=250)
 
     def validate(self, donnees: dict[str, Any]) -> dict[str, Any]:
         if donnees["date_fin"] < donnees["date_debut"]:
@@ -123,7 +135,7 @@ class ModificationSerieSerializer(serializers.Serializer):
     recurrence = serializers.CharField(required=False, allow_blank=True, max_length=200)
     exclure_vacances = serializers.BooleanField(required=False)
     exclure_feries = serializers.BooleanField(required=False)
-    exdates = serializers.ListField(child=serializers.DateField(), required=False)
+    exdates = serializers.ListField(child=serializers.DateField(), required=False, max_length=200)
 
 
 class DossierSerializer(serializers.ModelSerializer):
@@ -154,12 +166,24 @@ class DossierSerializer(serializers.ModelSerializer):
             "statut",
             "cree_le",
             "depose_le",
+            "conditions_attestees",
             "reservations",
         ]
-        read_only_fields = ["numero", "origine", "cree_le", "depose_le", "statut", "reservations"]
+        read_only_fields = ["numero", "origine", "cree_le", "depose_le", "statut", "reservations", "conditions_attestees"]
 
 
 class MotifSerializer(serializers.Serializer):
+    motif = serializers.CharField(max_length=300)
+
+
+class AnnulationSerializer(MotifSerializer):
+    par_usager = serializers.BooleanField(
+        default=False, help_text="Annulation demandée par l'usager (tardive dans le délai paramétré, RG-08)."
+    )
+
+
+class AttestationSerializer(serializers.Serializer):
+    condition = serializers.ChoiceField(choices=["pieces", "convention", "acompte", "caution"])
     motif = serializers.CharField(max_length=300)
 
 
@@ -176,6 +200,7 @@ class DeplacementSerializer(serializers.Serializer):
     debut = serializers.DateTimeField()
     fin = serializers.DateTimeField()
     forcer_horaires = serializers.BooleanField(default=False)
+    motif_forcage = serializers.CharField(required=False, allow_blank=True, default="", max_length=250)
 
 
 class PresenceSerializer(serializers.Serializer):
@@ -218,9 +243,18 @@ class ApercuSerializer(serializers.Serializer):
     description = serializers.CharField()
 
 
+def _cles_entieres(valeur: dict[str, Any]) -> dict[str, Any]:
+    if any(not str(k).isdigit() or len(str(k)) > 12 for k in valeur):
+        raise serializers.ValidationError("Les clés doivent être des identifiants numériques.")
+    return valeur
+
+
 class PrioriteMunicipaleSerializer(serializers.Serializer):
     motif = serializers.CharField(max_length=300)
     deplacements = serializers.DictField(child=DeplacementSerializer(), required=False, default=dict)
+
+    def validate_deplacements(self, valeur: dict[str, Any]) -> dict[str, Any]:
+        return _cles_entieres(valeur)
 
 
 class CampagneSerializer(serializers.ModelSerializer):
@@ -243,6 +277,23 @@ class CampagneSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = ["statut"]
 
+    def validate(self, donnees: dict[str, Any]) -> dict[str, Any]:
+        campagne = self.instance
+        if campagne is not None and campagne.statut != "preparation":
+            figes = {"saison", "sites", "ouverture"} & set(donnees)
+            changes = [
+                c
+                for c in figes
+                if (set(donnees[c]) != set(campagne.sites.all()) if c == "sites" else donnees[c] != getattr(campagne, c))
+            ]
+            if changes:
+                raise serializers.ValidationError(
+                    "Saison, sites et date d'ouverture ne changent plus après l'ouverture de la campagne."
+                )
+            if campagne.statut in {"attribuee", "close"} and set(donnees) - {"nom"}:
+                raise serializers.ValidationError("Une campagne attribuée ou close ne se modifie plus.")
+        return donnees
+
     def get_nombre_demandes(self, campagne: Campagne) -> int:
         return Reservation.objects.filter(dossier__campagne=campagne).count()
 
@@ -258,6 +309,9 @@ class DecisionSerializer(serializers.Serializer):
 
 class AttributionSerializer(serializers.Serializer):
     decisions = serializers.DictField(child=DecisionSerializer())
+
+    def validate_decisions(self, valeur: dict[str, Any]) -> dict[str, Any]:
+        return _cles_entieres(valeur)
 
 
 class ListeAttenteSerializer(serializers.ModelSerializer):

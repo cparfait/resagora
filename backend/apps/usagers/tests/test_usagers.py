@@ -91,10 +91,12 @@ def test_usr03_depot_verification_et_pieces_manquantes(client_agent):
     assert depot.status_code == 201 and depot.json()["statut"] == "a_verifier"
     piece = depot.json()["id"]
     assert client.post(f"/api/gestion/usagers/pieces/{piece}/verifier", {"valide": False}, format="json").status_code == 400
+    meme_agent = client.post(f"/api/gestion/usagers/pieces/{piece}/verifier", {"valide": True}, format="json")
+    assert meme_agent.status_code == 409 and meme_agent.json()["code"] == "double_controle"
     assert (
-        client.post(
-            f"/api/gestion/usagers/pieces/{piece}/verifier", {"valide": True, "valide_jusqu_au": "2027-09-01"}, format="json"
-        ).status_code
+        client_agent(agent("gestionnaire"))
+        .post(f"/api/gestion/usagers/pieces/{piece}/verifier", {"valide": True, "valide_jusqu_au": "2027-09-01"}, format="json")
+        .status_code
         == 200
     )
     assert assurance not in pieces_manquantes(usager, date(2026, 11, 10))

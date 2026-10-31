@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     "apps.referentiel",
     "apps.usagers",
     "apps.communication",
+    "apps.comptes",
     "apps.reservations",
     "apps.portail",
 ]

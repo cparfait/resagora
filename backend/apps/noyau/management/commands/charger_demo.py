@@ -2,8 +2,10 @@
 
 from __future__ import annotations
 
+import os
 from typing import Any
 
+from django.conf import settings
 from django.core.management.base import BaseCommand, CommandError
 from django.db import transaction
 
@@ -17,6 +19,8 @@ class Command(BaseCommand):
         parser.add_argument("--graine", type=int, default=92320, help="Graine du générateur (jeu reproductible).")
 
     def handle(self, *args: Any, **options: Any) -> None:
+        if getattr(settings, "ENVIRONNEMENT", os.environ.get("ENVIRONNEMENT", "")) == "prod":
+            raise CommandError("Le jeu de démonstration ne se charge jamais en production (ENVIRONNEMENT=prod).")
         if socle.deja_charge():
             raise CommandError("Le jeu de démonstration est déjà chargé.")
         with transaction.atomic():

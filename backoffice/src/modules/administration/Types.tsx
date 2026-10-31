@@ -36,6 +36,19 @@ export function TypesReservation() {
         { nom: "exige_convention", libelle: "Exige une convention ou un contrat signé", type: "booleen" },
         { nom: "exige_acompte", libelle: "Exige un acompte payé", type: "booleen" },
         { nom: "exige_caution", libelle: "Exige une caution reçue", type: "booleen" },
+        { nom: "ouvert_portail", libelle: "Demandable sur le portail", type: "booleen" },
+        {
+          nom: "types_usager",
+          libelle: "Réservé aux types d'usagers (aucun : tous)",
+          type: "multiple",
+          options: [
+            { valeur: "association", libelle: "Associations" },
+            { valeur: "ecole", libelle: "Écoles" },
+            { valeur: "entreprise", libelle: "Entreprises et CSE" },
+            { valeur: "particulier", libelle: "Particuliers" },
+            { valeur: "autre_collectivite", libelle: "Autres collectivités" },
+          ],
+        },
         { nom: "ordre", libelle: "Ordre d'affichage", type: "nombre" },
       ]}
     />

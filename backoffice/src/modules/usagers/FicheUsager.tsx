@@ -15,6 +15,8 @@ import { useNotifications } from "../../ui/Notifications";
 import { Page } from "../../ui/Page";
 import { Tableau } from "../../ui/Tableau";
 
+const STATUTS_USAGER: Record<string, string> = { en_attente: "En attente de validation", valide: "Validé", suspendu: "Suspendu", anonymise: "Anonymisé" };
+
 const ROLES = [
   { valeur: "president", libelle: "Président(e)" },
   { valeur: "tresorier", libelle: "Trésorier(ère)" },
@@ -42,6 +44,7 @@ export default function FicheUsager() {
   const [depot, setDepot] = useState<{ type: string; fichier: File | null; fin: string } | null>(null);
   const [refus, setRefus] = useState<{ piece: Piece; motif: string } | null>(null);
   const [erreur, setErreur] = useState<string | null>(null);
+  const [suspension, setSuspension] = useState<string | null>(null);
 
   const usager = useQuery({ queryKey: ["usager", id], queryFn: () => requete<Usager>("GET", `/api/gestion/usagers/usagers/${id}`) });
   const pieces = useQuery({ queryKey: ["pieces", id], queryFn: () => requete<PageApi<Piece>>("GET", construireChemin("/api/gestion/usagers/pieces", { usager: id, taille: 200 })) });
@@ -99,6 +102,17 @@ export default function FicheUsager() {
     onError: (e) => annoncer(e instanceof ErreurApi ? e.message : "Vérification impossible.", "erreur"),
   });
 
+  const statut = useMutation({
+    mutationFn: ({ verbe, motif }: { verbe: "valider" | "suspendre" | "reactiver"; motif?: string }) =>
+      requete<Usager>("POST", `/api/gestion/usagers/usagers/${id}/${verbe}`, motif === undefined ? undefined : { motif }),
+    onSuccess: async (u) => {
+      annoncer(`Usager : ${STATUTS_USAGER[u.statut] ?? u.statut}.`);
+      setSuspension(null);
+      await rafraichir();
+    },
+    onError: (e) => annoncer(e instanceof ErreurApi ? e.message : "Action impossible.", "erreur"),
+  });
+
   if (usager.isPending) return <Chargement />;
   if (usager.isError) return <Erreur erreur={usager.error} reessayer={() => void usager.refetch()} />;
   const u = usager.data;
@@ -111,8 +125,36 @@ export default function FicheUsager() {
   };
 
   return (
-    <Page titre={u.nom} description={`${u.type_libelle}${u.commune ? ` — ${u.commune}` : ""}`}>
+    <Page
+      titre={u.nom}
+      description={`${u.type_libelle}${u.commune ? ` — ${u.commune}` : ""}`}
+      actions={
+        peut("valider_compte_usager") ? (
+          <>
+            {u.statut === "en_attente" ? (
+              <Bouton enCours={statut.isPending} onClick={() => statut.mutate({ verbe: "valider" })}>
+                Valider l'usager
+              </Bouton>
+            ) : null}
+            {["valide", "en_attente"].includes(u.statut) ? (
+              <Bouton variante="danger" onClick={() => setSuspension("")}>
+                Suspendre
+              </Bouton>
+            ) : null}
+            {u.statut === "suspendu" ? (
+              <Bouton variante="secondaire" enCours={statut.isPending} onClick={() => statut.mutate({ verbe: "reactiver" })}>
+                Réactiver
+              </Bouton>
+            ) : null}
+          </>
+        ) : null
+      }
+    >
       <dl className="details details--grille">
+        <dt>Statut</dt>
+        <dd>
+          <Badge libelle={STATUTS_USAGER[u.statut] ?? u.statut} ton={u.statut === "valide" ? "succes" : u.statut === "suspendu" ? "danger" : "attention"} />
+        </dd>
         <dt>SIRET</dt>
         <dd>{u.siret || "—"}</dd>
         <dt>RNA</dt>
@@ -292,6 +334,27 @@ export default function FicheUsager() {
               </Bouton>
               <Bouton type="submit" variante="danger" enCours={verifier.isPending}>
                 Refuser
+              </Bouton>
+            </div>
+          </form>
+        ) : null}
+      </Dialogue>
+      <Dialogue ouvert={suspension !== null} titre="Suspendre l'usager" onFermer={() => setSuspension(null)}>
+        {suspension !== null ? (
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              statut.mutate({ verbe: "suspendre", motif: suspension });
+            }}
+          >
+            <p>Un usager suspendu ne peut plus déposer de demande ; ses réservations en cours ne sont pas annulées.</p>
+            <ChampTexte libelle="Motif de la suspension" obligatoire value={suspension} onChange={(e) => setSuspension(e.target.value)} />
+            <div className="formulaire__actions">
+              <Bouton variante="secondaire" onClick={() => setSuspension(null)}>
+                Retour
+              </Bouton>
+              <Bouton type="submit" variante="danger" enCours={statut.isPending}>
+                Suspendre
               </Bouton>
             </div>
           </form>

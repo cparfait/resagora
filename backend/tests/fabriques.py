@@ -52,7 +52,8 @@ class UtilisateurFabrique(DjangoModelFactory):
 
 
 def perimetre_sites(*sites: Site, nom: str | None = None) -> Perimetre:
-    perimetre = Perimetre.objects.create(nom=nom or "Périmètre " + "-".join(str(s.pk) for s in sites))
+    """Périmètre couvrant exactement ces sites (réutilisé s'il existe déjà sous ce nom)."""
+    perimetre, _ = Perimetre.objects.get_or_create(nom=nom or "Périmètre " + "-".join(str(s.pk) for s in sites))
     perimetre.sites.set(sites)
     return perimetre
 

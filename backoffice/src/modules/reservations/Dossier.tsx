@@ -7,7 +7,7 @@ import type { Dossier as TypeDossier, Reservation, Seance } from "../../api/type
 import { useSession } from "../../auth/session";
 import { Badge } from "../../ui/Badge";
 import { Bouton } from "../../ui/Bouton";
-import { ChampTexte, ChampZone } from "../../ui/Champ";
+import { CaseACocher, ChampSelection, ChampTexte, ChampZone } from "../../ui/Champ";
 import { Dialogue } from "../../ui/Dialogue";
 import { Chargement, Erreur } from "../../ui/Etats";
 import { dateHeure, heure, jourLong, STATUTS } from "../../ui/metier";
@@ -15,13 +15,20 @@ import { useNotifications } from "../../ui/Notifications";
 import { Page } from "../../ui/Page";
 import { Tableau } from "../../ui/Tableau";
 
+const CONDITIONS: Record<string, string> = {
+  pieces: "Pièces justificatives",
+  convention: "Convention ou contrat signé",
+  acompte: "Acompte payé",
+  caution: "Caution reçue",
+};
+
 type ActionMotivee = { reservation: Reservation; type: "refuser" | "annuler" } | { seance: Seance; type: "annuler_seance" } | null;
 
 function Seances({ reservation }: { reservation: Reservation }) {
   const { peut } = useSession();
   const client = useQueryClient();
   const { annoncer } = useNotifications();
-  const [motif, setMotif] = useState<{ seance: Seance; texte: string } | null>(null);
+  const [motif, setMotif] = useState<{ seance: Seance; texte: string; parUsager: boolean } | null>(null);
   const [maintenant] = useState(() => Date.now());
   const seances = useQuery({
     queryKey: ["seances", reservation.id],
@@ -63,7 +70,7 @@ function Seances({ reservation }: { reservation: Reservation }) {
         actions={(s) => (
           <>
             {peut("annuler_reservation") && ["demande", "en_instruction", "option", "validee", "confirmee"].includes(s.statut) ? (
-              <Bouton variante="lien" onClick={() => setMotif({ seance: s, texte: "" })} aria-label={`Annuler la séance du ${jourLong(s.debut)}`}>
+              <Bouton variante="lien" onClick={() => setMotif({ seance: s, texte: "", parUsager: false })} aria-label={`Annuler la séance du ${jourLong(s.debut)}`}>
                 Annuler
               </Bouton>
             ) : null}
@@ -82,11 +89,17 @@ function Seances({ reservation }: { reservation: Reservation }) {
           <form
             onSubmit={(e) => {
               e.preventDefault();
-              action.mutate({ url: `/api/gestion/reservations/seances/${motif.seance.id}/annuler`, corps: { motif: motif.texte } });
+              action.mutate({ url: `/api/gestion/reservations/seances/${motif.seance.id}/annuler`, corps: { motif: motif.texte, par_usager: motif.parUsager } });
             }}
           >
             <p>{dateHeure(motif.seance.debut)}</p>
             <ChampZone libelle="Motif de l'annulation" obligatoire value={motif.texte} onChange={(e) => setMotif({ ...motif, texte: e.target.value })} />
+            <CaseACocher
+              libelle="À la demande de l'usager"
+              aide="Dans le délai paramétré avant la séance, l'annulation est tardive et peut donner lieu à des frais."
+              checked={motif.parUsager}
+              onChange={(e) => setMotif({ ...motif, parUsager: e.target.checked })}
+            />
             <div className="formulaire__actions">
               <Bouton variante="secondaire" onClick={() => setMotif(null)}>
                 Retour
@@ -109,6 +122,8 @@ export default function Dossier() {
   const { annoncer } = useNotifications();
   const [actionMotivee, setActionMotivee] = useState<ActionMotivee>(null);
   const [motif, setMotif] = useState("");
+  const [parUsager, setParUsager] = useState(false);
+  const [attestation, setAttestation] = useState<{ condition: string; motif: string } | null>(null);
   const [optionJours, setOptionJours] = useState("7");
   const dossier = useQuery({ queryKey: ["dossier", id], queryFn: () => requete<TypeDossier>("GET", `/api/gestion/reservations/dossiers/${id}`) });
 
@@ -123,6 +138,15 @@ export default function Dossier() {
     },
     onError: (e) => annoncer(e instanceof ErreurApi ? e.message : "Action impossible.", "erreur"),
   });
+  const attester = useMutation({
+    mutationFn: (corps: { condition: string; motif: string }) => requete<TypeDossier>("POST", `/api/gestion/reservations/dossiers/${id}/attester`, corps),
+    onSuccess: async () => {
+      annoncer("Condition constatée et tracée au journal.");
+      setAttestation(null);
+      await client.invalidateQueries({ queryKey: ["dossier", id] });
+    },
+    onError: (e) => annoncer(e instanceof ErreurApi ? e.message : "Constat impossible.", "erreur"),
+  });
 
   if (dossier.isPending) return <Chargement />;
   if (dossier.isError) return <Erreur erreur={dossier.error} reessayer={() => void dossier.refetch()} />;
@@ -134,7 +158,7 @@ export default function Dossier() {
     if (["demande", "en_instruction"].includes(r.statut)) possibles.push({ verbe: "option", libelle: "Poser une option", action: "valider_reservation", variante: "secondaire" });
     if (["demande", "en_instruction", "option"].includes(r.statut)) possibles.push({ verbe: "valider", libelle: "Valider", action: "valider_reservation" });
     if (r.statut === "validee") possibles.push({ verbe: "confirmer", libelle: "Confirmer", action: "confirmer_reservation" });
-    if (r.statut === "realisee") possibles.push({ verbe: "cloturer", libelle: "Clôturer", action: "cloturer_reservation", variante: "secondaire" });
+    if (["validee", "confirmee", "realisee"].includes(r.statut)) possibles.push({ verbe: "cloturer", libelle: "Clôturer", action: "cloturer_reservation", variante: "secondaire" });
     return possibles.filter((p) => peut(p.action));
   };
 
@@ -155,6 +179,20 @@ export default function Dossier() {
         <dd>{d.effectif || "—"}</dd>
         <dt>Origine</dt>
         <dd>{{ guichet: "Guichet", portail: "Portail", campagne: "Campagne annuelle", ville: "Service municipal" }[d.origine] ?? d.origine}</dd>
+        {Object.keys(d.conditions_attestees ?? {}).length ? (
+          <>
+            <dt>Conditions constatées</dt>
+            <dd>
+              <ul className="liste-simple">
+                {Object.entries(d.conditions_attestees as Record<string, { par: string; le: string; motif: string }>).map(([code, a]) => (
+                  <li key={code}>
+                    {CONDITIONS[code] ?? code} : {a.motif} ({a.par}, {dateHeure(a.le)})
+                  </li>
+                ))}
+              </ul>
+            </dd>
+          </>
+        ) : null}
       </dl>
       {d.reservations.length === 0 ? <p>Aucune réservation dans ce dossier.</p> : null}
       {d.reservations.map((r) => (
@@ -176,6 +214,11 @@ export default function Dossier() {
                   <li key={c}>{c}</li>
                 ))}
               </ul>
+              {peut("valider_reservation") ? (
+                <Bouton variante="lien" onClick={() => setAttestation({ condition: "caution", motif: "" })}>
+                  Constater une condition remplie hors application…
+                </Bouton>
+              ) : null}
             </div>
           ) : null}
           <div className="formulaire__actions formulaire__actions--gauche">
@@ -215,16 +258,59 @@ export default function Dossier() {
           <form
             onSubmit={(e) => {
               e.preventDefault();
-              transition.mutate({ reservation: actionMotivee.reservation.id, verbe: actionMotivee.type, corps: { motif } });
+              const corps = actionMotivee.type === "annuler" ? { motif, par_usager: parUsager } : { motif };
+              transition.mutate({ reservation: actionMotivee.reservation.id, verbe: actionMotivee.type, corps });
             }}
           >
             <ChampZone libelle="Motif (communiqué à l'usager)" obligatoire value={motif} onChange={(e) => setMotif(e.target.value)} />
+            {actionMotivee.type === "annuler" ? (
+              <CaseACocher
+                libelle="À la demande de l'usager"
+                aide="Les séances dans le délai d'annulation tardive seront marquées comme telles (frais possibles)."
+                checked={parUsager}
+                onChange={(e) => setParUsager(e.target.checked)}
+              />
+            ) : null}
             <div className="formulaire__actions">
               <Bouton variante="secondaire" onClick={() => setActionMotivee(null)}>
                 Retour
               </Bouton>
               <Bouton type="submit" variante="danger" enCours={transition.isPending}>
                 {actionMotivee.type === "refuser" ? "Refuser" : "Annuler la réservation"}
+              </Bouton>
+            </div>
+          </form>
+        ) : null}
+      </Dialogue>
+      <Dialogue ouvert={attestation !== null} titre="Constater une condition de confirmation" onFermer={() => setAttestation(null)}>
+        {attestation ? (
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              attester.mutate(attestation);
+            }}
+          >
+            <p>Le constat est enregistré au journal d'audit avec votre nom ; il remplace la vérification automatique.</p>
+            <ChampSelection
+              libelle="Condition"
+              obligatoire
+              options={Object.entries(CONDITIONS).map(([valeur, libelle]) => ({ valeur, libelle }))}
+              value={attestation.condition}
+              onChange={(e) => setAttestation({ ...attestation, condition: e.target.value })}
+            />
+            <ChampZone
+              libelle="Ce qui a été constaté"
+              obligatoire
+              aide="Exemple : chèque de caution n° 1234 remis au guichet le 3 novembre."
+              value={attestation.motif}
+              onChange={(e) => setAttestation({ ...attestation, motif: e.target.value })}
+            />
+            <div className="formulaire__actions">
+              <Bouton variante="secondaire" onClick={() => setAttestation(null)}>
+                Retour
+              </Bouton>
+              <Bouton type="submit" enCours={attester.isPending}>
+                Enregistrer le constat
               </Bouton>
             </div>
           </form>
