@@ -20,3 +20,10 @@ class FinancesConfig(AppConfig):
             services.CROCHETS["validation"].append(preparer)
         if apres_annulation_tardive not in services.CROCHETS["annulation_tardive"]:
             services.CROCHETS["annulation_tardive"].append(apres_annulation_tardive)
+
+        from apps.noyau.demo import socle
+
+        from .demo import charger as charger_demo
+
+        if charger_demo not in socle.EXTENSIONS:
+            socle.EXTENSIONS.append(charger_demo)

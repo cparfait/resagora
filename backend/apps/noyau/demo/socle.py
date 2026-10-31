@@ -524,6 +524,18 @@ def reservations(bilan: Bilan, espaces: dict[str, Espace], par_type: dict[str, l
     )
 
 
+def existant() -> dict[str, Any]:
+    """Jeu déjà chargé : mêmes clés que `charger`, relues en base, pour compléter avec les lots suivants."""
+    sites = Site.objects.filter(code__startswith="demo-")
+    espaces = {e.code: e for e in Espace.objects.filter(batiment__site__in=sites).select_related("famille")}
+    par_type: dict[str, list[Usager]] = {
+        t: [] for t in ("association", "ecole", "entreprise", "particulier", "service_municipal")
+    }
+    for u in Usager.objects.filter(dossiers__reservations__espace__in=espaces.values()).distinct().order_by("pk"):
+        par_type.setdefault(u.type, []).append(u)
+    return {"bilan": {}, "espaces": espaces, "usagers": par_type, "saison": Saison.objects.get(nom="2026-2027")}
+
+
 def charger(graine: int = 92320) -> dict[str, Any]:
     random.seed(graine)
     faux = Generateur(graine)

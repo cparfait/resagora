@@ -3,6 +3,7 @@ import { BrowserRouter, Navigate, Route, Routes, useLocation } from "react-route
 import { Cadre } from "./Cadre";
 import { Demande } from "./espace/Demande";
 import { FicheDossier, MesDossiers, TableauDeBord } from "./espace/Dossiers";
+import { MesFinances } from "./espace/Finances";
 import { Campagnes, MaStructure, MonCompte } from "./espace/Profil";
 import { Confirmation, ConfirmationNouvelleAdresse, Connexion, Inscription, Invitation, MotDePasseOublie, Reinitialisation } from "./pages/Comptes";
 import { Accueil, Catalogue, DisponibilitesPage, FicheEquipement } from "./pages/Publiques";
@@ -46,6 +47,7 @@ export function Routage() {
         <Route path="/espace/campagnes" element={<Protege><Campagnes /></Protege>} />
         <Route path="/espace/structures/:id" element={<Protege><MaStructure /></Protege>} />
         <Route path="/espace/compte" element={<Protege><MonCompte /></Protege>} />
+        <Route path="/espace/factures" element={<Protege><MesFinances /></Protege>} />
         <Route path="*" element={<PageIntrouvable />} />
       </Routes>
     </Cadre>

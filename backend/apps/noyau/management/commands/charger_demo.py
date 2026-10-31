@@ -17,12 +17,26 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser: Any) -> None:
         parser.add_argument("--graine", type=int, default=92320, help="Graine du générateur (jeu reproductible).")
+        parser.add_argument(
+            "--completer",
+            action="store_true",
+            help="Jeu déjà chargé : ajoute seulement les parties des lots suivants qui manquent (finances, personnel…).",
+        )
 
     def handle(self, *args: Any, **options: Any) -> None:
         if getattr(settings, "ENVIRONNEMENT", os.environ.get("ENVIRONNEMENT", "")) == "prod":
             raise CommandError("Le jeu de démonstration ne se charge jamais en production (ENVIRONNEMENT=prod).")
         if socle.deja_charge():
-            raise CommandError("Le jeu de démonstration est déjà chargé.")
+            if not options["completer"]:
+                raise CommandError("Le jeu de démonstration est déjà chargé (--completer ajoute les parties manquantes).")
+            with transaction.atomic():
+                resultat = socle.existant()
+                for module in socle.EXTENSIONS:
+                    resultat["bilan"].update(module(resultat))
+            for cle, nombre in sorted(resultat["bilan"].items()):
+                self.stdout.write(f"{cle} : {nombre}")
+            self.stdout.write(self.style.SUCCESS("Jeu de démonstration complété."))
+            return
         with transaction.atomic():
             resultat = socle.charger(options["graine"])
             for module in socle.EXTENSIONS:

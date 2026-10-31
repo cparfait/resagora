@@ -13,7 +13,13 @@ from apps.usagers.models import Usager
 pytestmark = pytest.mark.django_db
 
 
-def test_jeu_de_demonstration_complet_et_coherent():
+def test_jeu_de_demonstration_complet_et_coherent(monkeypatch, modeles_documents):
+    from apps.documents import services as documents
+    from apps.finances.models import Caution, GrilleTarifaire, PieceComptable
+    from apps.noyau import fichiers
+
+    monkeypatch.setattr(documents, "convertir_en_pdfa", lambda nom, docx, transport=None: b"%PDF-1.7 %%EOF")
+    monkeypatch.setattr(fichiers, "analyser_clamav", lambda contenu: None)
     call_command("charger_demo")
     assert Site.objects.filter(code__startswith="demo-").count() == 3
     assert Espace.objects.count() == 40 and Espace.objects.filter(parent__isnull=False).count() == 5
@@ -27,5 +33,9 @@ def test_jeu_de_demonstration_complet_et_coherent():
         ).count()
         >= 5
     )
+    # Lot 3 : grille votée, devis des locations, caution de 500 € de la salle des fêtes (CAU-01), factures.
+    assert GrilleTarifaire.objects.filter(statut="votee").count() == 1
+    assert PieceComptable.objects.filter(nature="devis").exists() and PieceComptable.objects.filter(nature="facture").exists()
+    assert Caution.objects.filter(reservation__espace__famille__code="salle-fetes", montant=50000).exists()
     with pytest.raises(CommandError):
         call_command("charger_demo")

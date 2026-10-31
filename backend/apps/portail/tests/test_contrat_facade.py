@@ -36,19 +36,11 @@ def _motifs_facade() -> set[str]:
 
 def test_sec01_toute_route_de_la_facade_existe_dans_l_api():
     absentes = {m for m in _motifs_facade() if "{uuid}" not in m} - _motifs_django()
+    # Routes des lots suivants : attestations de valorisation (lot 6), paiement en ligne PayFiP (lot 7).
     lots_suivants = {
         m
         for m in absentes
-        if m.startswith(
-            (
-                "/api/portail/factures",
-                "/api/portail/cautions",
-                "/api/portail/attestations",
-                "/api/portail/simulation-tarif",
-                "/api/portail/paiements",
-            )
-        )
-        or "/devis/" in m
+        if m.startswith(("/api/portail/attestations", "/api/portail/paiements")) or m.endswith("/paiement-en-ligne")
     }
     assert absentes - lots_suivants == set()
 

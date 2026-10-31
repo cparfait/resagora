@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Link, useNavigate, useParams } from "react-router";
 import { messageErreur, requete, telecharger } from "../api/http";
 import type { DocumentPortail, Dossier, Message, NotificationPortail, PieceExigee, Seance, Structure } from "../api/types";
+import { PiecesDuDossier } from "./Finances";
 import { Bouton } from "../ui/Bouton";
 import { Champ, Zone } from "../ui/Champs";
 import { Dialogue } from "../ui/Dialogue";
@@ -372,6 +373,7 @@ export function FicheDossier() {
           </Bouton>
         ) : null}
       </section>
+      <PiecesDuDossier dossier={d.id} />
       <Documents dossier={d.id} />
       <Messagerie dossier={d.id} />
       <Dialogue ouvert={annulation !== null} titre={annulation?.seance ? "Annuler une séance" : "Annuler la demande"} onFermer={() => setAnnulation(null)}>

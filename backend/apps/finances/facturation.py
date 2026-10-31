@@ -158,7 +158,11 @@ def etablir_devis(dossier: Dossier, *, acteur: Any, prestations: list[dict[str, 
         raise ErreurMetier("Aucune séance à chiffrer dans ce dossier.", code="rien_a_facturer")
     piece = PieceComptable.objects.create(nature="devis", dossier=dossier, usager=dossier.usager, objet=dossier.objet)
     _ecrire_lignes(piece, lignes)
-    return _emettre(piece, acteur)
+    _emettre(piece, acteur)
+    notifier(
+        "devis_emis", {"piece": piece, "dossier": dossier, "montant": euros(piece.total_du)}, usager=dossier.usager, objet=piece
+    )
+    return piece
 
 
 def _lignes_prestations(dossier: Dossier, prestations: list[dict[str, Any]]) -> list[LigneCalculee]:
@@ -249,7 +253,14 @@ def facturer_acompte(dossier: Dossier, *, acteur: Any) -> PieceComptable:
             )
         ],
     )
-    return _emettre(piece, acteur)
+    _emettre(piece, acteur)
+    notifier(
+        "facture_emise",
+        {"piece": piece, "dossier": dossier, "montant": euros(piece.total_du)},
+        usager=dossier.usager,
+        objet=piece,
+    )
+    return piece
 
 
 @transaction.atomic

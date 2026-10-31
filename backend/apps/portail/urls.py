@@ -4,7 +4,7 @@ la liste blanche de la façade (facade/facade/routes.py), sinon elle reste injoi
 
 from django.urls import path
 
-from . import catalogue, vues_comptes, vues_documents, vues_dossiers, vues_publiques, vues_usagers
+from . import catalogue, vues_comptes, vues_documents, vues_dossiers, vues_finances, vues_publiques, vues_usagers
 
 urlpatterns = [
     # Public
@@ -16,6 +16,7 @@ urlpatterns = [
     path("catalogue/espaces/<int:pk>/documents/<int:document>", catalogue.VueDocumentPublic.as_view()),
     path("disponibilites", vues_publiques.VueDisponibilites.as_view()),
     path("accessibilite", vues_publiques.VueAccessibilite.as_view()),
+    path("simulation-tarif", vues_finances.VueSimulationTarif.as_view()),
     # Comptes
     path("auth/connexion", vues_comptes.VueConnexion.as_view()),
     path("auth/totp", vues_comptes.VueDefiTotp.as_view()),
@@ -56,6 +57,10 @@ urlpatterns = [
     path("dossiers/<int:pk>/documents/<int:document>/fichier", vues_documents.VueFichierDocument.as_view()),
     path("dossiers/<int:pk>/documents/<int:document>/signature", vues_documents.VueSignatureDocument.as_view()),
     path("dossiers/<int:pk>/documents/<int:document>/scan-signe", vues_documents.VueScanSigne.as_view()),
+    path("dossiers/<int:pk>/devis/<int:devis>/accepter", vues_finances.VueAccepterDevis.as_view()),
+    path("factures", vues_finances.VuePiecesPortail.as_view()),
+    path("factures/<int:pk>/fichier", vues_finances.VueFichierPiece.as_view()),
+    path("cautions", vues_finances.VueCautionsPortail.as_view()),
     path("campagnes", vues_dossiers.VueCampagnesPortail.as_view()),
     path("campagnes/<int:pk>/demandes", vues_dossiers.VueDemandeCampagne.as_view()),
     path("notifications", vues_dossiers.VueNotificationsPortail.as_view()),

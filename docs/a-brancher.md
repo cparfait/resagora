@@ -131,4 +131,22 @@ Production : conteneur `docuseal` de la DMZ (image épinglée), pages de signatu
 | `FACTEUR_DEBIT`, `DEBIT_*` | Jamais en production | Laisser les valeurs par défaut (D-032) | — |
 | `ENVIRONNEMENT` | LAN et DMZ | `prod` (valeur par défaut) ; `recette` seulement sur un serveur de recette (D-038) | Avec un seuil modifié, la façade refuse de démarrer et `verifier_deploiement` échoue |
 
-## 10. Ciril, PayFiP, accès mobile — complétés aux lots concernés
+## 10. Finances et CIVIL Finances Publiques (Ciril GROUP) — TAR-01 à TAR-13
+
+Aucune connexion directe à Ciril : la plateforme produit des fichiers de titres et relit l'état des encaissements,
+dans des formats entièrement paramétrables (écran « Paramètres », groupe Finances). Le format définitif est à
+convenir avec l'éditeur et le service financier.
+
+| Paramètre | Où | À fournir | Comment tester |
+| --- | --- | --- | --- |
+| `ciril.format`, `ciril.colonnes` | Paramètres | Format attendu par l'import de titres de Ciril (CSV, XLSX ou XML) et ordre des colonnes ; champs disponibles listés dans l'aide du paramètre | Finances → Titres vers Ciril → « Créer le lot » : le fichier s'importe dans Ciril en recette éditeur |
+| `ciril.csv_separateur`, `ciril.csv_encodage`, `ciril.xml_racine`, `ciril.xml_element` | Paramètres | Détails du format | Même test |
+| `ciril.imputation`, `ciril.code_produit` | Paramètres | Imputation budgétaire et code produit des recettes de location | Colonnes « Imputation » et « Code produit » du lot |
+| `ciril.import_colonnes` | Paramètres | En-têtes de l'état des titres soldés exporté de Ciril (titre, référence de la facture, montant, date, référence du paiement) | Finances → Encaissements → importer l'état : les factures passent « Soldée », les lignes non rapprochées figurent au rapport |
+| `comptable.titulaire`, `comptable.iban`, `comptable.bic` | Paramètres | Coordonnées du compte du comptable public (Trésor public) | Les factures et le portail affichent ces coordonnées et la référence à indiquer |
+| Grille tarifaire et délibération | Finances → Grilles tarifaires | Tarifs votés par le conseil municipal, référence et date de la délibération ; cautions par espace | Simulation publique d'une salle des fêtes sur le portail |
+| `acomptes.taux`, `factures.echeance_jours`, `devis.validite_jours` | Paramètres | Règles financières de la Ville | Devis et facture d'une location |
+| `caution.seuil_double_validation_centimes`, `caution.delai_restitution_jours` | Paramètres | Seuil au-delà duquel une retenue est validée par le service financier ; délai de restitution | Retenue au-delà du seuil : état « Retenue à valider » |
+| Modèles « devis », « facture », « avoir » | Documents → Modèles | Charte de la Ville (logo, mentions légales du comptable) | Générer un devis : PDF/A conforme |
+
+## 11. PayFiP, accès mobile — complétés aux lots concernés

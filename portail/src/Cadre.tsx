@@ -37,6 +37,9 @@ function Navigation() {
               <NavLink to="/espace/dossiers">Mes demandes</NavLink>
             </li>
             <li>
+              <NavLink to="/espace/factures">Mes factures</NavLink>
+            </li>
+            <li>
               <NavLink to="/espace/compte">Mon compte{contact ? ` (${contact.prenom})` : ""}</NavLink>
             </li>
             <li>

@@ -82,6 +82,8 @@ def _categories() -> list[tuple[str, str]]:
 
 
 def reduction_applicable(usager: Usager, jour: date, type_reservation_id: int | None = None) -> Reduction | None:
+    if usager.pk is None:  # usager fictif de la simulation publique : aucune réduction personnelle
+        return None
     qs = Reduction.objects.filter(usager=usager, debut__lte=jour).filter(Q(fin__isnull=True) | Q(fin__gte=jour))
     if type_reservation_id is not None:
         qs = qs.filter(Q(type_reservation__isnull=True) | Q(type_reservation_id=type_reservation_id))

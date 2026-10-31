@@ -16,12 +16,13 @@ export function jetonSimulateur(): string {
 }
 
 /** Dernier lien reçu par courriel par `destinataire` (Mailpit), par exemple « /confirmation#jeton=… ». */
-export async function lienRecu(page: Page, destinataire: string, chemin: string, motif?: string): Promise<string> {
+export async function lienRecu(page: Page, destinataire: string, chemin: string, motif?: string, depuis?: Date): Promise<string> {
   for (let essai = 0; essai < 40; essai++) {
     const liste = (await (await page.request.get(`${MAILPIT}/api/v1/search?query=${encodeURIComponent(`to:"${destinataire}"`)}`)).json()) as {
-      messages: { ID: string }[];
+      messages: { ID: string; Created: string }[];
     };
     for (const message of liste.messages ?? []) {
+      if (depuis && new Date(message.Created) < depuis) continue;
       const detail = (await (await page.request.get(`${MAILPIT}/api/v1/message/${message.ID}`)).json()) as { Text: string };
       const trouve = new RegExp(motif ?? String.raw`https?://\S+/${chemin}#jeton=[\w-]+`).exec(detail.Text);
       if (trouve) return trouve[0];

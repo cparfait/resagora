@@ -232,6 +232,8 @@ class VueReductions(VuePerimetre):
     serializer_class = ReductionSerializer
     actions_requises = DROITS_TARIFS
     filterset_fields = ["usager", "type_reservation"]
+    # Une réduction appliquée fonde des pièces émises : elle se clôt (date de fin), elle ne se supprime pas.
+    http_method_names = ["get", "post", "patch", "head", "options"]
 
     def perform_create(self, serializer: Any) -> None:
         serializer.validated_data["cree_par"] = agent_courant(self.request)
@@ -468,13 +470,14 @@ class VuePieces(VuePerimetre):
 
 
 class LotTitresSerializer(serializers.ModelSerializer):
-    pieces: serializers.SlugRelatedField[PieceComptable] = serializers.SlugRelatedField(
-        slug_field="numero", many=True, read_only=True
-    )
+    pieces = serializers.SerializerMethodField()
 
     class Meta:
         model = LotTitres
         fields = ["id", "numero", "format", "pieces", "total_centimes", "cree_le"]
+
+    def get_pieces(self, lot: LotTitres) -> list[str]:
+        return sorted(p.numero or "" for p in lot.pieces.all())
 
 
 class ExportSerializer(serializers.Serializer):
@@ -554,6 +557,8 @@ class CautionSerializer(serializers.ModelSerializer):
     espace_nom = serializers.CharField(source="reservation.espace.nom", read_only=True)
     fin_occupation = serializers.DateField(source="reservation.date_fin", read_only=True)
     mouvements = serializers.SerializerMethodField()
+    derniere_seance = serializers.SerializerMethodField()
+    etat_sortie = serializers.SerializerMethodField()
 
     class Meta:
         model = Caution
@@ -575,8 +580,18 @@ class CautionSerializer(serializers.ModelSerializer):
             "motif_retenue",
             "restituee_le",
             "mouvements",
+            "derniere_seance",
+            "etat_sortie",
         ]
         read_only_fields = fields
+
+    def get_derniere_seance(self, caution: Caution) -> int | None:
+        derniere = caution.reservation.occurrences.exclude(statut__in=["annulee", "refusee"]).order_by("-debut").first()
+        return derniere.pk if derniere else None
+
+    def get_etat_sortie(self, caution: Caution) -> str | None:
+        etat = services_cautions.etat_de_sortie(caution)
+        return etat.constat if etat else None
 
     def get_mouvements(self, caution: Caution) -> list[dict[str, Any]]:
         return [

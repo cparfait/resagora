@@ -37,7 +37,7 @@ TRANSITIONS = {
 
 
 def _mouvement(caution: Caution, action: str, cible: str, acteur: Any, *, montant: int = 0, motif: str = "") -> None:
-    if cible not in TRANSITIONS[caution.statut] and cible != caution.statut:
+    if cible not in TRANSITIONS[caution.statut]:
         raise ErreurMetier(
             f"Une caution « {caution.get_statut_display()} » ne peut pas passer à cet état.", code="transition_caution"
         )
@@ -88,7 +88,7 @@ def recevoir(caution: Caution, *, acteur: Any, mode: str, reference: str, jour: 
     return caution
 
 
-def _etat_sortie(caution: Caution) -> EtatDesLieux | None:
+def etat_de_sortie(caution: Caution) -> EtatDesLieux | None:
     derniere = caution.reservation.occurrences.exclude(statut__in=["annulee", "refusee"]).order_by("-debut").first()
     if derniere is None:
         return None
@@ -130,7 +130,7 @@ def constater_sortie(
         etat.photos.set(photos)
     journaliser("etat_des_lieux_sortie", etat, apres={"constat": constat, "source": source}, acteur=acteur)
     for caution in Caution.objects.select_for_update().filter(reservation=occurrence.reservation, statut="recue"):
-        if constat == "conforme" and _etat_sortie(caution) is not None:
+        if constat == "conforme" and etat_de_sortie(caution) is not None:
             _mouvement(caution, "restituable", "restituable", acteur, motif="État des lieux de sortie conforme")
             caution.save()
     return etat
@@ -141,7 +141,7 @@ def restituer(caution: Caution, *, acteur: Any, jour: date | None = None) -> Cau
     """CAU-03, RG-11 : restitution seulement après l'état des lieux de sortie, et s'il est conforme."""
     caution = Caution.objects.select_for_update().get(pk=caution.pk)
     _controler(acteur, "gerer_caution", caution)
-    etat = _etat_sortie(caution)
+    etat = etat_de_sortie(caution)
     if etat is None:
         raise ErreurMetier("La caution ne peut être restituée qu'après l'état des lieux de sortie.", code="etat_des_lieux_requis")
     if etat.constat != "conforme" and caution.statut != "restituable":
@@ -163,7 +163,7 @@ def proposer_retenue(caution: Caution, *, acteur: Any, montant: int, motif: str,
     """CAU-04 : motif, photos et montant ; au-delà du seuil, un second agent doit valider (CAU-05)."""
     caution = Caution.objects.select_for_update().get(pk=caution.pk)
     _controler(acteur, "proposer_retenue", caution)
-    if _etat_sortie(caution) is None:
+    if etat_de_sortie(caution) is None:
         raise ErreurMetier(
             "Une retenue se fonde sur l'état des lieux de sortie : établissez-le d'abord.", code="etat_des_lieux_requis"
         )

@@ -193,11 +193,12 @@ test.describe.serial("Lot 2 — parcours d'une association", () => {
     await signer.click();
     await expect(page.getByRole("heading", { name: /Signature/ })).toBeVisible();
     await page.getByLabel(/je le signe/).check();
+    const signatureUsager = new Date(Date.now() - 2_000);
     await page.getByRole("button", { name: "Signer le document" }).click();
     await expect(page.getByText("Votre signature est enregistrée.")).toBeVisible();
 
     // SIG-01 : dès que l'usager a signé, l'élu reçoit par courriel son lien personnel (aucune lecture du simulateur).
-    const lienElu = await lienRecu(page, ELU_COURRIEL, "s", String.raw`https?://\S+/s/[\w-]+`);
+    const lienElu = await lienRecu(page, ELU_COURRIEL, "s", String.raw`https?://\S+/s/[\w-]+`, signatureUsager);
     await page.goto(lienElu);
     await page.getByLabel(/je le signe/).check();
     await page.getByRole("button", { name: "Signer le document" }).click();
@@ -207,5 +208,34 @@ test.describe.serial("Lot 2 — parcours d'une association", () => {
       await page.reload();
       await expect(page.getByText(/Signé électroniquement/)).toBeVisible({ timeout: 2_000 });
     }).toPass({ timeout: 60_000 });
+  });
+
+  test("TAR-04 TAR-12 @a11y le devis établi par la Ville est accepté en ligne, la facture indique comment régler", async ({ page, browser }) => {
+    const contexteAgent = await browser.newContext({ ignoreHTTPSErrors: true, locale: "fr-FR", timezoneId: "Europe/Paris" });
+    const agent = await contexteAgent.newPage();
+    await connecterAgent(agent, "gest.ville");
+    await expect(agent.getByRole("heading", { level: 1, name: /Bonjour/ })).toBeVisible();
+    await agent.goto(`${BACKOFFICE}/reservations/dossiers/${dossier}`);
+    await agent.getByRole("button", { name: "Établir le devis" }).click();
+    await expect(agent.getByRole("cell", { name: /^DV\d{4}-\d{5}$/ })).toBeVisible();
+    await sansViolationAxe(agent, "les devis et factures du dossier");
+
+    await connecterUsager(page);
+    await page.goto(`${PORTAIL}/espace/dossiers/${dossier}`);
+    await expect(page.getByRole("heading", { level: 2, name: "Devis et factures" })).toBeVisible();
+    await sansViolationAxe(page, "le devis à accepter");
+    await page.getByRole("button", { name: /Accepter le devis/ }).click();
+    await expect(page.getByText(/accepté\. Le service vous adresse la suite/)).toBeVisible();
+
+    await agent.reload();
+    await agent.getByRole("button", { name: "Facturer les séances et frais" }).click();
+    await expect(agent.getByRole("cell", { name: /^F\d{4}-\d{5}$/ })).toBeVisible();
+    await contexteAgent.close();
+
+    await page.goto(`${PORTAIL}/espace/factures`);
+    await expect(page.getByRole("heading", { level: 1, name: "Mes devis, factures et cautions" })).toBeVisible();
+    await expect(page.getByText("Référence à indiquer")).toBeVisible();
+    await expect(page.getByText(/^FR76/)).toBeVisible();
+    await sansViolationAxe(page, "mes factures");
   });
 });

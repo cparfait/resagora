@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import { Link, useParams, useSearchParams } from "react-router";
 import { chemin, requete, telecharger } from "../api/http";
 import type { Disponibilites, EspacePublic, Famille, Page, Site } from "../api/types";
+import { SimulateurTarif } from "../espace/Finances";
 import { useSession } from "../session";
 import { Bouton } from "../ui/Bouton";
 import { Case, Champ, Liste } from "../ui/Champs";
@@ -173,6 +174,7 @@ export function FicheEquipement() {
           </section>
         ) : null}
       </div>
+      <SimulateurTarif espace={e.id} />
       <p className="actions">
         <Link className="bouton bouton--secondaire" to={`/disponibilites?espace=${e.id}`}>
           Voir les disponibilités
