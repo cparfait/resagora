@@ -3,7 +3,7 @@
 name: equipements-dev
 
 services:
-  postgres:
+  postgres-dev:
     image: postgres:18.6-trixie@sha256:979bccfde35445db618c65107d27d08c6c21339d8dc3ad4c830c6633947be0e4
     environment:
       POSTGRES_DB: equipements
@@ -16,7 +16,7 @@ services:
       interval: 5s
       retries: 20
 
-  valkey:
+  valkey-dev:
     image: valkey/valkey:9-trixie@sha256:3add1a336a920ea54770a001ab6feb3da5fceea96a40373a3a2cd469b815f0b7
     ports: ["127.0.0.1:56379:6379"]
 
@@ -35,15 +35,15 @@ services:
     image: axllent/mailpit:v1.33.0@sha256:9b3a463be15354c0f0eba91697d80e3e0d8a5623ef0e627cacc836bc17fd5231
     ports: ["127.0.0.1:51025:1025", "127.0.0.1:58025:8025"]
 
-  gotenberg:
+  gotenberg-dev:
     image: gotenberg/gotenberg:8.39.0@sha256:13672f317b443c793e972b1bd2155ec62a3e7b6891b411e8196442cc053ee5f5
     ports: ["127.0.0.1:53000:3000"]
 
-  clamav:
+  clamav-dev:
     image: clamav/clamav:1.5.4-debian13-slim@sha256:cce3e1a43ae2bb40e11335c52c0e1e98273b12fa3d587e617f63a6907cc4b70b
     ports: ["127.0.0.1:53310:3310"]
 
-  docuseal:
+  docuseal-dev:
     image: docuseal/docuseal:3.3.4@sha256:2786607f1f6eb54f982a926bd78c81ee23b6545e59d1ff548bd672094760621c
     ports: ["127.0.0.1:53001:3000"]
     volumes: [docuseal-dev:/data]

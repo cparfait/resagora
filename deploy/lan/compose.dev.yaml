@@ -4,6 +4,8 @@ services:
   api:
     networks: [lan_app, lan_data, outillage, liaison_dmz]
   api-portail:
+    # Sur un hôte unique, la façade joint api-portail par le réseau de liaison : pas de port publié.
+    ports: !reset []
     networks: [lan_data, liaison_dmz, outillage]
   worker:
     networks: [lan_app, lan_data, outillage, liaison_dmz]

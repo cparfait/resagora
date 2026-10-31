@@ -47,7 +47,8 @@ services:
 
   valkey:
     image: valkey/valkey:9.1.3-trixie@sha256:3add1a336a920ea54770a001ab6feb3da5fceea96a40373a3a2cd469b815f0b7
-    command: ["valkey-server", "--save", "", "--appendonly", "no", "--protected-mode", "yes", "--bind", "0.0.0.0", "--enable-debug-command", "no"]
+    entrypoint: ["sh", "-c", "exec valkey-server --save '' --appendonly no --enable-debug-command no --requirepass \"$$(cat /run/secrets/valkey_mot_de_passe)\""]
+    secrets: [valkey_mot_de_passe]
     <<: *durci
     user: "999:999"
     networks: [lan_data]
@@ -72,7 +73,7 @@ services:
     environment: { CANAL: portail }
     secrets: [django_secret_key, cle_chiffrement, postgres_password, valkey_url, api_portail.crt, api_portail.key, ac_facade.crt,
               docuseal_api_jeton, payfip_secret, smtp_mot_de_passe]
-    command: ["gunicorn", "config.wsgi", "--bind", "0.0.0.0:8443", "--workers", "3", "--timeout", "60",
+    command: ["gunicorn", "config.wsgi", "--bind", "0.0.0.0:8443", "--control-socket", "/tmp/gunicorn.ctl", "--workers", "3", "--timeout", "60",
               "--certfile", "/run/secrets/api_portail.crt", "--keyfile", "/run/secrets/api_portail.key",
               "--ca-certs", "/run/secrets/ac_facade.crt", "--cert-reqs", "2"]
     healthcheck: { test: ["CMD", "python", "-c", "import socket;socket.create_connection(('127.0.0.1',8443),3)"], interval: 30s }
@@ -147,6 +148,7 @@ secrets:
   cle_chiffrement: { file: ./secrets/cle_chiffrement }
   postgres_password: { file: ./secrets/postgres_password }
   valkey_url: { file: ./secrets/valkey_url }
+  valkey_mot_de_passe: { file: ./secrets/valkey_mot_de_passe }
   ldap_mot_de_passe: { file: ./secrets/ldap_mot_de_passe }
   ldap_ac.pem: { file: ./secrets/ac_interne.crt }
   docuseal_api_jeton: { file: ./secrets/docuseal_api_jeton }

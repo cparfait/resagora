@@ -22,13 +22,22 @@ def _conf(**surcharges: object) -> dict[str, object]:
     if not (SECRETS / "ldap_mot_de_passe").exists():
         pytest.skip("Secrets de développement absents")
     conf: dict[str, object] = {
-        "URI": URI, "STARTTLS": False, "FICHIER_AC": str(SECRETS / "ac_interne.crt"), "VERIFIER_CERTIFICAT": True,
+        "URI": URI,
+        "STARTTLS": False,
+        "FICHIER_AC": str(SECRETS / "ac_interne.crt"),
+        "VERIFIER_CERTIFICAT": True,
         "COMPTE_SERVICE_DN": "cn=svc-equipements,ou=services,dc=chatillon,dc=test",
         "COMPTE_SERVICE_MOT_DE_PASSE": (SECRETS / "ldap_mot_de_passe").read_text().strip(),
-        "BASE_UTILISATEURS": "ou=agents,dc=chatillon,dc=test", "BASE_GROUPES": "ou=groupes,dc=chatillon,dc=test",
-        "FILTRE_UTILISATEUR": "(&(objectClass=inetOrgPerson)(uid={identifiant}))", "MODE_GROUPES": "memberof",
-        "ATTRIBUT_IDENTIFIANT": "uid", "ATTRIBUT_PRENOM": "givenName", "ATTRIBUT_NOM": "sn", "ATTRIBUT_COURRIEL": "mail",
-        "ATTRIBUT_GROUPES": "memberOf", "DELAI_SECONDES": 5,
+        "BASE_UTILISATEURS": "ou=agents,dc=chatillon,dc=test",
+        "BASE_GROUPES": "ou=groupes,dc=chatillon,dc=test",
+        "FILTRE_UTILISATEUR": "(&(objectClass=inetOrgPerson)(uid={identifiant}))",
+        "MODE_GROUPES": "memberof",
+        "ATTRIBUT_IDENTIFIANT": "uid",
+        "ATTRIBUT_PRENOM": "givenName",
+        "ATTRIBUT_NOM": "sn",
+        "ATTRIBUT_COURRIEL": "mail",
+        "ATTRIBUT_GROUPES": "memberOf",
+        "DELAI_SECONDES": 5,
     }
     conf.update(surcharges)
     return conf
@@ -55,6 +64,8 @@ def test_sec02_ldaps_reel_mot_de_passe_faux():
 
 def test_sec02_ldaps_certificat_non_reconnu_refuse(tmp_path):
     autre_ac = tmp_path / "autre.crt"
-    autre_ac.write_text((SECRETS / "annuaire.crt").read_text().split("-----END CERTIFICATE-----")[0] + "-----END CERTIFICATE-----\n")
+    autre_ac.write_text(
+        (SECRETS / "annuaire.crt").read_text().split("-----END CERTIFICATE-----")[0] + "-----END CERTIFICATE-----\n"
+    )
     with pytest.raises(AnnuaireIndisponible):
         Annuaire(_conf(FICHIER_AC=str(autre_ac))).authentifier("gest.ville", _mdp_agents())

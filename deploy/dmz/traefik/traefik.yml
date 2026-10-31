@@ -22,3 +22,5 @@ api:
 global:
   checkNewVersion: false
   sendAnonymousUsage: false
+  # Refus des en-têtes « alias » (X_Forwarded_For…) qui contourneraient les contrôles en aval.
+  aliasHeadersStrategy: reject

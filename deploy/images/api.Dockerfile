@@ -19,8 +19,8 @@ COPY --from=construction /app/.venv /app/.venv
 COPY --chown=10001:10001 backend/ .
 ENV PATH="/app/.venv/bin:$PATH" PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1 \
     DJANGO_SETTINGS_MODULE=config.settings.prod STOCKAGE_FICHIERS=/stockage
-RUN rm -rf .venv-local tests conftest.py **/tests && python -m compileall -q /app/apps /app/config
+RUN rm -rf tests conftest.py && find /app/apps -type d -name tests -prune -exec rm -rf {} + && python -m compileall -q /app/apps /app/config
 USER 10001
 EXPOSE 8000 8443
 HEALTHCHECK --interval=30s --timeout=5s CMD ["python", "-c", "import urllib.request;urllib.request.urlopen('http://127.0.0.1:8000/sante', timeout=4)"]
-CMD ["gunicorn", "config.wsgi", "--bind", "0.0.0.0:8000", "--workers", "4", "--timeout", "60", "--forwarded-allow-ips", "*"]
+CMD ["gunicorn", "config.wsgi", "--bind", "0.0.0.0:8000", "--control-socket", "/tmp/gunicorn.ctl", "--workers", "4", "--timeout", "60", "--forwarded-allow-ips", "*"]

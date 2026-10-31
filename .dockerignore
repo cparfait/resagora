@@ -1,0 +1,17 @@
+.git
+**/.venv
+**/node_modules
+**/__pycache__
+**/.pytest_cache
+**/.mypy_cache
+**/.ruff_cache
+**/dist
+**/coverage
+**/playwright-report
+**/test-results
+deploy/*/secrets
+backend/.stockage-tests
+backend/stockage
+docs
+.claude
+*.md

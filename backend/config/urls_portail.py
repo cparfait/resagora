@@ -7,9 +7,7 @@ from django.urls import include, path
 
 from apps.noyau.views import sante
 
-portail: list = []
-
 urlpatterns = [
     path("sante", sante),
-    path("api/portail/", include(portail)),
+    path("api/portail/", include("apps.portail.urls")),
 ]

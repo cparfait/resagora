@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     "apps.audit",
     "apps.habilitations",
     "apps.referentiel",
+    "apps.portail",
 ]
 
 MIDDLEWARE = [

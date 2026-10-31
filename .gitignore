@@ -27,3 +27,4 @@ deploy/*/secrets/
 # Divers
 .DS_Store
 Thumbs.db
+.playwright/

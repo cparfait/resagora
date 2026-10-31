@@ -1,0 +1,12 @@
+[
+  {"dn": "cn=GG-Equipements-Admins,ou=groupes,dc=chatillon,dc=test", "libelle": "Administrateurs", "role": "administrateur", "perimetre": "Ville entière"},
+  {"dn": "cn=GG-Equipements-Gestionnaires,ou=groupes,dc=chatillon,dc=test", "libelle": "Gestionnaires", "role": "gestionnaire", "perimetre": "Ville entière"},
+  {"dn": "cn=GG-Equipements-Accueil,ou=groupes,dc=chatillon,dc=test", "libelle": "Accueil", "role": "accueil", "perimetre": "Ville entière"},
+  {"dn": "cn=GG-Equipements-Regie,ou=groupes,dc=chatillon,dc=test", "libelle": "Régie", "role": "regisseur", "perimetre": "Ville entière"},
+  {"dn": "cn=GG-Equipements-Finances,ou=groupes,dc=chatillon,dc=test", "libelle": "Finances", "role": "financier", "perimetre": "Ville entière"},
+  {"dn": "cn=GG-Equipements-Planification,ou=groupes,dc=chatillon,dc=test", "libelle": "Planification", "role": "planificateur", "perimetre": "Ville entière"},
+  {"dn": "cn=GG-Equipements-Direction,ou=groupes,dc=chatillon,dc=test", "libelle": "Direction", "role": "direction", "perimetre": "Ville entière"},
+  {"dn": "cn=GG-Equipements-Commission,ou=groupes,dc=chatillon,dc=test", "libelle": "Commission", "role": "elu_commission", "perimetre": "Ville entière"},
+  {"dn": "cn=GG-Equipements-Materiel,ou=groupes,dc=chatillon,dc=test", "libelle": "Matériel", "role": "technicien_materiel", "perimetre": "Ville entière"},
+  {"dn": "cn=GG-Equipements-Gardiens,ou=groupes,dc=chatillon,dc=test", "libelle": "Gardiens", "role": "gardien", "perimetre": "Ville entière"}
+]

@@ -47,13 +47,18 @@ def main() -> int:
     ecrire(LAN / "django_secret_key", jeton(48))
     ecrire(LAN / "cle_chiffrement", base64.urlsafe_b64encode(secrets.token_bytes(32)).decode())
     ecrire(LAN / "postgres_password", jeton(24))
-    ecrire(LAN / "valkey_url", "redis://valkey:6379/0")
+    ecrire(LAN / "valkey_mot_de_passe", jeton(24))
+    ecrire(DMZ / "valkey_mot_de_passe", jeton(24))
+    for zone, hote in ((LAN, "valkey"), (DMZ, "valkey-dmz")):
+        nom = "valkey_url" if zone is LAN else "valkey_dmz_url"
+        if (zone / nom).exists() and "@" not in lire(zone / nom):
+            (zone / nom).unlink()
+        ecrire(zone / nom, f"redis://:{lire(zone / 'valkey_mot_de_passe')}@{hote}:6379/0")
     ecrire(LAN / "ldap_mot_de_passe", jeton(18))
     ecrire(LAN / "docuseal_api_jeton", "a-renseigner-apres-creation-du-compte-docuseal")
     ecrire(LAN / "docuseal_webhook_secret", jeton(24))
     ecrire(LAN / "payfip_secret", jeton(24))
     ecrire(LAN / "smtp_mot_de_passe", "")
-    ecrire(DMZ / "valkey_dmz_url", "redis://valkey-dmz:6379/0")
     ecrire(DMZ / "docuseal_webhook_secret", lire(LAN / "docuseal_webhook_secret"))
     ecrire(DEV / "ldap_mot_de_passe", lire(LAN / "ldap_mot_de_passe"))
     ecrire(DEV / "ldap_admin_mot_de_passe", jeton(18))

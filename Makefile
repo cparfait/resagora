@@ -16,7 +16,7 @@ export PYTHONIOENCODING := utf-8
 ## Piles ------------------------------------------------------------------------------------------
 
 up: certs secrets ## Pile LAN complète (API, back-office, mobile, services de développement)
-	$(COMPOSE_DEV) up -d postgres valkey annuaire mailpit gotenberg clamav docuseal simulateurs
+	$(COMPOSE_DEV) up -d postgres-dev valkey-dev annuaire mailpit simulateurs
 	$(COMPOSE_LAN) up -d --build
 
 up-dmz: certs secrets ## Façade et portail DMZ (relais mTLS vers la pile LAN)

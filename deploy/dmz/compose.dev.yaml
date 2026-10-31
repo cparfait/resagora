@@ -2,6 +2,9 @@
 # de la pile LAN pour atteindre api-portail:8443. En production, les deux zones sont sur des hôtes
 # distincts et la façade vise l'adresse du pare-feu (API_URL).
 services:
+  proxy-dmz:
+    # Sur le poste de développement, le portail est publié sur 127.0.0.1:9443 (le 443 sert au proxy LAN).
+    ports: !override ["127.0.0.1:9443:8443"]
   facade:
     networks: [dmz_front, dmz_back, liaison]
   docuseal:
