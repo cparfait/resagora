@@ -22,3 +22,7 @@ MEDIA_ROOT = BASE_DIR / ".stockage-tests"
 REST_FRAMEWORK = {**REST_FRAMEWORK, "NUM_PROXIES": 0}
 ALLOWED_HOSTS = ["testserver", "localhost"]
 LOGGING = {"version": 1, "disable_existing_loggers": False, "root": {"level": "WARNING"}}
+
+MAILERS = {"default": {"BACKEND": "django.core.mail.backends.locmem.EmailBackend"}}
+URL_CALENDRIER_SCOLAIRE = "https://calendrier-scolaire.test/records"
+URL_JOURS_FERIES = "https://jours-feries.test/{annee}.json"

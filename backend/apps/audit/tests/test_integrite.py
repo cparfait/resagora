@@ -103,9 +103,6 @@ def test_adm05_export_neutralise_les_formules_et_est_journalise(client_agent):
 
 
 def test_adm05_journal_exige_un_perimetre_ville_entiere(client_agent):
-    from apps.habilitations.models import Habilitation, Role
-
-    controleur = agent("controle_interne", SiteFabrique())
-    assert client_agent(controleur).get("/api/gestion/audit/journal").status_code == 403
-    Habilitation.objects.create(utilisateur=controleur, role=Role.objects.get(code="controle_interne"), perimetre_id=1)
-    controleur.vider_cache_habilitations()
+    controleur_local = agent("controle_interne", SiteFabrique())
+    assert client_agent(controleur_local).get("/api/gestion/audit/journal").status_code == 403
+    assert client_agent(agent("controle_interne")).get("/api/gestion/audit/journal").status_code == 200

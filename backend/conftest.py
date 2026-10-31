@@ -20,6 +20,11 @@ def django_db_setup(django_db_setup, django_db_blocker):  # type: ignore[no-unty
         nom = curseur.fetchone()[0]
         curseur.execute(f"ALTER DATABASE \"{nom}\" SET equipements.truncate_autorise = 'oui'")
         curseur.execute("SET equipements.truncate_autorise = 'oui'")
+    with django_db_blocker.unblock():
+        from apps.noyau.amorcage import amorcer_donnees_de_reference
+
+        # Une base réutilisée peut avoir été vidée par un test transactionnel : on recrée la référence.
+        amorcer_donnees_de_reference()
 
 
 @pytest.fixture(autouse=True)

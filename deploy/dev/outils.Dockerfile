@@ -7,7 +7,7 @@ COPY --from=node /usr/local/bin/node /usr/local/bin/node
 COPY --from=node /usr/local/lib/node_modules /usr/local/lib/node_modules
 RUN ln -s /usr/local/lib/node_modules/npm/bin/npm-cli.js /usr/local/bin/npm \
     && ln -s /usr/local/lib/node_modules/npm/bin/npx-cli.js /usr/local/bin/npx \
-    && apt-get update && apt-get install -y --no-install-recommends make git ca-certificates libatomic1 \
+    && apt-get update && apt-get install -y --no-install-recommends make git ca-certificates libatomic1 build-essential libldap-dev libsasl2-dev \
     && rm -rf /var/lib/apt/lists/* \
     && pip install --no-cache-dir uv==0.13.6
 WORKDIR /depot

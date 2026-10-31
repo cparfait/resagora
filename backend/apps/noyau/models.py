@@ -41,3 +41,13 @@ class Fichier(models.Model):
 
     def __str__(self) -> str:
         return self.nom_origine
+
+
+class Compteur(models.Model):
+    """Numérotation chronologique sans trou (dossiers, devis, factures, avoirs, lots d'export) — TAR-05."""
+
+    cle = models.CharField(max_length=60, unique=True)
+    valeur = models.PositiveIntegerField(default=0)
+
+    def __str__(self) -> str:
+        return f"{self.cle} = {self.valeur}"

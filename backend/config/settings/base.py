@@ -38,6 +38,9 @@ INSTALLED_APPS = [
     "apps.audit",
     "apps.habilitations",
     "apps.referentiel",
+    "apps.usagers",
+    "apps.communication",
+    "apps.reservations",
     "apps.portail",
 ]
 
@@ -193,6 +196,32 @@ LDAP: dict[str, Any] = {
 CLE_CHIFFREMENT = secret("cle_chiffrement", defaut="")
 TOTP_EMETTEUR = os.environ.get("TOTP_EMETTEUR", "Ville de Châtillon — Équipements")
 
+# Messagerie électronique (COM-01) : Mailpit en recette, serveur SMTP de la Ville en production.
+# Réglage MAILERS de Django 6.1 (les réglages EMAIL_* sont dépréciés).
+MAILERS = {
+    "default": {
+        "BACKEND": "django.core.mail.backends.smtp.EmailBackend",
+        "OPTIONS": {
+            "host": os.environ.get("SMTP_HOTE", "mailpit"),
+            "port": entier("SMTP_PORT", 1025),
+            "username": os.environ.get("SMTP_UTILISATEUR", ""),
+            "password": secret("smtp_mot_de_passe", defaut=""),
+            "use_tls": booleen("SMTP_STARTTLS", False),
+            "use_ssl": booleen("SMTP_TLS", False),
+            "timeout": entier("SMTP_DELAI_SECONDES", 20),
+        },
+    }
+}
+DEFAULT_FROM_EMAIL = os.environ.get("COURRIEL_EXPEDITEUR", "Équipements sportifs — Ville de Châtillon <equipements@chatillon.test>")
+PORTAIL_URL = os.environ.get("PORTAIL_URL", "https://equipements.chatillon.test")
+BACKOFFICE_URL = os.environ.get("BACKOFFICE_URL", "https://equipements.chatillon.local")
+
+# Calendrier national (ADM-01)
+URL_CALENDRIER_SCOLAIRE = os.environ.get(
+    "URL_CALENDRIER_SCOLAIRE", "https://data.education.gouv.fr/api/explore/v2.1/catalog/datasets/fr-en-calendrier-scolaire/records"
+)
+URL_JOURS_FERIES = os.environ.get("URL_JOURS_FERIES", "https://calendrier.api.gouv.fr/jours-feries/metropole/{annee}.json")
+
 # Celery
 CELERY_BROKER_URL = VALKEY_URL
 CELERY_RESULT_BACKEND = None
@@ -203,6 +232,9 @@ CELERY_TIMEZONE = TIME_ZONE
 CELERY_BEAT_SCHEDULE: dict[str, dict[str, object]] = {
     "verifier-journal-audit": {"task": "apps.audit.tasks.verifier_integrite", "schedule": timedelta(hours=6)},
     "ancrer-journal-audit": {"task": "apps.audit.tasks.ancrer_journal", "schedule": timedelta(hours=1)},
+    "traiter-options": {"task": "apps.reservations.tasks.traiter_options", "schedule": timedelta(hours=1)},
+    "marquer-realisees": {"task": "apps.reservations.tasks.marquer_realisees", "schedule": timedelta(hours=6)},
+    "relancer-notifications": {"task": "apps.communication.tasks.relancer_echecs", "schedule": timedelta(minutes=30)},
 }
 
 # Journal d'audit (SEC-08) : clé HMAC de la chaîne et conservation minimale 6 mois.
