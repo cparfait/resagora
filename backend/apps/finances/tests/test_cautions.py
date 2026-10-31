@@ -41,8 +41,11 @@ JPEG = b"\xff\xd8\xff\xe0" + b"photo-degats" * 20
 def environnement(monkeypatch, modeles_documents):
     monkeypatch.setattr(documents, "convertir_en_pdfa", lambda nom, docx, transport=None: PDF)
     monkeypatch.setattr(fichiers, "analyser_clamav", lambda contenu: None)
-    with freeze_time("2026-11-02 10:00"):
-        yield
+    with freeze_time("2026-11-02 10:00") as horloge:
+        yield horloge
+
+
+APRES_LA_SEANCE = "2026-12-09 19:00"  # la location du 9/12 (14 h – 18 h) est terminée
 
 
 @pytest.fixture
@@ -79,7 +82,10 @@ def test_cau02_reception_par_la_regie_seulement(caution):
     assert not [c for c in conditions.conditions_manquantes(caution.reservation) if "caution" in c]
 
 
-def test_rg11_restitution_seulement_apres_etat_des_lieux_de_sortie_conforme(caution, django_capture_on_commit_callbacks):
+def test_rg11_restitution_seulement_apres_etat_des_lieux_de_sortie_conforme(
+    caution, django_capture_on_commit_callbacks, environnement
+):
+    environnement.move_to(APRES_LA_SEANCE)
     regisseur = agent("regisseur")
     caution = cautions.recevoir(caution, acteur=regisseur, mode="cheque", reference="Chèque 0012345")
     with pytest.raises(ErreurMetier) as refus:
@@ -96,7 +102,8 @@ def test_rg11_restitution_seulement_apres_etat_des_lieux_de_sortie_conforme(caut
         cautions.restituer(caution, acteur=regisseur)
 
 
-def test_cau04_retenue_motivee_avec_photos_sous_le_seuil(caution):
+def test_cau04_retenue_motivee_avec_photos_sous_le_seuil(caution, environnement):
+    environnement.move_to(APRES_LA_SEANCE)
     regisseur, gestionnaire = agent("regisseur"), agent("gestionnaire")
     caution = cautions.recevoir(caution, acteur=regisseur, mode="consignation", reference="Consignation 77")
     seance = caution.reservation.occurrences.get()
@@ -118,7 +125,8 @@ def test_cau04_retenue_motivee_avec_photos_sous_le_seuil(caution):
     assert Notification.objects.filter(sujet__startswith="Retenue sur votre caution", usager=caution.usager).exists()
 
 
-def test_cau05_double_validation_au_dela_du_seuil_par_un_autre_agent(caution, seuil_100_euros):
+def test_cau05_double_validation_au_dela_du_seuil_par_un_autre_agent(caution, seuil_100_euros, environnement):
+    environnement.move_to(APRES_LA_SEANCE)
     regisseur, gestionnaire = agent("regisseur"), agent("gestionnaire")
     caution = cautions.recevoir(caution, acteur=regisseur, mode="cheque", reference="Chèque 0012346")
     cautions.constater_sortie(
@@ -141,7 +149,8 @@ def test_cau05_double_validation_au_dela_du_seuil_par_un_autre_agent(caution, se
         MouvementCaution.objects.filter(caution=caution).update(montant=1)
 
 
-def test_cau05_l_agent_qui_propose_ne_valide_pas(caution, seuil_100_euros):
+def test_cau05_l_agent_qui_propose_ne_valide_pas(caution, seuil_100_euros, environnement):
+    environnement.move_to(APRES_LA_SEANCE)
     from apps.habilitations.models import Habilitation, Role
     from tests.fabriques import ville_entiere
 
@@ -177,7 +186,8 @@ def test_cau06_cau07_etat_exportable_et_alertes(caution, client_agent):
     assert hors.status_code == 404
 
 
-def test_cau04_retenue_par_l_api_avec_photo(caution, client_agent):
+def test_cau04_retenue_par_l_api_avec_photo(caution, client_agent, environnement):
+    environnement.move_to(APRES_LA_SEANCE)
     client_regie = client_agent(agent("regisseur"))
     client_regie.post(
         f"/api/gestion/finances/cautions/{caution.pk}/recevoir", {"mode": "cheque", "reference": "Chèque 1"}, format="json"

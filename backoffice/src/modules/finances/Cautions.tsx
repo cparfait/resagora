@@ -41,6 +41,7 @@ interface Caution {
   mouvements: Mouvement[];
   derniere_seance: number | null;
   etat_sortie: string | null;
+  photos_retenue: number[];
 }
 
 const STATUTS: Record<string, { libelle: string; ton: "neutre" | "info" | "succes" | "attention" | "danger" }> = {
@@ -51,6 +52,7 @@ const STATUTS: Record<string, { libelle: string; ton: "neutre" | "info" | "succe
   restituee: { libelle: "Restituée", ton: "succes" },
   retenue_partielle: { libelle: "Retenue partielle", ton: "attention" },
   retenue_totale: { libelle: "Retenue totale", ton: "danger" },
+  solde_restitue: { libelle: "Solde restitué, retenue à encaisser", ton: "attention" },
   encaissee: { libelle: "Retenue encaissée", ton: "neutre" },
 };
 const MODES = [
@@ -171,7 +173,12 @@ export function Cautions({ alertes = false }: { alertes?: boolean }) {
                   Statuer sur la retenue<span className="visuellement-masque"> : {c.dossier_numero}</span>
                 </Bouton>
               ) : null}
-              {peut("gerer_caution") && ["retenue_partielle", "retenue_totale"].includes(c.statut) ? (
+              {peut("gerer_caution") && c.statut === "retenue_partielle" ? (
+                <Bouton variante="lien" onClick={() => operation.mutate({ url: `/api/gestion/finances/cautions/${c.id}/restituer` })}>
+                  Restituer le solde<span className="visuellement-masque"> : {c.dossier_numero}</span>
+                </Bouton>
+              ) : null}
+              {peut("gerer_caution") && ["solde_restitue", "retenue_totale"].includes(c.statut) ? (
                 <Bouton variante="lien" onClick={() => setAction({ type: "encaisser", caution: c })}>
                   Encaisser la retenue<span className="visuellement-masque"> : {c.dossier_numero}</span>
                 </Bouton>
@@ -234,6 +241,15 @@ export function Cautions({ alertes = false }: { alertes?: boolean }) {
                 <p>
                   Retenue proposée : {euros(action.caution.montant_retenu)} — {action.caution.motif_retenue}
                 </p>
+                <ul className="liste-simple">
+                  {action.caution.photos_retenue.map((photo, rang) => (
+                    <li key={photo}>
+                      <Bouton variante="lien" onClick={() => void telecharger(`/api/gestion/finances/cautions/${action.caution.id}/photos/${photo}`, `photo-${rang + 1}.jpg`)}>
+                        Voir la photo {rang + 1}
+                      </Bouton>
+                    </li>
+                  ))}
+                </ul>
                 <ChampSelection
                   libelle="Décision"
                   obligatoire

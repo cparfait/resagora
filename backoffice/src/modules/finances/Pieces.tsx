@@ -6,7 +6,7 @@ import { construireChemin, ErreurApi, requete, telecharger, type Page as PageApi
 import { useSession } from "../../auth/session";
 import { Badge } from "../../ui/Badge";
 import { Bouton } from "../../ui/Bouton";
-import { ChampSelection, ChampTexte } from "../../ui/Champ";
+import { CaseACocher, ChampSelection, ChampTexte } from "../../ui/Champ";
 import { Dialogue } from "../../ui/Dialogue";
 import { Chargement, DroitsInsuffisants, Erreur } from "../../ui/Etats";
 import { dateHeure, dateSimple, euros } from "../../ui/metier";
@@ -32,6 +32,8 @@ export interface Piece {
   acompte_deduit: number;
   montant_regle: number;
   reste_du: number;
+  montant_avoirs: number;
+  lignes: { id: number; rang: number; libelle: string; montant_du: number }[];
   reference_virement: string;
   titre_numero: string;
   document: number | null;
@@ -43,6 +45,7 @@ export const STATUTS_PIECE: Record<string, { libelle: string; ton: "neutre" | "i
   accepte: { libelle: "Accepté", ton: "succes" },
   refuse: { libelle: "Refusé", ton: "neutre" },
   expire: { libelle: "Expiré", ton: "neutre" },
+  remplace: { libelle: "Remplacé par un nouveau devis", ton: "neutre" },
   a_titrer: { libelle: "À titrer", ton: "attention" },
   titre_emis: { libelle: "Titre émis", ton: "info" },
   solde_partiel: { libelle: "Partiellement soldée", ton: "attention" },
@@ -63,6 +66,7 @@ export function TableauPieces({ pieces, legende, rafraichir }: { pieces: Piece[]
   const { annoncer } = useNotifications();
   const [action, setAction] = useState<Action>(null);
   const [saisie, setSaisie] = useState({ motif: "", montant: "", date: "", reference: "", titre: "" });
+  const [lignesAvoir, setLignesAvoir] = useState<number[]>([]);
   const operation = useMutation({
     mutationFn: ({ url, corps }: { url: string; corps?: unknown }) => requete<Piece>("POST", url, corps),
     onSuccess: async (p) => {
@@ -76,7 +80,7 @@ export function TableauPieces({ pieces, legende, rafraichir }: { pieces: Piece[]
   const valider = () => {
     if (!action) return;
     const base = `/api/gestion/finances/pieces/${action.piece.id}`;
-    if (action.type === "avoir") operation.mutate({ url: `${base}/avoir`, corps: { motif: saisie.motif } });
+    if (action.type === "avoir") operation.mutate({ url: `${base}/avoir`, corps: { motif: saisie.motif, lignes: lignesAvoir } });
     if (action.type === "titre") operation.mutate({ url: `${base}/titre`, corps: { titre: saisie.titre } });
     if (action.type === "pointer") {
       const centimes = Math.round(Number(saisie.montant.replace(/\s/g, "").replace(",", ".")) * 100);
@@ -123,7 +127,13 @@ export function TableauPieces({ pieces, legende, rafraichir }: { pieces: Piece[]
               </Bouton>
             ) : null}
             {peut("emettre_avoir") && ["facture", "acompte"].includes(p.nature) && p.statut !== "annulee" ? (
-              <Bouton variante="lien" onClick={() => setAction({ type: "avoir", piece: p })}>
+              <Bouton
+                variante="lien"
+                onClick={() => {
+                  setLignesAvoir([]);
+                  setAction({ type: "avoir", piece: p });
+                }}
+              >
                 Avoir…<span className="visuellement-masque"> sur {p.numero}</span>
               </Bouton>
             ) : null}
@@ -158,7 +168,18 @@ export function TableauPieces({ pieces, legende, rafraichir }: { pieces: Piece[]
             {action.type === "avoir" ? (
               <>
                 <ChampTexte libelle="Motif de l'avoir" obligatoire value={saisie.motif} onChange={(e) => setSaisie({ ...saisie, motif: e.target.value })} />
-                <p>La facture n'est pas modifiée : l'avoir annule l'ensemble de ses lignes et porte sa propre numérotation.</p>
+                <fieldset className="groupe">
+                  <legend>Lignes à créditer (aucune cochée : toute la facture)</legend>
+                  {action.piece.lignes.map((ligne) => (
+                    <CaseACocher
+                      key={ligne.id}
+                      libelle={`${ligne.libelle} — ${euros(ligne.montant_du)}`}
+                      checked={lignesAvoir.includes(ligne.id)}
+                      onChange={(e) => setLignesAvoir(e.target.checked ? [...lignesAvoir, ligne.id] : lignesAvoir.filter((id) => id !== ligne.id))}
+                    />
+                  ))}
+                </fieldset>
+                <p>La facture n'est pas modifiée : l'avoir crédite les lignes choisies et porte sa propre numérotation.</p>
               </>
             ) : null}
             {action.type === "pointer" ? (
@@ -232,6 +253,8 @@ interface Lot {
   pieces: string[];
   total_centimes: number;
   cree_le: string;
+  annule_le: string | null;
+  motif_annulation: string;
 }
 
 export function TitresCiril() {
@@ -239,6 +262,17 @@ export function TitresCiril() {
   const client = useQueryClient();
   const { annoncer } = useNotifications();
   const [format, setFormat] = useState("");
+  const [rejet, setRejet] = useState<{ lot: Lot; motif: string } | null>(null);
+  const annuler = useMutation({
+    mutationFn: () => requete<Lot>("POST", `/api/gestion/finances/lots-titres/${rejet?.lot.id}/annuler`, { motif: rejet?.motif }),
+    onSuccess: async (l) => {
+      annoncer(`Lot ${l.numero} annulé : ses pièces sont de nouveau à exporter.`);
+      setRejet(null);
+      await client.invalidateQueries({ queryKey: ["a-titrer"] });
+      await client.invalidateQueries({ queryKey: ["lots-titres"] });
+    },
+    onError: (e) => annoncer(erreurTexte(e), "erreur"),
+  });
   const aTitrer = useQuery({ queryKey: ["a-titrer"], queryFn: () => requete<Piece[]>("GET", "/api/gestion/finances/lots-titres/a-titrer"), enabled: peut("exporter_titres") });
   const lots = useQuery({ queryKey: ["lots-titres"], queryFn: () => requete<PageApi<Lot>>("GET", "/api/gestion/finances/lots-titres"), enabled: peut("exporter_titres") });
   const exporter = useMutation({
@@ -298,14 +332,43 @@ export function TitresCiril() {
             { cle: "date", titre: "Créé le", rendu: (l) => dateHeure(l.cree_le), valeurTri: (l) => l.cree_le },
             { cle: "pieces", titre: "Pièces", rendu: (l) => l.pieces.join(", ") },
             { cle: "total", titre: "Total", rendu: (l) => euros(l.total_centimes) },
+            { cle: "etat", titre: "État", rendu: (l) => (l.annule_le ? <Badge libelle={`Annulé : ${l.motif_annulation}`} ton="neutre" /> : <Badge libelle="Transmis" ton="succes" />) },
           ]}
           actions={(l) => (
-            <Bouton variante="lien" onClick={() => void telecharger(`/api/gestion/finances/lots-titres/${l.id}/fichier`, `titres-${l.numero}.${l.format}`)}>
-              Retélécharger<span className="visuellement-masque"> le lot {l.numero}</span>
-            </Bouton>
+            <>
+              <Bouton variante="lien" onClick={() => void telecharger(`/api/gestion/finances/lots-titres/${l.id}/fichier`, `titres-${l.numero}.${l.format}`)}>
+                Retélécharger<span className="visuellement-masque"> le lot {l.numero}</span>
+              </Bouton>
+              {l.annule_le ? null : (
+                <Bouton variante="lien" onClick={() => setRejet({ lot: l, motif: "" })}>
+                  Rejeté par Ciril…<span className="visuellement-masque"> lot {l.numero}</span>
+                </Bouton>
+              )}
+            </>
           )}
         />
       ) : null}
+      <Dialogue ouvert={rejet !== null} titre="Annuler un lot rejeté par Ciril" onFermer={() => setRejet(null)}>
+        {rejet ? (
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              annuler.mutate();
+            }}
+          >
+            <p>Le fichier du lot {rejet.lot.numero} reste consultable ; ses pièces redeviennent à exporter.</p>
+            <ChampTexte libelle="Motif du rejet" obligatoire value={rejet.motif} onChange={(e) => setRejet({ ...rejet, motif: e.target.value })} />
+            <div className="formulaire__actions">
+              <Bouton variante="secondaire" onClick={() => setRejet(null)}>
+                Retour
+              </Bouton>
+              <Bouton type="submit" variante="danger" enCours={annuler.isPending}>
+                Annuler le lot
+              </Bouton>
+            </div>
+          </form>
+        ) : null}
+      </Dialogue>
     </Page>
   );
 }

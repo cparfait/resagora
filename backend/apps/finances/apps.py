@@ -12,14 +12,15 @@ class FinancesConfig(AppConfig):
 
         from . import contexte_documents  # noqa: F401 — enregistre les contextes de fusion des pièces comptables
         from .cautions import caution_manquante, preparer
-        from .facturation import acompte_manquant, apres_annulation_tardive
+        from .facturation import acompte_manquant, apres_annulation
 
         enregistrer_verification("acompte", acompte_manquant)
         enregistrer_verification("caution", caution_manquante)
         if preparer not in services.CROCHETS["validation"]:
             services.CROCHETS["validation"].append(preparer)
-        if apres_annulation_tardive not in services.CROCHETS["annulation_tardive"]:
-            services.CROCHETS["annulation_tardive"].append(apres_annulation_tardive)
+        # Séance annulée : avoir si elle était facturée, frais du barème si l'annulation est tardive (RG-08).
+        if apres_annulation not in services.CROCHETS["annulation"]:
+            services.CROCHETS["annulation"].append(apres_annulation)
 
         from apps.noyau.demo import socle
 

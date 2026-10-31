@@ -11,7 +11,7 @@ from django.urls import URLPattern, URLResolver, get_resolver
 RACINE = Path(__file__).resolve().parents[4]
 sys.path.insert(0, str(RACINE / "facade"))
 
-from facade.routes import ROUTES  # noqa: E402
+from facade.routes import ROUTES, ROUTES_MOBILE  # noqa: E402
 
 
 def _motifs_django() -> set[str]:
@@ -25,12 +25,18 @@ def _motifs_django() -> set[str]:
                 resultat.append("/" + re.sub(r"<int:\w+>", "{id}", texte).removeprefix("^").removesuffix("$"))
         return resultat
 
-    return {m for m in parcourir(get_resolver("config.urls_portail").url_patterns, "") if m.startswith("/api/portail/")}
+    return {
+        m
+        for m in parcourir(get_resolver("config.urls_portail").url_patterns, "")
+        if m.startswith(("/api/portail/", "/api/mobile/"))
+    }
 
 
 def _motifs_facade() -> set[str]:
     return {
-        r.motif.pattern.replace("[0-9]{1,12}", "{id}") for r in ROUTES if not r.motif.pattern.startswith("/api/portail/payfip")
+        r.motif.pattern.replace("[0-9]{1,12}", "{id}")
+        for r in [*ROUTES, *ROUTES_MOBILE]
+        if not r.motif.pattern.startswith("/api/portail/payfip")
     }
 
 

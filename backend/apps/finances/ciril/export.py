@@ -20,6 +20,7 @@ from xml.etree import ElementTree as ET
 from openpyxl import Workbook
 
 from apps.noyau.parametres import parametre
+from apps.noyau.tableur import cellule_sure, texte_xml
 
 from ..models import PieceComptable
 
@@ -28,8 +29,15 @@ if TYPE_CHECKING:
     from apps.usagers.models import Usager
 
 
+# Champs numériques : jamais préfixés (un avoir de -12,00 reste un montant) ; tous les autres sont neutralisés.
+CHAMPS_NUMERIQUES = {"montant", "montant_centimes", "exercice"}
+
+
 def _montant(centimes: int) -> str:
-    return f"{centimes / 100:.2f}".replace(".", ",")
+    """Montant en euros, virgule décimale, calculé en entiers (règle 5 : jamais de flottant)."""
+    signe = "-" if centimes < 0 else ""
+    euros_, reste = divmod(abs(centimes), 100)
+    return f"{signe}{euros_},{reste:02d}"
 
 
 def _champ_usager(piece: PieceComptable, champ: str) -> str:
@@ -67,8 +75,11 @@ CHAMPS: dict[str, Callable[[PieceComptable], Any]] = {
 
 def lignes(pieces: list[PieceComptable]) -> tuple[list[str], list[list[Any]]]:
     colonnes = parametre("ciril.colonnes")
-    entetes = [c["entete"] for c in colonnes]
-    contenu = [[CHAMPS[c["champ"]](p) for c in colonnes] for p in pieces]
+    entetes = [cellule_sure(c["entete"]) for c in colonnes]
+    contenu = [
+        [CHAMPS[c["champ"]](p) if c["champ"] in CHAMPS_NUMERIQUES else cellule_sure(CHAMPS[c["champ"]](p)) for c in colonnes]
+        for p in pieces
+    ]
     return entetes, contenu
 
 
@@ -89,6 +100,10 @@ def produire(pieces: list[PieceComptable], format_export: str | None = None) -> 
         feuille.append(entetes)
         for ligne in contenu:
             feuille.append(ligne)
+        for rangee in feuille.iter_rows():
+            for cellule in rangee:
+                if isinstance(cellule.value, str):
+                    cellule.data_type = "s"  # jamais de formule, même si le texte commence par « = »
         tampon = io.BytesIO()
         classeur.save(tampon)
         return tampon.getvalue(), "xlsx", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
@@ -97,6 +112,6 @@ def produire(pieces: list[PieceComptable], format_export: str | None = None) -> 
         for ligne in contenu:
             element = ET.SubElement(racine, str(parametre("ciril.xml_element")))
             for colonne, valeur in zip(parametre("ciril.colonnes"), ligne, strict=True):
-                ET.SubElement(element, colonne["champ"]).text = str(valeur)
+                ET.SubElement(element, colonne["champ"]).text = texte_xml(str(valeur).removeprefix("'"))
         return ET.tostring(racine, encoding="utf-8", xml_declaration=True), "xml", "application/xml"
     raise ValueError(f"Format d'export Ciril inconnu : {format_export}")

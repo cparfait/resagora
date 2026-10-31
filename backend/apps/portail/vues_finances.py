@@ -18,7 +18,6 @@ from apps.finances.models import CATEGORIES, Caution, PieceComptable
 from apps.noyau import fichiers
 from apps.noyau.exceptions import AccesRefuse, ErreurMetier
 from apps.noyau.montants import euros
-from apps.noyau.parametres import parametre
 
 from .authentification import Introuvable, contact_courant, usagers_du_contact
 from .catalogue import espaces_publics
@@ -34,6 +33,7 @@ STATUTS_PUBLICS = {
     "titre_emis": "À régler",
     "solde_partiel": "Partiellement réglée",
     "solde": "Réglée",
+    "remplace": "Remplacé par un nouveau devis",
     "en_recouvrement": "En recouvrement auprès du comptable public",
     "annulee": "Annulée par avoir",
 }
@@ -45,8 +45,10 @@ STATUTS_CAUTION_PUBLICS = {
     "restituee": "Restituée",
     "retenue_partielle": "Retenue partielle",
     "retenue_totale": "Retenue totale",
+    "solde_restitue": "Retenue partielle, solde restitué",
     "encaissee": "Retenue encaissée",
 }
+DECIDEES = {"retenue_partielle", "retenue_totale", "solde_restitue", "encaissee"}
 CATEGORIES_PUBLIQUES = [c for c, _ in CATEGORIES if c not in {"service_municipal"}]
 
 
@@ -92,9 +94,9 @@ def representation_piece(piece: PieceComptable) -> dict[str, Any]:
         "a_accepter": piece.nature == "devis" and piece.statut == "emis",
         "pdf": piece.document_id is not None,
         "reglement": {
-            "titulaire": parametre("comptable.titulaire"),
-            "iban": parametre("comptable.iban"),
-            "bic": parametre("comptable.bic"),
+            "titulaire": piece.reglement.get("titulaire", ""),
+            "iban": piece.reglement.get("iban", ""),
+            "bic": piece.reglement.get("bic", ""),
             "reference": piece.reference_virement,
         }
         if reglement
@@ -124,8 +126,8 @@ class VueSimulationTarif(VuePublique):
         espace = espaces_publics().filter(pk=d["espace"]).first()
         if espace is None:
             raise Introuvable()
-        if d["heure_fin"] <= d["heure_debut"]:
-            raise ErreurMetier("L'heure de fin doit suivre l'heure de début.", code="horaires_invalides")
+        if d["heure_fin"] == d["heure_debut"]:
+            raise ErreurMetier("L'heure de fin doit différer de l'heure de début.", code="horaires_invalides")
         debut, fin = tarification._debut_fin(d["date"], d["heure_debut"], d["heure_fin"])
         try:
             resultat = tarification.simuler(
@@ -197,8 +199,8 @@ class VueCautionsPortail(VueContact):
                     "montant_texte": euros(c.montant),
                     "statut": c.statut,
                     "statut_libelle": STATUTS_CAUTION_PUBLICS.get(c.statut, c.get_statut_display()),
-                    "montant_retenu": c.montant_retenu,
-                    "motif_retenue": c.motif_retenue if c.statut in {"retenue_partielle", "retenue_totale", "encaissee"} else "",
+                    "montant_retenu": c.montant_retenu if c.statut in DECIDEES else 0,
+                    "motif_retenue": c.motif_retenue if c.statut in DECIDEES else "",
                     "recue_le": c.recue_le,
                     "restituee_le": c.restituee_le,
                     "a_deposer_avant": c.reservation.date_debut if c.statut == "attendue" else None,

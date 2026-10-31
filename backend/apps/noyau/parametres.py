@@ -50,8 +50,7 @@ DEFINITIONS: list[DefinitionParametre] = [
         "annulation.bareme",
         "Barème des frais d'annulation (heures avant le début → taux en dix-millièmes)",
         [
-            {"heures_avant": 168, "taux": 0},
-            {"heures_avant": 72, "taux": 2500},
+            {"heures_avant": 72, "taux": 0},
             {"heures_avant": 24, "taux": 5000},
             {"heures_avant": 0, "taux": 10000},
         ],
@@ -217,7 +216,7 @@ DEFINITIONS: list[DefinitionParametre] = [
         "Finances",
         "TAR-12 : communiqué par le comptable public.",
     ),
-    DefinitionParametre("comptable.iban", "IBAN du comptable public", "FR76 0000 0000 0000 0000 0000 000", "Finances", "TAR-12"),
+    DefinitionParametre("comptable.iban", "IBAN du comptable public", "FR76 3000 1007 9412 3456 7890 185", "Finances", "TAR-12"),
     DefinitionParametre("comptable.bic", "BIC du comptable public", "TRPUFRP1", "Finances", "TAR-12"),
     DefinitionParametre("ciril.format", "Format de l'export des titres vers Ciril (csv, xlsx, xml)", "csv", "Finances", "TAR-06"),
     DefinitionParametre(
@@ -342,6 +341,20 @@ BORNES = {
 }
 
 
+PARAMETRES_FINANCIERS = frozenset(
+    {"comptable.titulaire", "comptable.iban", "comptable.bic", "caution.seuil_double_validation_centimes", "acomptes.taux"}
+)
+
+
+def iban_valide(iban: str) -> bool:
+    """ISO 13616 : contrôle modulo 97."""
+    compact = iban.replace(" ", "").upper()
+    if not re.fullmatch(r"[A-Z]{2}\d{2}[A-Z0-9]{11,30}", compact):
+        return False
+    deplace = compact[4:] + compact[:4]
+    return int("".join(str(int(c, 36)) for c in deplace)) % 97 == 1
+
+
 def _verifier_specifique(cle: str, valeur: Any) -> str | None:
     if cle == "priorites.ordre":
         attendu = set(PAR_CLE[cle].defaut)
@@ -370,11 +383,29 @@ def _verifier_specifique(cle: str, valeur: Any) -> str | None:
             return "Paliers {heures_avant ≥ 0, taux de 0 à 10000} attendus."
         if not any(p["heures_avant"] == 0 for p in valeur):
             return "Le barème doit comporter un palier à 0 heure."
+        delai = int(parametre("annulation.delai_tardif_heures"))
+        inutiles = [p["heures_avant"] for p in valeur if p["taux"] > 0 and p["heures_avant"] >= delai]
+        if inutiles:
+            return (
+                f"Un palier payant à {inutiles[0]} h ne s'appliquerait jamais : une annulation n'est tardive qu'en deçà de "
+                f"{delai} h (paramètre « annulation.delai_tardif_heures »)."
+            )
+    elif cle == "annulation.delai_tardif_heures":
+        bareme = parametre("annulation.bareme")
+        inutiles = [p["heures_avant"] for p in bareme if p["taux"] > 0 and p["heures_avant"] >= valeur]
+        if inutiles:
+            return f"Le barème prévoit des frais à {inutiles[0]} h : le délai tardif doit le dépasser."
     elif cle == "rgpd.conservation_annees_documents":
         if "autres" not in valeur or not all(
             isinstance(v, int) and not isinstance(v, bool) and 1 <= v <= 100 for v in valeur.values()
         ):
             return "Durées en années (1 à 100) par nature de document, dont « autres »."
+    elif cle == "comptable.iban":
+        if not iban_valide(valeur):
+            return "IBAN invalide (contrôle ISO 13616)."
+    elif cle == "comptable.bic":
+        if not re.fullmatch(r"[A-Z]{4}[A-Z]{2}[A-Z0-9]{2}([A-Z0-9]{3})?", valeur.replace(" ", "").upper()):
+            return "BIC invalide (8 ou 11 caractères)."
     elif cle == "personnel.nuit":
         if not all(isinstance(valeur.get(k), str) and HEURE.match(valeur[k]) for k in ("debut", "fin")):
             return "« debut » et « fin » au format HH:MM."

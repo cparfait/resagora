@@ -2,11 +2,12 @@
 
 from __future__ import annotations
 
-from datetime import datetime, timedelta
+from datetime import date, datetime, timedelta
 from typing import Any
 
 import django_filters
 from django.db.models import Q, QuerySet
+from django.http import HttpResponse
 from django.utils import timezone
 from drf_spectacular.utils import OpenApiParameter, extend_schema
 from rest_framework import status
@@ -24,7 +25,16 @@ from apps.noyau.exceptions import ErreurMetier, ErreurValidation
 from .. import campagne as services_campagne
 from .. import conditions as services_conditions
 from .. import services
-from ..models import Campagne, Dossier, ListeAttente, Occurrence, Reservation, TypeReservation, VueEnregistree
+from ..models import (
+    STATUTS_BLOQUANTS,
+    Campagne,
+    Dossier,
+    ListeAttente,
+    Occurrence,
+    Reservation,
+    TypeReservation,
+    VueEnregistree,
+)
 from ..recurrence import decrire
 from . import serializers as s
 
@@ -411,6 +421,63 @@ class VuePlanning(APIView):
         )
         if tronque:
             reponse["X-Planning-Tronque"] = str(self.MAX_SEANCES)
+        return reponse
+
+
+class VuePlanningIcal(APIView):
+    """IMP-05 : planning d'un espace en iCalendar (séances validées et annulées signalées), dans le périmètre."""
+
+    actions_requises = {"get": "lire_reservation"}
+    MAX_JOURS = 200
+
+    @extend_schema(
+        parameters=[OpenApiParameter(n, str) for n in ("espace", "du", "au")],
+        responses={(200, "text/calendar"): bytes},
+    )
+    def get(self, request: Request) -> HttpResponse:
+        from apps.noyau import ical
+        from apps.referentiel.models import Espace
+
+        p = request.query_params
+        espace = (
+            Espace.objects.select_related("batiment__site").filter(pk=int(p["espace"])).first()
+            if p.get("espace", "").isdigit()
+            else None
+        )
+        if espace is None:
+            raise ErreurValidation("Indiquez l'espace.", code="espace_requis")
+        exiger(agent_courant(request), "lire_reservation", espace)
+        try:
+            du = date.fromisoformat(p["du"]) if p.get("du") else timezone.localdate() - timedelta(days=7)
+            au = date.fromisoformat(p["au"]) if p.get("au") else du + timedelta(days=120)
+        except ValueError as erreur:
+            raise ErreurValidation("Dates au format AAAA-MM-JJ attendues.", code="dates_invalides") from erreur
+        if au < du or (au - du).days > self.MAX_JOURS:
+            raise ErreurValidation(f"Période de {self.MAX_JOURS} jours au plus.", code="periode_invalide")
+        debut = timezone.make_aware(datetime.combine(du, datetime.min.time()))
+        fin = timezone.make_aware(datetime.combine(au + timedelta(days=1), datetime.min.time()))
+        seances = (
+            Occurrence.objects.filter(espace=espace, debut__lt=fin, fin__gt=debut, statut__in=[*STATUTS_BLOQUANTS, "annulee"])
+            .select_related("reservation__dossier__usager")
+            .order_by("debut")
+        )
+        contenu = ical.calendrier(
+            f"Planning — {espace.nom}",
+            [
+                ical.Evenement(
+                    uid=f"seance-{o.pk}@equipements.chatillon",
+                    debut=o.debut,
+                    fin=o.fin,
+                    resume=f"{o.reservation.dossier.usager.nom} — {o.reservation.dossier.objet}"[:200],
+                    lieu=f"{espace.nom}, {espace.batiment.site.nom}",
+                    description=f"Dossier {o.reservation.dossier.numero}",
+                    annule=o.statut == "annulee",
+                )
+                for o in seances
+            ],
+        )
+        reponse = HttpResponse(contenu, content_type="text/calendar; charset=utf-8")
+        reponse["Content-Disposition"] = f'attachment; filename="planning-espace-{espace.pk}.ics"'
         return reponse
 
 

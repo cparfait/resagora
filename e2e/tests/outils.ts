@@ -67,3 +67,33 @@ export async function connecterAgent(page: Page, identifiant: string): Promise<v
   await page.getByLabel(/Mot de passe/).fill(motDePasseDemo());
   await page.getByRole("button", { name: "Se connecter" }).click();
 }
+
+const ETAT = resolve(import.meta.dirname, "../.etat");
+
+/** Connexion d'un compte à double authentification : enrôlement au premier passage (clé conservée hors Git dans
+ * e2e/.etat), code TOTP ensuite. */
+export async function connecterAvecTotp(page: Page, identifiant: string): Promise<void> {
+  const { existsSync, mkdirSync, writeFileSync } = await import("node:fs");
+  const fichier = resolve(ETAT, `totp-${identifiant}.txt`);
+  await connecterAgent(page, identifiant);
+  const titre = page.getByRole("heading", { level: 1 });
+  await expect(titre).toHaveText(/deux étapes/);
+  let graine: string;
+  if ((await titre.textContent())?.includes("Activer")) {
+    graine = ((await page.locator(".connexion__graine").textContent()) ?? "").replace(/\s/g, "");
+    mkdirSync(ETAT, { recursive: true });
+    writeFileSync(fichier, graine, "utf8");
+  } else {
+    if (!existsSync(fichier)) throw new Error(`Clé TOTP de ${identifiant} inconnue : faites réinitialiser la double authentification.`);
+    graine = readFileSync(fichier, "utf8").trim();
+  }
+  // Un code TOTP ne sert qu'une fois (anti-rejeu) : une seconde connexion dans la même fenêtre attend le suivant.
+  if (DERNIER_CODE.get(identifiant) === codeTotp(graine)) await page.waitForTimeout(30_500 - (Date.now() % 30_000));
+  const code = codeTotp(graine);
+  DERNIER_CODE.set(identifiant, code);
+  await page.getByLabel(/Code à 6 chiffres/).fill(code);
+  await page.getByRole("button", { name: "Valider le code" }).click();
+  await expect(page.getByRole("heading", { level: 1, name: /Bonjour/ })).toBeVisible();
+}
+
+const DERNIER_CODE = new Map<string, string>();

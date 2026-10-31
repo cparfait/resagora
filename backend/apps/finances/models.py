@@ -73,7 +73,7 @@ class Tarif(models.Model):
     )
     categorie = models.CharField(max_length=20, choices=CATEGORIES)
     unite = models.CharField(max_length=15, choices=UNITES, default="heure")
-    prix_centimes = models.PositiveIntegerField()
+    prix_centimes = models.PositiveIntegerField(help_text="RG-05 : jamais nul ; une gratuité est une réduction de 100 %.")
     caution_centimes = models.PositiveIntegerField(default=0, help_text="CAU-01 : caution exigée (0 : aucune).")
 
     class Meta:
@@ -84,8 +84,9 @@ class Tarif(models.Model):
                 | (Q(espace__isnull=True) & Q(famille__isnull=False)),
                 name="tarif_espace_ou_famille",
             ),
-            models.UniqueConstraint(fields=["grille", "espace", "categorie", "unite"], name="tarif_unique_espace"),
-            models.UniqueConstraint(fields=["grille", "famille", "categorie", "unite"], name="tarif_unique_famille"),
+            models.CheckConstraint(condition=Q(prix_centimes__gte=1), name="rg05_tarif_de_reference_non_nul"),
+            models.UniqueConstraint(fields=["grille", "espace", "categorie"], name="tarif_unique_espace_categorie"),
+            models.UniqueConstraint(fields=["grille", "famille", "categorie"], name="tarif_unique_famille_categorie"),
         ]
 
     def __str__(self) -> str:
@@ -172,6 +173,7 @@ class PieceComptable(models.Model):
         ("accepte", "Devis accepté"),
         ("refuse", "Devis refusé"),
         ("expire", "Devis expiré"),
+        ("remplace", "Devis remplacé"),
         ("a_titrer", "À titrer"),
         ("titre_emis", "Titre émis"),
         ("solde", "Soldée"),
@@ -201,6 +203,10 @@ class PieceComptable(models.Model):
     total_du = models.BigIntegerField(default=0, help_text="Somme des montants dus (centimes, négatif pour un avoir).")
     acompte_deduit = models.BigIntegerField(default=0)
     montant_regle = models.BigIntegerField(default=0)
+    montant_avoirs = models.BigIntegerField(default=0, help_text="Cumul des avoirs émis sur cette facture (centimes, positif).")
+    reglement = models.JSONField(
+        default=dict, blank=True, help_text="TAR-12 : coordonnées du comptable figées à l'émission (titulaire, IBAN, BIC)."
+    )
     motif = models.CharField(max_length=300, blank=True, default="", help_text="Avoir : motif de la correction.")
     reference_virement = models.CharField(max_length=40, blank=True, default="")
     titre_numero = models.CharField("numéro de titre Ciril", max_length=40, blank=True, default="")
@@ -215,6 +221,9 @@ class PieceComptable(models.Model):
     class Meta:
         ordering = ["-cree_le"]
         indexes = [models.Index(fields=["nature", "statut"]), models.Index(fields=["titre_numero"])]
+        constraints = [
+            models.UniqueConstraint(fields=["titre_numero"], condition=~Q(titre_numero=""), name="titre_numero_unique"),
+        ]
 
     def __str__(self) -> str:
         return f"{self.get_nature_display()} {self.numero or '(brouillon)'}"
@@ -224,7 +233,12 @@ class PieceComptable(models.Model):
 
     @property
     def reste_du(self) -> int:
-        return self.total_du - self.acompte_deduit - self.montant_regle
+        return self.total_du - self.acompte_deduit - self.montant_regle - self.montant_avoirs
+
+    @property
+    def montant_titre(self) -> int:
+        """Montant à recouvrer par le comptable public (acompte déduit)."""
+        return self.total_du - self.acompte_deduit
 
 
 class LigneComptable(models.Model):
@@ -235,6 +249,19 @@ class LigneComptable(models.Model):
         "reservations.Occurrence", null=True, blank=True, on_delete=models.PROTECT, related_name="lignes_comptables"
     )
     espace = models.ForeignKey("referentiel.Espace", null=True, blank=True, on_delete=models.PROTECT, related_name="+")
+    seance_debut = models.DateTimeField(null=True, blank=True, help_text="Horaires de la séance au moment du chiffrage.")
+    seance_fin = models.DateTimeField(null=True, blank=True)
+    ligne_devis = models.ForeignKey(
+        "self", null=True, blank=True, on_delete=models.PROTECT, related_name="facturations", help_text="Ligne du devis facturée."
+    )
+    ligne_origine = models.ForeignKey(
+        "self",
+        null=True,
+        blank=True,
+        on_delete=models.PROTECT,
+        related_name="avoirs",
+        help_text="Avoir : ligne de facture créditée.",
+    )
     nature = models.CharField(
         max_length=15,
         choices=[
@@ -256,6 +283,11 @@ class LigneComptable(models.Model):
 
     class Meta:
         ordering = ["piece", "rang"]
+        constraints = [
+            models.UniqueConstraint(
+                fields=["ligne_origine"], condition=Q(ligne_origine__isnull=False), name="ligne_creditee_une_fois"
+            ),
+        ]
 
     def __str__(self) -> str:
         return self.libelle
@@ -267,10 +299,13 @@ class LotTitres(models.Model):
     numero = models.CharField(max_length=20, unique=True)
     format = models.CharField(max_length=5, choices=[("csv", "CSV"), ("xlsx", "Tableur XLSX"), ("xml", "XML")])
     pieces = models.ManyToManyField(PieceComptable, related_name="lots_titres")
+    numeros = models.JSONField(default=list, help_text="Pièces du lot (conservées si le lot est annulé).")
     fichier = models.ForeignKey("noyau.Fichier", on_delete=models.PROTECT, related_name="+")
     total_centimes = models.BigIntegerField()
     cree_par = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, on_delete=models.SET_NULL, related_name="+")
     cree_le = models.DateTimeField(auto_now_add=True)
+    annule_le = models.DateTimeField(null=True, blank=True, help_text="Lot rejeté par Ciril : ses pièces sont à réexporter.")
+    motif_annulation = models.CharField(max_length=300, blank=True, default="")
 
     ecriture_ville_entiere = True
 
@@ -400,6 +435,7 @@ class Caution(models.Model):
         ("restituee", "Restituée"),
         ("retenue_partielle", "Retenue partielle"),
         ("retenue_totale", "Retenue totale"),
+        ("solde_restitue", "Retenue partielle, solde restitué"),
         ("encaissee", "Encaissée"),
     ]
     MODES = [("cheque", "Chèque (non encaissé)"), ("consignation", "Consignation auprès du comptable"), ("virement", "Virement")]

@@ -89,6 +89,57 @@ Critère de sortie (reconstitué) :
 
 **Lot 2 terminé le 2026-10-31.**
 
+## Lot 3 — Finances et Ciril
+
+Exigences : TAR-01 à TAR-13, CAU-01 à CAU-07, RG-04, RG-05, RG-08, RG-11, RG-13.
+
+| Étape | Contenu | Exigences | État |
+| --- | --- | --- | --- |
+| 3.1 | Grilles tarifaires votées (délibération), tarifs de référence jamais nuls, majorations, prestations, réductions et gratuités fondées (100 % sur tarif conservé) | TAR-01 à TAR-03, RG-05 | fait |
+| 3.2 | Devis (remplacement, validité, expiration quotidienne, acceptation en ligne), acomptes, factures depuis les lignes du devis, avoirs ligne à ligne, frais d'annulation au barème | TAR-04, TAR-05, TAR-07 à TAR-09, RG-04, RG-08 | fait |
+| 3.3 | Titres vers Ciril (CSV, XLSX, XML paramétrables, lots numérotés, annulation d'un lot rejeté, report du numéro de titre) et import de l'état des encaissements (rapprochement, doublons signalés, ClamAV) | TAR-06, TAR-13 | fait |
+| 3.4 | Règlement par virement : coordonnées figées à l'émission, IBAN contrôlé, retards | TAR-10, TAR-12 | fait |
+| 3.5 | Cautions : attendue, reçue, restituable après l'état des lieux de sortie, retenue motivée avec photos (EXIF retiré), validation par un second agent au-delà du seuil, solde restitué, encaissement, alertes | CAU-01 à CAU-07, RG-11 | fait |
+| 3.6 | Immuabilité en base (déclencheurs) des pièces émises, lignes, journaux de caution ; séparation des tâches dans les rôles | RG-13, ADR 0005 | fait |
+| 3.7 | Back-office (tarifs, pièces, titres, encaissements, cautions), portail (simulation, factures, devis, cautions), démonstration, e2e + axe, revues (4 bloquants et 20 majeurs corrigés, D-041 à D-045) | TAR-11 | fait |
+
+Critère de sortie (reconstitué) :
+- [x] une location est simulée sur le portail, devisée, acceptée en ligne, facturée depuis le devis avec déduction de l'acompte ;
+- [x] une annulation tardive produit un avoir et les frais du barème ; un avoir ne crédite jamais deux fois la même ligne ;
+- [x] un lot de titres s'exporte au format paramétré, un lot rejeté s'annule et se réexporte, l'état des encaissements solde les factures ;
+- [x] une caution n'est restituée qu'après l'état des lieux de sortie ; une retenue au-delà du seuil exige un second agent ;
+- [x] pièces émises et journaux de caution immuables en base ; montants en centimes ;
+- [x] revues sécurité et métier traitées.
+
+**Lot 3 terminé le 2026-10-31.**
+
+## Lot 4 — Personnel et application mobile hors ligne
+
+Exigences : PER-01 à PER-09, MOB-01 à MOB-08, IMP-02, IMP-05, SEC-10.
+
+| Étape | Contenu | Exigences | État |
+| --- | --- | --- | --- |
+| 4.1 | Agents, habilitations datées (SSIAP exigé pour garder un site), rattachement au compte de l'annuaire à la première connexion | PER-01 | fait |
+| 4.2 | Besoins nés des réservations des espaces gardiennés, fusionnés par site, recalculés à chaque changement de séance (vacations « à revoir », agent prévenu) | PER-02, RG-09 | fait |
+| 4.3 | Vacations, trames hebdomadaires appliquées sur la saison, candidats et remplaçants, moteur de règles (durée, repos, hebdomadaire, nuit), forçage motivé et tracé, absences | PER-03 à PER-06 | fait |
+| 4.4 | Compteurs (planifiées, réalisées, supplémentaires, nuit, dimanches et fériés, astreintes) et export paie ; iCal personnel à jeton révocable ; planning PDF par agent ou site ; iCal du planning d'un espace | PER-07, PER-08, IMP-02, IMP-05 | fait |
+| 4.5 | API mobile : options A (VPN) et B (DMZ, certificat d'appareil, TOTP), paquet minimal, saisies idempotentes, conflits conservés et signalés, photos, incidents, état des lieux vers les cautions | MOB-03 à MOB-07, PER-09, SEC-10 | fait |
+| 4.6 | PWA hors ligne : service worker (coquille et ressources en cache dès l'installation), coffre IndexedDB chiffré (AES-GCM, PBKDF2), file d'envoi, déverrouillage sans réseau, reconnexion sans perte (rechiffrement), fraîcheur et purge à 7 jours | MOB-01, MOB-02, MOB-05, MOB-07, MOB-08 | fait |
+| 4.7 | Back-office personnel (planning, agents, habilitations, trames, absences, compteurs, incidents, saisies, appareils), démonstration (8 gardiens), e2e hors ligne + axe | — | fait |
+| 4.8 | Revues sécurité (8 majeurs) et métier (3 bloquants, 12 majeurs) corrigées : besoins rattachés et séances réalisées (RG-09), trames et horaires contrôlés, compteurs au prorata, saisies bornées, état des lieux réservé à l'agent en poste, appareils à autoriser, refus neutres, code de déverrouillage local, photos analysées et sans métadonnées, certificat d'appareil au format Traefik (D-047, D-051 à D-054) | — | fait |
+
+Critère de sortie (reconstitué) :
+- [x] une réservation d'espace gardienné crée le besoin ; une séance annulée met la vacation « à revoir » et prévient le gardien ;
+- [x] une trame appliquée sur la saison n'affecte que des agents habilités, présents et dans les règles ; le forçage est motivé et tracé ;
+- [x] une absence libère les vacations non pointées et un remplaçant conforme est proposé ;
+- [x] compteurs du mois et export paie justes (prorata, nuit, dimanches et fériés, changement d'heure) ; iCal personnel révocable ; planning PDF ;
+- [x] un gardien se connecte, choisit son code, pointe en mode avion, rouvre l'application sans réseau et synchronise : la saisie est reçue une fois ;
+- [x] état des lieux de sortie avec photo et signature hors ligne, qui alimente la caution ; conflits conservés et signalés ;
+- [x] paquet sans montant ni pièce ni autre site ; données locales chiffrées ; planning effacé après 7 jours sans synchronisation ;
+- [x] e2e hors ligne et axe sans violation ; revues sécurité et métier traitées.
+
+**Lot 4 terminé le 2026-10-31.**
+
 ## Journal
 
 - 2026-10-31 — Démarrage. Cahier des charges absent (D-001), référentiel reconstitué.
@@ -97,3 +148,6 @@ Critère de sortie (reconstitué) :
 - 2026-10-31 — Lot 1 : 173 tests API, 28 tests front, 3 e2e lot 1 (axe sans violation) ; jeu de démonstration chargé (3 sites, 40 espaces, 63 créneaux annuels, locations) ; matrice lots 0–1 complète (49 exigences).
 - 2026-10-31 — Revues lot 1 : campagnes « tous sites » réservées à la ville entière, conditions RG-06 refusées par défaut avec constat manuel tracé, transitions de clôture et d'attribution contrôlées, grammaire RRULE bornée, fermetures et saisons closes contrôlées par l'API, historique des séances conservé, verrous recalculés quand la hiérarchie change, paramètres validés par schéma. 207 tests API (hors intégration), 28 tests front, 7 e2e.
 - 2026-10-31 — Revues lot 2 : élu invité à son tour, scan de l'usager contrôlé par un agent, avenant exigé quand le créneau change, modèles fusionnés en bac à sable strict, verrous TOTP et mot de passe, invitations sans énumération ni reprise de compte, signalements neutres sur le portail, archives RGPD (ADR 0006), garde-fous de recette, ClamAV et DocuSeal sans root.
+- 2026-10-31 — Lot 3 et revues : facturation depuis le devis, avoirs ligne à ligne, barème cohérent, lots Ciril annulables, cautions restituables après état des lieux, immuabilité renforcée en base, IBAN réservé à l'ordonnateur et contrôlé, neutralisation des formules dans les exports.
+- 2026-10-31 — Lot 4 : personnel (besoins, trames, règles, absences, compteurs, iCal, planning PDF), API mobile options A et B, PWA hors ligne chiffrée ; 14 tests mobile, parcours e2e en mode avion.
+- 2026-10-31 — Revues lot 4 : moteur de besoins (jour de rattachement, séances réalisées, vacations existantes), contrôles des trames et des horaires, compteurs au prorata et astreintes à part, saisies terrain bornées, cautions bloquées par des dégâts intermédiaires, appareils à autoriser, connexion sans oracle, code de déverrouillage local (PBKDF2 600 000), photos mobiles en quarantaine DMZ (option B). Types Node épinglés pour le typage des parcours e2e.

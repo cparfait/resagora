@@ -21,6 +21,7 @@ class Nature(StrEnum):
     WEBHOOK_DOCUSEAL = "webhook_docuseal"
     NOTIFICATION_PAYFIP = "notification_payfip"
     MOBILE = "mobile"
+    PHOTO_MOBILE = "photo_mobile"
 
 
 @dataclass(frozen=True)
@@ -125,10 +126,11 @@ ROUTES_MOBILE: list[Route] = [
     # Option B uniquement (SEC-10) : certificat d'appareil vérifié par le proxy DMZ, puis par l'API.
     r("POST", "/api/mobile/auth/connexion", Nature.MOBILE, debit="connexion"),
     r("POST", "/api/mobile/auth/totp", Nature.MOBILE, debit="connexion"),
+    r("POST", "/api/mobile/auth/deconnexion", Nature.MOBILE),
     r("GET", "/api/mobile/sante", Nature.MOBILE),
     r("GET", "/api/mobile/paquet", Nature.MOBILE),
     r("POST", "/api/mobile/saisies", Nature.MOBILE, debit="televersement"),
-    r("POST", "/api/mobile/photos", Nature.MOBILE, debit="televersement"),
+    r("POST", "/api/mobile/photos", Nature.PHOTO_MOBILE, debit="televersement"),
 ]
 
 DEBITS: dict[str, tuple[int, int]] = {

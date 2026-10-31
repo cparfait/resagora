@@ -47,7 +47,7 @@ class Configuration:
     payfip_sans_filtre_ip: bool = field(default_factory=lambda: os.environ.get("PAYFIP_SANS_FILTRE_IP", "0") == "1")
     mobile_option: str = field(default_factory=lambda: os.environ.get("MOBILE_OPTION", "A"))
     entete_certificat_appareil: str = field(
-        default_factory=lambda: os.environ.get("ENTETE_CERTIFICAT_APPAREIL", "X-Forwarded-Tls-Client-Cert-Info")
+        default_factory=lambda: os.environ.get("ENTETE_CERTIFICAT_APPAREIL", "X-Forwarded-Tls-Client-Cert")
     )
     nombre_proxies: int = field(default_factory=lambda: _entier("NOMBRE_PROXIES", 1))
     # Recette automatisée uniquement : multiplie les seuils de débit (SEC-06) ; 1 en production.

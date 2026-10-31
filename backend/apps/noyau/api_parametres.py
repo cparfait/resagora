@@ -15,7 +15,7 @@ from apps.habilitations.services import exiger
 
 from .exceptions import ErreurValidation
 from .models import Parametre
-from .parametres import DEFINITIONS, invalider, tous, valider_valeur
+from .parametres import DEFINITIONS, PARAMETRES_FINANCIERS, invalider, tous, valider_valeur
 
 
 class ParametreSerializer(serializers.Serializer):
@@ -32,7 +32,8 @@ class ModificationSerializer(serializers.Serializer):
 
 
 class VueParametres(APIView):
-    actions_requises = {"get": "lire_referentiel", "patch": "gerer_parametres"}
+    # PATCH : le service contrôle gerer_parametres ou, pour les paramètres financiers, gerer_tarifs.
+    actions_requises = {"get": "lire_referentiel", "patch": "lire_referentiel"}
 
     @extend_schema(responses=ParametreSerializer(many=True))
     def get(self, request: Request) -> Response:
@@ -54,9 +55,15 @@ class VueParametres(APIView):
     @extend_schema(request=ModificationSerializer, responses=ParametreSerializer(many=True))
     def patch(self, request: Request) -> Response:
         agent = agent_courant(request)
-        exiger(agent, "gerer_parametres", Parametre(cle="*"))
         donnees = ModificationSerializer(data=request.data)
         donnees.is_valid(raise_exception=True)
+        # Coordonnées bancaires du comptable et seuils financiers : réservés à l'ordonnateur (gerer_tarifs), jamais à
+        # l'administrateur fonctionnel (séparation des tâches, revue sécurité du lot 3, M5).
+        cles = set(donnees.validated_data["valeurs"])
+        if cles & PARAMETRES_FINANCIERS:
+            exiger(agent, "gerer_tarifs", Parametre(cle="*"))
+        if cles - PARAMETRES_FINANCIERS:
+            exiger(agent, "gerer_parametres", Parametre(cle="*"))
         erreurs = {}
         for cle, valeur in donnees.validated_data["valeurs"].items():
             message = valider_valeur(cle, valeur)
@@ -76,4 +83,17 @@ class VueParametres(APIView):
                     apres={"valeur": valeur},
                 )
         invalider()
+        financiers = sorted(cles & PARAMETRES_FINANCIERS)
+        if financiers:
+            from django.db import transaction as transaction_notif
+
+            from apps.communication.services import notifier
+            from apps.noyau.parametres import parametre
+
+            with transaction_notif.atomic():
+                notifier(
+                    "parametre_financier_modifie",
+                    {"agent": str(agent), "parametres": ", ".join(financiers)},
+                    courriels=[str(parametre("portail.service_courriel"))],
+                )
         return self.get(request)

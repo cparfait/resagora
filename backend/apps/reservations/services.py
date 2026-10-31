@@ -48,7 +48,7 @@ from .recurrence import PARIS, generer_plages, valider_regle
 journal = logging.getLogger(__name__)
 SYSTEME = "système"
 # Points d'extension des autres modules (finances : caution attendue, frais d'annulation tardive).
-CROCHETS: dict[str, list[Any]] = {"validation": [], "annulation_tardive": []}
+CROCHETS: dict[str, list[Any]] = {"validation": [], "annulation": [], "annulation_tardive": []}
 
 
 def declencher(evenement: str, objet: Any) -> None:
@@ -770,6 +770,7 @@ def _annuler_occurrence(
         acteur=acteur,
     )
     proposer_liste_attente(occurrence)
+    declencher("annulation", occurrence)
     if tardive:
         declencher("annulation_tardive", occurrence)
     if notifier_usager and not par_usager:

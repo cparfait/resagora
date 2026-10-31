@@ -86,6 +86,11 @@ ACTIONS_SENSIBLES = frozenset(
 )
 
 #: Couples d'actions qu'un même agent ne peut pas cumuler (séparation ordonnateur / comptable, ADR 0005).
+# Actes financiers : jamais portés par un rôle d'administration (ADR 0005).
+ACTIONS_FINANCIERES = frozenset(
+    {"gerer_tarifs", "emettre_facture", "emettre_avoir", "exporter_titres", "encaisser", "gerer_caution", "valider_retenue"}
+)
+
 INCOMPATIBILITES: list[tuple[str, str]] = [
     ("encaisser", "emettre_facture"),
     ("encaisser", "emettre_avoir"),

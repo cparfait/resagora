@@ -30,8 +30,8 @@ def grille_votee(
         "association": prix,
         "particulier": prix,
         "entreprise": prix * 2,
-        "ecole": 0,
-        "service_municipal": 0,
+        "ecole": prix // 2,
+        "service_municipal": prix // 2,
         "autre_collectivite": prix,
     }.items():
         Tarif.objects.create(

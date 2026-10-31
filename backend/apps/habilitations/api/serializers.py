@@ -4,11 +4,12 @@ from typing import Any
 
 from rest_framework import serializers
 
+from apps.noyau.exceptions import ErreurValidation
 from apps.referentiel.models import Site
 
-from ..actions import ACTIONS_SENSIBLES
+from ..actions import ACTIONS, ACTIONS_FINANCIERES, ACTIONS_SENSIBLES, INCOMPATIBILITES
 from ..models import GroupeAD, Habilitation, Perimetre, Role, Utilisateur
-from ..services import verifier_actions
+from ..services import verifier_actions, verifier_incompatibilites
 
 
 class ConnexionSerializer(serializers.Serializer):
@@ -73,9 +74,29 @@ class RoleSerializer(serializers.ModelSerializer):
 
     def validate(self, donnees: dict[str, Any]) -> dict[str, Any]:
         actions = set(donnees.get("actions", getattr(self.instance, "actions", [])))
-        exigee = donnees.get("double_authentification")
+        exigee = donnees.get("double_authentification", getattr(self.instance, "double_authentification", False))
         sensibles = sorted(actions & ACTIONS_SENSIBLES)
-        if sensibles and exigee is False:
+        # Séparation des tâches (ADR 0005) : un rôle ne réunit jamais deux actions incompatibles, et l'administration
+        # ne porte aucun acte financier ; les titulaires actuels sont contrôlés comme à l'attribution.
+        for premiere, seconde in INCOMPATIBILITES:
+            if premiere in actions and seconde in actions:
+                raise serializers.ValidationError(
+                    {"actions": f"Cumul interdit dans un même rôle : « {ACTIONS[premiere]} » et « {ACTIONS[seconde]} »."}
+                )
+        financieres = actions & ACTIONS_FINANCIERES
+        if "administrer" in actions and financieres:
+            raise serializers.ValidationError({"actions": "Un rôle d'administration ne porte aucun acte financier."})
+        if self.instance is not None:
+            provisoire = Role(code=self.instance.code, actions=sorted(actions))
+            for habilitation in self.instance.habilitations.select_related("utilisateur"):
+                try:
+                    verifier_incompatibilites(habilitation.utilisateur, provisoire, sauf=habilitation)
+                except ErreurValidation as erreur:
+                    raise serializers.ValidationError({"actions": f"{habilitation.utilisateur} : {erreur.message}"}) from erreur
+        if sensibles and self.instance is None and "double_authentification" not in donnees:
+            donnees["double_authentification"] = True
+            exigee = True
+        if sensibles and not exigee:
             raise serializers.ValidationError(
                 {
                     "double_authentification": "Ce rôle porte des actions sensibles ("

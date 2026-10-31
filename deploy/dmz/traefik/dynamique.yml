@@ -29,10 +29,10 @@ http:
     taille:
       buffering: { maxRequestBodyBytes: 12582912 }
     certificat-appareil:
+      # Option B (SEC-10) : le certificat client vérifié (RequireAndVerifyClientCert) est transmis entier, en PEM
+      # échappé (en-tête X-Forwarded-Tls-Client-Cert, réécrit par Traefik) ; l'API compare son empreinte SHA-256.
       passTLSClientCert:
-        info:
-          subject: { commonName: true, serialNumber: true }
-          notAfter: true
+        pem: true
 
   routers:
     portail:

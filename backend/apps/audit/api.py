@@ -70,10 +70,7 @@ class PerimetreVilleEntiere(BasePermission):
         return isinstance(utilisateur, Utilisateur) and sites_autorises(utilisateur, "lire_audit") is None
 
 
-def cellule_sure(valeur: object) -> str:
-    """Neutralise l'injection de formules dans les tableurs (=, +, -, @, tabulation, retour chariot)."""
-    texte = "" if valeur is None else str(valeur)
-    return "'" + texte if texte[:1] in ("=", "+", "-", "@", "\t", "\r") else texte
+from apps.noyau.tableur import cellule_sure  # noqa: E402 — partagé par tous les exports tableur
 
 
 class _Tampon:

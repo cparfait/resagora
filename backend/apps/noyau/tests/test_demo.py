@@ -37,5 +37,11 @@ def test_jeu_de_demonstration_complet_et_coherent(monkeypatch, modeles_documents
     assert GrilleTarifaire.objects.filter(statut="votee").count() == 1
     assert PieceComptable.objects.filter(nature="devis").exists() and PieceComptable.objects.filter(nature="facture").exists()
     assert Caution.objects.filter(reservation__espace__famille__code="salle-fetes", montant=50000).exists()
+    # Lot 4 : huit gardiens rattachables aux comptes de recette, vacations issues des trames, besoins, absence.
+    from apps.personnel.models import Absence, Agent, Besoin, Vacation
+
+    assert Agent.objects.filter(identifiant_ad__regex=r"^gardien0[1-8]$").count() == 8
+    assert Vacation.objects.filter(statut="planifiee").count() > 20 and Besoin.objects.exists()
+    assert Absence.objects.exists() and Vacation.objects.filter(statut="a_pourvoir").exists()
     with pytest.raises(CommandError):
         call_command("charger_demo")

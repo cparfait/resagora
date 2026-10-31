@@ -149,4 +149,16 @@ convenir avec l'éditeur et le service financier.
 | `caution.seuil_double_validation_centimes`, `caution.delai_restitution_jours` | Paramètres | Seuil au-delà duquel une retenue est validée par le service financier ; délai de restitution | Retenue au-delà du seuil : état « Retenue à valider » |
 | Modèles « devis », « facture », « avoir » | Documents → Modèles | Charte de la Ville (logo, mentions légales du comptable) | Générer un devis : PDF/A conforme |
 
-## 11. PayFiP, accès mobile — complétés aux lots concernés
+## 11. Application mobile des gardiens et planning du personnel — MOB-01 à MOB-08, PER-07, PER-08, SEC-10
+
+| Réglage | Où | À fournir | Comment tester |
+| --- | --- | --- | --- |
+| `MOBILE_OPTION` (`A` ou `B`) | `deploy/lan/.env` et `deploy/dmz/.env` | Choix de la DSI : A = application et API joignables par le VPN des smartphones (recommandé) ; B = par Internet via la DMZ, certificat d'appareil et double authentification obligatoires | Option A : depuis un smartphone connecté au VPN, ouvrir `https://gardiens.<domaine LAN>` et se connecter avec un compte du groupe « Gardiens » |
+| Nom `gardiens.<domaine>` et certificat | DNS interne (A) ou public (B), `deploy/*/secrets` | Entrée DNS et certificat serveur reconnu par les smartphones (autorité interne déployée par la MDM) | L'application s'installe (« Ajouter à l'écran d'accueil ») et s'ouvre en mode avion |
+| Certificats d'appareil (option B) | Autorité interne, profil MDM, Personnel → Appareils mobiles | Un certificat client par smartphone ; le PEM est collé dans la fiche de l'appareil (seule l'empreinte est conservée) | Sans certificat, la connexion est refusée ; un appareil retiré perd ses sessions immédiatement |
+| Groupe de l'annuaire « Gardiens » → rôle `gardien` | Administration → Groupes de l'annuaire | DN du groupe des gardiens | Le gardien se connecte ; sa fiche agent (champ « Identifiant de l'annuaire ») est rattachée à sa première connexion |
+| `mobile.horizon_jours`, `mobile.alerte_heures`, `mobile.purge_jours` | Paramètres (groupe Mobile) | Horizon du planning embarqué (14 j), alerte de fraîcheur (24 h), effacement sans synchronisation (7 j) | Bandeau « plus de 24 h » ; effacement après 7 jours |
+| Format de l'export paie | Personnel → Compteurs d'heures | Colonnes attendues par le logiciel de paie de la DRH (export livré : CSV point-virgule, heures décimales) | Exporter le mois et l'importer dans la paie en recette |
+| Abonnements iCal | Personnel → Agents → « Lien iCal » | Rien : l'adresse est servie par l'API de gestion, joignable du LAN et du VPN | Abonner un agenda au lien puis le révoquer : l'agenda ne se met plus à jour |
+
+## 12. PayFiP — complété au lot 7

@@ -19,8 +19,9 @@ export default defineConfig({
     timezoneId: "Europe/Paris",
     trace: "retain-on-failure",
     screenshot: "only-on-failure",
-    // Recette sur un poste : les noms publics du portail et de la signature pointent vers le proxy DMZ local.
-    launchOptions: { args: ["--host-resolver-rules=MAP equipements.chatillon.test 127.0.0.1, MAP signature.chatillon.test 127.0.0.1"] },
+    // Recette sur un poste : les noms publics pointent vers les proxys locaux ; l'autorité de recette n'étant pas installée,
+    // les erreurs de certificat sont ignorées par le navigateur lui-même (sinon le service worker du mobile est refusé).
+    launchOptions: { args: ["--host-resolver-rules=MAP equipements.chatillon.test 127.0.0.1, MAP signature.chatillon.test 127.0.0.1, MAP gardiens.chatillon.local 127.0.0.1", "--ignore-certificate-errors"] },
   },
   projects: [{ name: "chromium", use: { ...devices["Desktop Chrome"] } }],
 });

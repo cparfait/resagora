@@ -8,6 +8,7 @@ import io
 from datetime import date, timedelta
 from typing import Any
 
+from django.conf import settings
 from django.db import transaction
 from django.db.models import QuerySet
 from django.utils import timezone
@@ -18,6 +19,7 @@ from apps.habilitations.models import Utilisateur
 from apps.noyau.exceptions import ErreurMetier, ErreurValidation
 from apps.noyau.montants import euros
 from apps.noyau.parametres import parametre
+from apps.noyau.tableur import cellule_sure
 from apps.reservations.models import Occurrence, Reservation
 
 from .facturation import _controler
@@ -29,7 +31,8 @@ TRANSITIONS = {
     "recue": {"restituable", "retenue_a_valider", "retenue_partielle", "retenue_totale"},
     "restituable": {"restituee", "retenue_a_valider", "retenue_partielle", "retenue_totale"},
     "retenue_a_valider": {"retenue_partielle", "retenue_totale", "restituable"},
-    "retenue_partielle": {"encaissee"},
+    "retenue_partielle": {"solde_restitue"},
+    "solde_restitue": {"encaissee"},
     "retenue_totale": {"encaissee"},
     "restituee": set(),
     "encaissee": set(),
@@ -84,8 +87,25 @@ def recevoir(caution: Caution, *, acteur: Any, mode: str, reference: str, jour: 
         caution, "recue", "recue", acteur, montant=caution.montant, motif=f"{dict(Caution.MODES)[mode]} — {reference.strip()}"
     )
     caution.mode, caution.reference, caution.recue_le = mode, reference.strip()[:100], jour or timezone.localdate()
+    if _restituable(caution):
+        # Caution déposée après un état des lieux de sortie déjà conforme : elle est aussitôt restituable.
+        _mouvement(caution, "restituable", "restituable", acteur, motif="État des lieux de sortie déjà conforme")
     caution.save()
     return caution
+
+
+#: Un état des lieux de sortie se fait en fin de séance : 15 minutes d'avance au plus sur l'heure de fin (RG-11).
+AVANCE_SORTIE = timedelta(minutes=15)
+
+
+def degats_sur_la_reservation(caution: Caution) -> bool:
+    """Des dégâts relevés à la sortie d'une séance quelconque de la réservation bloquent la restitution (RG-11)."""
+    return EtatDesLieux.objects.filter(occurrence__reservation=caution.reservation, moment="sortie", constat="degats").exists()
+
+
+def _restituable(caution: Caution) -> bool:
+    etat = etat_de_sortie(caution)
+    return etat is not None and etat.constat == "conforme" and not degats_sur_la_reservation(caution)
 
 
 def etat_de_sortie(caution: Caution) -> EtatDesLieux | None:
@@ -106,9 +126,16 @@ def constater_sortie(
     source: str = "backoffice",
     constate_le: Any = None,
 ) -> EtatDesLieux:
-    """État des lieux de sortie : sans dégât, la caution devient restituable (RG-11)."""
-    if source == "backoffice":
-        _controler(acteur, "gerer_caution", occurrence)
+    """État des lieux de sortie, établi après la séance : sans dégât, la caution devient restituable (RG-11)."""
+    _controler(acteur, "gerer_caution" if source == "backoffice" else "utiliser_mobile", occurrence)
+    if occurrence.statut in {"annulee", "refusee"}:
+        raise ErreurMetier("Cette séance est annulée : pas d'état des lieux de sortie.", code="seance_annulee")
+    maintenant = timezone.now()
+    constate_le = constate_le or maintenant
+    if occurrence.fin > maintenant + timedelta(minutes=30) or constate_le < occurrence.fin - AVANCE_SORTIE:
+        raise ErreurMetier("L'état des lieux de sortie s'établit à la fin de la séance, pas avant.", code="seance_non_terminee")
+    if constate_le > maintenant + timedelta(minutes=5):
+        raise ErreurValidation("Heure du constat postérieure à sa saisie : vérifiez l'heure de l'appareil.", code="heure_future")
     if constat not in {"conforme", "degats"}:
         raise ErreurValidation("Constat inconnu.", code="constat_invalide")
     if constat == "degats" and len(observations.strip()) < 5:
@@ -121,7 +148,7 @@ def constater_sortie(
             "observations": observations.strip(),
             "agent": acteur if isinstance(acteur, Utilisateur) else None,
             "source": source,
-            "constate_le": constate_le or timezone.now(),
+            "constate_le": constate_le,
         },
     )
     if not cree:
@@ -130,9 +157,24 @@ def constater_sortie(
         etat.photos.set(photos)
     journaliser("etat_des_lieux_sortie", etat, apres={"constat": constat, "source": source}, acteur=acteur)
     for caution in Caution.objects.select_for_update().filter(reservation=occurrence.reservation, statut="recue"):
-        if constat == "conforme" and etat_de_sortie(caution) is not None:
+        if constat == "conforme" and _restituable(caution):
             _mouvement(caution, "restituable", "restituable", acteur, motif="État des lieux de sortie conforme")
             caution.save()
+    if constat == "degats":
+        # Le régisseur statue sur une retenue (CAU-04) : il est prévenu dès la réception du constat.
+        notifier(
+            "etat_des_lieux_degats",
+            {
+                "espace": occurrence.espace.nom,
+                "debut": timezone.localtime(occurrence.debut).strftime("%d/%m/%Y %H:%M"),
+                "usager": occurrence.reservation.dossier.usager.nom,
+                "dossier": occurrence.reservation.dossier.numero,
+                "observations": observations.strip()[:500],
+                "lien": f"{settings.BACKOFFICE_URL}/finances/cautions",
+            },
+            courriels=[str(parametre("portail.service_courriel"))],
+            objet=etat,
+        )
     return etat
 
 
@@ -141,10 +183,23 @@ def restituer(caution: Caution, *, acteur: Any, jour: date | None = None) -> Cau
     """CAU-03, RG-11 : restitution seulement après l'état des lieux de sortie, et s'il est conforme."""
     caution = Caution.objects.select_for_update().get(pk=caution.pk)
     _controler(acteur, "gerer_caution", caution)
+    if caution.statut == "retenue_partielle":
+        # CAU-02 : après une retenue partielle, le solde (montant moins la retenue) est restitué et tracé.
+        solde = caution.montant - caution.montant_retenu
+        _mouvement(caution, "solde_restitue", "solde_restitue", acteur, montant=solde, motif="Restitution du solde après retenue")
+        caution.restituee_le = jour or timezone.localdate()
+        caution.save()
+        notifier(
+            "caution_restituee",
+            {"caution": caution, "montant": euros(solde), "dossier": caution.dossier},
+            usager=caution.usager,
+            objet=caution,
+        )
+        return caution
     etat = etat_de_sortie(caution)
     if etat is None:
         raise ErreurMetier("La caution ne peut être restituée qu'après l'état des lieux de sortie.", code="etat_des_lieux_requis")
-    if etat.constat != "conforme" and caution.statut != "restituable":
+    if (etat.constat != "conforme" or degats_sur_la_reservation(caution)) and caution.statut != "restituable":
         raise ErreurMetier("Des dégâts ont été constatés : statuez d'abord sur une retenue.", code="degats_constates")
     _mouvement(caution, "restituee", "restituee", acteur, montant=caution.montant)
     caution.restituee_le = jour or timezone.localdate()
@@ -163,6 +218,8 @@ def proposer_retenue(caution: Caution, *, acteur: Any, montant: int, motif: str,
     """CAU-04 : motif, photos et montant ; au-delà du seuil, un second agent doit valider (CAU-05)."""
     caution = Caution.objects.select_for_update().get(pk=caution.pk)
     _controler(acteur, "proposer_retenue", caution)
+    if caution.statut not in {"recue", "restituable"}:
+        raise ErreurMetier("Une retenue se propose sur une caution reçue, avant toute décision.", code="transition_caution")
     if etat_de_sortie(caution) is None:
         raise ErreurMetier(
             "Une retenue se fonde sur l'état des lieux de sortie : établissez-le d'abord.", code="etat_des_lieux_requis"
@@ -180,7 +237,9 @@ def proposer_retenue(caution: Caution, *, acteur: Any, montant: int, motif: str,
     )
     caution.photos_retenue.set(photos)
     seuil = int(parametre("caution.seuil_double_validation_centimes"))
-    if montant > seuil:
+    # Après un refus du second agent, toute nouvelle proposition repasse par la validation, quel que soit le montant.
+    deja_refusee = caution.mouvements.filter(action="retenue_rejetee").exists()
+    if montant > seuil or deja_refusee:
         _mouvement(caution, "retenue_proposee", "retenue_a_valider", acteur, montant=montant, motif=motif)
         caution.save()
         return caution
@@ -227,7 +286,11 @@ def _appliquer_retenue(caution: Caution, acteur: Any) -> Caution:
 def encaisser_retenue(caution: Caution, *, acteur: Any, reference: str) -> Caution:
     caution = Caution.objects.select_for_update().get(pk=caution.pk)
     _controler(acteur, "gerer_caution", caution)
-    _mouvement(caution, "encaissee", "encaissee", acteur, montant=caution.montant_retenu, motif=reference)
+    if len(reference.strip()) < 3:
+        raise ErreurValidation("Indiquez la référence de l'encaissement (titre, chèque).", code="reference_requise")
+    if caution.statut == "retenue_partielle":
+        raise ErreurMetier("Restituez d'abord le solde de la caution, puis encaissez la retenue.", code="solde_a_restituer")
+    _mouvement(caution, "encaissee", "encaissee", acteur, montant=caution.montant_retenu, motif=reference.strip())
     caution.save()
     return caution
 
@@ -237,7 +300,9 @@ def en_alerte(jour: date | None = None) -> QuerySet[Caution]:
     jour = jour or timezone.localdate()
     limite = jour - timedelta(days=int(parametre("caution.delai_restitution_jours")))
     return (
-        Caution.objects.filter(statut__in=["recue", "restituable", "retenue_a_valider"], reservation__date_fin__lt=limite)
+        Caution.objects.filter(
+            statut__in=["recue", "restituable", "retenue_a_valider", "retenue_partielle"], reservation__date_fin__lt=limite
+        )
         .select_related("usager", "dossier", "reservation__espace")
         .order_by("reservation__date_fin")
     )
@@ -265,14 +330,14 @@ def etat_csv(cautions: QuerySet[Caution]) -> bytes:
     for c in cautions.select_related("dossier", "usager", "reservation__espace"):
         ecrivain.writerow(
             [
-                c.dossier.numero,
-                c.usager.nom,
-                c.reservation.espace.nom,
+                cellule_sure(c.dossier.numero),
+                cellule_sure(c.usager.nom),
+                cellule_sure(c.reservation.espace.nom),
                 f"{c.reservation.date_fin:%d/%m/%Y}",
                 euros(c.montant),
                 c.get_statut_display(),
                 c.get_mode_display() if c.mode else "",
-                c.reference,
+                cellule_sure(c.reference),
                 f"{c.recue_le:%d/%m/%Y}" if c.recue_le else "",
                 euros(c.montant_retenu) if c.montant_retenu else "",
                 f"{c.restituee_le:%d/%m/%Y}" if c.restituee_le else "",
@@ -283,7 +348,7 @@ def etat_csv(cautions: QuerySet[Caution]) -> bytes:
 
 def caution_manquante(reservation: Reservation) -> str | None:
     """RG-06 « caution reçue »."""
-    caution = Caution.objects.filter(reservation=reservation).first()
+    caution = Caution.objects.filter(reservation=reservation).first() or preparer(reservation)
     if caution is None:
         # Refus par défaut (D-021) : sans tarif de référence, le montant de la caution n'est pas connu.
         try:

@@ -17,6 +17,9 @@ from facade.sessions import MagasinMemoire
 ORIGINE = "https://equipements.chatillon.test"
 PDF = b"%PDF-1.7\n1 0 obj<<>>endobj\ntrailer<<>>\n%%EOF"
 PNG = b"\x89PNG\r\n\x1a\n" + b"\x00" * 32
+JPEG_MINIMAL = b"\xff\xd8\xff\xe0" + b"\x00" * 32 + b"\xff\xd9"
+# Certificat d'appareil tel que Traefik le transmet (passTLSClientCert pem) : base64 du DER, échappé, sans délimiteurs.
+CERTIFICAT_TRAEFIK = "MIIBszCCAVmgAwIBAgIUZm9vYmFy%2BZXhlbXBsZQ%3D%3D"
 EICAR = b"X5O!P%@AP[4\\PZX54(P^)7CC)7}$EICAR-STANDARD-ANTIVIRUS-TEST-FILE!$H+H*"
 
 
@@ -277,13 +280,37 @@ def test_sec10_option_b_exige_le_certificat_d_appareil(config, api):
     config.mobile_option = "B"
     c = client(config, api)
     assert c.get("/api/mobile/paquet").status_code == 403
+    # Format réel de Traefik (passTLSClientCert pem) : certificat DER en base64, échappé pour l'URL, sans délimiteurs.
     reponse = c.get(
         "/api/mobile/paquet",
-        headers={"X-Forwarded-Tls-Client-Cert-Info": 'Subject="CN=appareil-12"', "Authorization": "Appareil abc"},
+        headers={"X-Forwarded-Tls-Client-Cert": CERTIFICAT_TRAEFIK, "Authorization": "Appareil abc"},
     )
     assert reponse.status_code == 200
-    assert api.requetes[-1].headers["x-certificat-appareil"] == 'Subject="CN=appareil-12"'
+    assert api.requetes[-1].headers["x-certificat-appareil"] == CERTIFICAT_TRAEFIK
     assert api.requetes[-1].headers["authorization"] == "Appareil abc"
+    assert c.get("/api/mobile/paquet", headers={"X-Forwarded-Tls-Client-Cert-Info": 'Subject="CN=x"'}).status_code == 403
+
+
+def test_sec10_option_b_photo_mobile_en_quarantaine(config, api):
+    config.mobile_option = "B"
+    c = client(config, api)
+    entetes = {"X-Forwarded-Tls-Client-Cert": CERTIFICAT_TRAEFIK, "Authorization": "Appareil abc"}
+    reponse = c.post(
+        "/api/mobile/photos",
+        data={"uuid": "0b1d7b2e-62f4-4c0a-9a55-4d3bd3a6ac1e"},
+        files={"fichier": ("photo.jpg", JPEG_MINIMAL, "image/jpeg")},
+        headers=entetes,
+    )
+    assert reponse.status_code == 200
+    relayee = api.requetes[-1]
+    assert relayee.headers["x-fichier-controle"] == "clamav" and relayee.headers["x-certificat-appareil"] == CERTIFICAT_TRAEFIK
+    refus = c.post(
+        "/api/mobile/photos",
+        data={"uuid": "0b1d7b2e-62f4-4c0a-9a55-4d3bd3a6ac1e"},
+        files={"fichier": ("photo.jpg", b"MZ executable", "image/jpeg")},
+        headers=entetes,
+    )
+    assert refus.status_code == 422
 
 
 def test_sec01_api_injoignable_message_neutre(config):

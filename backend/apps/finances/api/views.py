@@ -95,7 +95,13 @@ class VueGrilles(VuePerimetre):
     @extend_schema(request=None, responses=GrilleSerializer)
     @action(detail=True, methods=["post"])
     def archiver(self, request: Request, pk: str | None = None) -> Response:
+        """Une grille ne s'archive qu'au terme de sa période (elle reste la référence des pièces de cette période)."""
         grille = self.get_object()
+        if grille.statut != "votee" or grille.fin is None or grille.fin >= timezone.localdate():
+            raise ErreurMetier(
+                "Seule une grille votée dont la période est achevée s'archive : fixez d'abord sa date de fin.",
+                code="grille_en_vigueur",
+            )
         with transaction.atomic():
             grille.statut = "archivee"
             grille.save(update_fields=["statut"])
@@ -168,6 +174,13 @@ class TarifSerializer(serializers.ModelSerializer):
             "caution_centimes",
         ]
 
+    def validate_prix_centimes(self, valeur: int) -> int:
+        if valeur < 1:
+            raise serializers.ValidationError(
+                "RG-05 : le tarif de référence n'est jamais nul ; une gratuité est une réduction de 100 %."
+            )
+        return valeur
+
     def validate(self, donnees: dict[str, Any]) -> dict[str, Any]:
         espace = donnees.get("espace", getattr(self.instance, "espace", None))
         famille = donnees.get("famille", getattr(self.instance, "famille", None))
@@ -218,6 +231,10 @@ class ReductionSerializer(serializers.ModelSerializer):
         read_only_fields = ["cree_le"]
 
     def validate(self, donnees: dict[str, Any]) -> dict[str, Any]:
+        if self.instance is not None and set(donnees) - {"fin"}:
+            raise serializers.ValidationError("Une réduction accordée ne se modifie plus : seule sa date de fin peut être fixée.")
+        if self.instance is not None:
+            return donnees
         tarification.verifier_reduction(
             donnees.get("taux", getattr(self.instance, "taux", 0)),
             donnees.get("fondement", getattr(self.instance, "fondement", "")),
@@ -265,6 +282,7 @@ class PieceSerializer(serializers.ModelSerializer):
     dossier_numero = serializers.CharField(source="dossier.numero", read_only=True)
     origine_numero = serializers.CharField(source="origine.numero", read_only=True, default="")
     reste_du = serializers.IntegerField(read_only=True)
+    montant_titre = serializers.IntegerField(read_only=True)
 
     class Meta:
         model = PieceComptable
@@ -288,7 +306,10 @@ class PieceSerializer(serializers.ModelSerializer):
             "total_du",
             "acompte_deduit",
             "montant_regle",
+            "montant_avoirs",
+            "montant_titre",
             "reste_du",
+            "reglement",
             "motif",
             "reference_virement",
             "titre_numero",
@@ -310,9 +331,14 @@ def _pieces_lisibles(request: Request, action_requise: str) -> QuerySet[PieceCom
     return qs if sites is None else qs.filter(dossier__reservations__espace__batiment__site__in=sites).distinct()
 
 
+class PrestationDemandeeSerializer(serializers.Serializer):
+    code = serializers.SlugField(max_length=40)
+    quantite = serializers.IntegerField(min_value=1, max_value=999, default=1)
+
+
 class DevisSerializer(serializers.Serializer):
     dossier = serializers.PrimaryKeyRelatedField(queryset=Dossier.objects.all())
-    prestations = serializers.ListField(child=serializers.DictField(), required=False, default=list, max_length=20)
+    prestations = PrestationDemandeeSerializer(many=True, required=False, default=list)
 
 
 class DossierSerializer(serializers.Serializer):
@@ -474,10 +500,10 @@ class LotTitresSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = LotTitres
-        fields = ["id", "numero", "format", "pieces", "total_centimes", "cree_le"]
+        fields = ["id", "numero", "format", "pieces", "total_centimes", "cree_le", "annule_le", "motif_annulation"]
 
     def get_pieces(self, lot: LotTitres) -> list[str]:
-        return sorted(p.numero or "" for p in lot.pieces.all())
+        return sorted(str(n) for n in lot.numeros) if lot.numeros else sorted(p.numero or "" for p in lot.pieces.all())
 
 
 class ExportSerializer(serializers.Serializer):
@@ -495,13 +521,30 @@ class VueLotsTitres(VuePerimetre):
         "ecriture": "exporter_titres",
         "a_titrer": "exporter_titres",
         "fichier": "exporter_titres",
+        "annuler": "exporter_titres",
     }
     http_method_names = ["get", "post", "head", "options"]
+
+    def initial(self, request: Request, *args: Any, **kwargs: Any) -> None:
+        super().initial(request, *args, **kwargs)
+        titres.exiger_ville_entiere(agent_courant(request), "exporter_titres")
 
     @extend_schema(responses=PieceSerializer(many=True))
     @action(detail=False, methods=["get"], url_path="a-titrer")
     def a_titrer(self, request: Request) -> Response:
         return Response(PieceSerializer(titres.a_titrer()[:1000], many=True).data)
+
+    @extend_schema(
+        request={"application/json": {"type": "object", "properties": {"motif": {"type": "string"}}}},
+        responses=LotTitresSerializer,
+    )
+    @action(detail=True, methods=["post"])
+    def annuler(self, request: Request, pk: str | None = None) -> Response:
+        """TAR-06 : lot rejeté par Ciril ; ses pièces redeviennent à exporter, le fichier reste consultable."""
+        motif = str(request.data.get("motif", "")) if isinstance(request.data, dict) else ""
+        return Response(
+            LotTitresSerializer(titres.annuler_lot(self.get_object(), acteur=agent_courant(request), motif=motif)).data
+        )
 
     @extend_schema(request=ExportSerializer, responses=LotTitresSerializer)
     def create(self, request: Request, *args: Any, **kwargs: Any) -> Response:
@@ -559,6 +602,7 @@ class CautionSerializer(serializers.ModelSerializer):
     mouvements = serializers.SerializerMethodField()
     derniere_seance = serializers.SerializerMethodField()
     etat_sortie = serializers.SerializerMethodField()
+    photos_retenue = serializers.SerializerMethodField()
 
     class Meta:
         model = Caution
@@ -582,8 +626,12 @@ class CautionSerializer(serializers.ModelSerializer):
             "mouvements",
             "derniere_seance",
             "etat_sortie",
+            "photos_retenue",
         ]
         read_only_fields = fields
+
+    def get_photos_retenue(self, caution: Caution) -> list[int]:
+        return [f.pk for f in caution.photos_retenue.all()]
 
     def get_derniere_seance(self, caution: Caution) -> int | None:
         derniere = caution.reservation.occurrences.exclude(statut__in=["annulee", "refusee"]).order_by("-debut").first()
@@ -625,6 +673,19 @@ class ValidationRetenueSerializer(serializers.Serializer):
     commentaire = serializers.CharField(max_length=500, required=False, allow_blank=True, default="")
 
 
+def enregistrer_photos(televerses: list[Any], agent: Any) -> list[Any]:
+    """Photos contrôlées (type réel, ClamAV) et débarrassées des métadonnées EXIF (géolocalisation)."""
+    return [
+        fichiers.enregistrer(
+            p.name or "photo.jpg",
+            fichiers.sans_metadonnees(p.read()),
+            types_autorises=("image/jpeg", "image/png"),
+            depose_par=str(agent),
+        )
+        for p in televerses
+    ]
+
+
 class VueCautions(VuePerimetre):
     queryset = Caution.objects.select_related("usager", "dossier", "reservation__espace").prefetch_related("mouvements")
     serializer_class = CautionSerializer
@@ -640,6 +701,7 @@ class VueCautions(VuePerimetre):
         "encaisser": "gerer_caution",
         "alertes": "lire_finances",
         "export": "lire_finances",
+        "photo": "lire_finances",
     }
     http_method_names = ["get", "post", "head", "options"]
     filterset_fields = ["statut", "dossier", "usager"]
@@ -675,14 +737,12 @@ class VueCautions(VuePerimetre):
         entree = RetenueSerializer(data=request.data)
         entree.is_valid(raise_exception=True)
         agent = agent_courant(request)
-        photos = [
-            fichiers.enregistrer(
-                p.name or "photo.jpg", p.read(), types_autorises=("image/jpeg", "image/png"), depose_par=str(agent)
-            )
-            for p in entree.validated_data["photos"]
-        ]
+        caution = self.get_object()  # contrôle d'objet avant tout enregistrement de fichier
+        if caution.statut not in {"recue", "restituable"}:
+            raise ErreurMetier("Une retenue se propose sur une caution reçue, avant toute décision.", code="transition_caution")
+        photos = enregistrer_photos(entree.validated_data["photos"], agent)
         caution = services_cautions.proposer_retenue(
-            self.get_object(),
+            caution,
             acteur=agent,
             montant=entree.validated_data["montant"],
             motif=entree.validated_data["motif"],
@@ -709,6 +769,17 @@ class VueCautions(VuePerimetre):
         return self._repondre(
             services_cautions.encaisser_retenue(self.get_object(), acteur=agent_courant(request), reference=reference)
         )
+
+    @extend_schema(responses={(200, "image/jpeg"): bytes})
+    @action(detail=True, methods=["get"], url_path=r"photos/(?P<photo>\d+)")
+    def photo(self, request: Request, pk: str | None = None, photo: str = "") -> FileResponse:
+        """CAU-05 : le second agent examine les photos de la retenue avant de statuer."""
+        caution = self.get_object()
+        fichier = caution.photos_retenue.filter(pk=int(photo)).first()
+        if fichier is None:
+            raise NotFound()
+        journaliser("consulter_photo_retenue", caution, apres={"photo": fichier.pk}, acteur=agent_courant(request))
+        return fichiers.reponse_telechargement(fichier, en_ligne=True)
 
     @extend_schema(responses=CautionSerializer(many=True))
     @action(detail=False, methods=["get"])
@@ -759,12 +830,8 @@ class VueEtatsDesLieux(VuePerimetre):
         entree.is_valid(raise_exception=True)
         agent = agent_courant(request)
         d = entree.validated_data
-        photos = [
-            fichiers.enregistrer(
-                p.name or "photo.jpg", p.read(), types_autorises=("image/jpeg", "image/png"), depose_par=str(agent)
-            )
-            for p in d["photos"]
-        ]
+        self._verifier_objet(d["occurrence"])  # contrôle d'objet avant tout enregistrement de fichier
+        photos = enregistrer_photos(d["photos"], agent)
         etat = services_cautions.constater_sortie(
             d["occurrence"], acteur=agent, constat=d["constat"], observations=d["observations"], photos=photos
         )

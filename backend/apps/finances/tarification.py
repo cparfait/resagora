@@ -39,6 +39,8 @@ class LigneCalculee:
     tarif: Tarif | None = None
     espace: Espace | None = None
     occurrence_id: int | None = None
+    seance_debut: datetime | None = None
+    seance_fin: datetime | None = None
 
 
 def categorie(usager: Usager) -> str:
@@ -49,7 +51,7 @@ def categorie(usager: Usager) -> str:
 
 def grille_en_vigueur(jour: date) -> GrilleTarifaire:
     grille = (
-        GrilleTarifaire.objects.filter(statut="votee", debut__lte=jour)
+        GrilleTarifaire.objects.filter(statut__in=["votee", "archivee"], debut__lte=jour)
         .filter(Q(fin__isnull=True) | Q(fin__gte=jour))
         .order_by("-debut")
         .first()

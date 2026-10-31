@@ -89,7 +89,7 @@ def enregistrer(
         formats = ", ".join(sorted({e.lstrip(".").upper() for t in types_autorises for e in TYPES[t][1]}))
         raise ErreurValidation(f"Format non accepté. Formats acceptés : {formats}.", code="format_refuse")
     empreinte = hashlib.sha256(contenu).hexdigest()
-    if controle_facade == "clamav" and empreinte_facade == empreinte:
+    if controle_facade == "clamav" and empreinte_facade == empreinte and getattr(settings, "CANAL", "") == "portail":
         controle = "clamav-dmz"
     else:
         try:
@@ -131,6 +131,67 @@ def enregistrer_genere(nom: str, contenu: bytes, type_mime: str, *, depose_par: 
         controle_antivirus="genere",
         depose_par=depose_par[:200],
     )
+
+
+def enregistrer_analyse(nom: str, contenu: bytes, type_mime: str, *, depose_par: str) -> Fichier:
+    """Fichier de données déposé par un agent (état d'encaissements…) : analysé par ClamAV avant d'être conservé."""
+    if not contenu:
+        raise ErreurValidation("Le fichier est vide.", code="fichier_vide")
+    if len(contenu) > TAILLE_MAX:
+        raise ErreurValidation(f"Le fichier dépasse {TAILLE_MAX // (1024 * 1024)} Mo.", code="fichier_trop_gros")
+    try:
+        signature = analyser_clamav(contenu)
+    except OSError as erreur:
+        raise ErreurValidation(
+            "Le contrôle antivirus est momentanément indisponible. Réessayez plus tard.", code="antivirus_indisponible"
+        ) from erreur
+    if signature:
+        raise ErreurValidation("Le fichier a été refusé par le contrôle antivirus.", code="fichier_infecte")
+    fichier = enregistrer_genere(nom, contenu, type_mime, depose_par=depose_par)
+    Fichier.objects.filter(pk=fichier.pk).update(controle_antivirus="clamav-lan")
+    fichier.controle_antivirus = "clamav-lan"
+    return fichier
+
+
+PNG_SIGNATURE = b"\x89PNG\r\n\x1a\n"
+#: Blocs PNG de texte et de métadonnées (auteur, logiciel, EXIF, date) retirés ; l'image elle-même est intacte.
+PNG_METADONNEES = {b"tEXt", b"iTXt", b"zTXt", b"eXIf", b"tIME"}
+
+
+def _png_sans_metadonnees(contenu: bytes) -> bytes:
+    sortie, position = bytearray(PNG_SIGNATURE), len(PNG_SIGNATURE)
+    while position + 12 <= len(contenu):
+        longueur = int.from_bytes(contenu[position : position + 4], "big")
+        type_bloc = contenu[position + 4 : position + 8]
+        fin = position + 12 + longueur
+        if fin > len(contenu):
+            break
+        if type_bloc not in PNG_METADONNEES:
+            sortie += contenu[position:fin]
+        position = fin
+        if type_bloc == b"IEND":
+            return bytes(sortie)
+    return bytes(sortie + contenu[position:])
+
+
+def sans_metadonnees(contenu: bytes) -> bytes:
+    """Retire les métadonnées (géolocalisation, appareil, auteur) d'une photo JPEG (EXIF, XMP) ou PNG (blocs de
+    texte, EXIF), sans réencodage."""
+    if contenu.startswith(PNG_SIGNATURE):
+        return _png_sans_metadonnees(contenu)
+    if not contenu.startswith(b"\xff\xd8"):
+        return contenu
+    sortie, position = bytearray(b"\xff\xd8"), 2
+    while position + 4 <= len(contenu) and contenu[position] == 0xFF:
+        marqueur = contenu[position + 1]
+        if marqueur == 0xDA:  # début des données d'image : le reste est recopié tel quel
+            break
+        longueur = int.from_bytes(contenu[position + 2 : position + 4], "big")
+        segment = contenu[position : position + 2 + longueur]
+        if marqueur != 0xE1:  # APP1 = EXIF / XMP
+            sortie += segment
+        position += 2 + longueur
+    return bytes(sortie + contenu[position:])
 
 
 def lire(fichier: Fichier) -> bytes:

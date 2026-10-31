@@ -12,4 +12,8 @@ routeur.register("reservations/campagnes", views.VueCampagnes, basename="campagn
 routeur.register("reservations/liste-attente", views.VueListeAttente, basename="liste-attente")
 routeur.register("reservations/vues", views.VueVuesEnregistrees, basename="vues-planning")
 
-urlpatterns = [path("reservations/planning", views.VuePlanning.as_view(), name="planning"), *routeur.urls]
+urlpatterns = [
+    path("reservations/planning", views.VuePlanning.as_view(), name="planning"),
+    path("reservations/planning.ics", views.VuePlanningIcal.as_view(), name="planning-ical"),
+    *routeur.urls,
+]

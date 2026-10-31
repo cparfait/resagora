@@ -10,4 +10,5 @@ from apps.noyau.views import sante
 urlpatterns = [
     path("sante", sante),
     path("api/portail/", include("apps.portail.urls")),
+    path("api/mobile/", include("apps.personnel.urls_mobile")),
 ]

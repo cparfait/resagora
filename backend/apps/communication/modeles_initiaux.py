@@ -369,3 +369,61 @@ SMS_COMPLEMENTS: dict[str, str] = {
     "occurrence_annulee": "Ville de Châtillon : séance du {{ date }} ({{ espace }}) annulée. Détails par courriel.",
     "priorite_municipale": "Ville de Châtillon : votre créneau du {{ date }} ({{ espace }}) est modifié. Détails par courriel.",
 }
+
+
+# Lot 4 — personnel et application mobile : (libellé, sujet, corps, texte SMS éventuel).
+MODELES_LOT4: dict[str, tuple[str, str, str, str]] = {
+    "vacation_affectee": (
+        "Vacation affectée (agent)",
+        "Nouvelle vacation : {{ site }} le {{ debut }}",
+        "Bonjour {{ agent }},\n\nUne vacation vous est affectée : {{ site }}, du {{ debut }} au {{ fin }}. Elle figure dans "
+        "l'application mobile à la prochaine synchronisation.",
+        "Ville de Châtillon : vacation {{ site }} le {{ debut }}.",
+    ),
+    "vacation_a_revoir": (
+        "Vacation à revoir (agent)",
+        "Votre vacation du {{ debut }} est modifiée",
+        "Bonjour {{ agent }},\n\nVotre vacation {{ site }} du {{ debut }} au {{ fin }} est à revoir : {{ motif }}.\n"
+        "Le planificateur vous confirmera la nouvelle organisation.",
+        "Ville de Châtillon : vacation {{ site }} du {{ debut }} à revoir.",
+    ),
+    "incident_signale": (
+        "Incident signalé (service)",
+        "Incident {{ gravite }} — {{ site }}",
+        "Incident « {{ nature }} » ({{ gravite }}) signalé sur {{ site }}{% if seance %}, séance {{ seance }}{% endif %}"
+        "{% if usager_nom %}, usager {{ usager_nom }}{% endif %} :\n\n{{ description }}\n\nSuivi : {{ lien }}",
+        "",
+    ),
+    "saisie_mobile_conflit": (
+        "Saisie mobile à vérifier (service)",
+        "Saisie de {{ agent }} à vérifier",
+        "Une saisie de l'application mobile ({{ type }}, {{ horodatage }}) de {{ agent }} est conservée mais à vérifier :\n"
+        "{{ message }}\n\nSaisies : {{ lien }}",
+        "",
+    ),
+}
+
+
+# Corrections du lot 3 (revues) : tout changement de paramètre financier est signalé au service.
+MODELES_CORRECTIONS_LOT3: dict[str, tuple[str, str, str, str]] = {
+    "parametre_financier_modifie": (
+        "Paramètre financier modifié (service)",
+        "Paramètre financier modifié : {{ parametres }}",
+        "Bonjour,\n\n{{ agent }} vient de modifier les paramètres financiers suivants : {{ parametres }}.\nLe détail "
+        "(valeurs avant et après) figure dans le journal d'audit. Si ce changement n'était pas prévu, prévenez la DSI.",
+        "",
+    ),
+}
+
+
+# Corrections du lot 4 (revues) : dégâts relevés par un gardien, à examiner par le régisseur.
+MODELES_CORRECTIONS_LOT4: dict[str, tuple[str, str, str, str]] = {
+    "etat_des_lieux_degats": (
+        "Dégâts constatés à la sortie (service)",
+        "Dégâts constatés — {{ espace }}, {{ debut }}",
+        "Bonjour,\n\nL'état des lieux de sortie de la séance du {{ debut }} ({{ espace }}, {{ usager }}, dossier {{ dossier }}) "
+        "relève des dégâts :\n{{ observations }}\n\nLa caution reste bloquée : statuez sur une retenue depuis le back-office : "
+        "{{ lien }}",
+        "",
+    ),
+}

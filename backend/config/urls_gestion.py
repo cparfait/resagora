@@ -20,6 +20,7 @@ gestion = [
     path("", include("apps.communication.api.urls")),
     path("", include("apps.documents.api.urls")),
     path("", include("apps.finances.api.urls")),
+    path("", include("apps.personnel.api.urls")),
     path("parametres", VueParametres.as_view(), name="parametres"),
     *routeur.urls,
 ]
@@ -27,5 +28,6 @@ gestion = [
 urlpatterns = [
     path("sante", sante),
     path("api/gestion/", include(gestion)),
+    path("api/mobile/", include("apps.personnel.urls_mobile")),
     path("api/schema/gestion", SpectacularAPIView.as_view(urlconf=[path("api/gestion/", include(gestion))]), name="schema"),
 ]

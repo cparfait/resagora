@@ -208,7 +208,9 @@ class Facade:
             return erreur(400, "requete_invalide", "La requête est invalide.")
         taille_annoncee = int(longueur)
         limite = (
-            self.config.taille_max_fichier + 1024 * 1024 if route.nature == Nature.TELEVERSEMENT else self.config.taille_max_json
+            self.config.taille_max_fichier + 1024 * 1024
+            if route.nature in (Nature.TELEVERSEMENT, Nature.PHOTO_MOBILE)
+            else self.config.taille_max_json
         )
         if taille_annoncee > limite:
             return erreur(413, "trop_volumineux", "Le contenu envoyé est trop volumineux.")
@@ -218,7 +220,9 @@ class Facade:
         if route.nature == Nature.NOTIFICATION_PAYFIP:
             return await self.relayer_notification_payfip(request, chemin, adresse)
         if route.nature == Nature.MOBILE:
-            return await self.relayer_mobile(request, chemin)
+            return await self.relayer_mobile(request, chemin, limite)
+        if route.nature == Nature.PHOTO_MOBILE:
+            return await self.relayer_photo_mobile(request, chemin)
 
         identifiant = self.lire_cookie(request, COOKIE_SESSION)
         session = self.sessions.lire(identifiant)
@@ -337,21 +341,59 @@ class Facade:
             return erreur(503, "indisponible", "Service indisponible.")
         return self.reponse_relayee(reponse_api)
 
-    async def relayer_mobile(self, request: Request, chemin: str) -> Response:
-        """Option B : le proxy DMZ a vérifié le certificat d'appareil ; on transmet son empreinte à l'API."""
+    def entetes_mobile(self, request: Request) -> dict[str, str] | None:
+        """Option B : le proxy DMZ a vérifié le certificat d'appareil et le transmet ; l'API compare son empreinte."""
         certificat = request.headers.get(self.config.entete_certificat_appareil.lower(), "")
         if not certificat:
-            return erreur(403, "certificat_appareil_requis", "Appareil non reconnu.")
+            return None
         entetes = self.entetes_api(request, None)
-        entetes["X-Certificat-Appareil"] = certificat[:2000]
+        entetes["X-Certificat-Appareil"] = certificat[:8000]
         autorisation = request.headers.get("authorization", "")
         if autorisation.startswith("Appareil "):
             entetes["Authorization"] = autorisation[:600]
+        return entetes
+
+    async def relayer_mobile(self, request: Request, chemin: str, limite: int) -> Response:
+        entetes = self.entetes_mobile(request)
+        if entetes is None:
+            return erreur(403, "certificat_appareil_requis", "Appareil non reconnu.")
         corps = await request.body()
+        if len(corps) > limite:
+            # Envoi fragmenté sans longueur annoncée : la limite s'applique au contenu réellement reçu.
+            return erreur(413, "trop_volumineux", "Le contenu envoyé est trop volumineux.")
         if corps:
             entetes["Content-Type"] = request.headers.get("content-type", "application/json")
         reponse_api = await self.appeler(
             request.method, chemin, params=list(request.query_params.multi_items()), content=corps or None, headers=entetes
+        )
+        if reponse_api is None:
+            return erreur(503, "indisponible", "Service indisponible.")
+        return self.reponse_relayee(reponse_api)
+
+    async def relayer_photo_mobile(self, request: Request, chemin: str) -> Response:
+        """Photo d'état des lieux ou d'incident (option B) : quarantaine DMZ, ClamAV et type réel, comme les pièces."""
+        entetes = self.entetes_mobile(request)
+        if entetes is None:
+            return erreur(403, "certificat_appareil_requis", "Appareil non reconnu.")
+        try:
+            formulaire = await request.form(max_files=1, max_fields=5)
+        except Exception:
+            return erreur(400, "formulaire_invalide", "Le formulaire envoyé est invalide.")
+        fichier = formulaire.get("fichier")
+        if fichier is None or isinstance(fichier, str):
+            await formulaire.close()
+            return erreur(400, "fichier_absent", "Aucun fichier n'a été joint.")
+        contenu = await fichier.read(self.config.taille_max_fichier + 1)
+        try:
+            controle = self.quarantaine.controler(fichier.filename or "photo.jpg", contenu)
+        except FichierRefuse as refus:
+            return erreur(422, refus.code, refus.message)
+        finally:
+            await formulaire.close()
+        donnees = {k: v for k, v in formulaire.items() if isinstance(v, str) and k == "uuid"}
+        entetes = {**entetes, "X-Empreinte-Sha256": controle.sha256, "X-Fichier-Controle": "clamav"}
+        reponse_api = await self.appeler(
+            "POST", chemin, data=donnees, files={"fichier": (controle.nom_origine, controle.contenu, controle.type_mime)}, headers=entetes
         )
         if reponse_api is None:
             return erreur(503, "indisponible", "Service indisponible.")

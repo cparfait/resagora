@@ -29,3 +29,5 @@ deploy/*/secrets/
 Thumbs.db
 .playwright/
 .patchs/
+# État local des parcours (clés TOTP de recette)
+e2e/.etat/
