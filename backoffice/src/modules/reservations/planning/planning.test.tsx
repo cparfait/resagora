@@ -27,7 +27,7 @@ const seance = (id: number, jour: number, h: number, statut = "validee"): Seance
 describe("PLA-01 vues du planning", () => {
   it("PLA-01 la vue semaine place les séances par jour avec un nom accessible", () => {
     render(<VueSemaine seances={[seance(1, 10, 18)]} debut={lundi} coloration="statut" onOuvrir={vi.fn()} />);
-    expect(screen.getByRole("button", { name: /Club 1, Gymnase, mardi 10 novembre de 18:00 à 20:00, Validée/ })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /^18:00–20:00 ?Club 1, Gymnase, mardi 10 novembre, Validée/ })).toBeInTheDocument();
   });
 
   it("PLA-01 la vue liste est l'alternative accessible", async () => {

@@ -380,9 +380,11 @@ export function EcranRessource<T extends Objet>(p: Proprietes<T>) {
 export function useOptions(cle: string, chemin: string, libelle: (o: Record<string, unknown>) => string, actif = true): Option[] {
   const requeteOptions = useQuery({
     queryKey: ["options", cle],
-    queryFn: () => requete<PageApi<Record<string, unknown>>>("GET", construireChemin(chemin, { taille: 500 })),
+    queryFn: () => requete<PageApi<Record<string, unknown>> | Record<string, unknown>[]>("GET", construireChemin(chemin, { taille: 500 })),
     staleTime: 5 * 60_000,
     enabled: actif,
   });
-  return (requeteOptions.data?.results ?? []).map((o) => ({ valeur: String(o.id), libelle: libelle(o) }));
+  const donnees = requeteOptions.data;
+  const objets = Array.isArray(donnees) ? donnees : (donnees?.results ?? []);
+  return objets.map((o) => ({ valeur: String(o.id), libelle: libelle(o) }));
 }

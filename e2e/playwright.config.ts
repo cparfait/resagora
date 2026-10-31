@@ -13,6 +13,7 @@ export default defineConfig({
   retries: process.env.CI ? 1 : 0,
   reporter: [["list"], ["html", { open: "never" }]],
   use: {
+    baseURL: process.env.BACKOFFICE_URL ?? "https://localhost",
     ignoreHTTPSErrors: true,
     locale: "fr-FR",
     timezoneId: "Europe/Paris",

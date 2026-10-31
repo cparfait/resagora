@@ -1,0 +1,9 @@
+{"source": "data.education.gouv.fr, jeu fr-en-calendrier-scolaire, académie de Versailles, zone C (extrait du 31/10/2026)",
+ "results": [
+  {"description": "Vacances de la Toussaint", "start_date": "2026-10-16T22:00:00+00:00", "end_date": "2026-11-01T23:00:00+00:00", "population": "-"},
+  {"description": "Vacances de Noël", "start_date": "2026-12-18T23:00:00+00:00", "end_date": "2027-01-03T23:00:00+00:00", "population": "-"},
+  {"description": "Vacances d'Hiver", "start_date": "2027-02-05T23:00:00+00:00", "end_date": "2027-02-21T23:00:00+00:00", "population": "-"},
+  {"description": "Vacances de Printemps", "start_date": "2027-04-02T22:00:00+00:00", "end_date": "2027-04-18T22:00:00+00:00", "population": "-"},
+  {"description": "Pont de l'Ascension", "start_date": "2027-05-06T22:00:00+00:00", "end_date": "2027-05-06T22:00:00+00:00", "population": "-"},
+  {"description": "Vacances d'Été", "start_date": "2027-07-02T22:00:00+00:00", "end_date": "2027-09-01T22:00:00+00:00", "population": "Élèves"}
+ ]}

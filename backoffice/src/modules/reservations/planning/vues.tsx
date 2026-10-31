@@ -37,8 +37,9 @@ function classeSeance(s: SeancePlanning, coloration: Coloration): string {
   return `seance ${couleur} motif-${motif}${s.signalement ? " seance--signalee" : ""}`;
 }
 
-function libelleSeance(s: SeancePlanning): string {
-  return `${s.usager}, ${s.espace_nom}, ${jourLong(s.debut)} de ${heure(s.debut)} à ${heure(s.fin)}, ${STATUTS[s.statut]?.libelle ?? s.statut}${s.signalement ? `, à traiter : ${s.signalement}` : ""}`;
+/** Complément lu par les lecteurs d'écran : le nom accessible commence par le texte visible (RGAA 7.1, WCAG 2.5.3). */
+function complementSeance(s: SeancePlanning): string {
+  return `, ${s.espace_nom}, ${jourLong(s.debut)}, ${STATUTS[s.statut]?.libelle ?? s.statut}${s.signalement ? `, à traiter : ${s.signalement}` : ""}`;
 }
 
 function Pastille({ seance, coloration, onOuvrir, style, glissable }: { seance: SeancePlanning; coloration: Coloration; onOuvrir: (s: SeancePlanning) => void; style?: CSSProperties; glissable: boolean }) {
@@ -47,11 +48,12 @@ function Pastille({ seance, coloration, onOuvrir, style, glissable }: { seance: 
     e.dataTransfer.effectAllowed = "move";
   };
   return (
-    <button type="button" className={classeSeance(seance, coloration)} style={style} draggable={glissable} onDragStart={glisser} onClick={() => onOuvrir(seance)} aria-label={libelleSeance(seance)}>
+    <button type="button" className={classeSeance(seance, coloration)} style={style} draggable={glissable} onDragStart={glisser} onClick={() => onOuvrir(seance)}>
       <span className="seance__heure">
         {heure(seance.debut)}–{heure(seance.fin)}
       </span>
       <span className="seance__titre">{seance.usager}</span>
+      <span className="visuellement-masque">{complementSeance(seance)}</span>
       {seance.signalement ? <span aria-hidden="true"> ⚠</span> : null}
     </button>
   );

@@ -152,14 +152,14 @@ export default function Planning() {
           ))}
         </div>
         <div className="navigation-periode">
-          <Bouton variante="secondaire" onClick={() => naviguer(-1)} aria-label="Période précédente">
-            ‹ Précédent
+          <Bouton variante="secondaire" onClick={() => naviguer(-1)}>
+            <span aria-hidden="true">‹ </span>Période précédente
           </Bouton>
           <Bouton variante="secondaire" onClick={() => setReference(new Date())}>
             Aujourd'hui
           </Bouton>
-          <Bouton variante="secondaire" onClick={() => naviguer(1)} aria-label="Période suivante">
-            Suivant ›
+          <Bouton variante="secondaire" onClick={() => naviguer(1)}>
+            Période suivante<span aria-hidden="true"> ›</span>
           </Bouton>
           <p className="periode-libelle" aria-live="polite">
             {libellePeriode}

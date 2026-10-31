@@ -115,6 +115,23 @@ def enregistrer(
     )
 
 
+def enregistrer_genere(nom: str, contenu: bytes, type_mime: str, *, depose_par: str = "application") -> Fichier:
+    """Stocke un fichier produit par l'application elle-même (PDF généré, jeu de démonstration) : pas d'analyse antivirale."""
+    relatif = f"{secrets.token_hex(2)}/{secrets.token_hex(16)}"
+    destination = Path(settings.MEDIA_ROOT) / relatif
+    destination.parent.mkdir(parents=True, exist_ok=True)
+    destination.write_bytes(contenu)
+    return Fichier.objects.create(
+        nom_origine=nom_sain(nom),
+        type_mime=type_mime,
+        taille=len(contenu),
+        sha256=hashlib.sha256(contenu).hexdigest(),
+        chemin=relatif,
+        controle_antivirus="genere",
+        depose_par=depose_par[:200],
+    )
+
+
 def lire(fichier: Fichier) -> bytes:
     contenu = (Path(settings.MEDIA_ROOT) / fichier.chemin).read_bytes()
     if hashlib.sha256(contenu).hexdigest() != fichier.sha256:
