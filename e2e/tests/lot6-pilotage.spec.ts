@@ -42,7 +42,8 @@ test("STA-01 STA-02 STA-03 DSH-04 VAL-01 VAL-05 IMP-04 @a11y les écrans de pilo
   await page.goto(`${BACKOFFICE}/pilotage/valorisation`);
   const synthese = page.getByRole("table", { name: /Synthèse \d{4}/ });
   await expect(synthese).toBeVisible();
-  await expect(synthese.getByText(/Convention obligatoire \(> 23/).first()).toBeVisible();
+  // Données de CityResa : associations valorisées, aucune au-delà du seuil de 23 000 € (alerte testée côté API).
+  await expect(synthese.getByRole("row").nth(1)).toBeVisible();
   await expect(page.getByText(/Les attestations s'éditent une fois l'exercice clôturé/)).toBeVisible();
   await page.goto(`${BACKOFFICE}/pilotage/editions`);
   await expect(page.getByRole("cell", { name: /Planning hebdomadaire/ }).first()).toBeVisible();

@@ -26,7 +26,7 @@ Couverture de l'API métier ≥ 80 % ; 100 % des règles RG-xx couvertes.
 ## Jeux de données
 
 - Fabriques `factory_boy` + Faker `fr_FR` ; **aucune donnée personnelle réelle**.
-- Jeu de recette réaliste : 3 sites, 15 espaces dont 1 gymnase divisible, 40 associations, 5 écoles, 10 particuliers, 8 gardiens, une saison complète avec vacances zone C.
+- Jeu de recette : les données d'exemple de CityResa (13 sites, 16 espaces, 41 associations du guide des sports aux contacts fictifs, 47 réservations — `backend/apps/noyau/demo/cityresa.json`), 8 gardiens, une saison complète avec vacances zone C.
 - Dates figées (`freezegun`) ; inclure les changements d'heure de mars et d'octobre.
 
 ## Scénarios transverses (cahier des charges §9.3)

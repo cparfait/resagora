@@ -13,7 +13,7 @@ from apps.noyau.demo import socle
 
 
 class Command(BaseCommand):
-    help = "Charge le jeu de démonstration (3 sites, 40 espaces, usagers fictifs, saison 2026-2027 et réservations)."
+    help = "Charge le jeu de démonstration : données d'exemple de CityResa (sites, espaces, usagers, réservations), saison 2026-2027."
 
     def add_arguments(self, parser: Any) -> None:
         parser.add_argument("--graine", type=int, default=92320, help="Graine du générateur (jeu reproductible).")

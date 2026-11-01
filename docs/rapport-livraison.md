@@ -110,14 +110,15 @@ docker compose -f deploy/lan/compose.yaml -f deploy/lan/compose.dev.yaml exec ap
 make test lint e2e a11y           # contrôles
 ```
 
-**Jeu de démonstration** : entièrement fictif, aucune donnée personnelle réelle, adresses en `.test` ou boîtes de service fictives.
-- 3 sites et 40 espaces, dont un gymnase divisible en tiers ;
-- saison 2026-2027 avec plus de 500 séances, campagne annuelle, locations ;
-- 40 associations, 5 écoles et 10 particuliers ;
-- grille tarifaire votée, devis, factures et caution ;
+**Jeu de démonstration** : les données d'exemple de l'application CityResa, pour comparer les deux applications
+avec les mêmes données (`backend/apps/noyau/demo/cityresa.json`, extrait par `outils/cityresa/extraire.mjs`) :
+- 13 sites et 16 espaces de la ville, avec leurs horaires, capacités, règlements et cautions ;
+- 46 usagers, dont les 41 associations du guide des sports, aux contacts fictifs (aucune personne réelle) ;
+- 47 réservations à tous les statuts, récurrences comprises, et la saison 2026-2027 ;
+- tarifs par espace (gratuités en réduction de 100 %), devis, factures et caution ;
 - 8 gardiens avec trames, vacations, besoins et une absence ;
-- catalogue de matériel, stocks, prêts, une panne et un contrôle dépassé ;
-- exercice de valorisation 2026 calculé, avec subventions en numéraire et alerte de convention ;
+- matériel et prêts de CityResa, un retour avec manquants et une panne ;
+- exercice de valorisation 2026 calculé, avec subventions en numéraire ;
 - envoi programmé d'un planning.
 
 **Comptes de recette** : annuaire OpenLDAP.

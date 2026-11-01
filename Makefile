@@ -44,7 +44,7 @@ down:
 	-$(COMPOSE_LAN) down
 	-$(COMPOSE_DEV) down
 
-demo: ## Jeu de données de démonstration anonyme (3 sites, 40 espaces, une saison complète)
+demo: ## Données de démonstration reprises de CityResa (13 sites, 16 espaces, 46 usagers, 47 réservations)
 	$(COMPOSE_LAN) exec -T api python manage.py charger_demo
 
 ## Tests ------------------------------------------------------------------------------------------

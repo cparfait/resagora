@@ -22,9 +22,9 @@ test("MAT-01 MAT-03 MAT-04 MAT-05 @a11y les écrans du matériel sont accessible
     await sansViolationAxe(page, `l'écran ${chemin}`);
   }
   await page.goto(`${BACKOFFICE}/materiel/controles`);
-  await expect(page.getByRole("heading", { name: /Contrôles dépassés \([1-9]/ })).toBeVisible();
+  await expect(page.getByRole("heading", { name: /Contrôles dépassés \(\d+/ })).toBeVisible();
   await page.goto(`${BACKOFFICE}/materiel/pannes`);
-  await expect(page.getByRole("cell", { name: /Sonorisation mobile/ }).first()).toBeVisible();
+  await expect(page.getByRole("cell", { name: /Sonorisation portable/ }).first()).toBeVisible();
 });
 
 test("MAT-02 R5-02 un prêt au-delà de la disponibilité est refusé depuis la fiche du dossier", async ({ page }) => {
@@ -42,8 +42,8 @@ test("MAT-02 R5-02 un prêt au-delà de la disponibilité est refusé depuis la 
     const dialogue = page.getByRole("dialog", { name: "Prêter du matériel" });
     await dialogue.getByLabel(/Réservation/).selectOption({ index: 1 });
     const liste = dialogue.getByLabel(/Matériel du site/);
-    await expect(liste.locator("option", { hasText: "Chaise coque" })).toHaveCount(1);
-    await liste.selectOption((await liste.locator("option", { hasText: "Chaise coque" }).getAttribute("value")) ?? "");
+    await expect(liste.locator("option", { hasText: "Chaises pliantes" })).toHaveCount(1);
+    await liste.selectOption((await liste.locator("option", { hasText: "Chaises pliantes" }).getAttribute("value")) ?? "");
     await dialogue.getByLabel(/Quantité/).fill(quantite);
     await dialogue.getByRole("button", { name: "Enregistrer le prêt" }).click();
   };
@@ -51,5 +51,5 @@ test("MAT-02 R5-02 un prêt au-delà de la disponibilité est refusé depuis la 
   await expect(page.getByText(/disponible\(s\) du .* 5000 demandé\(s\)/)).toBeVisible();
   await preter("3");
   await expect(page.getByText(/Prêt de matériel enregistré/)).toBeVisible();
-  await expect(section.getByRole("cell", { name: /3 × Chaise coque/ }).first()).toBeVisible();
+  await expect(section.getByRole("cell", { name: /3 × Chaises pliantes/ }).first()).toBeVisible();
 });
