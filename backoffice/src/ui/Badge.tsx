@@ -15,7 +15,7 @@ const TONS: Record<Ton, { icone: LucideIcon; classes: string }> = {
 export function Badge({ libelle, ton = "neutre" }: { libelle: string; ton?: Ton }) {
   const { icone: Icone, classes } = TONS[ton];
   return (
-    <span className={cn("inline-flex items-center gap-1.5 rounded-full border border-current px-2.5 py-0.5 text-sm font-semibold whitespace-nowrap", classes)}>
+    <span className={cn("inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-[0.8rem] font-semibold whitespace-nowrap", classes)}>
       <Icone aria-hidden="true" size={14} strokeWidth={1.8} />
       {libelle}
     </span>

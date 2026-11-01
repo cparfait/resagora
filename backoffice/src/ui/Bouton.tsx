@@ -11,16 +11,16 @@ interface Proprietes extends ButtonHTMLAttributes<HTMLButtonElement> {
   icone?: ReactNode;
 }
 
-/** Classes des boutons de la charte (DESIGN.md) : angles droits, 44 px de haut, un seul bouton principal par zone.
- * Exportées pour les liens qui ont l'apparence d'un bouton. */
+/** Classes des boutons (DESIGN.md, ergonomie Mariloo aux couleurs de la Ville) : pilules de 44 px, principal vert
+ * plein, secondaire blanc à contour fin, un seul bouton principal par zone. Exportées pour les liens-boutons. */
 export const CLASSES_BOUTON: Record<Variante, string> = {
-  principal: "border-2 border-vert bg-vert text-blanc hover:border-vert-fonce hover:bg-vert-fonce",
-  secondaire: "border-2 border-vert bg-carte text-vert hover:bg-info-fond hover:text-vert-fonce",
-  danger: "border-2 border-danger bg-danger text-blanc hover:underline",
-  lien: "min-h-0 border-0 bg-transparent px-1.5 py-1 font-medium text-vert underline underline-offset-2 hover:bg-info-fond hover:text-vert-fonce",
+  principal: "border border-vert bg-vert text-blanc hover:border-vert-fonce hover:bg-vert-fonce",
+  secondaire: "border border-contour-champ/40 bg-carte text-encre hover:border-vert hover:bg-vert-pale hover:text-vert-fonce",
+  danger: "border border-danger bg-danger text-blanc hover:underline",
+  lien: "min-h-0 rounded-md border-0 bg-transparent px-2 py-1 font-medium text-vert underline-offset-2 hover:bg-vert-pale hover:underline",
 };
 export const BASE_BOUTON =
-  "inline-flex min-h-11 cursor-pointer items-center justify-center gap-2 px-5 py-2 font-sans text-base font-semibold no-underline disabled:cursor-not-allowed disabled:opacity-60";
+  "inline-flex min-h-11 cursor-pointer items-center justify-center gap-2 rounded-full px-5 py-2 font-sans text-[0.95rem] font-semibold no-underline transition-colors disabled:cursor-not-allowed disabled:opacity-60";
 
 /** Texte d'un libellé fait de chaînes (les libellés composés d'éléments n'ont pas d'icône déduite). */
 export function texteDe(contenu: ReactNode): string | undefined {

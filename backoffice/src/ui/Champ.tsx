@@ -16,7 +16,7 @@ interface Commun {
 
 /** La classe « champ » reste un repère pour les mises en page de formulaires (filtres, lignes de formulaire). */
 const CONTENEUR = "champ mb-4 flex flex-col gap-1";
-const SAISIE = "min-h-11 w-full border border-contour-champ bg-carte px-3 py-2 font-sans text-base text-encre";
+const SAISIE = "min-h-11 w-full rounded-md border border-contour-champ/70 bg-carte px-3.5 py-2 font-sans text-base text-encre";
 const SAISIE_ERREUR = "border-2 border-danger";
 
 function useIdentifiants(erreur: Commun["erreur"], aide: Commun["aide"]) {
@@ -28,7 +28,7 @@ function useIdentifiants(erreur: Commun["erreur"], aide: Commun["aide"]) {
 
 function Libelle({ id, libelle, obligatoire }: { id: string; libelle: string; obligatoire?: boolean | undefined }) {
   return (
-    <label htmlFor={id} className="font-semibold">
+    <label htmlFor={id} className="text-petit font-semibold text-encre">
       {libelle}
       {obligatoire ? <span className="font-normal text-encre-douce"> (obligatoire)</span> : null}
     </label>

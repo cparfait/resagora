@@ -1,4 +1,4 @@
-/** En-tête d'écran : titre de document unique, un seul h1 suivi du filet anis de la charte, actions principales. */
+/** En-tête d'écran : titre de document unique, un seul h1 sobre (ergonomie Mariloo), actions principales à droite. */
 import { useEffect, type ReactNode } from "react";
 import { cn } from "./cn";
 
@@ -20,16 +20,12 @@ export function Page({
   }, [titre]);
   return (
     <section className={cn("page", className)} aria-labelledby="titre-page">
-      <header className="mb-6 flex flex-wrap items-start justify-between gap-4">
+      <header className="mb-5 flex flex-wrap items-end justify-between gap-4">
         <div>
-          <h1
-            id="titre-page"
-            tabIndex={-1}
-            className="m-0 text-h1 text-encre after:mt-2 after:block after:h-1 after:w-10 after:bg-anis after:content-[''] focus:outline-none"
-          >
+          <h1 id="titre-page" tabIndex={-1} className="m-0 text-[1.75rem] leading-tight font-semibold text-encre focus:outline-none">
             {titre}
           </h1>
-          {description ? <p className="mt-3 mb-0 max-w-[70ch] text-encre-douce">{description}</p> : null}
+          {description ? <p className="mt-1.5 mb-0 max-w-[75ch] text-petit text-encre-douce">{description}</p> : null}
         </div>
         {actions ? <div className="flex flex-wrap gap-2">{actions}</div> : null}
       </header>

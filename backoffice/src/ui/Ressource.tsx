@@ -256,15 +256,17 @@ export function EcranRessource<T extends Objet>(p: Proprietes<T>) {
         <>
           {p.actionsPage}
           {ecriture && p.champs ? (
-            <Bouton onClick={() => ouvrir((p.valeursInitiales ?? {}) as Partial<T>)} icone="+">
+            <Bouton onClick={() => ouvrir((p.valeursInitiales ?? {}) as Partial<T>)}>
               Ajouter {p.libelleObjet.toLowerCase()}
             </Bouton>
           ) : null}
         </>
       }
     >
+      <div className="rounded-lg bg-carte shadow-carte">
+      <div className="flex flex-wrap items-end justify-between gap-x-4 gap-y-2 border-b border-filet px-4 pt-3 pb-1">
       {p.filtres?.length ? (
-        <form className="filtres" role="search" aria-label={`Filtrer : ${p.titre}`} onSubmit={(e) => e.preventDefault()}>
+        <form className="filtres filtres--carte" role="search" aria-label={`Filtrer : ${p.titre}`} onSubmit={(e) => e.preventDefault()}>
           {p.filtres.map((f) =>
             f.options ? (
               <ChampSelection
@@ -294,16 +296,20 @@ export function EcranRessource<T extends Objet>(p: Proprietes<T>) {
         </form>
       ) : null}
 
+      {liste.data ? (
+        <p className="compteur compteur--pastille" aria-live="polite">
+          {total} {total > 1 ? "éléments" : "élément"}
+        </p>
+      ) : null}
+      </div>
       {liste.isPending ? (
         <Chargement />
       ) : liste.isError ? (
         <Erreur erreur={liste.error} reessayer={() => void liste.refetch()} />
       ) : (
         <>
-          <p className="compteur" aria-live="polite">
-            {total} {total > 1 ? "éléments" : "élément"}
-          </p>
           <Tableau
+            nu
             legende={p.titre}
             colonnes={p.colonnes}
             lignes={liste.data.results}
@@ -330,7 +336,7 @@ export function EcranRessource<T extends Objet>(p: Proprietes<T>) {
             }
           />
           {pages > 1 ? (
-            <nav className="pagination" aria-label="Pagination">
+            <nav className="pagination px-4 pb-4" aria-label="Pagination">
               <Bouton variante="secondaire" disabled={page <= 1} onClick={() => setPage(page - 1)}>
                 Page précédente
               </Bouton>
@@ -344,6 +350,7 @@ export function EcranRessource<T extends Objet>(p: Proprietes<T>) {
           ) : null}
         </>
       )}
+      </div>
 
       <Dialogue ouvert={edition !== null} titre={creation ? `Ajouter : ${p.libelleObjet.toLowerCase()}` : `Modifier : ${p.libelleObjet.toLowerCase()}`} onFermer={() => setEdition(null)} large>
         <form onSubmit={soumettre} noValidate>

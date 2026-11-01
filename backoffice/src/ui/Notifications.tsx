@@ -35,7 +35,7 @@ export function NotificationsProvider({ children }: { children: ReactNode }) {
         {messages.map((m) => (
           <div
             key={m.id}
-            className={`flex items-start gap-2 border border-l-[6px] border-filet bg-carte py-2 pr-1 pl-4 ${m.ton === "succes" ? "border-l-succes" : "border-l-danger"}`}
+            className={`flex items-start gap-2 rounded-lg border-l-[6px] bg-carte py-2 pr-1 pl-4 shadow-flottant ${m.ton === "succes" ? "border-l-succes" : "border-l-danger"}`}
           >
             {m.ton === "succes" ? (
               <Check aria-hidden="true" size={20} strokeWidth={1.8} className="mt-2.5 shrink-0 text-succes" />
@@ -45,7 +45,7 @@ export function NotificationsProvider({ children }: { children: ReactNode }) {
             <span className="flex-1 py-2">{m.texte}</span>
             <button
               type="button"
-              className="inline-flex size-11 shrink-0 cursor-pointer items-center justify-center border-0 bg-transparent text-encre hover:bg-fond"
+              className="inline-flex size-11 shrink-0 cursor-pointer items-center justify-center rounded-full border-0 bg-transparent text-encre hover:bg-fond"
               onClick={() => retirer(m.id)}
               aria-label="Masquer ce message"
             >

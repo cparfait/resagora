@@ -18,12 +18,14 @@ interface Proprietes<T> {
   cleLigne: (ligne: T) => string | number;
   actions?: (ligne: T) => ReactNode;
   messageVide?: string;
+  /** Sans cadre propre : le tableau est déjà dans une carte (listes génériques). */
+  nu?: boolean;
 }
 
-const TETE = "border-b border-filet bg-info-fond px-3 py-1.5 text-left align-bottom font-bold whitespace-nowrap text-vert-profond";
-const CELLULE = "border-b border-filet px-3 py-2 text-left align-top";
+const TETE = "border-b border-filet bg-carte px-4 py-2 text-left align-bottom text-[0.8rem] font-semibold whitespace-nowrap text-encre-douce";
+const CELLULE = "border-b border-filet px-4 py-3 text-left align-middle";
 
-export function Tableau<T>({ legende, colonnes, lignes, cleLigne, actions, messageVide = "Aucun élément." }: Proprietes<T>) {
+export function Tableau<T>({ legende, colonnes, lignes, cleLigne, actions, messageVide = "Aucun élément.", nu = false }: Proprietes<T>) {
   const [tri, setTri] = useState<{ cle: string; sens: "ascending" | "descending" } | null>(null);
   const triees = useMemo(() => {
     const colonne = colonnes.find((c) => c.cle === tri?.cle);
@@ -39,7 +41,7 @@ export function Tableau<T>({ legende, colonnes, lignes, cleLigne, actions, messa
 
   // relative : les textes masqués (sr-only, positionnés) restent dans la zone qui défile, pas dans la page.
   return (
-    <div className="relative overflow-x-auto border border-filet bg-carte">
+    <div className={nu ? "relative overflow-x-auto" : "relative overflow-x-auto rounded-lg bg-carte shadow-carte"}>
       <table className="w-full border-collapse text-petit">
         <caption className="sr-only">{legende}</caption>
         <thead>
@@ -55,7 +57,7 @@ export function Tableau<T>({ legende, colonnes, lignes, cleLigne, actions, messa
                 {c.valeurTri ? (
                   <button
                     type="button"
-                    className="inline-flex min-h-11 cursor-pointer items-center gap-1.5 border-0 bg-transparent p-0 font-sans text-petit font-bold text-vert-profond"
+                    className="inline-flex min-h-11 cursor-pointer items-center gap-1.5 border-0 bg-transparent p-0 font-sans text-[0.8rem] font-semibold text-encre-douce hover:text-vert"
                     onClick={() => setTri((t) => ({ cle: c.cle, sens: t?.cle === c.cle && t.sens === "ascending" ? "descending" : "ascending" }))}
                   >
                     {c.titre}

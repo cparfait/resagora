@@ -32,7 +32,7 @@ export function Dialogue({ ouvert, titre, onFermer, children, large = false }: P
   return (
     <dialog
       ref={reference}
-      className={cn("m-auto max-h-[90vh] border-0 bg-carte p-0 text-encre backdrop:bg-encre/60", large ? "w-[min(60rem,95vw)]" : "w-[min(36rem,95vw)]")}
+      className={cn("m-auto max-h-[90vh] rounded-2xl border-0 bg-carte p-0 text-encre shadow-flottant backdrop:bg-encre/50", large ? "w-[min(60rem,95vw)]" : "w-[min(36rem,95vw)]")}
       aria-labelledby={idTitre}
       onCancel={(evenement) => {
         evenement.preventDefault();
@@ -41,7 +41,7 @@ export function Dialogue({ ouvert, titre, onFermer, children, large = false }: P
     >
       {ouvert ? (
         <>
-          <div className="sticky top-0 flex items-center justify-between gap-4 border-b border-filet bg-carte px-6 py-3">
+          <div className="sticky top-0 flex items-center justify-between gap-4 border-b border-filet bg-carte px-6 py-4">
             <h2 id={idTitre} className="m-0 text-h3 text-encre">
               {titre}
             </h2>

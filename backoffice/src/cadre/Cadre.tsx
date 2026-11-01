@@ -3,7 +3,7 @@
  * traiter », section « Administration » repliable ; les écrans d'une rubrique sont proposés en onglets au-dessus de
  * la page. Charte (DESIGN.md) : en-tête blanc, élément actif en vert plein ; sur petit écran, bouton « Menu ». */
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { ChevronRight, LogOut, Menu, Plus, X } from "lucide-react";
+import { ChevronRight, Landmark, LogOut, Menu, Plus, X } from "lucide-react";
 import { Suspense, useEffect, useRef, useState } from "react";
 import { Link, Outlet, useLocation } from "react-router";
 import { requete } from "../api/http";
@@ -16,8 +16,19 @@ import { MODULES, type Module } from "./modules";
 import { ecransPermis, RUBRIQUES, rubriqueDe, rubriqueDuLien, type Rubrique } from "./navigation";
 
 const LIEN_MENU =
-  "flex min-h-11 items-center gap-3 px-3 py-1.5 text-petit leading-snug text-encre no-underline hover:bg-info-fond hover:text-vert-fonce";
-const LIEN_ACTIF = "bg-vert font-semibold text-blanc hover:bg-vert-fonce hover:text-blanc";
+  "flex min-h-11 items-center gap-3 rounded-lg px-3 py-1.5 text-petit leading-snug text-encre no-underline transition-colors hover:bg-fond hover:text-vert-fonce";
+// Élément actif façon Mariloo : aplat vert pâle, texte vert (7,1:1).
+const LIEN_ACTIF = "bg-vert-pale font-semibold text-vert hover:bg-vert-pale hover:text-vert";
+const TITRE_SECTION = "mx-3 mt-1 mb-2 text-[0.75rem] font-semibold tracking-[0.08em] text-encre-douce uppercase";
+
+function initiales(nom: string | undefined): string {
+  return (nom ?? "")
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((mot) => mot[0]?.toUpperCase() ?? "")
+    .join("");
+}
 
 function EntreeMenu({ rubrique, cible, active, nombre, onChoisir }: { rubrique: Rubrique; cible: Module; active: boolean; nombre: number; onChoisir: () => void }) {
   const Icone = rubrique.icone;
@@ -28,7 +39,7 @@ function EntreeMenu({ rubrique, cible, active, nombre, onChoisir }: { rubrique: 
         <span className="flex-1">{rubrique.libelle}</span>
         {nombre > 0 ? (
           <>
-            <span aria-hidden="true" className={cn("min-w-6 rounded-full px-1.5 text-center text-xs font-bold", active ? "bg-blanc text-vert" : "bg-anis text-encre")}>
+            <span aria-hidden="true" className="min-w-6 rounded-full bg-vert px-1.5 text-center text-xs leading-5 font-bold text-blanc">
               {nombre}
             </span>
             <span className="sr-only">, {nombre} à traiter</span>
@@ -44,16 +55,16 @@ function Onglets({ rubrique, ecrans, chemin }: { rubrique: Rubrique; ecrans: Mod
   if (ecrans.length < 2) return null;
   const actif = ecrans.find((m) => m.chemin === chemin) ?? ecrans.find((m) => rubrique.prefixes?.some((p) => chemin.startsWith(p) && m.chemin === p.replace(/\/$/, "")));
   return (
-    <nav aria-label={`Écrans de la rubrique ${rubrique.libelle}`} className="mb-4 border-b border-filet print:hidden">
-      <ul className="m-0 flex list-none flex-wrap gap-x-1 p-0">
+    <nav aria-label={`Écrans de la rubrique ${rubrique.libelle}`} className="mb-4 print:hidden">
+      <ul className="m-0 flex list-none flex-wrap gap-2 p-0">
         {ecrans.map((m) => (
           <li key={m.chemin}>
             <Link
               to={m.chemin}
               aria-current={m === actif ? "page" : undefined}
               className={cn(
-                "-mb-px inline-flex min-h-11 items-center border-b-4 border-transparent px-3 text-petit font-semibold text-encre no-underline hover:text-vert",
-                m === actif && "border-anis text-vert",
+                "inline-flex min-h-10 items-center rounded-full border border-filet bg-carte px-4 text-[0.9rem] font-medium text-encre no-underline transition-colors hover:border-vert hover:text-vert",
+                m === actif && "border-vert bg-vert-pale font-semibold text-vert",
               )}
             >
               {m.libelle}
@@ -115,7 +126,7 @@ export function Cadre() {
       >
         Aller au contenu
       </a>
-      <header className="sticky top-0 z-40 flex h-16 items-center justify-between gap-4 border-b border-filet bg-carte px-4 print:hidden lg:px-6">
+      <header className="sticky top-0 z-40 flex h-16 items-center justify-between gap-4 border-b border-filet bg-carte px-4 print:hidden lg:ml-[15rem] lg:justify-end lg:px-8">
         <div className="flex items-center gap-3">
           <button
             type="button"
@@ -125,11 +136,11 @@ export function Cadre() {
             onClick={() => setMenuOuvert((ouvert) => !ouvert)}
           >
             {menuOuvert ? <X aria-hidden="true" size={20} strokeWidth={1.8} /> : <Menu aria-hidden="true" size={20} strokeWidth={1.8} />}
-            Menu
+            <span className="sr-only sm:not-sr-only">Menu</span>
           </button>
-          <Link to="/" className="m-0 flex min-w-0 flex-col leading-tight no-underline">
-            <span className="text-surtitre font-semibold tracking-[0.12em] text-vert uppercase">Ville de Châtillon</span>
-            <span className="text-lg font-bold text-encre">Équipements</span>
+          <Link to="/" className="m-0 flex min-w-0 flex-col leading-tight no-underline lg:hidden">
+            <span className="text-[0.7rem] font-semibold tracking-[0.12em] text-vert uppercase">Ville de Châtillon</span>
+            <span className="text-base font-bold text-encre">Équipements</span>
           </Link>
         </div>
         <div className="flex items-center gap-3">
@@ -139,10 +150,20 @@ export function Cadre() {
               <span className="sr-only md:not-sr-only">Nouvelle demande</span>
             </Link>
           ) : null}
-          <span className="hidden text-petit text-encre-douce xl:inline">{moi?.nom_affiche}</span>
-          <button type="button" className={cn(BASE_BOUTON, CLASSES_BOUTON.secondaire, "px-3 sm:px-5")} onClick={() => void deconnecter()}>
+          <span className="hidden items-center gap-2 text-petit font-medium text-encre sm:inline-flex">
+            <span aria-hidden="true" className="inline-flex size-9 items-center justify-center rounded-full bg-vert-pale text-[0.8rem] font-bold text-vert">
+              {initiales(moi?.nom_affiche)}
+            </span>
+            <span className="hidden xl:inline">{moi?.nom_affiche}</span>
+          </span>
+          <button
+            type="button"
+            className="inline-flex size-11 cursor-pointer items-center justify-center rounded-full border border-filet bg-carte text-encre hover:border-vert hover:text-vert"
+            onClick={() => void deconnecter()}
+            title="Se déconnecter"
+          >
             <LogOut aria-hidden="true" size={18} strokeWidth={1.8} />
-            <span className="sr-only sm:not-sr-only">Se déconnecter</span>
+            <span className="sr-only">Se déconnecter</span>
           </button>
         </div>
       </header>
@@ -150,12 +171,21 @@ export function Cadre() {
         <nav
           id="navigation-principale"
           className={cn(
-            "border-b border-filet bg-carte px-3 py-4 print:hidden lg:sticky lg:top-16 lg:block lg:h-[calc(100dvh-4rem)] lg:overflow-y-auto lg:border-r lg:border-b-0",
+            "border-b border-filet bg-carte px-3 py-4 print:hidden lg:fixed lg:top-0 lg:left-0 lg:z-50 lg:block lg:h-dvh lg:w-[15rem] lg:overflow-y-auto lg:border-r lg:border-b-0",
             menuOuvert ? "block" : "hidden",
           )}
           aria-label="Navigation principale"
         >
-          <h2 className="mx-3 mt-1 mb-2 text-surtitre font-semibold tracking-[0.12em] text-vert uppercase">Général</h2>
+          <Link to="/" className="mx-3 mb-5 hidden items-center gap-3 border-b border-filet pb-4 no-underline lg:flex">
+            <span aria-hidden="true" className="inline-flex size-10 items-center justify-center rounded-lg bg-vert text-blanc">
+              <Landmark size={20} strokeWidth={1.8} />
+            </span>
+            <span className="flex flex-col leading-tight">
+              <span className="text-[0.7rem] font-semibold tracking-[0.12em] text-vert uppercase">Ville de Châtillon</span>
+              <span className="text-base font-bold text-encre">Équipements</span>
+            </span>
+          </Link>
+          <h2 className={TITRE_SECTION}>Général</h2>
           <ul className="m-0 list-none p-0">
             {generales.map(({ rubrique, cible }) => (
               <EntreeMenu
@@ -170,7 +200,7 @@ export function Cadre() {
           </ul>
           {administration.length ? (
             <details className="group mt-4" open={courante?.section === "administration" || undefined}>
-              <summary className="mx-0 flex min-h-11 cursor-pointer list-none items-center justify-between px-3 text-surtitre font-semibold tracking-[0.12em] text-vert uppercase hover:bg-info-fond [&::-webkit-details-marker]:hidden">
+              <summary className="mx-0 flex min-h-11 cursor-pointer list-none items-center justify-between rounded-lg px-3 text-[0.75rem] font-semibold tracking-[0.08em] text-encre-douce uppercase hover:bg-fond [&::-webkit-details-marker]:hidden">
                 Administration
                 <ChevronRight aria-hidden="true" size={16} strokeWidth={1.8} className="transition-transform group-open:rotate-90" />
               </summary>
@@ -182,7 +212,7 @@ export function Cadre() {
             </details>
           ) : null}
         </nav>
-        <main id="contenu" className="min-w-0 px-4 py-6 focus:outline-none lg:px-8" ref={principal} tabIndex={-1}>
+        <main id="contenu" className="min-w-0 px-4 py-6 focus:outline-none lg:col-start-2 lg:px-8" ref={principal} tabIndex={-1}>
           {courante ? <Onglets rubrique={courante} ecrans={ecransPermis(courante, MODULES, peut)} chemin={chemin} /> : null}
           <Suspense fallback={<Chargement libelle="Chargement de l'écran…" />}>
             <Outlet />

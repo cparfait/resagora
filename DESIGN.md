@@ -86,6 +86,27 @@ Le corps de texte ne descend jamais sous 16 px, **sauf à l'intérieur de la gri
 - **Pied de page** : bande vert profond, texte blanc, trois colonnes de liens (accessibilité, données personnelles,
   mentions légales).
 
+## Back-office : ergonomie inspirée de Mariloo (décision DSI du 01/11/2026)
+
+Le back-office reprend l'ergonomie et les formes de l'outil Mariloo, **aux couleurs de la Ville** (vert sapin, anis ;
+ni le rose ni le dégradé de Mariloo, marque d'un produit tiers). Elles remplacent, pour le back-office seulement, les
+angles droits et le « design plat » de la direction B ; le portail public garde sa présentation actuelle.
+
+- **Surfaces** : fond `#F6F7F5`, cartes blanches arrondies (16 px, `rounded-lg`), grands blocs 24 px ; deux ombres
+  douces seulement (`shadow-carte`, `shadow-flottant` pour les fenêtres et menus) ; toujours aucun dégradé.
+- **Boutons et filtres en pilule** (`rounded-full`) : principal vert plein, secondaire blanc à contour fin, boutons
+  d'action ronds (icône seule, avec `aria-label`).
+- **Champs** arrondis (12 px) ; recherche en pilule avec loupe.
+- **Menu** : élément actif sur fond vert pâle `#EEF4F0`, texte vert (7,1:1) ; pastilles de comptage.
+- **Listes** : carte titrée avec compteur de résultats, vignette (photo ou pictogramme) devant chaque espace ou usager,
+  filtres en pilules avec compteur (« Toutes / À traiter 2 / … »).
+- **Tableau de bord** : cartes chiffres-clés avec pastille d'icône teintée, graphiques sobres (barres, anneau) et leur
+  tableau de données en alternative.
+- **Planning par espace** : une ligne par espace (vignette, capacité), séances en cartes arrondies avec filet de
+  couleur, pastilles de statut et initiales de l'usager.
+- **Fiche réservation** : retour, numéro, statut en pastille ; actions principales en gros boutons ; échanges façon
+  messagerie ; sections repliables.
+
 ## Planning du back-office : sans défilement
 
 Exigence de la DSI : **la vue semaine du planning tient dans la fenêtre sans défilement vertical** (écran

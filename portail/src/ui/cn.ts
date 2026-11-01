@@ -6,6 +6,8 @@ import { extendTailwindMerge } from "tailwind-merge";
 const fusionner = extendTailwindMerge({
   extend: {
     theme: {
+      shadow: ["carte", "flottant"],
+      radius: ["sm", "md", "lg", "xl", "2xl"],
       text: ["h1", "h2", "h3", "surtitre", "chiffre", "corps", "petit"],
       color: [
         "blanc",
@@ -17,6 +19,7 @@ const fusionner = extendTailwindMerge({
         "vert-fonce",
         "vert-profond",
         "vert-clair",
+        "vert-pale",
         "anis",
         "anis-fonce",
         "anis-clair",

@@ -1,7 +1,9 @@
 /* Charte graphique de la Ville de Châtillon (DESIGN.md), commune au portail et au back-office.
    Jetons Tailwind v4 : la palette, les ombres et les flous par défaut de Tailwind sont retirés, si bien qu'une
    classe hors charte (bg-blue-500, shadow-lg, backdrop-blur…) ne produit aucun style. Contrastes vérifiés dans
-   DESIGN.md. Police Montserrat hébergée par l'application (CSP font-src 'self', aucun appel à Google). */
+   DESIGN.md. Police Montserrat hébergée par l'application (CSP font-src 'self', aucun appel à Google).
+   Back-office : ergonomie inspirée de Mariloo (rayons et deux ombres douces ci-dessous) ; le portail garde ses angles
+   droits tant qu'il n'utilise pas ces jetons. */
 
 @theme {
   --color-*: initial;
@@ -9,7 +11,7 @@
   --color-current: currentColor;
   --color-blanc: #ffffff;
 
-  --color-fond: #f7f7f7;
+  --color-fond: #f6f7f5;
   --color-carte: #ffffff;
   --color-encre: #111311;
   --color-encre-douce: #5a5a5a;
@@ -33,6 +35,7 @@
   --color-danger-fond: #fde8e6;
   --color-info: #1a5d36;
   --color-info-fond: #e8efe9;
+  --color-vert-pale: #eef4f0;
 
   --font-*: initial;
   --font-sans: "Montserrat Variable", Arial, Tahoma, sans-serif;
@@ -56,10 +59,18 @@
   --text-petit: 0.9375rem;
   --text-petit--line-height: 1.5;
 
-  /* Angles droits partout (charte de la Ville) ; seul rounded-full reste disponible, pour les pastilles. */
+  /* Rayons (back-office, ergonomie Mariloo) : champs 12 px, cartes 16 px, grands blocs 24 px ; pastilles et boutons
+     en pilule (rounded-full). */
   --radius-*: initial;
-  /* Design plat : ni ombre, ni flou. */
+  --radius-sm: 0.5rem;
+  --radius-md: 0.75rem;
+  --radius-lg: 1rem;
+  --radius-xl: 1.25rem;
+  --radius-2xl: 1.5rem;
+  /* Deux ombres douces seulement (cartes, éléments flottants) ; ni dégradé, ni flou. */
   --shadow-*: initial;
+  --shadow-carte: 0 1px 2px rgb(17 19 17 / 0.04), 0 4px 16px -6px rgb(17 19 17 / 0.08);
+  --shadow-flottant: 0 16px 40px -12px rgb(17 19 17 / 0.22);
   --inset-shadow-*: initial;
   --drop-shadow-*: initial;
   --text-shadow-*: initial;

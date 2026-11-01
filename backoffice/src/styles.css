@@ -216,3 +216,33 @@
 .barres li { display: grid; grid-template-columns: 9rem 1fr 5rem; align-items: center; gap: 0.5rem; margin: 0.2rem 0; }
 .barres__barre { height: 1rem; background: var(--color-vert); min-width: 1px; }
 
+
+/* ── Ergonomie Mariloo, aux couleurs de la Ville (DESIGN.md) : cartes arrondies à ombre douce, pilules, aplats pâles.
+   Ajuste les classes communes des écrans ci-dessus ; les composants de src/ui portent directement leurs classes. ── */
+.filtres { border: 0; border-radius: var(--radius-lg); box-shadow: var(--shadow-carte); padding: 0.75rem 1rem 0.25rem; }
+.filtres .champ { min-width: 11rem; margin-bottom: 0.5rem; }
+.filtres--carte { background: transparent; box-shadow: none; padding: 0; margin: 0; flex: 1 1 auto; }
+.compteur--pastille { align-self: center; margin: 0 0 0.5rem; padding: 0.15rem 0.75rem; border-radius: 9999px; background: var(--color-vert-pale); color: var(--color-vert); font-size: 0.8rem; font-weight: 600; white-space: nowrap; }
+.alerte { border-radius: var(--radius-md); border-left-width: 4px; }
+.bloc-prioritaire { border-radius: var(--radius-2xl); border-left: 0; background: var(--color-anis-clair); }
+.connexion__carte { border: 0; border-top: 0; border-radius: var(--radius-2xl); box-shadow: var(--shadow-flottant); }
+.code-reactivation { border-radius: var(--radius-lg); }
+.carte, .details--grille, .groupe, .indicateur { border: 0; border-radius: var(--radius-lg); box-shadow: var(--shadow-carte); }
+.raccourcis a { border-radius: 9999px; }
+.raccourcis a:hover { background: var(--color-vert-pale); }
+.compteur a { border: 0; border-left: 0; border-radius: var(--radius-lg); box-shadow: var(--shadow-carte); }
+.compteur a::before { content: ""; display: block; width: 2.25rem; height: 0.3rem; border-radius: 9999px; background: var(--color-vert); }
+.compteur--attention a::before { background: var(--color-attention); }
+.compteur--danger a::before { background: var(--color-danger); }
+.segments { border: 0; border-radius: 9999px; background: var(--color-carte); box-shadow: var(--shadow-carte); padding: 4px; }
+.segment { border-radius: 9999px; padding: 0 1rem; }
+.segment:not(.segment--actif):hover { background: var(--color-vert-pale); }
+.grille, .chronologie { border: 0; border-radius: var(--radius-lg); box-shadow: var(--shadow-carte); }
+.grille__entete, .chronologie__ligne--entete { background: var(--color-carte); color: var(--color-encre); border-bottom: 1px solid var(--color-filet); }
+.seance { border-radius: 6px; border: 0; border-left: 3px solid var(--color-vert); box-shadow: 0 1px 2px rgb(17 19 17 / 0.08); }
+.seance.statut-demande, .seance.statut-en_instruction, .seance.statut-option { border-left-color: var(--color-attention); }
+.seance.statut-refusee, .seance.statut-annulee { border-left-color: var(--color-danger); }
+.seance.motif-pointille { border-left-style: dashed; }
+.legende__pastille { border-radius: 4px; }
+.jauge, .jauge__remplissage, .barres__barre { border-radius: 9999px; }
+.tableau-conteneur { border: 0; border-radius: var(--radius-lg); box-shadow: var(--shadow-carte); }
