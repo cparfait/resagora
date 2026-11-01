@@ -22,11 +22,15 @@ test.describe("Lot 0 — socle", () => {
     await expect(page.getByRole("heading", { level: 1, name: /Bonjour/ })).toBeVisible();
     await expect(page.getByText("Gestionnaire des équipements")).toBeVisible();
     const navigation = page.getByRole("navigation", { name: "Navigation principale" });
-    await expect(navigation.getByRole("link", { name: "Espaces", exact: true })).toBeVisible();
+    await expect(navigation.getByRole("link", { name: "Sites et espaces", exact: true })).toBeVisible();
     await expect(navigation.getByRole("link", { name: "Journal d'audit" })).toHaveCount(0);
     await sansViolationAxe(page, "l'accueil du gestionnaire");
-    await navigation.getByRole("link", { name: "Sites", exact: true }).click();
+    await navigation.getByRole("link", { name: "Sites et espaces", exact: true }).click();
     await expect(page.getByRole("heading", { level: 1, name: "Sites" })).toBeVisible();
+    // Les écrans de la rubrique sont proposés en onglets (menu sur le modèle de CityResa).
+    const onglets = page.getByRole("navigation", { name: "Écrans de la rubrique Sites et espaces" });
+    await expect(onglets.getByRole("link", { name: "Sites", exact: true })).toHaveAttribute("aria-current", "page");
+    await expect(onglets.getByRole("link", { name: "Espaces", exact: true })).toBeVisible();
     await sansViolationAxe(page, "la liste des sites");
     const reponse = await page.request.get(`${BACKOFFICE}/api/gestion/audit/journal`);
     expect(reponse.status()).toBe(403);

@@ -74,7 +74,7 @@ describe("RG-14 droits dans l'interface", () => {
   it("RG-14 la navigation n'affiche que les écrans autorisés", async () => {
     simulerApi((_m, url) => (url.endsWith("/moi") ? { json: profil(["lire_referentiel"]) } : { json: { count: 0, results: [] } }));
     afficher(<Cadre />);
-    await waitFor(() => expect(screen.getByRole("link", { name: "Sites" })).toBeInTheDocument());
+    await waitFor(() => expect(screen.getByRole("link", { name: "Sites et espaces" })).toBeInTheDocument());
     expect(screen.queryByRole("link", { name: "Journal d'audit" })).not.toBeInTheDocument();
     expect(screen.queryByRole("link", { name: "Rôles" })).not.toBeInTheDocument();
     expect(screen.getByRole("link", { name: "Aller au contenu" })).toHaveAttribute("href", "#contenu");

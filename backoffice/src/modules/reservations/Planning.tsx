@@ -147,8 +147,9 @@ export default function Planning() {
   const optionsEspaces = espacesAffiches.map((e) => ({ valeur: String(e.id), libelle: `${e.site_nom} — ${e.nom}` }));
 
   return (
-    // Vues semaine et jour : la page occupe la hauteur de la fenêtre et la grille l'espace restant (sans défilement).
-    <Page titre="Planning" className={cn(pleineHauteur && "flex flex-col lg:h-[calc(100dvh-7rem)]")}>
+    // Vues semaine et jour : la page occupe la hauteur de la fenêtre (en-tête, onglets de la rubrique et marges déduits)
+    // et la grille l'espace restant (sans défilement).
+    <Page titre="Planning" className={cn(pleineHauteur && "flex flex-col lg:h-[calc(100dvh-11rem)]")}>
       <div className="barre-planning">
         <div className="segments" role="group" aria-label="Vue du planning">
           {MODES.map((m) => (

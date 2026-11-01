@@ -45,7 +45,9 @@ avantages en nature, statistiques et éditions.
 
 Trois applications pour trois publics :
 
-- **Back-office** des agents (réseau interne uniquement) : environ 65 écrans ;
+- **Back-office** des agents (réseau interne uniquement) : environ 65 écrans, rangés comme dans CityResa en une
+  douzaine de rubriques (avec pastilles « à traiter »), plus une section « Administration » repliable ; les écrans
+  d'une rubrique s'ouvrent par des onglets ;
 - **Portail public** des usagers (associations, écoles, entreprises, particuliers) ;
 - **Application mobile** des gardiens, utilisable sans réseau, accessible par VPN.
 
