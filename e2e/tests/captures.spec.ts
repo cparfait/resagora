@@ -31,6 +31,11 @@ async function capturer(page: Page, application: string, ecrans: string[][], bas
     for (const [ecran, chemin] of ecrans) {
       await page.goto(`${base}${chemin}`);
       await page.waitForLoadState("networkidle");
+      if (ecran === "planning") {
+        // Semaine de la Toussaint vide dans le jeu de démonstration : la suivante montre des séances.
+        await page.getByRole("button", { name: "Période suivante" }).click();
+        await page.getByRole("group", { name: /^Planning du/ }).waitFor();
+      }
       await page.screenshot({ path: resolve(DOSSIER, `${application}-${ecran}-${nom}.png`), fullPage: true });
       const { defilement, horizontal } = await page.evaluate(() => ({
         defilement: document.documentElement.scrollHeight - window.innerHeight,

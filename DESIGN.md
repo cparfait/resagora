@@ -27,6 +27,7 @@ Contrastes calculés (WCAG 2.x) pour chaque association autorisée.
 | Anis foncé | `#788300` | `--anis-fonce` | Filet ou trait épais uniquement (4,2:1 : insuffisant pour du texte courant) |
 | Anis clair | `#EBEBB3` | `--anis-clair` | Fond du **bloc prioritaire** unique de l'écran (texte encre 15,2:1, vert 6,4:1) |
 | Orange | `#FE872B` | `--orange` | Fond seulement, texte encre (7,8:1). Jamais en texte (2,4:1). Usage rare : mise en avant événementielle |
+| Orange clair | `#FFE0C7` | `--orange-clair` | Fond de séance du planning (option, particulier), texte encre |
 | Brun | `#5C300F` | `--brun` | Texte sur orange clair si besoin (11,1:1 sur carte) |
 | Filet | `#E4E4DE` | `--filet` | Séparateurs et contours de cartes (décoratifs, 1,3:1) |
 | Contour de champ | `#5A5A5A` | `--contour-champ` | Bordure des champs et cases (6,9:1, ≥ 3:1 exigé) |

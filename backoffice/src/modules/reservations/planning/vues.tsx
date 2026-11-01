@@ -28,10 +28,29 @@ interface Commun {
   onDeposer?: (deplacement: Deplacement) => void;
 }
 
+// Capacité horaire de référence de la vue multi-sites (taux d'occupation) : inchangée.
 const HEURE_MIN = 7;
 const HEURE_MAX = 24;
 const PAS_MINUTES = 15;
-const HAUTEUR_HEURE = 48;
+
+/** Plage horaire de la vue semaine : 8 h – 22 h, élargie aux séances affichées. La grille occupe la hauteur
+ * disponible de la fenêtre (planning sans défilement, DESIGN.md) : positions et hauteurs en pourcentage. */
+interface Plage {
+  min: number;
+  max: number;
+}
+
+export function plageHoraire(seances: SeancePlanning[]): Plage {
+  let min = 8;
+  let max = 22;
+  for (const s of seances) {
+    const debut = new Date(s.debut);
+    const fin = new Date(s.fin);
+    min = Math.min(min, Math.floor(minutesDuJour(debut) / 60));
+    max = Math.max(max, memeJour(debut, fin) ? Math.ceil(minutesDuJour(fin) / 60) : 24);
+  }
+  return { min: Math.max(0, min), max: Math.min(24, max) };
+}
 
 function classeSeance(s: SeancePlanning, coloration: Coloration): string {
   const motif = STATUTS[s.statut]?.motif ?? "plein";
@@ -76,48 +95,100 @@ function zoneDepot(onDeposer: Commun["onDeposer"], seances: SeancePlanning[], ca
   };
 }
 
-function instantDepuisPosition(jour: Date, e: DragEvent<HTMLDivElement>): Date {
+function instantDepuisPosition(jour: Date, plage: Plage, e: DragEvent<HTMLDivElement>): Date {
   const zone = e.currentTarget.getBoundingClientRect();
-  const minutes = Math.max(0, Math.round(((e.clientY - zone.top) / HAUTEUR_HEURE) * 60 / PAS_MINUTES) * PAS_MINUTES);
+  const portee = (plage.max - plage.min) * 60;
+  const minutes = Math.max(0, Math.round((((e.clientY - zone.top) / zone.height) * portee) / PAS_MINUTES) * PAS_MINUTES);
   const r = new Date(jour);
-  r.setHours(HEURE_MIN, 0, 0, 0);
+  r.setHours(plage.min, 0, 0, 0);
   r.setMinutes(r.getMinutes() + minutes);
   return r;
 }
 
-function Graduations() {
+function Graduations({ plage }: { plage: Plage }) {
   return (
     <div className="grille__heures" aria-hidden="true">
-      {Array.from({ length: HEURE_MAX - HEURE_MIN }, (_, i) => (
-        <div key={i} className="grille__heure" style={{ height: HAUTEUR_HEURE }}>
-          {HEURE_MIN + i} h
-        </div>
+      <div className="grille__heures-espace" />
+      <div className="grille__heures-liste">
+        {Array.from({ length: plage.max - plage.min }, (_, i) => (
+          <div key={i} className="grille__heure">
+            {plage.min + i} h
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function Lignes({ plage }: { plage: Plage }) {
+  return (
+    <div className="grille__lignes" aria-hidden="true">
+      {Array.from({ length: plage.max - plage.min }, (_, i) => (
+        <div key={i} />
       ))}
     </div>
   );
 }
 
-function positionVerticale(s: SeancePlanning): CSSProperties {
+/** Séances simultanées d'un même jour côte à côte : chaque groupe de séances qui se chevauchent est réparti en
+ * sous-colonnes (partition gloutonne), une séance isolée garde toute la largeur. */
+function couloirs(seances: SeancePlanning[]): Map<number, { rang: number; nombre: number }> {
+  const places = new Map<number, { rang: number; nombre: number }>();
+  let groupe: { id: number; rang: number }[] = [];
+  let fins: number[] = [];
+  let finGroupe = -Infinity;
+  const clore = () => {
+    for (const { id, rang } of groupe) places.set(id, { rang, nombre: Math.max(1, fins.length) });
+    groupe = [];
+    fins = [];
+  };
+  for (const s of seances.toSorted((a, b) => new Date(a.debut).getTime() - new Date(b.debut).getTime())) {
+    const debut = new Date(s.debut).getTime();
+    const fin = new Date(s.fin).getTime();
+    if (debut >= finGroupe) clore();
+    const libre = fins.findIndex((f) => f <= debut);
+    const rang = libre === -1 ? fins.length : libre;
+    fins[rang] = fin;
+    groupe.push({ id: s.id, rang });
+    finGroupe = groupe.length === 1 ? fin : Math.max(finGroupe, fin);
+  }
+  clore();
+  return places;
+}
+
+function positionVerticale(s: SeancePlanning, plage: Plage, rang = 0, nombre = 1): CSSProperties {
   const debut = new Date(s.debut);
   const fin = new Date(s.fin);
-  const haut = ((minutesDuJour(debut) - HEURE_MIN * 60) / 60) * HAUTEUR_HEURE;
+  const portee = (plage.max - plage.min) * 60;
+  const haut = ((minutesDuJour(debut) - plage.min * 60) / portee) * 100;
   const duree = Math.max(PAS_MINUTES, (fin.getTime() - debut.getTime()) / 60000);
-  return { top: Math.max(0, haut), height: Math.max(18, (duree / 60) * HAUTEUR_HEURE - 2) };
+  return {
+    top: `${Math.max(0, haut)}%`,
+    height: `${(duree / portee) * 100}%`,
+    left: `calc(${(100 * rang) / nombre}% + 1px)`,
+    width: `calc(${100 / nombre}% - 2px)`,
+    right: "auto",
+  };
 }
 
 export function VueSemaine({ seances, debut, coloration, onOuvrir, onDeposer, jours = 7 }: Commun & { jours?: number }) {
   const colonnes = Array.from({ length: jours }, (_, i) => ajouterJours(debut, i));
+  const plage = plageHoraire(seances);
   return (
-    <div className="grille" role="group" aria-label={`Planning du ${jourLong(colonnes[0] ?? debut)}${jours > 1 ? ` au ${jourLong(colonnes[colonnes.length - 1] ?? debut)}` : ""}`}>
-      <Graduations />
+    // Zone qui peut défiler horizontalement sur petit écran : focalisable pour défiler au clavier (WCAG 2.1.1).
+    // oxlint-disable-next-line jsx-a11y/no-noninteractive-tabindex
+    <div className="grille" role="group" tabIndex={0} aria-label={`Planning du ${jourLong(colonnes[0] ?? debut)}${jours > 1 ? ` au ${jourLong(colonnes[colonnes.length - 1] ?? debut)}` : ""}`}>
+      <Graduations plage={plage} />
       {colonnes.map((jour) => {
         const duJour = seances.filter((s) => memeJour(new Date(s.debut), jour));
+        const places = couloirs(duJour);
         return (
           <div key={isoJour(jour)} className="grille__colonne">
             <div className="grille__entete">{jourCourt(jour)}</div>
-            <div className="grille__corps" style={{ height: (HEURE_MAX - HEURE_MIN) * HAUTEUR_HEURE }} {...zoneDepot(onDeposer, seances, (e) => ({ debut: instantDepuisPosition(jour, e) }))}>
+            <div className="grille__corps" {...zoneDepot(onDeposer, seances, (e) => ({ debut: instantDepuisPosition(jour, plage, e) }))}>
+              <Lignes plage={plage} />
               {duJour.map((s) => (
-                <Pastille key={s.id} seance={s} coloration={coloration} onOuvrir={onOuvrir} style={positionVerticale(s)} glissable={Boolean(onDeposer)} />
+                <Pastille key={s.id} seance={s} coloration={coloration} onOuvrir={onOuvrir} style={positionVerticale(s, plage, places.get(s.id)?.rang, places.get(s.id)?.nombre)} glissable={Boolean(onDeposer)} />
               ))}
             </div>
           </div>
@@ -293,7 +364,7 @@ export function VueListe({ seances, onOuvrir }: Pick<Commun, "seances" | "onOuvr
         <tbody>
           {seances.length === 0 ? (
             <tr>
-              <td colSpan={7} className="tableau__vide">
+              <td colSpan={7} className="p-8 text-center text-encre-douce">
                 Aucune séance sur cette période.
               </td>
             </tr>

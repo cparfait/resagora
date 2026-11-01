@@ -1,5 +1,6 @@
 /** Planning des équipements (PLA-01, PLA-02, PLA-03) : six vues, filtres, coloration, vues enregistrées. */
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { ChevronLeft, ChevronRight, SlidersHorizontal } from "lucide-react";
 import { useMemo, useState } from "react";
 import { Link } from "react-router";
 import { construireChemin, ErreurApi, requete, type Page as PageApi } from "../../api/http";
@@ -7,6 +8,7 @@ import type { Controle, Espace, SeancePlanning, Site, VueEnregistree } from "../
 import { useSession } from "../../auth/session";
 import { Badge } from "../../ui/Badge";
 import { Bouton } from "../../ui/Bouton";
+import { cn } from "../../ui/cn";
 import { CaseACocher, ChampSelection, ChampTexte } from "../../ui/Champ";
 import { Dialogue } from "../../ui/Dialogue";
 import { Chargement, Erreur } from "../../ui/Etats";
@@ -61,6 +63,7 @@ export default function Planning() {
   const [coloration, setColoration] = useState<Coloration>("statut");
   const [filtres, setFiltres] = useState<Filtres>(FILTRES_VIDES);
   const [voirAnnulees, setVoirAnnulees] = useState(false);
+  const [filtresOuverts, setFiltresOuverts] = useState(false);
   const [ouverte, setOuverte] = useState<SeancePlanning | null>(null);
   const [proposition, setProposition] = useState<{ deplacement: Deplacement; controle: Controle } | null>(null);
   const [deplacementClavier, setDeplacementClavier] = useState<{ espace: string; debut: string; fin: string } | null>(null);
@@ -136,13 +139,16 @@ export default function Planning() {
 
   const naviguer = (sens: -1 | 1) => setReference((r) => ajouterJours(r, sens * (mode === "mois" ? 30 : mode === "jour" ? 1 : 7)));
   const glisserAutorise = peut("valider_reservation") && mode !== "liste" && mode !== "mois" && mode !== "multi_sites";
+  const pleineHauteur = mode === "semaine" || mode === "jour";
+  const filtresActifs = Object.values(filtres).filter(Boolean).length + (coloration === "statut" ? 0 : 1) + (voirAnnulees ? 1 : 0);
   const libellePeriode = mode === "jour" ? jourLong(debut) : mode === "mois" ? new Intl.DateTimeFormat("fr-FR", { month: "long", year: "numeric" }).format(reference) : `Semaine du ${jourLong(debut)}`;
 
   const optionsSites = (sites.data?.results ?? []).map((s) => ({ valeur: String(s.id), libelle: s.nom }));
   const optionsEspaces = espacesAffiches.map((e) => ({ valeur: String(e.id), libelle: `${e.site_nom} — ${e.nom}` }));
 
   return (
-    <Page titre="Planning" description="Les séances validées et confirmées bloquent le créneau ; les demandes et options apparaissent hachurées.">
+    // Vues semaine et jour : la page occupe la hauteur de la fenêtre et la grille l'espace restant (sans défilement).
+    <Page titre="Planning" className={cn(pleineHauteur && "flex flex-col lg:h-[calc(100dvh-7rem)]")}>
       <div className="barre-planning">
         <div className="segments" role="group" aria-label="Vue du planning">
           {MODES.map((m) => (
@@ -152,22 +158,31 @@ export default function Planning() {
           ))}
         </div>
         <div className="navigation-periode">
-          <Bouton variante="secondaire" onClick={() => naviguer(-1)}>
-            <span aria-hidden="true">‹ </span>Période précédente
+          <Bouton variante="secondaire" className="px-0 size-11" onClick={() => naviguer(-1)} aria-label="Période précédente" title="Période précédente">
+            <ChevronLeft aria-hidden="true" size={20} strokeWidth={1.8} />
           </Bouton>
           <Bouton variante="secondaire" onClick={() => setReference(new Date())}>
             Aujourd'hui
           </Bouton>
-          <Bouton variante="secondaire" onClick={() => naviguer(1)}>
-            Période suivante<span aria-hidden="true"> ›</span>
+          <Bouton variante="secondaire" className="px-0 size-11" onClick={() => naviguer(1)} aria-label="Période suivante" title="Période suivante">
+            <ChevronRight aria-hidden="true" size={20} strokeWidth={1.8} />
           </Bouton>
           <p className="periode-libelle" aria-live="polite">
             {libellePeriode}
           </p>
         </div>
+        <Bouton
+          variante={filtresOuverts ? "principal" : "secondaire"}
+          aria-expanded={filtresOuverts}
+          aria-controls="filtres-planning"
+          onClick={() => setFiltresOuverts((ouverts) => !ouverts)}
+          icone={<SlidersHorizontal size={18} strokeWidth={1.8} />}
+        >
+          Filtres{filtresActifs ? ` (${filtresActifs} actif${filtresActifs > 1 ? "s" : ""})` : ""}
+        </Bouton>
       </div>
 
-      <form className="filtres" role="search" aria-label="Filtrer le planning" onSubmit={(e) => e.preventDefault()}>
+      <form id="filtres-planning" hidden={!filtresOuverts} className="filtres" role="search" aria-label="Filtrer le planning" onSubmit={(e) => e.preventDefault()}>
         <ChampSelection libelle="Site" videLibelle="Tous les sites" options={optionsSites} value={filtres.site} onChange={(e) => setFiltres({ ...filtres, site: e.target.value, espace: "" })} />
         <ChampSelection libelle="Famille" videLibelle="Toutes" options={familles} value={filtres.famille} onChange={(e) => setFiltres({ ...filtres, famille: e.target.value })} />
         <ChampSelection libelle="Espace" videLibelle="Tous" options={optionsEspaces} value={filtres.espace} onChange={(e) => setFiltres({ ...filtres, espace: e.target.value })} />
@@ -187,7 +202,10 @@ export default function Planning() {
         </Bouton>
       </form>
 
-      <Legende coloration={coloration} />
+      <div className="planning__aide">
+        <Legende coloration={coloration} />
+        <p className="m-0">Les séances validées et confirmées bloquent le créneau ; les demandes et options apparaissent hachurées.</p>
+      </div>
 
       {seances.isPending || espaces.isPending ? (
         <Chargement libelle="Chargement du planning…" />

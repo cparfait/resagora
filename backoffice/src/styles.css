@@ -55,7 +55,8 @@
 .formulaire__actions { display: flex; justify-content: flex-end; gap: 0.5rem; margin-top: 1rem; }
 .formulaire-ligne { display: flex; align-items: flex-end; gap: 1rem; flex-wrap: wrap; margin: 0.5rem 0 1rem; }
 .formulaire-ligne .champ { margin-bottom: 0; max-width: 32rem; }
-.filtres { display: flex; gap: 1rem; flex-wrap: wrap; align-items: flex-end; background: var(--surface); border: 1px solid var(--bordure); border-radius: var(--rayon); padding: 0.75rem 1rem 0; margin-bottom: 1rem; }
+.filtres { display: flex; gap: 0 1rem; flex-wrap: wrap; align-items: flex-end; background: var(--color-carte); border: 1px solid var(--color-filet); padding: 0.75rem 1rem 0; margin-bottom: 1rem; }
+.filtres[hidden] { display: none; }
 .filtres .champ { min-width: 12rem; }
 
 /* Tableau */
@@ -117,75 +118,93 @@
 .liste-arbitrage { padding-left: 1.25rem; }
 .liste-arbitrage li { margin-bottom: 0.75rem; }
 
-/* Barre du planning */
-.barre-planning { display: flex; flex-wrap: wrap; gap: 1rem; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
-.segments { display: inline-flex; flex-wrap: wrap; border: 2px solid var(--bleu); border-radius: var(--rayon); overflow: hidden; }
-.segment { font: inherit; border: 0; background: var(--surface); color: var(--bleu); padding: 0.45rem 0.8rem; cursor: pointer; border-right: 1px solid var(--bleu); }
-.segment:last-child { border-right: 0; }
-.segment--actif { background: var(--bleu); color: #fff; font-weight: 700; }
+/* Planning (PLA-01) — charte de la Ville. Vues semaine et jour sans défilement : la page occupe la hauteur de la
+   fenêtre (classe posée par l'écran) et la grille prend l'espace restant ; positions des séances en pourcentage. */
+.barre-planning { display: flex; flex-wrap: wrap; gap: 0.5rem 1rem; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; }
+.segments { display: inline-flex; flex-wrap: wrap; gap: 2px; padding: 3px; background: var(--color-carte); border: 1px solid var(--color-filet); }
+.segment { font: inherit; font-size: var(--text-petit); font-weight: 600; min-height: 2.5rem; border: 0; background: transparent; color: var(--color-encre); padding: 0 0.8rem; cursor: pointer; }
+.segment:hover { background: var(--color-info-fond); color: var(--color-vert-fonce); }
+.segment--actif, .segment--actif:hover { background: var(--color-vert); color: var(--color-blanc); }
 .navigation-periode { display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap; }
-.periode-libelle { margin: 0 0 0 0.5rem; font-weight: 700; text-transform: capitalize; }
+.periode-libelle { margin: 0 0 0 0.25rem; font-weight: 700; text-transform: capitalize; }
+.planning__aide { display: flex; flex-wrap: wrap; align-items: center; gap: 0.25rem 1.5rem; margin: 0 0 0.25rem; font-size: var(--text-petit); color: var(--color-encre-douce); }
+.page > .compteur { font-size: var(--text-petit); margin: 0 0 0.5rem; }
+.page > .filtres { margin-bottom: 0.5rem; }
 
-/* Séances : couleur + motif + texte (jamais la couleur seule) */
-.seance { position: absolute; left: 2px; right: 2px; display: flex; flex-direction: column; overflow: hidden; text-align: left; font: inherit; font-size: 0.78rem; line-height: 1.2; padding: 2px 4px; border-radius: 4px; border: 1px solid rgb(0 0 0 / 35%); cursor: pointer; color: #111; }
+/* Séances : couleur + motif + texte (jamais la couleur seule). Teintes de la charte uniquement. */
+.seance { position: absolute; left: 2px; right: 2px; min-height: 1.1rem; display: flex; flex-wrap: wrap; align-content: flex-start; column-gap: 0.3rem; overflow: hidden; text-align: left; font: inherit; font-size: 0.8125rem; line-height: 1.15; padding: 1px 4px; border: 1px solid var(--color-encre-douce); cursor: pointer; color: var(--color-encre); }
 .mois__seances .seance, .legende .seance { position: static; }
 .seance__heure { font-weight: 700; }
-.seance__titre { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.seance--signalee { outline: 3px solid var(--attention); }
-.statut-demande, .statut-en_instruction { background-color: #dbe9f8; }
-.statut-option { background-color: #fff0cc; }
-.statut-validee { background-color: #c9ecd5; }
-.statut-confirmee { background-color: #8fd3a7; }
-.statut-realisee, .statut-cloturee { background-color: #e1e4e8; }
-.statut-refusee, .statut-annulee { background-color: #f8d4d6; }
-.type-association { background-color: #cfe3ff; }
-.type-ecole { background-color: #ffe2b8; }
-.type-entreprise { background-color: #e6d6ff; }
-.type-particulier { background-color: #ffd6e5; }
-.type-ville { background-color: #c8eedf; }
-.type-autre { background-color: #e8e8e8; }
-.motif-hachure-legere { background-image: repeating-linear-gradient(135deg, rgb(255 255 255 / 70%) 0 4px, transparent 4px 8px); }
+.seance__titre { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+.seance--signalee { outline: 3px solid var(--color-attention); outline-offset: -3px; }
+.statut-demande, .statut-en_instruction { background-color: var(--color-anis-clair); }
+.statut-option { background-color: var(--color-orange-clair); }
+.statut-validee { background-color: var(--color-succes-fond); }
+.statut-confirmee { background-color: var(--color-vert-clair); }
+.statut-realisee, .statut-cloturee { background-color: var(--color-filet); }
+.statut-refusee, .statut-annulee { background-color: var(--color-danger-fond); }
+.type-association { background-color: var(--color-vert-clair); }
+.type-ecole { background-color: var(--color-anis-clair); }
+.type-entreprise { background-color: var(--color-attention-fond); }
+.type-particulier { background-color: var(--color-orange-clair); }
+.type-ville { background-color: var(--color-succes-fond); }
+.type-autre { background-color: var(--color-filet); }
+/* Hachures : motif fonctionnel (statut lisible sans la couleur), pas un dégradé décoratif. */
+.motif-hachure-legere { background-image: repeating-linear-gradient(135deg, color-mix(in srgb, var(--color-carte) 70%, transparent) 0 4px, transparent 4px 8px); }
 .motif-pointille { border-style: dashed; border-width: 2px; }
 .motif-barre { text-decoration: line-through; }
 
 /* Grille jour / semaine */
-.grille { display: grid; grid-template-columns: 3rem repeat(auto-fit, minmax(7rem, 1fr)); background: var(--surface); border: 1px solid var(--bordure); border-radius: var(--rayon); overflow-x: auto; }
-.grille__heures { padding-top: 2rem; }
-.grille__heure { font-size: 0.75rem; color: var(--texte-doux); border-top: 1px solid #eef0f3; text-align: right; padding-right: 0.25rem; }
-.grille__colonne { border-left: 1px solid #e1e6ec; min-width: 7rem; }
-.grille__entete { height: 2rem; display: flex; align-items: center; justify-content: center; font-weight: 700; background: var(--bleu-clair); text-transform: capitalize; }
-.grille__corps { position: relative; background-image: linear-gradient(#eef0f3 1px, transparent 1px); background-size: 100% 48px; }
+.grille { flex: 1 1 auto; min-height: 20rem; display: grid; grid-template-columns: 2.75rem repeat(auto-fit, minmax(5.5rem, 1fr)); background: var(--color-carte); border: 1px solid var(--color-filet); overflow-x: auto; }
+.grille__heures { display: flex; flex-direction: column; }
+.grille__heures-espace { height: 2rem; flex: none; }
+.grille__heures-liste { flex: 1; display: flex; flex-direction: column; }
+.grille__heure { flex: 1; font-size: 0.75rem; line-height: 1; color: var(--color-encre-douce); border-top: 1px solid var(--color-filet); text-align: right; padding: 2px 0.25rem 0 0; }
+.grille__colonne { display: flex; flex-direction: column; border-left: 1px solid var(--color-filet); min-width: 5.5rem; }
+.grille__entete { height: 2rem; flex: none; display: flex; align-items: center; justify-content: center; font-size: var(--text-petit); font-weight: 700; color: var(--color-vert-profond); background: var(--color-info-fond); text-transform: capitalize; }
+.grille__corps { position: relative; flex: 1; }
+.grille__lignes { position: absolute; inset: 0; display: flex; flex-direction: column; pointer-events: none; }
+.grille__lignes > div { flex: 1; border-top: 1px solid var(--color-filet); }
 
 /* Chronologie par espace */
-.chronologie { background: var(--surface); border: 1px solid var(--bordure); border-radius: var(--rayon); overflow-x: auto; }
-.chronologie__ligne { display: grid; grid-template-columns: 13rem 1fr; border-bottom: 1px solid #e1e6ec; min-height: 2.6rem; }
-.chronologie__ligne--entete { background: var(--bleu-clair); font-weight: 700; min-height: 2rem; }
-.chronologie__espace { padding: 0.4rem 0.6rem; border-right: 1px solid #e1e6ec; }
+.chronologie { background: var(--color-carte); border: 1px solid var(--color-filet); overflow-x: auto; }
+.chronologie__ligne { display: grid; grid-template-columns: 13rem 1fr; border-bottom: 1px solid var(--color-filet); min-height: 2.6rem; }
+.chronologie__ligne--entete { background: var(--color-info-fond); color: var(--color-vert-profond); font-weight: 700; min-height: 2rem; }
+.chronologie__espace { padding: 0.4rem 0.6rem; border-right: 1px solid var(--color-filet); }
 .chronologie__piste { position: relative; display: flex; min-width: 48rem; }
-.chronologie__jour { border-right: 1px solid #e1e6ec; text-align: center; padding: 0.4rem 0; text-transform: capitalize; }
+.chronologie__jour { border-right: 1px solid var(--color-filet); text-align: center; padding: 0.4rem 0; text-transform: capitalize; }
 .chronologie__piste .seance { top: 3px; bottom: 3px; height: auto; right: auto; }
 
 /* Mois */
-.mois { width: 100%; border-collapse: collapse; table-layout: fixed; background: var(--surface); }
-.mois th { background: var(--bleu-clair); padding: 0.4rem; }
-.mois td { border: 1px solid #e1e6ec; vertical-align: top; height: 7.5rem; padding: 0.25rem; }
-.mois__hors { background: #f7f8fa; color: var(--texte-doux); }
-.mois__numero { all: unset; cursor: pointer; font-weight: 700; padding: 0 0.3rem; border-radius: 3px; }
-.mois__numero:focus-visible { outline: 3px solid var(--focus); }
+.mois { width: 100%; border-collapse: collapse; table-layout: fixed; background: var(--color-carte); }
+.mois th { background: var(--color-info-fond); color: var(--color-vert-profond); padding: 0.4rem; }
+.mois td { border: 1px solid var(--color-filet); vertical-align: top; height: 7.5rem; padding: 0.25rem; }
+.mois__hors { background: var(--color-fond); color: var(--color-encre-douce); }
+.mois__numero { all: unset; cursor: pointer; font-weight: 700; padding: 0 0.3rem; }
+.mois__numero:focus-visible { outline: 3px solid var(--color-vert-profond); outline-offset: 2px; }
 .mois__seances { list-style: none; margin: 0.2rem 0 0; padding: 0; display: flex; flex-direction: column; gap: 2px; }
-.mois__plus { font-size: 0.78rem; color: var(--texte-doux); }
+.mois__plus { font-size: 0.8125rem; color: var(--color-encre-douce); }
 
 /* Multi-sites et légende */
 .multi-sites caption { text-align: left; padding: 0.5rem 0.75rem; font-weight: 700; }
-.jauge { display: inline-block; width: 4rem; height: 0.6rem; border: 1px solid #6b7684; border-radius: 3px; margin-right: 0.4rem; vertical-align: middle; background: #fff; }
-.jauge__remplissage { display: block; height: 100%; background: var(--bleu); }
-.legende { list-style: none; display: flex; flex-wrap: wrap; gap: 0.5rem 1rem; padding: 0; margin: 0 0 1rem; font-size: 0.9rem; }
+.jauge { display: inline-block; width: 4rem; height: 0.6rem; border: 1px solid var(--color-contour-champ); margin-right: 0.4rem; vertical-align: middle; background: var(--color-carte); }
+.jauge__remplissage { display: block; height: 100%; background: var(--color-vert); }
+.legende { list-style: none; display: flex; flex-wrap: wrap; gap: 0.25rem 0.9rem; padding: 0; margin: 0; font-size: var(--text-petit); color: var(--color-encre); }
 .legende li { display: inline-flex; align-items: center; gap: 0.35rem; }
-.legende__pastille { display: inline-block; width: 1.1rem; height: 1.1rem; border: 1px solid rgb(0 0 0 / 40%); border-radius: 3px; }
+.legende__pastille { display: inline-block; width: 1rem; height: 1rem; border: 1px solid var(--color-encre-douce); }
 
 @media print {
-  .barre-planning, .legende { display: none !important; }
+  .barre-planning, .planning__aide { display: none !important; }
   .seance { border: 1px solid #000; background-image: none !important; }
+}
+
+/* Tableaux écrits sans le composant Tableau (liste du planning, multi-sites) : mêmes règles que lui. */
+@layer components {
+  .tableau-conteneur { @apply overflow-x-auto border border-filet bg-carte; }
+  .tableau { @apply w-full border-collapse bg-carte text-petit; }
+  .tableau th, .tableau td { @apply border-b border-filet px-3 py-2 text-left align-top; }
+  .tableau thead th { @apply bg-info-fond font-bold whitespace-nowrap text-vert-profond; }
+  .tableau tbody tr:hover { @apply bg-fond; }
 }
 
 /* Tableau de bord (DSH-01) : compteurs cliquables, contrastés, dont la gravité ne repose pas que sur la couleur. */

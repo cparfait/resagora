@@ -64,9 +64,9 @@ describe("PLA-01 vues du planning", () => {
     const { container } = render(<VueSemaine seances={[s]} debut={lundi} coloration="statut" onOuvrir={vi.fn()} onDeposer={deposer} />);
     const colonnes = container.querySelectorAll(".grille__corps");
     const cible = colonnes[3] as HTMLElement;
-    vi.spyOn(cible, "getBoundingClientRect").mockReturnValue({ top: 0, left: 0, width: 100, height: 816, right: 100, bottom: 816, x: 0, y: 0, toJSON: () => ({}) });
+    vi.spyOn(cible, "getBoundingClientRect").mockReturnValue({ top: 0, left: 0, width: 100, height: 672, right: 100, bottom: 672, x: 0, y: 0, toJSON: () => ({}) });
     const evenement = new Event("drop", { bubbles: true, cancelable: true });
-    Object.assign(evenement, { clientY: 48 * 11, dataTransfer: { getData: () => "1" } });
+    Object.assign(evenement, { clientY: 48 * 10, dataTransfer: { getData: () => "1" } }); // 8 h + 10 h = 18 h
     fireEvent(cible, evenement);
     expect(deposer).toHaveBeenCalledTimes(1);
     const appel = deposer.mock.calls[0] as [{ debut: Date; fin: Date; espace: number }];

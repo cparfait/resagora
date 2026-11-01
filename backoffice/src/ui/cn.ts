@@ -21,6 +21,7 @@ const fusionner = extendTailwindMerge({
         "anis-fonce",
         "anis-clair",
         "orange",
+        "orange-clair",
         "brun",
         "filet",
         "contour-champ",
