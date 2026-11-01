@@ -1,39 +1,39 @@
-/* Back-office des agents — charte sobre, contrastes AA (texte ≥ 4,5:1, composants ≥ 3:1), focus visible. */
+@layer theme, base, components, utilities;
+@import "tailwindcss/theme.css" layer(theme);
+@import "tailwindcss/utilities.css" layer(utilities);
+@import "@fontsource-variable/montserrat/wght.css";
+@import "../../charte/charte.css";
+
+/* Back-office des agents — charte de la Ville (DESIGN.md, charte/charte.css). Les anciennes variables pointent
+   vers les jetons de la charte le temps de la migration des composants vers Tailwind (étapes 2 à 4). */
 :root {
-  --bleu: #00427a;
-  --bleu-fonce: #002b52;
-  --bleu-clair: #e6eef6;
-  --texte: #1b1f24;
-  --texte-doux: #4a5360;
-  --fond: #f5f7fa;
-  --surface: #ffffff;
-  --bordure: #c4ccd6;
-  --succes: #1b6e3c;
-  --succes-fond: #e3f4e9;
-  --attention: #8a4b00;
-  --attention-fond: #fff1db;
-  --danger: #b0161e;
-  --danger-fond: #fde8e9;
-  --info: #0b5394;
-  --info-fond: #e3effa;
-  --focus: #ffbf47;
-  --rayon: 6px;
+  --bleu: var(--color-vert);
+  --bleu-fonce: var(--color-vert-fonce);
+  --bleu-clair: var(--color-info-fond);
+  --texte: var(--color-encre);
+  --texte-doux: var(--color-encre-douce);
+  --fond: var(--color-fond);
+  --surface: var(--color-carte);
+  --bordure: var(--color-filet);
+  --succes: var(--color-succes);
+  --succes-fond: var(--color-succes-fond);
+  --attention: var(--color-attention);
+  --attention-fond: var(--color-attention-fond);
+  --danger: var(--color-danger);
+  --danger-fond: var(--color-danger-fond);
+  --info: var(--color-info);
+  --info-fond: var(--color-info-fond);
+  --focus: var(--color-vert-profond);
+  --rayon: 0;
   --espace: 1rem;
-  font-family: "Marianne", "Segoe UI", system-ui, -apple-system, Roboto, Arial, sans-serif;
-  color: var(--texte);
-  background: var(--fond);
-  line-height: 1.5;
-  font-size: 100%;
 }
 
 * { box-sizing: border-box; }
-body { margin: 0; }
 h1 { font-size: 1.6rem; margin: 0 0 0.25rem; color: var(--bleu-fonce); }
 h2 { font-size: 1.2rem; margin: 1.5rem 0 0.75rem; }
 h3 { font-size: 1.05rem; margin: 0 0 0.5rem; }
 a { color: var(--bleu); }
 code { background: var(--bleu-clair); padding: 0 0.25em; border-radius: 3px; font-size: 0.9em; }
-:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; box-shadow: 0 0 0 5px var(--bleu-fonce); }
 [tabindex="-1"]:focus { outline: none; box-shadow: none; }
 
 .visuellement-masque {

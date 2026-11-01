@@ -11,6 +11,7 @@ COPY mobile/package.json mobile/
 COPY e2e/package.json e2e/
 RUN npm ci --ignore-scripts --no-audit --no-fund
 COPY ${APPLICATION}/ ${APPLICATION}/
+COPY charte/ charte/
 COPY tsconfig.base.json ./
 RUN npm run build --workspace ${APPLICATION}
 

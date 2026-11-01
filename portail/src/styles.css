@@ -1,22 +1,25 @@
-/* Portail public — charte de la Ville, contrastes RGAA (texte ≥ 4,5:1, composants ≥ 3:1), focus visible,
-   lisible jusqu'à 320 px de large et zoom 200 % sans défilement horizontal du contenu. */
+@layer theme, base, components, utilities;
+@import "tailwindcss/theme.css" layer(theme);
+@import "tailwindcss/utilities.css" layer(utilities);
+@import "@fontsource-variable/montserrat/wght.css";
+@import "../../charte/charte.css";
+
+/* Portail public — charte de la Ville (DESIGN.md, charte/charte.css), contrastes RGAA (texte ≥ 4,5:1,
+   composants ≥ 3:1), focus visible, lisible jusqu'à 320 px de large et zoom 200 % sans défilement horizontal.
+   Les anciennes variables pointent vers les jetons de la charte le temps de la migration vers Tailwind. */
 :root {
-  --bleu: #003d73;
-  --bleu-clair: #e6eef6;
-  --vert: #1c6b3a;
-  --orange: #8a4b00;
-  --rouge: #a3141c;
-  --gris-texte: #1f2328;
-  --gris-doux: #4a5058;
-  --gris-bord: #6b7280;
-  --fond: #ffffff;
-  --fond-doux: #f4f6f8;
-  --focus: #ffbf47;
-  --rayon: 6px;
-  font-family: Arial, "Helvetica Neue", Helvetica, sans-serif;
-  color: var(--gris-texte);
-  background: var(--fond);
-  line-height: 1.5;
+  --bleu: var(--color-vert);
+  --bleu-clair: var(--color-info-fond);
+  --vert: var(--color-succes);
+  --orange: var(--color-attention);
+  --rouge: var(--color-danger);
+  --gris-texte: var(--color-encre);
+  --gris-doux: var(--color-encre-douce);
+  --gris-bord: var(--color-contour-champ);
+  --fond: var(--color-carte);
+  --fond-doux: var(--color-fond);
+  --focus: var(--color-vert-profond);
+  --rayon: 0;
 }
 
 *,
@@ -26,8 +29,7 @@
 }
 
 body {
-  margin: 0;
-  font-size: 1rem;
+  background: var(--fond);
 }
 
 a {
@@ -40,11 +42,6 @@ a:hover {
   text-decoration-thickness: 2px;
 }
 
-:focus-visible {
-  outline: 3px solid var(--focus);
-  outline-offset: 2px;
-  box-shadow: 0 0 0 5px var(--gris-texte);
-}
 
 h1,
 h2,
