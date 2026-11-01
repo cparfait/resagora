@@ -37,13 +37,13 @@ test.describe("Lot 2 — pages publiques", () => {
     await expect(page.getByRole("heading", { level: 1, name: "Les équipements" })).toBeFocused();
     await expect(page.getByText(/équipements? trouvés?/)).toBeVisible();
     await sansViolationAxe(page, "le catalogue");
-    await page.getByLabel("Nom ou activité").fill("salle associative");
-    await page.getByRole("link", { name: "Salle associative 2" }).click();
-    await expect(page.getByRole("heading", { level: 1, name: "Salle associative 2" })).toBeVisible();
+    await page.getByLabel("Nom ou activité").fill("réunion du 1er");
+    await page.getByRole("link", { name: "Salle de réunion du 1er étage - Espace Maison Blanche" }).click();
+    await expect(page.getByRole("heading", { level: 1, name: "Salle de réunion du 1er étage - Espace Maison Blanche" })).toBeVisible();
     await sansViolationAxe(page, "la fiche d'un équipement");
     await page.getByRole("link", { name: "Voir les disponibilités" }).click();
     await expect(page.getByRole("table")).toBeVisible();
-    await expect(page.getByRole("table")).not.toContainText("CSE");
+    await expect(page.getByRole("table")).not.toContainText("Atelier Numérique");
     await sansViolationAxe(page, "la grille des disponibilités");
     await page.getByRole("button", { name: "Semaine suivante" }).click();
     await page.getByRole("button", { name: "Afficher en liste" }).click();
@@ -137,7 +137,7 @@ test.describe.serial("Lot 2 — parcours d'une association", () => {
     await page.getByRole("link", { name: "Nouvelle demande" }).first().click();
     await expect(page.getByText("Étape 1 sur 4 : Espace et dates")).toBeVisible();
     await page.getByLabel(/Type de demande/).selectOption({ label: "Réservation ponctuelle" });
-    await page.getByLabel(/^Équipement/).selectOption({ label: "Salle associative 2 — Maison des associations et salle des fêtes (25 pers.)" });
+    await page.getByLabel(/^Équipement/).selectOption({ label: "Salle de réunion du 1er étage - Espace Maison Blanche — Espace Maison Blanche (30 pers.)" });
     await page.getByLabel(/^Date/).fill(dansTroisSemaines());
     await page.getByLabel(/Heure de début/).fill("14:00");
     await page.getByLabel(/Heure de fin/).fill("16:00");

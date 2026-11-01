@@ -1,7 +1,6 @@
-"""Jeu de démonstration, lot 3 : grille votée 2026-2027, gratuités fondées, devis, acomptes, factures, cautions.
-
-Les montants sont fictifs (ordre de grandeur des tarifs municipaux d'Île-de-France) ; la délibération citée est
-une référence de démonstration. Enregistré dans `apps.noyau.demo.socle.EXTENSIONS`.
+"""Jeu de démonstration, lot 3 : grille votée 2026-2027 aux tarifs de CityResa (par espace), gratuités fondées,
+devis, acomptes, factures, cautions. La délibération citée est une référence de démonstration. Enregistré dans
+`apps.noyau.demo.socle.EXTENSIONS`.
 """
 
 from __future__ import annotations
@@ -12,7 +11,7 @@ from typing import Any
 from django.utils import timezone
 
 from apps.noyau.exceptions import ErreurMetier
-from apps.referentiel.models import FamilleEspace
+from apps.referentiel.models import Espace
 from apps.reservations.models import Reservation
 
 from . import cautions, facturation, titres
@@ -21,94 +20,42 @@ from .models import GrilleTarifaire, Majoration, Prestation, Reduction, Tarif
 SYSTEME = "système"
 DELIBERATION = "DCM-DEMO-2025-12-15-07"
 
-# Prix horaires de référence en centimes, par famille et catégorie ; caution par famille.
-PRIX: dict[str, dict[str, int]] = {
-    "gymnase": {
-        "association_locale": 1500,
-        "association": 2500,
-        "ecole": 1500,
-        "entreprise": 6000,
-        "particulier": 4000,
-        "service_municipal": 1500,
-        "autre_collectivite": 3000,
-    },
-    "dojo": {
-        "association_locale": 1000,
-        "association": 1800,
-        "ecole": 1000,
-        "entreprise": 4000,
-        "particulier": 3000,
-        "service_municipal": 1000,
-        "autre_collectivite": 2000,
-    },
-    "salle-sport": {
-        "association_locale": 1000,
-        "association": 1800,
-        "ecole": 1000,
-        "entreprise": 4000,
-        "particulier": 3000,
-        "service_municipal": 1000,
-        "autre_collectivite": 2000,
-    },
-    "terrain-exterieur": {
-        "association_locale": 2000,
-        "association": 3500,
-        "ecole": 2000,
-        "entreprise": 8000,
-        "particulier": 5000,
-        "service_municipal": 2000,
-        "autre_collectivite": 4000,
-    },
-    "salle-fetes": {
-        "association_locale": 2500,
-        "association": 4500,
-        "ecole": 2500,
-        "entreprise": 9000,
-        "particulier": 4500,
-        "service_municipal": 2500,
-        "autre_collectivite": 6000,
-    },
-    "salle-reunion": {
-        "association_locale": 500,
-        "association": 1200,
-        "ecole": 500,
-        "entreprise": 3000,
-        "particulier": 1500,
-        "service_municipal": 500,
-        "autre_collectivite": 1500,
-    },
-    "salle-associative": {
-        "association_locale": 500,
-        "association": 1200,
-        "ecole": 500,
-        "entreprise": 3000,
-        "particulier": 1500,
-        "service_municipal": 500,
-        "autre_collectivite": 1500,
-    },
-    "piste-athletisme": {
-        "association_locale": 1500,
-        "association": 2500,
-        "ecole": 1500,
-        "entreprise": 6000,
-        "particulier": 4000,
-        "service_municipal": 1500,
-        "autre_collectivite": 3000,
-    },
-    "salle-spectacle": {
-        "association_locale": 3000,
-        "association": 6000,
-        "ecole": 3000,
-        "entreprise": 12000,
-        "particulier": 7000,
-        "service_municipal": 3000,
-        "autre_collectivite": 8000,
-    },
+# Tarifs de CityResa (par espace et par profil) → catégories de la plateforme. Les tarifs « particulier extérieur »
+# deviennent la majoration « non résident » (CityResa : 1,5 à 2 fois le tarif de la commune, +75 % retenu).
+CATEGORIES = {
+    "particulier_commune": "particulier",
+    "association_commune": "association_locale",
+    "association_exterieure": "association",
+    "entreprise": "entreprise",
+    "service_interne": "service_municipal",
+    "collectivite": "autre_collectivite",
 }
-CAUTIONS = {"salle-fetes": 50000, "salle-spectacle": 80000, "gymnase": 30000, "terrain-exterieur": 30000}
+# Un seul tarif par espace et par catégorie (contrainte du modèle) : l'unité la plus fine disponible.
+ORDRE_UNITES = ["heure", "demi_journee", "journee"]
+UNITES_PRESTATION = {"forfait": "forfait", "heure": "heure"}
+CATEGORIES_CAUTION = {"particulier", "entreprise", "association", "autre_collectivite"}
 
 
-def grille() -> GrilleTarifaire:
+def _tarifs_espace(tarifs: list[dict[str, Any]]) -> dict[str, tuple[str, int]]:
+    """Catégorie → (unité, prix en centimes). RG-05 : un tarif à 0 € de CityResa (associations de la commune,
+    services municipaux) garde un prix de référence — celui des associations extérieures, sinon des entreprises — et
+    la gratuité devient une réduction de 100 % (voir `reductions`)."""
+    par_profil: dict[tuple[str | None, str], int] = {(t["profil"], t["unite"]): round(t["montant"] * 100) for t in tarifs}
+    resultat: dict[str, tuple[str, int]] = {}
+    for profil, categorie in CATEGORIES.items():
+        for unite in ORDRE_UNITES:
+            prix = par_profil.get((profil, unite), par_profil.get((None, unite)))
+            if prix is None:
+                continue
+            if prix == 0:
+                prix = par_profil.get(("association_exterieure", unite)) or par_profil.get(("entreprise", unite)) or 0
+            if prix:
+                resultat[categorie] = (unite, prix)
+                break
+    return resultat
+
+
+def grille(d: dict[str, Any]) -> GrilleTarifaire:
     g = GrilleTarifaire.objects.create(
         nom="Tarifs 2026-2027",
         debut=date(2026, 1, 1),
@@ -117,54 +64,40 @@ def grille() -> GrilleTarifaire:
         deliberation_date=date(2025, 12, 15),
         heure_soiree=time(20, 0),
     )
-    for famille in FamilleEspace.objects.filter(code__in=PRIX):
-        for categorie, prix in PRIX[famille.code].items():
+    espaces = {e.code: e for e in Espace.objects.filter(code__in=[x["cle"] for x in d["espaces"]])}
+    for e in d["espaces"]:
+        caution = round((e.get("cautionAmount") or 0) * 100)
+        for categorie, (unite, prix) in _tarifs_espace(e["tarifs"]).items():
             Tarif.objects.create(
                 grille=g,
-                famille=famille,
+                espace=espaces[e["cle"]],
                 categorie=categorie,
-                unite="heure",
+                unite=unite,
                 prix_centimes=prix,
-                caution_centimes=CAUTIONS.get(famille.code, 0)
-                if categorie in {"particulier", "entreprise", "association"}
-                else 0,
+                caution_centimes=caution if categorie in CATEGORIES_CAUTION else 0,
             )
-    Majoration.objects.create(grille=g, nature="week_end", taux=2500, categories=["particulier", "entreprise"])
-    Majoration.objects.create(grille=g, nature="soiree", taux=2000, categories=["particulier", "entreprise"])
-    Majoration.objects.create(grille=g, nature="ferie", taux=5000, categories=["particulier", "entreprise"])
-    Majoration.objects.create(grille=g, nature="non_resident", taux=5000, categories=["particulier"])
-    Prestation.objects.create(
-        grille=g, code="menage", libelle="Ménage après la manifestation", unite="forfait", prix_centimes=12000
-    )
-    Prestation.objects.create(
-        grille=g, code="sonorisation", libelle="Sonorisation et éclairage", unite="forfait", prix_centimes=8000
-    )
+    Majoration.objects.create(grille=g, nature="non_resident", taux=7500, categories=["particulier"])
+    options = [*d["options"], *(o for e in d["espaces"] for o in e.get("options", []))]
+    for o in options:
+        unite_prestation = UNITES_PRESTATION.get(o["unite"])
+        if unite_prestation is None or not o["montant"]:
+            continue  # prix à l'unité (tables) : c'est le matériel prêté
+        code = o["cle"].removeprefix("*:").replace(":", "-")
+        Prestation.objects.get_or_create(
+            grille=g,
+            code=code,
+            defaults={"libelle": o["label"], "unite": unite_prestation, "prix_centimes": round(o["montant"] * 100)},
+        )
     return g
 
 
 def reductions(usagers: dict[str, list[Any]]) -> int:
+    """CityResa met gratuitement ses espaces à disposition des associations de la commune et des services : réduction
+    de 100 % sur le tarif de référence (RG-05), qui garde la valorisation des avantages en nature juste."""
     nombre = 0
-    for association in usagers["association"]:
-        if association.local and association.conventionne:
-            Reduction.objects.create(
-                usager=association,
-                taux=10000,
-                fondement=f"{DELIBERATION} — gratuité des créneaux des associations conventionnées ({association.convention_reference})",
-                debut=date(2026, 9, 1),
-                fin=date(2027, 8, 31),
-            )
-            nombre += 1
-        elif association.local:
-            Reduction.objects.create(
-                usager=association,
-                taux=5000,
-                fondement=f"{DELIBERATION} — demi-tarif des associations de la commune",
-                debut=date(2026, 9, 1),
-            )
-            nombre += 1
-    for usager in (*usagers["ecole"], *usagers["service_municipal"]):
+    for usager in (*(a for a in usagers["association"] if a.local), *usagers["service_municipal"], *usagers.get("ecole", [])):
         Reduction.objects.create(
-            usager=usager, taux=10000, fondement=f"{DELIBERATION} — mise à disposition gratuite", debut=date(2026, 9, 1)
+            usager=usager, taux=10000, fondement=f"{DELIBERATION} — mise à disposition gratuite", debut=date(2026, 1, 1)
         )
         nombre += 1
     return nombre
@@ -184,8 +117,11 @@ def _chiffrable(reservation: Reservation) -> bool:
 def charger(resultat: dict[str, Any]) -> dict[str, int]:
     if GrilleTarifaire.objects.filter(deliberation_reference=DELIBERATION).exists():
         return {}
+    d = resultat.get("cityresa")
+    if d is None:
+        return {}
     bilan = {"grilles_tarifaires": 1}
-    grille()
+    grille(d)
     bilan["reductions"] = reductions(resultat["usagers"])
     devis = factures = cautions_recues = 0
     locations = Reservation.objects.filter(

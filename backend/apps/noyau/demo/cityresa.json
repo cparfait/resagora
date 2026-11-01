@@ -1,0 +1,3739 @@
+{
+ "source": "CityResa — prisma/seed-demo.ts et prisma/seed-associations.ts",
+ "reference": "2026-11-01",
+ "sites": [
+  {
+   "cle": "maison-blanche",
+   "name": "Espace Maison Blanche",
+   "description": "Le centre de la vie associative et culturelle de la ville : une grande salle polyvalente de 600 m² et trois salles de réunion aux étages.",
+   "address": "2 avenue de Saint-Exupéry",
+   "postalCode": "92320",
+   "city": "Châtillon",
+   "lat": 48.8071,
+   "lng": 2.2938,
+   "accessInfo": "Métro ligne 13 (Châtillon-Montrouge) puis bus 194. Parking gratuit. Accès PMR par l'entrée principale, ascenseur vers les étages.",
+   "picto": "batiment"
+  },
+  {
+   "cle": "gabriel-peri",
+   "name": "Salle Gabriel Péri",
+   "description": "Salle de 107 m² en centre-ville, pour les réunions, fêtes familiales et activités associatives.",
+   "address": "25 rue Gabriel Péri",
+   "postalCode": "92320",
+   "city": "Châtillon",
+   "lat": 48.8046,
+   "lng": 2.2902,
+   "accessInfo": "Centre-ville, à 10 min à pied du métro Châtillon-Montrouge. Stationnement en zone bleue. Badge d'accès remis par le service Vie associative.",
+   "picto": "table"
+  },
+  {
+   "cle": "henri-matisse",
+   "name": "Salle Henri Matisse",
+   "description": "Salle de 106 m² lumineuse, adaptée aux expositions, ateliers et réunions d'associations.",
+   "address": "13 rue de Bagneux",
+   "postalCode": "92320",
+   "city": "Châtillon",
+   "lat": 48.8012,
+   "lng": 2.2965,
+   "accessInfo": "Bus 194, arrêt Bagneux. Accès de plain-pied. Stationnement rue de Bagneux.",
+   "picto": "cadre"
+  },
+  {
+   "cle": "folie-desmares",
+   "name": "Salle de la Folie Desmares",
+   "description": "La plus grande des salles de quartier : 164 m² dans le parc de la Folie Desmares, pour les assemblées générales, conférences et réceptions.",
+   "address": "13 rue de la Gare",
+   "postalCode": "92320",
+   "city": "Châtillon",
+   "lat": 48.8098,
+   "lng": 2.2962,
+   "accessInfo": "À 5 min à pied du métro Châtillon-Montrouge. Parking de la gare. Accès PMR par le parc.",
+   "picto": "micro"
+  },
+  {
+   "cle": "chalet",
+   "name": "Chalet des quatre vents",
+   "description": "Petit chalet de 35 m² au cœur du quartier des quatre vents, pour les réunions de voisinage et les ateliers en petit groupe.",
+   "address": "31 rue Jean Bouin",
+   "postalCode": "92320",
+   "city": "Châtillon",
+   "lat": 48.7962,
+   "lng": 2.2868,
+   "accessInfo": "Bus 294, arrêt Jean Bouin. Stationnement sur rue.",
+   "picto": "table"
+  },
+  {
+   "cle": "terrain-multisport",
+   "name": "Terrain multisport",
+   "description": "Terrain de proximité en accès libre (football, basket, handball), réservable par créneau pour les clubs et les animations.",
+   "address": "rue Henri Gatinot",
+   "postalCode": "92320",
+   "city": "Châtillon",
+   "lat": 48.7991,
+   "lng": 2.2831,
+   "accessInfo": "Ouvert de 9 h à 21 h. Accès libre en dehors des créneaux réservés.",
+   "picto": "terrain"
+  },
+  {
+   "cle": "sablons",
+   "name": "Gymnase les Sablons",
+   "description": "Gymnase omnisports : plateau homologué basket, handball, volley et badminton, tribunes et vestiaires.",
+   "address": "25 villa des Paroseaux",
+   "postalCode": "92320",
+   "city": "Châtillon",
+   "lat": 48.8035,
+   "lng": 2.2812,
+   "accessInfo": "Bus 194, arrêt Sablons. Parking de 40 places. Vestiaires accessibles PMR.",
+   "picto": "ballon"
+  },
+  {
+   "cle": "gambetta",
+   "name": "Gymnase Gambetta",
+   "description": "Gymnase de quartier pour les sports collectifs, la gymnastique et les arts martiaux.",
+   "address": "Square de l'Europe",
+   "postalCode": "92320",
+   "city": "Châtillon",
+   "lat": 48.8058,
+   "lng": 2.2871,
+   "accessInfo": "Square de l'Europe, à proximité du centre-ville. Stationnement en zone bleue.",
+   "picto": "ballon"
+  },
+  {
+   "cle": "doret",
+   "name": "Salle sportive Marcel Doret",
+   "description": "Salle sportive polyvalente : tatamis, miroirs et vestiaires, pour le judo, la danse, le yoga et la gymnastique douce.",
+   "address": "18-20 rue Gay Lussac",
+   "postalCode": "92320",
+   "city": "Châtillon",
+   "lat": 48.7998,
+   "lng": 2.2894,
+   "accessInfo": "Bus 294, arrêt Gay Lussac. Accès PMR de plain-pied.",
+   "picto": "tatami"
+  },
+  {
+   "cle": "moquet",
+   "name": "Stade Guy Môquet",
+   "description": "Le stade de la ville : terrain d'honneur, terrain synthétique éclairé, piste d'athlétisme et vestiaires.",
+   "address": "35 avenue Clément Perrière",
+   "postalCode": "92320",
+   "city": "Châtillon",
+   "lat": 48.7955,
+   "lng": 2.2925,
+   "accessInfo": "Du lundi au vendredi de 8 h à 22 h 30 ; samedi, dimanche et jours fériés de 8 h à 20 h 30. Parking de 80 places. Se présenter au gardien.",
+   "picto": "terrain"
+  },
+  {
+   "cle": "roland-garros",
+   "name": "Complexe sportif Roland Garros",
+   "description": "Complexe sportif avec gymnase, salle de musculation et courts de tennis couverts.",
+   "address": "Rue Roland Garros",
+   "postalCode": "92320",
+   "city": "Châtillon",
+   "lat": 48.7938,
+   "lng": 2.2858,
+   "accessInfo": "Bus 294, arrêt Roland Garros. Parking sur place.",
+   "picto": "ballon"
+  },
+  {
+   "cle": "langevin",
+   "name": "Complexe sportif Langevin Wallon",
+   "description": "Gymnase et salles annexes attenants au groupe scolaire Langevin Wallon, prioritairement scolaires en journée.",
+   "address": "9 rue Henri Gatinot",
+   "postalCode": "92320",
+   "city": "Châtillon",
+   "lat": 48.7986,
+   "lng": 2.2838,
+   "accessInfo": "Accès par la rue Henri Gatinot. Créneaux scolaires prioritaires en semaine.",
+   "picto": "ballon"
+  },
+  {
+   "cle": "republique",
+   "name": "Gymnase République",
+   "description": "Gymnase de quartier avec plateau sportif, mur d'escalade et vestiaires.",
+   "address": "11 impasse de la Liberté",
+   "postalCode": "92320",
+   "city": "Châtillon",
+   "lat": 48.8082,
+   "lng": 2.2889,
+   "accessInfo": "Métro Châtillon-Montrouge à 8 min à pied. Stationnement impasse de la Liberté.",
+   "picto": "ballon"
+  }
+ ],
+ "espaces": [
+  {
+   "cle": "mb-polyvalente",
+   "site": "maison-blanche",
+   "name": "Salle polyvalente - Espace Maison Blanche",
+   "nature": "Salle des fêtes",
+   "description": "La grande salle de la ville : 600 m² modulables avec scène, sonorisation et éclairage scénique, cuisine professionnelle attenante et accès direct sur le parc. Pour les galas, repas, lotos, spectacles et grandes assemblées.",
+   "standing": 500,
+   "seated": 300,
+   "surface": 600,
+   "floor": "Rez-de-chaussée",
+   "couleur": 0,
+   "picto": "scene",
+   "photos": 3,
+   "horaires": {
+    "1": [
+     [
+      "08:00",
+      "23:00"
+     ]
+    ],
+    "2": [
+     [
+      "08:00",
+      "23:00"
+     ]
+    ],
+    "3": [
+     [
+      "08:00",
+      "23:00"
+     ]
+    ],
+    "4": [
+     [
+      "08:00",
+      "23:00"
+     ]
+    ],
+    "5": [
+     [
+      "08:00",
+      "23:00"
+     ]
+    ],
+    "6": [
+     [
+      "08:00",
+      "00:00"
+     ]
+    ],
+    "7": [
+     [
+      "09:00",
+      "22:00"
+     ]
+    ]
+   },
+   "slotStepMin": 30,
+   "minDurationMin": 180,
+   "delayMinDays": 21,
+   "bufferBeforeMin": 60,
+   "bufferAfterMin": 60,
+   "cautionAmount": 1000,
+   "rules": "Capacité maximale 500 personnes debout, 300 assises. Fin de la sonorisation à minuit (2 h le samedi). Interdiction de fumer et de confettis. Les lieux sont restitués propres, mobilier rangé ; un état des lieux est fait à la remise et à la restitution des clés.",
+   "instructions": "Clés à retirer à l'accueil de l'Espace Maison Blanche la veille avant 17 h. Code d'alarme communiqué à la remise des clés. Sortie des poubelles dans le local à droite de la cuisine.",
+   "equipements": [
+    "Scène",
+    "Sonorisation",
+    "Micro",
+    "Cuisine",
+    "Réfrigérateur",
+    "Tables",
+    "Chaises",
+    "Parking",
+    "Accès PMR",
+    "Chauffage",
+    "Vestiaires"
+   ],
+   "tarifs": [
+    {
+     "profil": "particulier_commune",
+     "unite": "journee",
+     "montant": 450
+    },
+    {
+     "profil": "particulier_commune",
+     "unite": "weekend",
+     "montant": 750
+    },
+    {
+     "profil": "particulier_commune",
+     "unite": "soiree",
+     "montant": 350
+    },
+    {
+     "profil": "particulier_exterieur",
+     "unite": "journee",
+     "montant": 900
+    },
+    {
+     "profil": "particulier_exterieur",
+     "unite": "weekend",
+     "montant": 1400
+    },
+    {
+     "profil": "particulier_exterieur",
+     "unite": "soiree",
+     "montant": 650
+    },
+    {
+     "profil": "association_commune",
+     "unite": "journee",
+     "montant": 0,
+     "label": "Mise à disposition gracieuse"
+    },
+    {
+     "profil": "association_exterieure",
+     "unite": "journee",
+     "montant": 400
+    },
+    {
+     "profil": "association_exterieure",
+     "unite": "weekend",
+     "montant": 650
+    },
+    {
+     "profil": "entreprise",
+     "unite": "heure",
+     "montant": 180
+    },
+    {
+     "profil": "entreprise",
+     "unite": "demi_journee",
+     "montant": 700
+    },
+    {
+     "profil": "entreprise",
+     "unite": "journee",
+     "montant": 1200
+    },
+    {
+     "profil": "service_interne",
+     "unite": "journee",
+     "montant": 0
+    },
+    {
+     "profil": "collectivite",
+     "unite": "journee",
+     "montant": 600
+    }
+   ],
+   "options": [
+    {
+     "cle": "fetes:sono",
+     "label": "Sonorisation et éclairage scénique",
+     "description": "Mise en service de la régie par un technicien, réglages avant l'événement.",
+     "montant": 150,
+     "unite": "forfait"
+    },
+    {
+     "cle": "fetes:tables",
+     "label": "Mise en place tables et chaises",
+     "description": "Disposition du mobilier selon votre plan de salle, avant votre arrivée.",
+     "montant": 120,
+     "unite": "forfait"
+    },
+    {
+     "cle": "fetes:cuisine",
+     "label": "Cuisine équipée",
+     "description": "Accès à la cuisine professionnelle (four, chambre froide, lave-vaisselle).",
+     "montant": 90,
+     "unite": "forfait"
+    }
+   ]
+  },
+  {
+   "cle": "mb-reunion-1",
+   "site": "maison-blanche",
+   "name": "Salle de réunion du 1er étage - Espace Maison Blanche",
+   "nature": "Salle de réunion",
+   "description": "Salle de 53 m² : 20 places autour d'une table en U, vidéoprojecteur et écran, tableau blanc, Wi-Fi. Pour un conseil d'administration, une formation ou un entretien.",
+   "seated": 20,
+   "standing": 30,
+   "surface": 53,
+   "floor": "1er étage",
+   "couleur": 8,
+   "picto": "table",
+   "photos": 1,
+   "horaires": {
+    "1": [
+     [
+      "08:00",
+      "20:00"
+     ]
+    ],
+    "2": [
+     [
+      "08:00",
+      "20:00"
+     ]
+    ],
+    "3": [
+     [
+      "08:00",
+      "20:00"
+     ]
+    ],
+    "4": [
+     [
+      "08:00",
+      "20:00"
+     ]
+    ],
+    "5": [
+     [
+      "08:00",
+      "20:00"
+     ]
+    ],
+    "6": [
+     [
+      "09:00",
+      "13:00"
+     ]
+    ]
+   },
+   "minDurationMin": 60,
+   "delayMinDays": 2,
+   "horizonMaxDays": 180,
+   "cautionAmount": 0,
+   "requiresValidation": true,
+   "equipements": [
+    "Wi-Fi",
+    "Vidéoprojecteur",
+    "Écran",
+    "Tableau blanc",
+    "Climatisation"
+   ],
+   "tarifs": [
+    {
+     "profil": null,
+     "unite": "heure",
+     "montant": 12
+    },
+    {
+     "profil": null,
+     "unite": "demi_journee",
+     "montant": 45
+    },
+    {
+     "profil": null,
+     "unite": "journee",
+     "montant": 80
+    },
+    {
+     "profil": "association_commune",
+     "unite": "heure",
+     "montant": 0
+    },
+    {
+     "profil": "service_interne",
+     "unite": "heure",
+     "montant": 0
+    }
+   ]
+  },
+  {
+   "cle": "mb-reunion-2",
+   "site": "maison-blanche",
+   "name": "Salle de réunion du 2e étage - Espace Maison Blanche",
+   "nature": "Salle de réunion",
+   "description": "60 m² réservés aux associations de la ville pour leurs activités régulières : cours, ateliers, permanences. Tables et chaises empilables, placard fermé par association.",
+   "seated": 25,
+   "standing": 35,
+   "surface": 60,
+   "floor": "2e étage",
+   "couleur": 2,
+   "picto": "table",
+   "photos": 2,
+   "horaires": {
+    "1": [
+     [
+      "08:00",
+      "23:00"
+     ]
+    ],
+    "2": [
+     [
+      "08:00",
+      "23:00"
+     ]
+    ],
+    "3": [
+     [
+      "08:00",
+      "23:00"
+     ]
+    ],
+    "4": [
+     [
+      "08:00",
+      "23:00"
+     ]
+    ],
+    "5": [
+     [
+      "08:00",
+      "23:00"
+     ]
+    ],
+    "6": [
+     [
+      "08:00",
+      "23:00"
+     ]
+    ],
+    "7": [
+     [
+      "09:00",
+      "18:00"
+     ]
+    ]
+   },
+   "minDurationMin": 60,
+   "delayMinDays": 3,
+   "cautionAmount": 150,
+   "allowedProfiles": [
+    "association_commune",
+    "association_exterieure",
+    "service_interne"
+   ],
+   "rules": "Réservée aux associations. Le matériel personnel est rangé dans le placard attribué ; rien ne reste dans la salle.",
+   "equipements": [
+    "Wi-Fi",
+    "Tables",
+    "Chaises",
+    "Tableau blanc",
+    "Chauffage"
+   ],
+   "tarifs": [
+    {
+     "profil": "association_commune",
+     "unite": "heure",
+     "montant": 0
+    },
+    {
+     "profil": "association_exterieure",
+     "unite": "heure",
+     "montant": 10
+    },
+    {
+     "profil": "association_exterieure",
+     "unite": "journee",
+     "montant": 60
+    },
+    {
+     "profil": "service_interne",
+     "unite": "heure",
+     "montant": 0
+    }
+   ]
+  },
+  {
+   "cle": "mb-reunion-3",
+   "site": "maison-blanche",
+   "name": "Salle de réunion du 3e étage - Espace Maison Blanche",
+   "nature": "Salle de réunion",
+   "description": "Petite salle de 35 m² sous les toits : 12 places autour d'une table, écran de visioconférence, Wi-Fi. Pour un bureau, un entretien ou un petit atelier.",
+   "seated": 12,
+   "standing": 18,
+   "surface": 35,
+   "floor": "3e étage",
+   "couleur": 5,
+   "picto": "table",
+   "photos": 1,
+   "horaires": {
+    "1": [
+     [
+      "08:00",
+      "20:00"
+     ]
+    ],
+    "2": [
+     [
+      "08:00",
+      "20:00"
+     ]
+    ],
+    "3": [
+     [
+      "08:00",
+      "20:00"
+     ]
+    ],
+    "4": [
+     [
+      "08:00",
+      "20:00"
+     ]
+    ],
+    "5": [
+     [
+      "08:00",
+      "20:00"
+     ]
+    ],
+    "6": [
+     [
+      "09:00",
+      "13:00"
+     ]
+    ]
+   },
+   "minDurationMin": 60,
+   "delayMinDays": 2,
+   "horizonMaxDays": 180,
+   "cautionAmount": 0,
+   "equipements": [
+    "Wi-Fi",
+    "Écran",
+    "Tableau blanc",
+    "Climatisation"
+   ],
+   "tarifs": [
+    {
+     "profil": null,
+     "unite": "heure",
+     "montant": 12
+    },
+    {
+     "profil": null,
+     "unite": "demi_journee",
+     "montant": 45
+    },
+    {
+     "profil": null,
+     "unite": "journee",
+     "montant": 80
+    },
+    {
+     "profil": "association_commune",
+     "unite": "heure",
+     "montant": 0
+    },
+    {
+     "profil": "service_interne",
+     "unite": "heure",
+     "montant": 0
+    }
+   ]
+  },
+  {
+   "cle": "gabriel-peri",
+   "site": "gabriel-peri",
+   "name": "Salle Gabriel Péri",
+   "nature": "Salle polyvalente",
+   "description": "Salle de 107 m² en centre-ville avec cuisine équipée, vaisselle pour 80 couverts, sonorisation d'ambiance et accès de plain-pied. La salle des fêtes familiales et des repas associatifs.",
+   "standing": 100,
+   "seated": 60,
+   "surface": 107,
+   "floor": "Rez-de-chaussée",
+   "couleur": 1,
+   "picto": "table",
+   "photos": 3,
+   "horaires": {
+    "1": [
+     [
+      "08:00",
+      "22:30"
+     ]
+    ],
+    "2": [
+     [
+      "08:00",
+      "22:30"
+     ]
+    ],
+    "3": [
+     [
+      "08:00",
+      "22:30"
+     ]
+    ],
+    "4": [
+     [
+      "08:00",
+      "22:30"
+     ]
+    ],
+    "5": [
+     [
+      "08:00",
+      "22:30"
+     ]
+    ],
+    "6": [
+     [
+      "09:00",
+      "22:30"
+     ]
+    ],
+    "7": [
+     [
+      "09:00",
+      "19:00"
+     ]
+    ]
+   },
+   "minDurationMin": 120,
+   "delayMinDays": 10,
+   "bufferBeforeMin": 30,
+   "bufferAfterMin": 30,
+   "cautionAmount": 400,
+   "rules": "Fin des festivités à 22 h 30 (19 h le dimanche). Le voisinage est résidentiel : portes et fenêtres fermées dès 20 h.",
+   "instructions": "Badge d'accès remis par le service Vie associative aux heures d'ouverture.",
+   "equipements": [
+    "Cuisine",
+    "Réfrigérateur",
+    "Tables",
+    "Chaises",
+    "Sonorisation",
+    "Wi-Fi",
+    "Accès PMR"
+   ],
+   "tarifs": [
+    {
+     "profil": "particulier_commune",
+     "unite": "heure",
+     "montant": 35
+    },
+    {
+     "profil": "particulier_commune",
+     "unite": "demi_journee",
+     "montant": 120
+    },
+    {
+     "profil": "particulier_commune",
+     "unite": "journee",
+     "montant": 200
+    },
+    {
+     "profil": "particulier_exterieur",
+     "unite": "demi_journee",
+     "montant": 240
+    },
+    {
+     "profil": "particulier_exterieur",
+     "unite": "journee",
+     "montant": 400
+    },
+    {
+     "profil": "association_commune",
+     "unite": "journee",
+     "montant": 0
+    },
+    {
+     "profil": "association_exterieure",
+     "unite": "journee",
+     "montant": 150
+    },
+    {
+     "profil": "entreprise",
+     "unite": "heure",
+     "montant": 70
+    },
+    {
+     "profil": "entreprise",
+     "unite": "demi_journee",
+     "montant": 260
+    },
+    {
+     "profil": "entreprise",
+     "unite": "journee",
+     "montant": 450
+    },
+    {
+     "profil": "service_interne",
+     "unite": "journee",
+     "montant": 0
+    }
+   ],
+   "options": [
+    {
+     "cle": "polyvalente:vaisselle",
+     "label": "Vaisselle (80 couverts)",
+     "montant": 45,
+     "unite": "forfait"
+    },
+    {
+     "cle": "polyvalente:sono",
+     "label": "Sonorisation d'ambiance",
+     "montant": 40,
+     "unite": "forfait"
+    }
+   ]
+  },
+  {
+   "cle": "henri-matisse",
+   "site": "henri-matisse",
+   "name": "Salle Henri Matisse",
+   "nature": "Salle polyvalente",
+   "description": "106 m² de cimaises et de lumière naturelle, pour une exposition de peinture ou de photographie, un salon associatif, un atelier ou une réunion. Grilles et éclairage sur rail compris.",
+   "standing": 100,
+   "seated": 60,
+   "surface": 106,
+   "floor": "Rez-de-chaussée",
+   "couleur": 7,
+   "picto": "cadre",
+   "photos": 2,
+   "horaires": {
+    "2": [
+     [
+      "10:00",
+      "19:00"
+     ]
+    ],
+    "3": [
+     [
+      "10:00",
+      "19:00"
+     ]
+    ],
+    "4": [
+     [
+      "10:00",
+      "19:00"
+     ]
+    ],
+    "5": [
+     [
+      "10:00",
+      "19:00"
+     ]
+    ],
+    "6": [
+     [
+      "10:00",
+      "19:00"
+     ]
+    ]
+   },
+   "slotStepMin": 60,
+   "minDurationMin": 240,
+   "delayMinDays": 14,
+   "cautionAmount": 300,
+   "rules": "Fermée le lundi et le dimanche. Accrochage sur cimaises uniquement (aucun perçage). Gardiennage à la charge de l'exposant pendant les heures d'ouverture au public.",
+   "equipements": [
+    "Wi-Fi",
+    "Accès PMR",
+    "Tables",
+    "Chaises",
+    "Chauffage"
+   ],
+   "tarifs": [
+    {
+     "profil": null,
+     "unite": "journee",
+     "montant": 120
+    },
+    {
+     "profil": "association_commune",
+     "unite": "journee",
+     "montant": 0
+    },
+    {
+     "profil": "entreprise",
+     "unite": "journee",
+     "montant": 350
+    }
+   ],
+   "options": [
+    {
+     "cle": "expo:vernissage",
+     "label": "Vernissage (tables hautes et verrerie)",
+     "montant": 80,
+     "unite": "forfait"
+    }
+   ]
+  },
+  {
+   "cle": "folie-desmares",
+   "site": "folie-desmares",
+   "name": "Salle de la Folie Desmares",
+   "nature": "Auditorium",
+   "description": "164 m² dans le parc de la Folie Desmares : 120 places assises en configuration conférence, estrade, sonorisation, vidéoprojecteur et écran 4 m, piano droit. Pour les assemblées générales, conférences, concerts de musique de chambre et réceptions.",
+   "seated": 120,
+   "standing": 160,
+   "surface": 164,
+   "floor": "Rez-de-chaussée",
+   "couleur": 4,
+   "picto": "micro",
+   "photos": 2,
+   "horaires": {
+    "2": [
+     [
+      "09:00",
+      "23:00"
+     ]
+    ],
+    "3": [
+     [
+      "09:00",
+      "23:00"
+     ]
+    ],
+    "4": [
+     [
+      "09:00",
+      "23:00"
+     ]
+    ],
+    "5": [
+     [
+      "09:00",
+      "23:00"
+     ]
+    ],
+    "6": [
+     [
+      "09:00",
+      "23:00"
+     ]
+    ],
+    "7": [
+     [
+      "10:00",
+      "20:00"
+     ]
+    ]
+   },
+   "minDurationMin": 120,
+   "delayMinDays": 14,
+   "bufferBeforeMin": 30,
+   "bufferAfterMin": 30,
+   "cautionAmount": 600,
+   "rules": "Fermée le lundi. Aucune boisson ni nourriture près du piano. Jauge 160 personnes, issues de secours dégagées. Le parc ferme à 22 h : accès par la rue de la Gare ensuite.",
+   "instructions": "Rendez-vous technique avec le régisseur au moins 8 jours avant l'événement (01 46 57 01 12).",
+   "equipements": [
+    "Sonorisation",
+    "Micro",
+    "Vidéoprojecteur",
+    "Écran",
+    "Chaises",
+    "Accès PMR",
+    "Piano",
+    "Chauffage"
+   ],
+   "tarifs": [
+    {
+     "profil": null,
+     "unite": "demi_journee",
+     "montant": 200
+    },
+    {
+     "profil": null,
+     "unite": "journee",
+     "montant": 350
+    },
+    {
+     "profil": null,
+     "unite": "soiree",
+     "montant": 280
+    },
+    {
+     "profil": "association_commune",
+     "unite": "demi_journee",
+     "montant": 0
+    },
+    {
+     "profil": "association_commune",
+     "unite": "journee",
+     "montant": 0
+    },
+    {
+     "profil": "association_commune",
+     "unite": "soiree",
+     "montant": 0
+    },
+    {
+     "profil": "entreprise",
+     "unite": "demi_journee",
+     "montant": 600
+    },
+    {
+     "profil": "entreprise",
+     "unite": "journee",
+     "montant": 1000
+    },
+    {
+     "profil": "service_interne",
+     "unite": "journee",
+     "montant": 0
+    }
+   ],
+   "options": [
+    {
+     "cle": "auditorium:regie",
+     "label": "Régisseur son et vidéo",
+     "description": "Technicien de la ville en régie pendant l'événement.",
+     "montant": 45,
+     "unite": "heure"
+    },
+    {
+     "cle": "auditorium:captation",
+     "label": "Captation vidéo",
+     "description": "Enregistrement 2 caméras, fichier remis sous 8 jours.",
+     "montant": 350,
+     "unite": "forfait"
+    }
+   ]
+  },
+  {
+   "cle": "chalet",
+   "site": "chalet",
+   "name": "Chalet des quatre vents",
+   "nature": "Salle polyvalente",
+   "description": "Chalet de 35 m² avec coin cuisine, tables et chaises, pour une réunion de voisinage, un atelier en petit groupe ou un goûter d'anniversaire.",
+   "standing": 30,
+   "seated": 20,
+   "surface": 35,
+   "floor": "Rez-de-chaussée",
+   "couleur": 6,
+   "picto": "table",
+   "photos": 1,
+   "horaires": {
+    "1": [
+     [
+      "09:00",
+      "22:00"
+     ]
+    ],
+    "2": [
+     [
+      "09:00",
+      "22:00"
+     ]
+    ],
+    "3": [
+     [
+      "09:00",
+      "22:00"
+     ]
+    ],
+    "4": [
+     [
+      "09:00",
+      "22:00"
+     ]
+    ],
+    "5": [
+     [
+      "09:00",
+      "22:00"
+     ]
+    ],
+    "6": [
+     [
+      "09:00",
+      "22:00"
+     ]
+    ],
+    "7": [
+     [
+      "09:00",
+      "19:00"
+     ]
+    ]
+   },
+   "minDurationMin": 120,
+   "delayMinDays": 7,
+   "cautionAmount": 150,
+   "rules": "Fin des activités à 22 h (19 h le dimanche). Pas de sonorisation extérieure.",
+   "equipements": [
+    "Cuisine",
+    "Réfrigérateur",
+    "Tables",
+    "Chaises",
+    "Chauffage"
+   ],
+   "tarifs": [
+    {
+     "profil": "particulier_commune",
+     "unite": "heure",
+     "montant": 25
+    },
+    {
+     "profil": "particulier_commune",
+     "unite": "demi_journee",
+     "montant": 90
+    },
+    {
+     "profil": "particulier_commune",
+     "unite": "journee",
+     "montant": 150
+    },
+    {
+     "profil": "particulier_exterieur",
+     "unite": "demi_journee",
+     "montant": 180
+    },
+    {
+     "profil": "particulier_exterieur",
+     "unite": "journee",
+     "montant": 300
+    },
+    {
+     "profil": "association_commune",
+     "unite": "journee",
+     "montant": 0,
+     "label": "Mise à disposition gracieuse"
+    },
+    {
+     "profil": "association_exterieure",
+     "unite": "journee",
+     "montant": 120
+    },
+    {
+     "profil": "entreprise",
+     "unite": "heure",
+     "montant": 60
+    },
+    {
+     "profil": "entreprise",
+     "unite": "journee",
+     "montant": 380
+    },
+    {
+     "profil": "service_interne",
+     "unite": "journee",
+     "montant": 0
+    }
+   ]
+  },
+  {
+   "cle": "terrain-multisport",
+   "site": "terrain-multisport",
+   "name": "Terrain multisport",
+   "nature": "Stade / terrain",
+   "description": "Terrain de proximité en revêtement synthétique, buts de football et de handball, paniers de basket. Ouvert de 9 h à 21 h ; réservable par créneau pour les clubs, centres de loisirs et animations.",
+   "standing": 60,
+   "couleur": 9,
+   "picto": "terrain",
+   "photos": 1,
+   "horaires": {
+    "1": [
+     [
+      "09:00",
+      "21:00"
+     ]
+    ],
+    "2": [
+     [
+      "09:00",
+      "21:00"
+     ]
+    ],
+    "3": [
+     [
+      "09:00",
+      "21:00"
+     ]
+    ],
+    "4": [
+     [
+      "09:00",
+      "21:00"
+     ]
+    ],
+    "5": [
+     [
+      "09:00",
+      "21:00"
+     ]
+    ],
+    "6": [
+     [
+      "09:00",
+      "21:00"
+     ]
+    ],
+    "7": [
+     [
+      "09:00",
+      "21:00"
+     ]
+    ]
+   },
+   "minDurationMin": 60,
+   "delayMinDays": 3,
+   "cautionAmount": 0,
+   "rules": "Chaussures de sport uniquement. Le terrain reste accessible au public hors créneaux réservés.",
+   "equipements": [],
+   "tarifs": [
+    {
+     "profil": "association_commune",
+     "unite": "heure",
+     "montant": 0
+    },
+    {
+     "profil": "association_exterieure",
+     "unite": "heure",
+     "montant": 15
+    },
+    {
+     "profil": "service_interne",
+     "unite": "heure",
+     "montant": 0
+    }
+   ]
+  },
+  {
+   "cle": "sablons",
+   "site": "sablons",
+   "name": "Gymnase les Sablons",
+   "nature": "Gymnase",
+   "description": "Plateau de 44 × 24 m homologué basket, handball, volley et badminton, tribunes télescopiques de 300 places, tableau d'affichage, 4 vestiaires avec douches.",
+   "standing": 500,
+   "seated": 300,
+   "surface": 1200,
+   "couleur": 3,
+   "picto": "ballon",
+   "photos": 3,
+   "horaires": {
+    "1": [
+     [
+      "08:00",
+      "23:00"
+     ]
+    ],
+    "2": [
+     [
+      "08:00",
+      "23:00"
+     ]
+    ],
+    "3": [
+     [
+      "08:00",
+      "23:00"
+     ]
+    ],
+    "4": [
+     [
+      "08:00",
+      "23:00"
+     ]
+    ],
+    "5": [
+     [
+      "08:00",
+      "23:00"
+     ]
+    ],
+    "6": [
+     [
+      "08:00",
+      "20:00"
+     ]
+    ],
+    "7": [
+     [
+      "08:00",
+      "18:00"
+     ]
+    ]
+   },
+   "minDurationMin": 60,
+   "delayMinDays": 7,
+   "bufferBeforeMin": 15,
+   "bufferAfterMin": 15,
+   "cautionAmount": 500,
+   "rules": "Chaussures de sport propres obligatoires sur le plateau. Les créneaux scolaires (lundi-vendredi 8 h-17 h en période scolaire) sont prioritaires.",
+   "instructions": "Se présenter au gardien à l'entrée principale 15 minutes avant le créneau.",
+   "equipements": [
+    "Vestiaires",
+    "Douches",
+    "Parking",
+    "Accès PMR",
+    "Chauffage",
+    "Sonorisation"
+   ],
+   "tarifs": [
+    {
+     "profil": "association_commune",
+     "unite": "heure",
+     "montant": 0
+    },
+    {
+     "profil": "association_exterieure",
+     "unite": "heure",
+     "montant": 25
+    },
+    {
+     "profil": "association_exterieure",
+     "unite": "journee",
+     "montant": 180
+    },
+    {
+     "profil": "particulier_commune",
+     "unite": "heure",
+     "montant": 30
+    },
+    {
+     "profil": "particulier_exterieur",
+     "unite": "heure",
+     "montant": 45
+    },
+    {
+     "profil": "entreprise",
+     "unite": "heure",
+     "montant": 60
+    },
+    {
+     "profil": "entreprise",
+     "unite": "journee",
+     "montant": 400
+    },
+    {
+     "profil": "service_interne",
+     "unite": "heure",
+     "montant": 0
+    },
+    {
+     "profil": "collectivite",
+     "unite": "heure",
+     "montant": 20
+    }
+   ],
+   "options": [
+    {
+     "cle": "gymnase:tribunes",
+     "label": "Tribunes télescopiques déployées",
+     "montant": 100,
+     "unite": "forfait"
+    },
+    {
+     "cle": "gymnase:gardien",
+     "label": "Gardiennage week-end",
+     "description": "Présence d'un gardien en dehors des horaires habituels.",
+     "montant": 28,
+     "unite": "heure"
+    }
+   ]
+  },
+  {
+   "cle": "gambetta",
+   "site": "gambetta",
+   "name": "Gymnase Gambetta",
+   "nature": "Gymnase",
+   "description": "Plateau multisports de 40 × 20 m, salle annexe de gymnastique, 2 vestiaires. Priorité aux écoles en journée.",
+   "standing": 200,
+   "seated": 80,
+   "surface": 800,
+   "couleur": 3,
+   "picto": "ballon",
+   "photos": 2,
+   "horaires": {
+    "1": [
+     [
+      "08:00",
+      "23:00"
+     ]
+    ],
+    "2": [
+     [
+      "08:00",
+      "23:00"
+     ]
+    ],
+    "3": [
+     [
+      "08:00",
+      "23:00"
+     ]
+    ],
+    "4": [
+     [
+      "08:00",
+      "23:00"
+     ]
+    ],
+    "5": [
+     [
+      "08:00",
+      "23:00"
+     ]
+    ],
+    "6": [
+     [
+      "08:00",
+      "20:00"
+     ]
+    ],
+    "7": [
+     [
+      "08:00",
+      "18:00"
+     ]
+    ]
+   },
+   "minDurationMin": 60,
+   "delayMinDays": 7,
+   "cautionAmount": 300,
+   "rules": "Chaussures de sport propres obligatoires. Créneaux scolaires prioritaires en semaine.",
+   "equipements": [
+    "Vestiaires",
+    "Douches",
+    "Parking",
+    "Accès PMR",
+    "Chauffage"
+   ],
+   "tarifs": [
+    {
+     "profil": "association_commune",
+     "unite": "heure",
+     "montant": 0
+    },
+    {
+     "profil": "association_exterieure",
+     "unite": "heure",
+     "montant": 25
+    },
+    {
+     "profil": "association_exterieure",
+     "unite": "journee",
+     "montant": 180
+    },
+    {
+     "profil": "particulier_commune",
+     "unite": "heure",
+     "montant": 30
+    },
+    {
+     "profil": "particulier_exterieur",
+     "unite": "heure",
+     "montant": 45
+    },
+    {
+     "profil": "entreprise",
+     "unite": "heure",
+     "montant": 60
+    },
+    {
+     "profil": "entreprise",
+     "unite": "journee",
+     "montant": 400
+    },
+    {
+     "profil": "service_interne",
+     "unite": "heure",
+     "montant": 0
+    },
+    {
+     "profil": "collectivite",
+     "unite": "heure",
+     "montant": 20
+    }
+   ]
+  },
+  {
+   "cle": "doret",
+   "site": "doret",
+   "name": "Salle sportive Marcel Doret",
+   "nature": "Dojo",
+   "description": "200 m² de tatamis (judo, karaté, aïkido, yoga, pilates), miroirs sur un mur, vestiaires attenants. Chauffage au sol.",
+   "standing": 80,
+   "surface": 200,
+   "couleur": 6,
+   "picto": "tatami",
+   "photos": 2,
+   "horaires": {
+    "1": [
+     [
+      "08:00",
+      "22:00"
+     ]
+    ],
+    "2": [
+     [
+      "08:00",
+      "22:00"
+     ]
+    ],
+    "3": [
+     [
+      "08:00",
+      "22:00"
+     ]
+    ],
+    "4": [
+     [
+      "08:00",
+      "22:00"
+     ]
+    ],
+    "5": [
+     [
+      "08:00",
+      "22:00"
+     ]
+    ],
+    "6": [
+     [
+      "08:00",
+      "20:00"
+     ]
+    ]
+   },
+   "minDurationMin": 60,
+   "delayMinDays": 7,
+   "cautionAmount": 200,
+   "rules": "Fermée le dimanche. Pieds nus ou chaussons sur les tatamis. Pas de chaussures de ville au-delà du vestiaire.",
+   "equipements": [
+    "Vestiaires",
+    "Douches",
+    "Chauffage",
+    "Accès PMR"
+   ],
+   "tarifs": [
+    {
+     "profil": null,
+     "unite": "heure",
+     "montant": 15
+    },
+    {
+     "profil": "association_commune",
+     "unite": "heure",
+     "montant": 0
+    },
+    {
+     "profil": "entreprise",
+     "unite": "heure",
+     "montant": 40
+    }
+   ]
+  },
+  {
+   "cle": "moquet",
+   "site": "moquet",
+   "name": "Stade Guy Môquet",
+   "nature": "Stade / terrain",
+   "description": "Terrain de football à 11 en gazon synthétique dernière génération, éclairage LED pour les séances en soirée, piste d'athlétisme, vestiaires et local matériel. Peut se réserver en moitié de terrain pour le football à 7.",
+   "standing": 300,
+   "surface": 7000,
+   "couleur": 9,
+   "picto": "terrain",
+   "photos": 2,
+   "horaires": {
+    "1": [
+     [
+      "08:00",
+      "22:30"
+     ]
+    ],
+    "2": [
+     [
+      "08:00",
+      "22:30"
+     ]
+    ],
+    "3": [
+     [
+      "08:00",
+      "22:30"
+     ]
+    ],
+    "4": [
+     [
+      "08:00",
+      "22:30"
+     ]
+    ],
+    "5": [
+     [
+      "08:00",
+      "22:30"
+     ]
+    ],
+    "6": [
+     [
+      "08:00",
+      "20:30"
+     ]
+    ],
+    "7": [
+     [
+      "08:00",
+      "20:30"
+     ]
+    ]
+   },
+   "minDurationMin": 60,
+   "delayMinDays": 5,
+   "cautionAmount": 0,
+   "rules": "Du lundi au vendredi de 8 h à 22 h 30 ; samedi, dimanche et jours fériés de 8 h à 20 h 30. Crampons moulés uniquement. Le terrain est fermé en cas de neige ou de gel annoncé.",
+   "equipements": [
+    "Vestiaires",
+    "Douches",
+    "Parking"
+   ],
+   "tarifs": [
+    {
+     "profil": "association_commune",
+     "unite": "heure",
+     "montant": 0
+    },
+    {
+     "profil": "association_exterieure",
+     "unite": "heure",
+     "montant": 35
+    },
+    {
+     "profil": "particulier_commune",
+     "unite": "heure",
+     "montant": 40
+    },
+    {
+     "profil": "particulier_exterieur",
+     "unite": "heure",
+     "montant": 60
+    },
+    {
+     "profil": "entreprise",
+     "unite": "heure",
+     "montant": 80
+    },
+    {
+     "profil": "service_interne",
+     "unite": "heure",
+     "montant": 0
+    }
+   ],
+   "options": [
+    {
+     "cle": "terrain:eclairage",
+     "label": "Éclairage nocturne",
+     "montant": 12,
+     "unite": "heure"
+    }
+   ]
+  },
+  {
+   "cle": "roland-garros",
+   "site": "roland-garros",
+   "name": "Complexe sportif Roland Garros",
+   "nature": "Gymnase",
+   "description": "Gymnase omnisports de 40 × 20 m avec salle de musculation et 2 courts de tennis couverts. Vestiaires et parking.",
+   "standing": 250,
+   "seated": 100,
+   "surface": 900,
+   "couleur": 3,
+   "picto": "ballon",
+   "photos": 2,
+   "horaires": {
+    "1": [
+     [
+      "08:00",
+      "23:00"
+     ]
+    ],
+    "2": [
+     [
+      "08:00",
+      "23:00"
+     ]
+    ],
+    "3": [
+     [
+      "08:00",
+      "23:00"
+     ]
+    ],
+    "4": [
+     [
+      "08:00",
+      "23:00"
+     ]
+    ],
+    "5": [
+     [
+      "08:00",
+      "23:00"
+     ]
+    ],
+    "6": [
+     [
+      "08:00",
+      "20:00"
+     ]
+    ],
+    "7": [
+     [
+      "08:00",
+      "18:00"
+     ]
+    ]
+   },
+   "minDurationMin": 60,
+   "delayMinDays": 7,
+   "cautionAmount": 300,
+   "rules": "Chaussures de sport propres obligatoires. Courts de tennis réservés aux adhérents du club en priorité.",
+   "equipements": [
+    "Vestiaires",
+    "Douches",
+    "Parking",
+    "Accès PMR",
+    "Chauffage"
+   ],
+   "tarifs": [
+    {
+     "profil": "association_commune",
+     "unite": "heure",
+     "montant": 0
+    },
+    {
+     "profil": "association_exterieure",
+     "unite": "heure",
+     "montant": 25
+    },
+    {
+     "profil": "association_exterieure",
+     "unite": "journee",
+     "montant": 180
+    },
+    {
+     "profil": "particulier_commune",
+     "unite": "heure",
+     "montant": 30
+    },
+    {
+     "profil": "particulier_exterieur",
+     "unite": "heure",
+     "montant": 45
+    },
+    {
+     "profil": "entreprise",
+     "unite": "heure",
+     "montant": 60
+    },
+    {
+     "profil": "entreprise",
+     "unite": "journee",
+     "montant": 400
+    },
+    {
+     "profil": "service_interne",
+     "unite": "heure",
+     "montant": 0
+    },
+    {
+     "profil": "collectivite",
+     "unite": "heure",
+     "montant": 20
+    }
+   ]
+  },
+  {
+   "cle": "langevin",
+   "site": "langevin",
+   "name": "Complexe sportif Langevin Wallon",
+   "nature": "Gymnase",
+   "description": "Gymnase de 40 × 20 m attenant au groupe scolaire, salle de danse et 2 vestiaires. Réservé aux écoles en journée, ouvert aux clubs le soir et le week-end.",
+   "standing": 200,
+   "seated": 60,
+   "surface": 800,
+   "couleur": 3,
+   "picto": "ballon",
+   "photos": 2,
+   "horaires": {
+    "1": [
+     [
+      "17:00",
+      "23:00"
+     ]
+    ],
+    "2": [
+     [
+      "17:00",
+      "23:00"
+     ]
+    ],
+    "3": [
+     [
+      "17:00",
+      "23:00"
+     ]
+    ],
+    "4": [
+     [
+      "17:00",
+      "23:00"
+     ]
+    ],
+    "5": [
+     [
+      "17:00",
+      "23:00"
+     ]
+    ],
+    "6": [
+     [
+      "08:00",
+      "20:00"
+     ]
+    ],
+    "7": [
+     [
+      "08:00",
+      "18:00"
+     ]
+    ]
+   },
+   "minDurationMin": 60,
+   "delayMinDays": 7,
+   "cautionAmount": 300,
+   "rules": "Réservé aux écoles du lundi au vendredi jusqu'à 17 h. Chaussures de sport propres obligatoires.",
+   "equipements": [
+    "Vestiaires",
+    "Douches",
+    "Parking",
+    "Accès PMR",
+    "Chauffage"
+   ],
+   "tarifs": [
+    {
+     "profil": "association_commune",
+     "unite": "heure",
+     "montant": 0
+    },
+    {
+     "profil": "association_exterieure",
+     "unite": "heure",
+     "montant": 25
+    },
+    {
+     "profil": "association_exterieure",
+     "unite": "journee",
+     "montant": 180
+    },
+    {
+     "profil": "particulier_commune",
+     "unite": "heure",
+     "montant": 30
+    },
+    {
+     "profil": "particulier_exterieur",
+     "unite": "heure",
+     "montant": 45
+    },
+    {
+     "profil": "entreprise",
+     "unite": "heure",
+     "montant": 60
+    },
+    {
+     "profil": "entreprise",
+     "unite": "journee",
+     "montant": 400
+    },
+    {
+     "profil": "service_interne",
+     "unite": "heure",
+     "montant": 0
+    },
+    {
+     "profil": "collectivite",
+     "unite": "heure",
+     "montant": 20
+    }
+   ]
+  },
+  {
+   "cle": "republique",
+   "site": "republique",
+   "name": "Gymnase République",
+   "nature": "Gymnase",
+   "description": "Plateau sportif de 36 × 18 m, mur d'escalade de 8 m avec 12 voies, 2 vestiaires. Escalade réservée aux encadrants diplômés.",
+   "standing": 150,
+   "seated": 50,
+   "surface": 650,
+   "couleur": 3,
+   "picto": "ballon",
+   "photos": 2,
+   "horaires": {
+    "1": [
+     [
+      "08:00",
+      "23:00"
+     ]
+    ],
+    "2": [
+     [
+      "08:00",
+      "23:00"
+     ]
+    ],
+    "3": [
+     [
+      "08:00",
+      "23:00"
+     ]
+    ],
+    "4": [
+     [
+      "08:00",
+      "23:00"
+     ]
+    ],
+    "5": [
+     [
+      "08:00",
+      "23:00"
+     ]
+    ],
+    "6": [
+     [
+      "08:00",
+      "20:00"
+     ]
+    ],
+    "7": [
+     [
+      "08:00",
+      "18:00"
+     ]
+    ]
+   },
+   "minDurationMin": 60,
+   "delayMinDays": 7,
+   "cautionAmount": 300,
+   "rules": "Chaussures de sport propres obligatoires. Le mur d'escalade n'est utilisable qu'avec un encadrant diplômé et le matériel vérifié.",
+   "equipements": [
+    "Vestiaires",
+    "Douches",
+    "Parking",
+    "Accès PMR",
+    "Chauffage"
+   ],
+   "tarifs": [
+    {
+     "profil": "association_commune",
+     "unite": "heure",
+     "montant": 0
+    },
+    {
+     "profil": "association_exterieure",
+     "unite": "heure",
+     "montant": 25
+    },
+    {
+     "profil": "association_exterieure",
+     "unite": "journee",
+     "montant": 180
+    },
+    {
+     "profil": "particulier_commune",
+     "unite": "heure",
+     "montant": 30
+    },
+    {
+     "profil": "particulier_exterieur",
+     "unite": "heure",
+     "montant": 45
+    },
+    {
+     "profil": "entreprise",
+     "unite": "heure",
+     "montant": 60
+    },
+    {
+     "profil": "entreprise",
+     "unite": "journee",
+     "montant": 400
+    },
+    {
+     "profil": "service_interne",
+     "unite": "heure",
+     "montant": 0
+    },
+    {
+     "profil": "collectivite",
+     "unite": "heure",
+     "montant": 20
+    }
+   ]
+  }
+ ],
+ "options": [
+  {
+   "cle": "*:menage",
+   "label": "Ménage",
+   "description": "Nettoyage après l'événement par le prestataire de la ville.",
+   "montant": 80,
+   "unite": "forfait"
+  },
+  {
+   "cle": "*:montage",
+   "label": "Montage / démontage",
+   "description": "Installation et rangement du mobilier par les services techniques.",
+   "montant": 120,
+   "unite": "forfait"
+  },
+  {
+   "cle": "*:regisseur",
+   "label": "Régisseur",
+   "description": "Présence d'un agent technique pendant l'événement.",
+   "montant": 35,
+   "unite": "heure"
+  },
+  {
+   "cle": "*:tables",
+   "label": "Tables et chaises supplémentaires",
+   "description": "Par table de 6 avec ses chaises, livrée sur place.",
+   "montant": 1.5,
+   "unite": "unite"
+  }
+ ],
+ "materiels": [
+  {
+   "cle": "chaises",
+   "name": "Chaises pliantes",
+   "categorie": "Mobilier",
+   "description": "Chaises pliantes coque polypropylène, livrées par chariots de 50.",
+   "stockTotal": 300,
+   "montant": 0.5,
+   "unite": "unite"
+  },
+  {
+   "cle": "tables",
+   "name": "Tables rectangulaires 6 places",
+   "categorie": "Mobilier",
+   "description": "Tables pliantes 180 × 80 cm.",
+   "stockTotal": 60,
+   "montant": 3,
+   "unite": "unite"
+  },
+  {
+   "cle": "videoprojecteur",
+   "name": "Vidéoprojecteur",
+   "categorie": "Électronique",
+   "description": "Vidéoprojecteur 4000 lumens avec écran sur pied 2 m et câble HDMI.",
+   "stockTotal": 4,
+   "montant": 25,
+   "unite": "jour"
+  },
+  {
+   "cle": "sono",
+   "name": "Sonorisation portable",
+   "categorie": "Électronique",
+   "description": "Enceinte amplifiée sur batterie, 2 micros HF, entrée Bluetooth.",
+   "stockTotal": 3,
+   "montant": 40,
+   "unite": "jour"
+  },
+  {
+   "cle": "barnum",
+   "name": "Barnum 3 × 3 m",
+   "categorie": "Autre",
+   "description": "Tente pliante avec 3 parois, lestage fourni.",
+   "stockTotal": 8,
+   "montant": 30,
+   "unite": "jour"
+  },
+  {
+   "cle": "grilles",
+   "name": "Grilles d'exposition",
+   "categorie": "Signalétique",
+   "description": "Grilles caddie 1 × 2 m avec pieds et crochets.",
+   "stockTotal": 40,
+   "montant": 0,
+   "unite": "gratuit"
+  }
+ ],
+ "usagers": [
+  {
+   "cle": "gama",
+   "type": "association",
+   "nom": "Groupement d'Arts Martiaux et d'Aïkido - GAMA",
+   "codePostal": "92260",
+   "commune": "Fontenay-aux-Roses",
+   "valide": false,
+   "rna": "",
+   "siteWeb": "http://association.gama.free.fr",
+   "adresse": "",
+   "contactFictif": true
+  },
+  {
+   "cle": "scmc-aquaforme",
+   "type": "association",
+   "nom": "SCMC Aqua-Forme",
+   "codePostal": "92320",
+   "commune": "Châtillon",
+   "valide": true,
+   "rna": "",
+   "siteWeb": "https://scmcaquaforme.fr",
+   "adresse": "35 avenue Clément Perrière",
+   "contactFictif": true
+  },
+  {
+   "cle": "scmc-athletisme",
+   "type": "association",
+   "nom": "SCMC Athlétisme",
+   "codePostal": "92320",
+   "commune": "Châtillon",
+   "valide": true,
+   "rna": "",
+   "siteWeb": "https://athlechatillon.com",
+   "adresse": "35 avenue Clément Perrière",
+   "contactFictif": true
+  },
+  {
+   "cle": "abac",
+   "type": "association",
+   "nom": "Association de Badminton Châtillonnais - ABAC",
+   "codePostal": "92260",
+   "commune": "Fontenay-aux-Roses",
+   "valide": true,
+   "rna": "",
+   "siteWeb": "https://abac.asso.fr",
+   "adresse": "",
+   "contactFictif": true
+  },
+  {
+   "cle": "ascb",
+   "type": "association",
+   "nom": "Association sportive Châtillon Basket - ASCB",
+   "codePostal": "92320",
+   "commune": "Châtillon",
+   "valide": true,
+   "rna": "",
+   "siteWeb": "https://ascbasket92.com",
+   "adresse": "35 avenue Clément Perrière",
+   "contactFictif": true
+  },
+  {
+   "cle": "ccpc",
+   "type": "association",
+   "nom": "Club Capoeira Paris-Châtillon - CCPC",
+   "codePostal": "92320",
+   "commune": "Châtillon",
+   "valide": true,
+   "rna": "",
+   "siteWeb": "",
+   "adresse": "35 avenue Clément Perrière",
+   "contactFictif": true
+  },
+  {
+   "cle": "acsc",
+   "type": "association",
+   "nom": "Académie Châtillonnaise des Sports de Contact - ACSC",
+   "codePostal": "92320",
+   "commune": "Châtillon",
+   "valide": true,
+   "rna": "",
+   "siteWeb": "https://acsc92.fr",
+   "adresse": "2 avenue de Saint-Exupéry",
+   "contactFictif": true
+  },
+  {
+   "cle": "scmc-billard",
+   "type": "association",
+   "nom": "SCMC Billard",
+   "codePostal": "92320",
+   "commune": "Châtillon",
+   "valide": true,
+   "rna": "",
+   "siteWeb": "https://scmcbillard.org",
+   "adresse": "2 avenue de Saint-Exupéry",
+   "contactFictif": true
+  },
+  {
+   "cle": "ajbi",
+   "type": "association",
+   "nom": "Association Jeunesse - AJBI (boxe anglaise)",
+   "codePostal": "92320",
+   "commune": "Châtillon",
+   "valide": true,
+   "rna": "",
+   "siteWeb": "",
+   "adresse": "2 avenue de Saint-Exupéry",
+   "contactFictif": true
+  },
+  {
+   "cle": "scmc-culturisme",
+   "type": "association",
+   "nom": "SCMC Culturisme",
+   "codePostal": "92320",
+   "commune": "Châtillon",
+   "valide": true,
+   "rna": "",
+   "siteWeb": "",
+   "adresse": "35 avenue Clément Perrière",
+   "contactFictif": true
+  },
+  {
+   "cle": "arounddance",
+   "type": "association",
+   "nom": "Around dance",
+   "codePostal": "92320",
+   "commune": "Châtillon",
+   "valide": true,
+   "rna": "",
+   "siteWeb": "https://around-dance.fr",
+   "adresse": "25 villa des Paroseaux",
+   "contactFictif": true
+  },
+  {
+   "cle": "ccr92",
+   "type": "association",
+   "nom": "Course sur Route 92 - CCR92",
+   "codePostal": "92320",
+   "commune": "Châtillon",
+   "valide": true,
+   "rna": "",
+   "siteWeb": "https://www.ccr92.fr",
+   "adresse": "35 avenue Clément Perrière",
+   "contactFictif": true
+  },
+  {
+   "cle": "cecet92",
+   "type": "association",
+   "nom": "Cercle d'Escrime Châtillon Estoc et Taille - CECET92",
+   "codePostal": "92320",
+   "commune": "Châtillon",
+   "valide": true,
+   "rna": "",
+   "siteWeb": "https://escrime-chatillon.fr",
+   "adresse": "2 avenue de Saint-Exupéry",
+   "contactFictif": true
+  },
+  {
+   "cle": "cepc",
+   "type": "association",
+   "nom": "Club d'Éducation Physique Châtillonnais - CEPC",
+   "codePostal": "92320",
+   "commune": "Châtillon",
+   "valide": true,
+   "rna": "",
+   "siteWeb": "https://www.gymcepc.org",
+   "adresse": "Square de l'Europe",
+   "contactFictif": true
+  },
+  {
+   "cle": "scmc-football",
+   "type": "association",
+   "nom": "SCMC Football",
+   "codePostal": "92320",
+   "commune": "Châtillon",
+   "valide": true,
+   "rna": "",
+   "siteWeb": "https://scmcfoot.fr",
+   "adresse": "35 avenue Clément Perrière",
+   "contactFictif": true
+  },
+  {
+   "cle": "asfsc",
+   "type": "association",
+   "nom": "Association Sportive de Foot en salle de Châtillon - ASFSC",
+   "codePostal": "92320",
+   "commune": "Châtillon",
+   "valide": true,
+   "rna": "",
+   "siteWeb": "",
+   "adresse": "35 avenue Clément Perrière",
+   "contactFictif": true
+  },
+  {
+   "cle": "grs",
+   "type": "association",
+   "nom": "G.R.S. Châtillon 92",
+   "codePostal": "92290",
+   "commune": "Châtenay-Malabry",
+   "valide": true,
+   "rna": "",
+   "siteWeb": "",
+   "adresse": "",
+   "contactFictif": true
+  },
+  {
+   "cle": "scmc-gv",
+   "type": "association",
+   "nom": "SCMC Gymnastique volontaire",
+   "codePostal": "92320",
+   "commune": "Châtillon",
+   "valide": true,
+   "rna": "",
+   "siteWeb": "https://scmcgym.wixsite.com/site",
+   "adresse": "9 rue Henri Gatinot",
+   "contactFictif": true
+  },
+  {
+   "cle": "kravmaga",
+   "type": "association",
+   "nom": "Krav Maga Self Defense 92",
+   "codePostal": "92320",
+   "commune": "Châtillon",
+   "valide": true,
+   "rna": "",
+   "siteWeb": "https://kravmaga-selfdefense.fr",
+   "adresse": "Square de l'Europe",
+   "contactFictif": true
+  },
+  {
+   "cle": "scmc-judo",
+   "type": "association",
+   "nom": "SCMC Judo",
+   "codePostal": "92320",
+   "commune": "Châtillon",
+   "valide": true,
+   "rna": "",
+   "siteWeb": "https://scmchatillonjudo.net",
+   "adresse": "2 avenue de Saint-Exupéry",
+   "contactFictif": true
+  },
+  {
+   "cle": "ucc",
+   "type": "association",
+   "nom": "Union Châtillon Club - UCC",
+   "codePostal": "92320",
+   "commune": "Châtillon",
+   "valide": true,
+   "rna": "",
+   "siteWeb": "https://union-chatillon-club.com",
+   "adresse": "9 rue Henri Gatinot",
+   "contactFictif": true
+  },
+  {
+   "cle": "scmc-natation",
+   "type": "association",
+   "nom": "SCMC Natation - Water-polo",
+   "codePostal": "92320",
+   "commune": "Châtillon",
+   "valide": true,
+   "rna": "",
+   "siteWeb": "https://scmc-natation.fr",
+   "adresse": "35 avenue Clément Perrière",
+   "contactFictif": true
+  },
+  {
+   "cle": "cpb92",
+   "type": "association",
+   "nom": "Châtillon Pelote Basque 92 - CPB92",
+   "codePostal": "92320",
+   "commune": "Châtillon",
+   "valide": true,
+   "rna": "",
+   "siteWeb": "",
+   "adresse": "",
+   "contactFictif": true
+  },
+  {
+   "cle": "petanque",
+   "type": "association",
+   "nom": "Pétanque Châtillonnaise",
+   "codePostal": "92320",
+   "commune": "Châtillon",
+   "valide": true,
+   "rna": "",
+   "siteWeb": "",
+   "adresse": "35 avenue Clément Perrière",
+   "contactFictif": true
+  },
+  {
+   "cle": "casc",
+   "type": "association",
+   "nom": "Club d'Activités Subaquatiques Châtillonnais - CASC",
+   "codePostal": "92320",
+   "commune": "Châtillon",
+   "valide": true,
+   "rna": "",
+   "siteWeb": "https://casc.fr",
+   "adresse": "",
+   "contactFictif": true
+  },
+  {
+   "cle": "randofass",
+   "type": "association",
+   "nom": "Randonnée Familiale Association - RANDOFASS 92",
+   "codePostal": "92320",
+   "commune": "Châtillon",
+   "valide": true,
+   "rna": "",
+   "siteWeb": "https://randofass.fr",
+   "adresse": "",
+   "contactFictif": true
+  },
+  {
+   "cle": "ccesaf",
+   "type": "association",
+   "nom": "Club des Chasseurs et Explorateurs Sous-Marins de France - CCESAF",
+   "codePostal": "92320",
+   "commune": "Châtillon",
+   "valide": true,
+   "rna": "",
+   "siteWeb": "",
+   "adresse": "",
+   "contactFictif": true
+  },
+  {
+   "cle": "rugby13",
+   "type": "association",
+   "nom": "Châtillon Rugby à XIII",
+   "codePostal": "92320",
+   "commune": "Châtillon",
+   "valide": true,
+   "rna": "",
+   "siteWeb": "",
+   "adresse": "35 avenue Clément Perrière",
+   "contactFictif": true
+  },
+  {
+   "cle": "rugby15",
+   "type": "association",
+   "nom": "Châtillon Rugby Club XV",
+   "codePostal": "92320",
+   "commune": "Châtillon",
+   "valide": true,
+   "rna": "",
+   "siteWeb": "",
+   "adresse": "35 avenue Clément Perrière",
+   "contactFictif": true
+  },
+  {
+   "cle": "taekwondo",
+   "type": "association",
+   "nom": "Taekwondo Châtillon - GC-TKD",
+   "codePostal": "92320",
+   "commune": "Châtillon",
+   "valide": true,
+   "rna": "",
+   "siteWeb": "",
+   "adresse": "18-20 rue Gay Lussac",
+   "contactFictif": true
+  },
+  {
+   "cle": "arsenal",
+   "type": "association",
+   "nom": "Arsenal Châtillon Tennis Club",
+   "codePostal": "92320",
+   "commune": "Châtillon",
+   "valide": true,
+   "rna": "",
+   "siteWeb": "https://club.fft.fr/tc.arsenal",
+   "adresse": "",
+   "contactFictif": true
+  },
+  {
+   "cle": "tcmc",
+   "type": "association",
+   "nom": "Tennis Club Municipal Châtillonnais - TCMC",
+   "codePostal": "92320",
+   "commune": "Châtillon",
+   "valide": true,
+   "rna": "",
+   "siteWeb": "https://www.tcmchatillon.fr",
+   "adresse": "",
+   "contactFictif": true
+  },
+  {
+   "cle": "ttmc",
+   "type": "association",
+   "nom": "Tennis de Table Municipal de Châtillon - TTMC",
+   "codePostal": "92320",
+   "commune": "Châtillon",
+   "valide": true,
+   "rna": "",
+   "siteWeb": "https://ttmc92.fr",
+   "adresse": "Rue Roland Garros",
+   "contactFictif": true
+  },
+  {
+   "cle": "ctac92",
+   "type": "association",
+   "nom": "Compagnie de Tir à l'Arc Châtillon 92 - CTAC92",
+   "codePostal": "92320",
+   "commune": "Châtillon",
+   "valide": true,
+   "rna": "",
+   "siteWeb": "https://ctac92.com",
+   "adresse": "11 impasse de la Liberté",
+   "contactFictif": true
+  },
+  {
+   "cle": "atc",
+   "type": "association",
+   "nom": "Association Trampoline Châtillon - ATC",
+   "codePostal": "92320",
+   "commune": "Châtillon",
+   "valide": true,
+   "rna": "",
+   "siteWeb": "https://trampolinechatillon.com",
+   "adresse": "Rue Roland Garros",
+   "contactFictif": true
+  },
+  {
+   "cle": "sgdt",
+   "type": "association",
+   "nom": "Sport Gym Danse Twirling 92",
+   "codePostal": "92320",
+   "commune": "Châtillon",
+   "valide": true,
+   "rna": "",
+   "siteWeb": "https://sportgdt92.com",
+   "adresse": "",
+   "contactFictif": true
+  },
+  {
+   "cle": "espace-yoga",
+   "type": "association",
+   "nom": "Espace Yoga",
+   "codePostal": "92320",
+   "commune": "Châtillon",
+   "valide": true,
+   "rna": "",
+   "siteWeb": "https://espace-yoga.org",
+   "adresse": "2 avenue de Saint-Exupéry",
+   "contactFictif": true
+  },
+  {
+   "cle": "scmc-volley",
+   "type": "association",
+   "nom": "SCMC Volley-ball",
+   "codePostal": "92320",
+   "commune": "Châtillon",
+   "valide": true,
+   "rna": "",
+   "siteWeb": "",
+   "adresse": "25 villa des Paroseaux",
+   "contactFictif": true
+  },
+  {
+   "cle": "usc",
+   "type": "association",
+   "nom": "Union Sport Châtillon - USC",
+   "codePostal": "92320",
+   "commune": "Châtillon",
+   "valide": true,
+   "rna": "",
+   "siteWeb": "",
+   "adresse": "",
+   "contactFictif": true
+  },
+  {
+   "cle": "scmc-yoga",
+   "type": "association",
+   "nom": "SCMC Yoga",
+   "codePostal": "92320",
+   "commune": "Châtillon",
+   "valide": true,
+   "rna": "",
+   "siteWeb": "",
+   "adresse": "35 avenue Clément Perrière",
+   "contactFictif": true
+  },
+  {
+   "cle": "omeps",
+   "type": "association",
+   "nom": "Office Municipal d'Éducation Physique et Sportive - OMEPS",
+   "codePostal": "92320",
+   "commune": "Châtillon",
+   "valide": true,
+   "rna": "",
+   "siteWeb": "",
+   "adresse": "35 avenue Clément Perrière",
+   "contactFictif": true
+  },
+  {
+   "cle": "atelier",
+   "type": "entreprise",
+   "nom": "Atelier Numérique SAS",
+   "codePostal": "92320",
+   "commune": "Châtillon",
+   "valide": true,
+   "siret": "90123456700012",
+   "rna": "",
+   "siteWeb": "",
+   "adresse": "41 avenue de Paris",
+   "notes": "Agence web de 12 salariés installée à Châtillon.",
+   "contactFictif": false,
+   "contact": {
+    "prenom": "Julien",
+    "nom": "Bernard",
+    "courriel": "julien.bernard@exemple.test",
+    "telephone": "01 99 51 87 33",
+    "fonction": "Gérant"
+   }
+  },
+  {
+   "cle": "mederic",
+   "type": "entreprise",
+   "nom": "Médéric Formation",
+   "codePostal": "92100",
+   "commune": "Boulogne-Billancourt",
+   "valide": true,
+   "siret": "81234567800021",
+   "rna": "",
+   "siteWeb": "",
+   "adresse": "120 route de la Reine",
+   "notes": "Organisme de formation professionnelle : séminaires et formations d'une journée.",
+   "contactFictif": false,
+   "contact": {
+    "prenom": "Isabelle",
+    "nom": "Roux",
+    "courriel": "isabelle.roux@exemple.test",
+    "telephone": "01 99 52 94 46",
+    "fonction": "Responsable formation"
+   }
+  },
+  {
+   "cle": "dupont",
+   "type": "particulier",
+   "nom": "Martine Dupont",
+   "codePostal": "92320",
+   "commune": "Châtillon",
+   "valide": true,
+   "siret": "",
+   "rna": "",
+   "siteWeb": "",
+   "adresse": "9 rue Pierre-Brossolette",
+   "notes": "",
+   "contactFictif": false,
+   "contact": {
+    "prenom": "Martine",
+    "nom": "Dupont",
+    "courriel": "martine.dupont@exemple.test",
+    "telephone": "01 99 53 01 59",
+    "fonction": ""
+   }
+  },
+  {
+   "cle": "garcia",
+   "type": "particulier",
+   "nom": "Antoine Garcia",
+   "codePostal": "92170",
+   "commune": "Vanves",
+   "valide": true,
+   "siret": "",
+   "rna": "",
+   "siteWeb": "",
+   "adresse": "33 rue Jean-Bleuzen",
+   "notes": "",
+   "contactFictif": false,
+   "contact": {
+    "prenom": "Antoine",
+    "nom": "Garcia",
+    "courriel": "antoine.garcia@exemple.test",
+    "telephone": "01 99 54 08 72",
+    "fonction": ""
+   }
+  },
+  {
+   "cle": "culture",
+   "type": "service_interne",
+   "nom": "Service Culturel",
+   "codePostal": "92320",
+   "commune": "Châtillon",
+   "valide": true,
+   "siret": "",
+   "rna": "",
+   "siteWeb": "",
+   "adresse": "1 place de la Libération",
+   "notes": "Service de la ville : programmation culturelle, conseil municipal, cérémonies.",
+   "contactFictif": false,
+   "contact": {
+    "prenom": "Léa",
+    "nom": "Fontaine",
+    "courriel": "lea.fontaine@exemple.test",
+    "telephone": "01 99 55 15 85",
+    "fonction": "Chargée de programmation"
+   }
+  }
+ ],
+ "reservations": [
+  {
+   "espace": "sablons",
+   "org": "ascb",
+   "titre": "Entraînement seniors masculins",
+   "nature": "Activité sportive",
+   "jour": -75,
+   "de": "18:00",
+   "a": "20:00",
+   "statut": "confirmee",
+   "participants": 24,
+   "public": false,
+   "recurrence": {
+    "freq": "weekly",
+    "interval": 1,
+    "byWeekday": [
+     2
+    ],
+    "until": "2027-01-25",
+    "except": [
+     "2026-11-24",
+     "2026-12-01"
+    ]
+   },
+   "description": "Créneau annuel du club, saison 2026-2027.",
+   "depuis": 95,
+   "ymd": "2026-08-18"
+  },
+  {
+   "espace": "mb-reunion-2",
+   "org": "ttmc",
+   "titre": "Entraînement jeunes et adultes",
+   "nature": "Activité culturelle",
+   "jour": -60,
+   "de": "14:00",
+   "a": "18:00",
+   "statut": "confirmee",
+   "participants": 30,
+   "recurrence": {
+    "freq": "weekly",
+    "interval": 1,
+    "byWeekday": [
+     3
+    ],
+    "until": "2027-01-28",
+    "except": [
+     "2026-12-23"
+    ]
+   },
+   "depuis": 80,
+   "ymd": "2026-09-02"
+  },
+  {
+   "espace": "gabriel-peri",
+   "org": "arounddance",
+   "titre": "Éveil à la danse des tout-petits",
+   "nature": "Activité culturelle",
+   "jour": -50,
+   "de": "09:30",
+   "a": "11:30",
+   "statut": "confirmee",
+   "participants": 18,
+   "recurrence": {
+    "freq": "weekly",
+    "interval": 2,
+    "byWeekday": [
+     6
+    ],
+    "until": "2027-01-24"
+   },
+   "depuis": 70,
+   "ymd": "2026-09-12"
+  },
+  {
+   "espace": "folie-desmares",
+   "org": "sgdt",
+   "titre": "Entraînement twirling et acrodanse",
+   "nature": "Activité culturelle",
+   "jour": -38,
+   "de": "20:00",
+   "a": "22:30",
+   "statut": "confirmee",
+   "participants": 45,
+   "recurrence": {
+    "freq": "weekly",
+    "interval": 1,
+    "byWeekday": [
+     4
+    ],
+    "until": "2027-01-20"
+   },
+   "depuis": 60,
+   "ymd": "2026-09-24"
+  },
+  {
+   "espace": "mb-polyvalente",
+   "org": "dupont",
+   "titre": "Mariage de Claire et Mehdi",
+   "nature": "Fête familiale",
+   "jour": 62,
+   "de": "14:00",
+   "a": "23:30",
+   "statut": "a_traiter",
+   "participants": 180,
+   "depuis": 1,
+   "source": "portail",
+   "options": [
+    [
+     "fetes:cuisine",
+     1
+    ],
+    [
+     "fetes:tables",
+     1
+    ],
+    [
+     "*:menage",
+     1
+    ]
+   ],
+   "materiels": [
+    [
+     "tables",
+     30
+    ],
+    [
+     "chaises",
+     180
+    ]
+   ],
+   "description": "Vin d'honneur à 15 h, dîner à 20 h. Traiteur extérieur.",
+   "ymd": "2027-01-02"
+  },
+  {
+   "espace": "folie-desmares",
+   "org": "mederic",
+   "titre": "Séminaire annuel des formateurs",
+   "nature": "Séminaire",
+   "jour": 46,
+   "de": "09:00",
+   "a": "17:30",
+   "statut": "a_traiter",
+   "participants": 120,
+   "depuis": 2,
+   "source": "portail",
+   "options": [
+    [
+     "auditorium:regie",
+     1
+    ]
+   ],
+   "materiels": [
+    [
+     "videoprojecteur",
+     1
+    ]
+   ],
+   "ymd": "2026-12-17"
+  },
+  {
+   "espace": "gabriel-peri",
+   "org": "garcia",
+   "titre": "Anniversaire 50 ans",
+   "nature": "Fête familiale",
+   "jour": 34,
+   "de": "18:00",
+   "a": "22:30",
+   "statut": "a_traiter",
+   "participants": 60,
+   "depuis": 3,
+   "source": "portail",
+   "options": [
+    [
+     "polyvalente:vaisselle",
+     1
+    ]
+   ],
+   "ymd": "2026-12-05"
+  },
+  {
+   "espace": "moquet",
+   "org": "atelier",
+   "titre": "Tournoi de football inter-entreprises",
+   "nature": "Activité sportive",
+   "jour": 27,
+   "de": "09:00",
+   "a": "13:00",
+   "statut": "a_traiter",
+   "participants": 80,
+   "depuis": 2,
+   "source": "portail",
+   "options": [
+    [
+     "terrain:eclairage",
+     1
+    ]
+   ],
+   "materiels": [
+    [
+     "barnum",
+     2
+    ]
+   ],
+   "ymd": "2026-11-28"
+  },
+  {
+   "espace": "henri-matisse",
+   "org": "gama",
+   "titre": "Démonstration et initiation à l'aïkido",
+   "nature": "Activité sportive",
+   "jour": 44,
+   "de": "10:00",
+   "a": "19:00",
+   "statut": "a_traiter",
+   "participants": 100,
+   "depuis": 4,
+   "source": "portail",
+   "recurrence": {
+    "freq": "daily",
+    "interval": 1,
+    "count": 5
+   },
+   "materiels": [
+    [
+     "grilles",
+     20
+    ]
+   ],
+   "ymd": "2026-12-15"
+  },
+  {
+   "espace": "mb-reunion-1",
+   "org": "ttmc",
+   "titre": "Conseil d'administration",
+   "nature": "Réunion",
+   "jour": 9,
+   "de": "19:00",
+   "a": "21:00",
+   "statut": "a_traiter",
+   "participants": 12,
+   "depuis": 1,
+   "source": "portail",
+   "ymd": "2026-11-10"
+  },
+  {
+   "espace": "doret",
+   "org": "garcia",
+   "titre": "Stage de yoga",
+   "nature": "Activité sportive",
+   "jour": 20,
+   "de": "09:00",
+   "a": "12:00",
+   "statut": "a_traiter",
+   "participants": 15,
+   "depuis": 5,
+   "source": "portail",
+   "ymd": "2026-11-21"
+  },
+  {
+   "espace": "mb-polyvalente",
+   "org": "atelier",
+   "titre": "Soirée des 10 ans de l'agence",
+   "nature": "Autre",
+   "jour": 61,
+   "de": "18:00",
+   "a": "23:00",
+   "statut": "en_traitement",
+   "participants": 150,
+   "depuis": 9,
+   "source": "portail",
+   "options": [
+    [
+     "fetes:sono",
+     1
+    ],
+    [
+     "fetes:cuisine",
+     1
+    ],
+    [
+     "*:menage",
+     1
+    ]
+   ],
+   "ymd": "2027-01-01"
+  },
+  {
+   "espace": "sablons",
+   "org": "mederic",
+   "titre": "Journée de cohésion (olympiades)",
+   "nature": "Séminaire",
+   "jour": 40,
+   "de": "09:00",
+   "a": "17:00",
+   "statut": "en_traitement",
+   "participants": 90,
+   "depuis": 12,
+   "source": "portail",
+   "options": [
+    [
+     "gymnase:tribunes",
+     1
+    ]
+   ],
+   "materiels": [
+    [
+     "sono",
+     1
+    ],
+    [
+     "tables",
+     6
+    ]
+   ],
+   "ymd": "2026-12-11"
+  },
+  {
+   "espace": "gabriel-peri",
+   "org": "gama",
+   "titre": "Repas de fin d'année du club",
+   "nature": "Autre",
+   "jour": 56,
+   "de": "11:00",
+   "a": "17:00",
+   "statut": "en_traitement",
+   "participants": 90,
+   "depuis": 6,
+   "source": "portail",
+   "ymd": "2026-12-27"
+  },
+  {
+   "espace": "folie-desmares",
+   "org": "arounddance",
+   "titre": "Spectacle de fin d'année des enfants",
+   "nature": "Spectacle",
+   "jour": 48,
+   "de": "14:00",
+   "a": "19:00",
+   "statut": "en_traitement",
+   "participants": 180,
+   "depuis": 15,
+   "source": "portail",
+   "public": true,
+   "options": [
+    [
+     "auditorium:regie",
+     1
+    ],
+    [
+     "auditorium:captation",
+     1
+    ]
+   ],
+   "ymd": "2026-12-19"
+  },
+  {
+   "espace": "mb-polyvalente",
+   "org": "garcia",
+   "titre": "Repas de famille (baptême)",
+   "nature": "Fête familiale",
+   "jour": 35,
+   "de": "11:00",
+   "a": "19:00",
+   "statut": "acceptee",
+   "participants": 70,
+   "depuis": 20,
+   "source": "portail",
+   "options": [
+    [
+     "fetes:cuisine",
+     1
+    ],
+    [
+     "*:menage",
+     1
+    ]
+   ],
+   "materiels": [
+    [
+     "tables",
+     12
+    ],
+    [
+     "chaises",
+     70
+    ]
+   ],
+   "ymd": "2026-12-06"
+  },
+  {
+   "espace": "folie-desmares",
+   "org": "atelier",
+   "titre": "Conférence « IA et collectivités »",
+   "nature": "Conférence",
+   "jour": 31,
+   "de": "18:30",
+   "a": "21:30",
+   "statut": "acceptee",
+   "participants": 150,
+   "depuis": 18,
+   "source": "portail",
+   "public": true,
+   "options": [
+    [
+     "auditorium:regie",
+     1
+    ]
+   ],
+   "ymd": "2026-12-02"
+  },
+  {
+   "espace": "gabriel-peri",
+   "org": "dupont",
+   "titre": "Fête de départ en retraite",
+   "nature": "Fête familiale",
+   "jour": 41,
+   "de": "17:00",
+   "a": "22:30",
+   "statut": "acceptee",
+   "participants": 50,
+   "depuis": 14,
+   "source": "portail",
+   "options": [
+    [
+     "polyvalente:vaisselle",
+     1
+    ],
+    [
+     "polyvalente:sono",
+     1
+    ]
+   ],
+   "ymd": "2026-12-12"
+  },
+  {
+   "espace": "sablons",
+   "org": "gama",
+   "titre": "Stage de ken jutsu",
+   "nature": "Activité sportive",
+   "jour": 42,
+   "de": "10:00",
+   "a": "18:00",
+   "statut": "acceptee",
+   "participants": 120,
+   "depuis": 24,
+   "source": "portail",
+   "options": [
+    [
+     "gymnase:gardien",
+     1
+    ]
+   ],
+   "ymd": "2026-12-13"
+  },
+  {
+   "espace": "mb-polyvalente",
+   "org": "mederic",
+   "titre": "Convention annuelle Médéric Formation",
+   "nature": "Séminaire",
+   "jour": 19,
+   "de": "08:30",
+   "a": "18:00",
+   "statut": "signee",
+   "participants": 200,
+   "depuis": 35,
+   "source": "portail",
+   "options": [
+    [
+     "fetes:sono",
+     1
+    ],
+    [
+     "fetes:tables",
+     1
+    ],
+    [
+     "*:regisseur",
+     1
+    ]
+   ],
+   "materiels": [
+    [
+     "videoprojecteur",
+     2
+    ]
+   ],
+   "ymd": "2026-11-20"
+  },
+  {
+   "espace": "gabriel-peri",
+   "org": "garcia",
+   "titre": "Baby shower",
+   "nature": "Fête familiale",
+   "jour": 28,
+   "de": "14:00",
+   "a": "19:00",
+   "statut": "signee",
+   "participants": 35,
+   "depuis": 22,
+   "source": "portail",
+   "options": [
+    [
+     "polyvalente:vaisselle",
+     1
+    ]
+   ],
+   "ymd": "2026-11-29"
+  },
+  {
+   "espace": "henri-matisse",
+   "org": "atelier",
+   "titre": "Salon des créateurs numériques",
+   "nature": "Exposition",
+   "jour": 61,
+   "de": "10:00",
+   "a": "19:00",
+   "statut": "signee",
+   "participants": 200,
+   "depuis": 40,
+   "source": "portail",
+   "recurrence": {
+    "freq": "daily",
+    "interval": 1,
+    "count": 2
+   },
+   "options": [
+    [
+     "expo:vernissage",
+     1
+    ]
+   ],
+   "materiels": [
+    [
+     "grilles",
+     30
+    ],
+    [
+     "tables",
+     10
+    ]
+   ],
+   "ymd": "2027-01-01"
+  },
+  {
+   "espace": "folie-desmares",
+   "org": "culture",
+   "titre": "Conseil municipal",
+   "nature": "Réunion",
+   "jour": 17,
+   "de": "19:00",
+   "a": "23:00",
+   "statut": "confirmee",
+   "participants": 80,
+   "depuis": 30,
+   "source": "backoffice",
+   "public": true,
+   "options": [
+    [
+     "auditorium:regie",
+     1
+    ]
+   ],
+   "recurrence": {
+    "freq": "monthly",
+    "interval": 1,
+    "count": 3
+   },
+   "ymd": "2026-11-18"
+  },
+  {
+   "espace": "mb-polyvalente",
+   "org": "arounddance",
+   "titre": "Gala de fin d'année d'Around dance",
+   "nature": "Fête familiale",
+   "jour": 55,
+   "de": "14:00",
+   "a": "20:00",
+   "statut": "confirmee",
+   "participants": 220,
+   "depuis": 45,
+   "source": "portail",
+   "public": true,
+   "options": [
+    [
+     "fetes:sono",
+     1
+    ],
+    [
+     "fetes:tables",
+     1
+    ]
+   ],
+   "materiels": [
+    [
+     "chaises",
+     150
+    ],
+    [
+     "barnum",
+     2
+    ]
+   ],
+   "ymd": "2026-12-26"
+  },
+  {
+   "espace": "sablons",
+   "org": "culture",
+   "titre": "Forum des associations",
+   "nature": "Autre",
+   "jour": 76,
+   "de": "09:00",
+   "a": "18:00",
+   "statut": "confirmee",
+   "participants": 600,
+   "depuis": 60,
+   "source": "backoffice",
+   "public": true,
+   "options": [
+    [
+     "gymnase:tribunes",
+     1
+    ],
+    [
+     "*:montage",
+     1
+    ]
+   ],
+   "materiels": [
+    [
+     "tables",
+     50
+    ],
+    [
+     "chaises",
+     120
+    ],
+    [
+     "barnum",
+     6
+    ],
+    [
+     "grilles",
+     10
+    ]
+   ],
+   "ymd": "2027-01-16"
+  },
+  {
+   "espace": "gabriel-peri",
+   "org": "dupont",
+   "titre": "Repas de quartier des Pierrelais",
+   "nature": "Fête familiale",
+   "jour": 21,
+   "de": "12:00",
+   "a": "18:30",
+   "statut": "confirmee",
+   "participants": 80,
+   "depuis": 28,
+   "source": "portail",
+   "options": [
+    [
+     "polyvalente:vaisselle",
+     1
+    ],
+    [
+     "*:menage",
+     1
+    ]
+   ],
+   "materiels": [
+    [
+     "tables",
+     14
+    ],
+    [
+     "chaises",
+     80
+    ]
+   ],
+   "ymd": "2026-11-22"
+  },
+  {
+   "espace": "mb-reunion-1",
+   "org": "sgdt",
+   "titre": "Assemblée générale de Sport Gym Danse Twirling",
+   "nature": "Assemblée générale",
+   "jour": 16,
+   "de": "19:00",
+   "a": "21:30",
+   "statut": "confirmee",
+   "participants": 20,
+   "depuis": 10,
+   "source": "portail",
+   "ymd": "2026-11-17"
+  },
+  {
+   "espace": "moquet",
+   "org": "ascb",
+   "titre": "Entraînement physique sur terrain",
+   "nature": "Activité sportive",
+   "jour": 13,
+   "de": "10:00",
+   "a": "12:00",
+   "statut": "confirmee",
+   "participants": 20,
+   "depuis": 9,
+   "source": "portail",
+   "gratuit": true,
+   "ymd": "2026-11-14"
+  },
+  {
+   "espace": "mb-polyvalente",
+   "org": "dupont",
+   "titre": "Noces d'or",
+   "nature": "Fête familiale",
+   "jour": -43,
+   "de": "12:00",
+   "a": "23:00",
+   "statut": "terminee",
+   "participants": 120,
+   "source": "portail",
+   "options": [
+    [
+     "fetes:cuisine",
+     1
+    ],
+    [
+     "fetes:tables",
+     1
+    ],
+    [
+     "*:menage",
+     1
+    ]
+   ],
+   "materiels": [
+    [
+     "tables",
+     20
+    ],
+    [
+     "chaises",
+     120
+    ]
+   ],
+   "ymd": "2026-09-19"
+  },
+  {
+   "espace": "folie-desmares",
+   "org": "mederic",
+   "titre": "Formation « Management de proximité »",
+   "nature": "Formation",
+   "jour": -60,
+   "de": "09:00",
+   "a": "17:00",
+   "statut": "terminee",
+   "participants": 60,
+   "source": "portail",
+   "options": [
+    [
+     "auditorium:regie",
+     1
+    ]
+   ],
+   "materiels": [
+    [
+     "videoprojecteur",
+     1
+    ]
+   ],
+   "ymd": "2026-09-02"
+  },
+  {
+   "espace": "sablons",
+   "org": "mederic",
+   "titre": "Team building sportif",
+   "nature": "Séminaire",
+   "jour": -30,
+   "de": "14:00",
+   "a": "18:00",
+   "statut": "terminee",
+   "participants": 70,
+   "source": "portail",
+   "options": [
+    [
+     "gymnase:tribunes",
+     1
+    ]
+   ],
+   "materiels": [
+    [
+     "sono",
+     1
+    ]
+   ],
+   "ymd": "2026-10-02"
+  },
+  {
+   "espace": "gabriel-peri",
+   "org": "garcia",
+   "titre": "Communion",
+   "nature": "Fête familiale",
+   "jour": -21,
+   "de": "12:00",
+   "a": "18:00",
+   "statut": "terminee",
+   "participants": 45,
+   "source": "portail",
+   "options": [
+    [
+     "polyvalente:vaisselle",
+     1
+    ]
+   ],
+   "ymd": "2026-10-11"
+  },
+  {
+   "espace": "henri-matisse",
+   "org": "sgdt",
+   "titre": "Exposition « Le twirling à Châtillon »",
+   "nature": "Exposition",
+   "jour": -54,
+   "de": "10:00",
+   "a": "19:00",
+   "statut": "terminee",
+   "participants": 300,
+   "source": "backoffice",
+   "public": true,
+   "recurrence": {
+    "freq": "daily",
+    "interval": 1,
+    "count": 5
+   },
+   "materiels": [
+    [
+     "grilles",
+     25
+    ]
+   ],
+   "ymd": "2026-09-08"
+  },
+  {
+   "espace": "chalet",
+   "org": "atelier",
+   "titre": "Lancement produit",
+   "nature": "Conférence",
+   "jour": -17,
+   "de": "17:00",
+   "a": "22:00",
+   "statut": "terminee",
+   "participants": 120,
+   "source": "portail",
+   "options": [
+    [
+     "*:regisseur",
+     1
+    ],
+    [
+     "*:menage",
+     1
+    ]
+   ],
+   "materiels": [
+    [
+     "videoprojecteur",
+     1
+    ],
+    [
+     "chaises",
+     120
+    ]
+   ],
+   "ymd": "2026-10-15"
+  },
+  {
+   "espace": "doret",
+   "org": "garcia",
+   "titre": "Atelier self-défense",
+   "nature": "Activité sportive",
+   "jour": -8,
+   "de": "14:00",
+   "a": "17:00",
+   "statut": "terminee",
+   "participants": 12,
+   "source": "portail",
+   "ymd": "2026-10-24"
+  },
+  {
+   "espace": "moquet",
+   "org": "atelier",
+   "titre": "Match de gala clients",
+   "nature": "Activité sportive",
+   "jour": -3,
+   "de": "18:00",
+   "a": "20:00",
+   "statut": "terminee",
+   "participants": 40,
+   "source": "portail",
+   "options": [
+    [
+     "terrain:eclairage",
+     1
+    ]
+   ],
+   "ymd": "2026-10-29"
+  },
+  {
+   "espace": "mb-reunion-1",
+   "org": "arounddance",
+   "titre": "Réunion de rentrée des parents",
+   "nature": "Réunion",
+   "jour": -47,
+   "de": "18:30",
+   "a": "20:30",
+   "statut": "terminee",
+   "participants": 18,
+   "source": "portail",
+   "ymd": "2026-09-15"
+  },
+  {
+   "espace": "mb-polyvalente",
+   "org": "garcia",
+   "titre": "Soirée dansante privée",
+   "nature": "Autre",
+   "jour": 48,
+   "de": "20:00",
+   "a": "02:00",
+   "statut": "refusee",
+   "participants": 250,
+   "depuis": 16,
+   "source": "portail",
+   "motif": "La salle des fêtes est déjà réservée ce soir-là pour le gala de fin d'année d'Around dance ; la fin à 2 h du matin dépasse par ailleurs les horaires autorisés.",
+   "ymd": "2026-12-19"
+  },
+  {
+   "espace": "sablons",
+   "org": "gama",
+   "titre": "Vide-grenier du club",
+   "nature": "Vide-grenier / brocante",
+   "jour": 35,
+   "de": "08:00",
+   "a": "18:00",
+   "statut": "refusee",
+   "participants": 400,
+   "depuis": 20,
+   "source": "portail",
+   "motif": "Le gymnase n'accueille pas de brocante (sol sportif). Orientez-vous vers le terrain synthétique ou le parvis de la Maison Blanche.",
+   "ymd": "2026-12-06"
+  },
+  {
+   "espace": "mb-reunion-2",
+   "org": "atelier",
+   "titre": "Formation interne",
+   "nature": "Formation",
+   "jour": 18,
+   "de": "09:00",
+   "a": "17:00",
+   "statut": "refusee",
+   "participants": 10,
+   "depuis": 8,
+   "source": "portail",
+   "motif": "Salle réservée aux associations de la commune. La salle de réunion du 1er étage est disponible à ces dates.",
+   "ymd": "2026-11-19"
+  },
+  {
+   "espace": "gabriel-peri",
+   "org": "arounddance",
+   "titre": "Bourse aux costumes de danse",
+   "nature": "Vide-grenier / brocante",
+   "jour": 0,
+   "de": "09:00",
+   "a": "17:00",
+   "statut": "annulee",
+   "participants": 100,
+   "source": "portail",
+   "motif": "Annulée par l'association : manque de bénévoles.",
+   "ymd": "2026-11-01"
+  },
+  {
+   "espace": "folie-desmares",
+   "org": "culture",
+   "titre": "Ciné-club de novembre",
+   "nature": "Spectacle",
+   "jour": 38,
+   "de": "20:00",
+   "a": "22:30",
+   "statut": "annulee",
+   "participants": 120,
+   "depuis": 25,
+   "source": "backoffice",
+   "motif": "Film non disponible à la date prévue ; séance reportée.",
+   "ymd": "2026-12-09"
+  },
+  {
+   "espace": "mb-reunion-1",
+   "org": "mederic",
+   "titre": "Entretiens de recrutement",
+   "nature": "Réunion",
+   "jour": 9,
+   "de": "09:00",
+   "a": "13:00",
+   "statut": "annulee",
+   "participants": 4,
+   "depuis": 7,
+   "source": "portail",
+   "motif": "Annulée par l'usager depuis son espace.",
+   "ymd": "2026-11-10"
+  },
+  {
+   "espace": "mb-polyvalente",
+   "org": "sgdt",
+   "titre": "Gala de printemps",
+   "nature": "Spectacle",
+   "jour": -85,
+   "de": "15:00",
+   "a": "23:00",
+   "statut": "archivee",
+   "participants": 350,
+   "source": "backoffice",
+   "public": true,
+   "options": [
+    [
+     "fetes:sono",
+     1
+    ],
+    [
+     "*:menage",
+     1
+    ]
+   ],
+   "ymd": "2026-08-08"
+  },
+  {
+   "espace": "sablons",
+   "org": "ascb",
+   "titre": "Tournoi de fin de saison",
+   "nature": "Activité sportive",
+   "jour": -78,
+   "de": "09:00",
+   "a": "19:00",
+   "statut": "archivee",
+   "participants": 200,
+   "source": "portail",
+   "options": [
+    [
+     "gymnase:tribunes",
+     1
+    ]
+   ],
+   "materiels": [
+    [
+     "tables",
+     6
+    ],
+    [
+     "sono",
+     1
+    ]
+   ],
+   "ymd": "2026-08-15"
+  },
+  {
+   "espace": "gabriel-peri",
+   "org": "ttmc",
+   "titre": "Open de tennis de table de Châtillon",
+   "nature": "Activité culturelle",
+   "jour": -84,
+   "de": "09:00",
+   "a": "19:00",
+   "statut": "archivee",
+   "participants": 90,
+   "source": "portail",
+   "materiels": [
+    [
+     "tables",
+     25
+    ],
+    [
+     "chaises",
+     100
+    ]
+   ],
+   "ymd": "2026-08-09"
+  },
+  {
+   "espace": "mb-reunion-3",
+   "org": "dupont",
+   "titre": "Cocktail d'anniversaire",
+   "nature": "Fête familiale",
+   "jour": -64,
+   "de": "17:00",
+   "a": "22:00",
+   "statut": "archivee",
+   "participants": 40,
+   "source": "portail",
+   "options": [
+    [
+     "*:menage",
+     1
+    ]
+   ],
+   "ymd": "2026-08-29"
+  }
+ ]
+}

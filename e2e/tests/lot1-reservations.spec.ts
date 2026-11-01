@@ -36,11 +36,11 @@ test.describe("Lot 1 — réservations", () => {
     await page.goto("/reservations/nouvelle");
     await expect(page.getByRole("heading", { level: 1, name: "Nouvelle demande" })).toBeVisible();
     await sansViolationAxe(page, "la saisie d'une demande");
-    await page.getByLabel("Rechercher un usager").fill("CSE");
+    await page.getByLabel("Rechercher un usager").fill("Atelier");
     await page.getByLabel(/^Usager/).selectOption({ index: 1 });
     await page.getByLabel(/^Type de réservation/).selectOption({ label: "Réservation ponctuelle" });
     await page.getByLabel(/^Objet/).fill("Tournoi de fin d'année");
-    await page.getByLabel(/^Espace/).selectOption({ label: "Maison des associations et salle des fêtes — Salle associative 2" });
+    await page.getByLabel(/^Espace/).selectOption({ label: "Espace Maison Blanche — Salle de réunion du 1er étage - Espace Maison Blanche" });
     const creneau = creneauDeRecette();
     await page.getByLabel(/^Date de début/).fill(creneau.date);
     await page.getByLabel(/^Heure de début/).fill(creneau.debut);

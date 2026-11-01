@@ -13,8 +13,8 @@ function samediProchain(): string {
 
 test("TAR-11 CAU-01 @a11y le tarif d'une salle des fêtes s'estime en ligne, caution comprise", async ({ page }) => {
   await page.goto(`${PORTAIL}/equipements`);
-  await page.getByLabel("Nom ou activité").fill("grande salle des fêtes");
-  await page.getByRole("link", { name: "Grande salle des fêtes" }).click();
+  await page.getByLabel("Nom ou activité").fill("salle polyvalente");
+  await page.getByRole("link", { name: "Salle polyvalente - Espace Maison Blanche" }).click();
   await expect(page.getByRole("heading", { level: 2, name: "Estimer le tarif" })).toBeVisible();
   await page.getByLabel(/^Date/).fill(samediProchain());
   await page.getByLabel(/Heure de début/).fill("14:00");
@@ -22,7 +22,7 @@ test("TAR-11 CAU-01 @a11y le tarif d'une salle des fêtes s'estime en ligne, cau
   await page.getByLabel(/Vous êtes/).selectOption({ label: "Particulier" });
   await page.getByRole("button", { name: "Estimer" }).click();
   await expect(page.getByText(/Total estimé/)).toBeVisible();
-  await expect(page.getByText(/Caution demandée : 500,00/)).toBeVisible();
+  await expect(page.getByText(/Caution demandée : 1\s?000,00/)).toBeVisible();
   await sansViolationAxe(page, "la simulation de tarif");
 });
 
