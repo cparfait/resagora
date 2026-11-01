@@ -131,7 +131,9 @@ export function VueChronologie({ seances, debut, coloration, onOuvrir, onDeposer
   const colonnes = Array.from({ length: jours }, (_, i) => ajouterJours(debut, i));
   const largeurJour = 100 / jours;
   return (
-    <div className="chronologie" role="group" aria-label="Chronologie par espace">
+    // Zone qui défile horizontalement : focalisable pour défiler au clavier (WCAG 2.1.1, règle axe scrollable-region-focusable).
+    // oxlint-disable-next-line jsx-a11y/no-noninteractive-tabindex
+    <div className="chronologie" role="group" aria-label="Chronologie par espace" tabIndex={0}>
       <div className="chronologie__ligne chronologie__ligne--entete">
         <div className="chronologie__espace">Espace</div>
         <div className="chronologie__piste">
