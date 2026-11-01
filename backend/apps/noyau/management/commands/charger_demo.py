@@ -9,7 +9,7 @@ from django.conf import settings
 from django.core.management.base import BaseCommand, CommandError
 from django.db import transaction
 
-from apps.noyau.demo import socle
+from apps.noyau.demo import simulation, socle
 
 
 class Command(BaseCommand):
@@ -17,6 +17,11 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser: Any) -> None:
         parser.add_argument("--graine", type=int, default=92320, help="Graine du générateur (jeu reproductible).")
+        parser.add_argument(
+            "--sans-simulation",
+            action="store_true",
+            help="Seulement les données de CityResa, sans les plannings simulés (comparaison stricte des deux applications).",
+        )
         parser.add_argument(
             "--completer",
             action="store_true",
@@ -31,6 +36,8 @@ class Command(BaseCommand):
                 raise CommandError("Le jeu de démonstration est déjà chargé (--completer ajoute les parties manquantes).")
             with transaction.atomic():
                 resultat = socle.existant()
+                if not options["sans_simulation"]:
+                    resultat["bilan"].update(simulation.charger(resultat["saison"], options["graine"]))
                 for module in socle.EXTENSIONS:
                     resultat["bilan"].update(module(resultat))
             for cle, nombre in sorted(resultat["bilan"].items()):
@@ -38,7 +45,7 @@ class Command(BaseCommand):
             self.stdout.write(self.style.SUCCESS("Jeu de démonstration complété."))
             return
         with transaction.atomic():
-            resultat = socle.charger(options["graine"])
+            resultat = socle.charger(options["graine"], simuler=not options["sans_simulation"])
             for module in socle.EXTENSIONS:
                 resultat["bilan"].update(module(resultat))
         for cle, nombre in sorted(resultat["bilan"].items()):

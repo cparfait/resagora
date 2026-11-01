@@ -49,13 +49,20 @@ def _seances(espaces: list[Espace], du: date, au: date) -> list[Occurrence]:
     )
 
 
+def nom_complet(espace: Espace) -> str:
+    """« Espace — Site », sans répéter le site quand le nom de l'espace le contient déjà (données de CityResa :
+    « Salle polyvalente - Espace Maison Blanche »)."""
+    site = espace.batiment.site.nom
+    return espace.nom if site.casefold() in espace.nom.casefold() else f"{espace.nom} — {site}"
+
+
 def _cible(site: Site | None, espace: Espace | None) -> tuple[list[Espace], str, str]:
     if (site is None) == (espace is None):
         raise ErreurValidation("Choisissez un site ou un espace.", code="cible_requise")
     if espace is not None:
         return (
             [espace],
-            f"{espace.nom} — {espace.batiment.site.nom}",
+            nom_complet(espace),
             f"{settings.BACKOFFICE_URL.rstrip('/')}/reservations/planning?espace={espace.pk}",
         )
     assert site is not None

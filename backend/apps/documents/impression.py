@@ -80,22 +80,32 @@ def verifier_mise_en_page(valeur: str) -> str:
 def grilles_datees(
     du: date, au: date, seances: list[tuple[datetime, datetime, list[str], bool]], *, prefixe: str = ""
 ) -> list[Grille]:
-    """Une grille par semaine (lundi → dimanche) couvrant la période ; heures locales Europe/Paris attendues. Le
+    """Une grille par tranche de 7 jours à partir du premier jour de la période (une période de 7 jours tient sur une
+    seule grille, donc une seule page, quel que soit son premier jour) ; heures locales Europe/Paris attendues. Le
     préfixe (nom de l'espace dans le planning d'un site) s'affiche au-dessus de chaque grille."""
-    lundi = du - timedelta(days=du.weekday())
     grilles = []
-    while lundi <= au:
-        dimanche = lundi + timedelta(days=6)
+    premier = du
+    while premier <= au:
+        dernier = min(premier + timedelta(days=6), au)
         blocs = [
-            Bloc(debut.weekday(), debut.time(), fin.time() if fin.date() == debut.date() else time(0), lignes, provisoire)
+            Bloc(
+                (debut.date() - premier).days,
+                debut.time(),
+                fin.time() if fin.date() == debut.date() else time(0),
+                lignes,
+                provisoire,
+            )
             for debut, fin, lignes, provisoire in seances
-            if lundi <= debut.date() <= dimanche
+            if premier <= debut.date() <= dernier
         ]
-        jours = [f"{JOURS_COURTS[i]} {lundi + timedelta(days=i):%d/%m}" for i in range(7)]
-        semaine = f"semaine du {lundi:%d/%m/%Y} au {dimanche:%d/%m/%Y}"
+        jours = [
+            f"{JOURS_COURTS[jour.weekday()]} {jour:%d/%m}"
+            for jour in (premier + timedelta(days=i) for i in range((dernier - premier).days + 1))
+        ]
+        semaine = f"du {premier:%d/%m/%Y} au {dernier:%d/%m/%Y}"
         intitule = f"{prefixe} — {semaine}" if prefixe else semaine.capitalize()
         grilles.append(Grille(intitule, jours, blocs, afficher_intitule=bool(prefixe)))
-        lundi += timedelta(days=7)
+        premier += timedelta(days=7)
     return grilles
 
 
@@ -198,7 +208,7 @@ def _calendrier(document: object, grille: Grille, largeur: int, hauteur: int) ->
     heure_min = min([8 * 60, *debuts]) // 60
     heure_max = min(24, math.ceil(max([22 * 60, *fins]) / 60))
     nombre_lignes = (heure_max - heure_min) * 60 // PAS_MINUTES
-    par_jour: list[list[tuple[int, int, Bloc]]] = [[] for _ in range(7)]
+    par_jour: list[list[tuple[int, int, Bloc]]] = [[] for _ in grille.jours]
     for bloc, debut, fin in zip(grille.blocs, debuts, fins, strict=True):
         premiere = max(0, (debut - heure_min * 60) // PAS_MINUTES)
         derniere = min(nombre_lignes - 1, math.ceil((fin - heure_min * 60) / PAS_MINUTES) - 1)
@@ -255,14 +265,14 @@ def _grilles(document: object, edition: Edition, page_largeur: int, page_hauteur
     marge = Cm(1.2)
     # En-tête compact (titre et QR code côte à côte), intitulé, ligne des jours et pied de page : environ 5 cm.
     utile_largeur, utile_hauteur = page_largeur - 2 * marge, page_hauteur - 2 * marge - Cm(5.4)
-    if not any(g.blocs for g in edition.grilles):
-        document.add_paragraph(edition.mention_vide)  # type: ignore[attr-defined]
     for rang, grille in enumerate(edition.grilles):
         if rang:
             document.add_paragraph().add_run().add_break(WD_BREAK.PAGE)  # type: ignore[attr-defined]
+        hauteur = utile_hauteur
         if grille.intitule and (grille.afficher_intitule or len(edition.grilles) > 1):
             document.add_heading(texte_xml(grille.intitule), level=2)  # type: ignore[attr-defined]
-        _calendrier(document, grille, utile_largeur, utile_hauteur)
+            hauteur -= Cm(1.0)  # l'intitulé prend sa place sur la page de la grille
+        _calendrier(document, grille, utile_largeur, hauteur)
 
 
 def _qr(lien: str) -> io.BytesIO:
@@ -317,6 +327,9 @@ def construire_docx(edition: Edition, maintenant: datetime | None = None) -> byt
     style.font.size = Pt(10)
     edite = f"Édité le {maintenant:%d/%m/%Y à %H:%M} — la version en ligne fait foi."
     if edition.grilles:
+        if not any(g.blocs for g in edition.grilles):
+            # Dans le sous-titre plutôt qu'en paragraphe : la grille garde toute la hauteur de la page.
+            edition.sous_titre = f"{edition.sous_titre} — {edition.mention_vide}"
         _entete_compact(document, edition, edite, largeur - Cm(2.4))
     else:
         document.add_heading(edition.titre, level=1)

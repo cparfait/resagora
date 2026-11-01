@@ -139,6 +139,16 @@ applications avec les mêmes données :
 Ces données s'accompagnent de la saison 2026-2027 avec les vacances de la zone C, de 8 gardiens avec leurs trames et
 vacations, de devis, factures et cautions, et d'un exercice de valorisation.
 
+**Plannings simulés.** Les données de CityResa occupent peu les salles. S'y ajoutent donc, par défaut, des plannings
+simulés, absents de CityResa :
+- environ 125 créneaux hebdomadaires des associations selon leur discipline (arts martiaux au dojo, sports de ballon
+  en gymnase, football et rugby au stade, danse et yoga en salle) ;
+- le sport scolaire en journée ;
+- des galas, lotos et tournois, et les assemblées générales.
+
+Chaque dossier simulé porte la mention « Créneau simulé (démonstration) ». Pour une comparaison stricte avec CityResa,
+sans simulation, chargez avec `python manage.py charger_demo --sans-simulation`.
+
 Les dates sont relatives au jour du chargement : chargées le même jour, les deux applications montrent les mêmes
 séances aux mêmes dates.
 

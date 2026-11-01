@@ -9,7 +9,7 @@ import pytest
 from django.core.management import call_command
 from django.core.management.base import CommandError
 
-from apps.noyau.demo import cityresa
+from apps.noyau.demo import cityresa, simulation
 from apps.referentiel.models import Espace, Site
 from apps.reservations.models import Reservation, Verrou
 from apps.usagers.models import Contact, Usager
@@ -44,10 +44,15 @@ def test_jeu_de_demonstration_complet_et_coherent(monkeypatch, modeles_documents
     assert Espace.objects.count() == len(d["espaces"])
     attendus = collections.Counter(cityresa.TYPES_USAGER.get(u["type"], u["type"]) for u in d["usagers"])
     assert collections.Counter(Usager.objects.values_list("type", flat=True)) == attendus
-    assert Reservation.objects.count() == len(d["reservations"]), "aucune réservation de CityResa écartée"
-    assert collections.Counter(Reservation.objects.values_list("statut", flat=True)) == collections.Counter(
+    reprises = Reservation.objects.exclude(dossier__observations=simulation.MENTION)
+    assert reprises.count() == len(d["reservations"]), "aucune réservation de CityResa écartée"
+    assert collections.Counter(reprises.values_list("statut", flat=True)) == collections.Counter(
         STATUTS[r["statut"]] for r in d["reservations"]
     )
+    # Plannings simulés (repérables, absents de CityResa) : créneaux réguliers, manifestations, assemblées générales.
+    simulees = Reservation.objects.filter(dossier__observations=simulation.MENTION)
+    assert simulees.filter(dossier__type_reservation__code="creneau_annuel").count() >= 40
+    assert simulees.filter(espace__code="mb-polyvalente").exists() and simulees.filter(espace__code="doret").exists()
     assert Verrou.objects.exists()
     assert Reservation.objects.filter(dossier__usager__type="particulier", dossier__type_reservation__code="location").exists()
     # Aucune donnée personnelle réelle (CLAUDE.md, règle 7) : contacts fictifs, domaine réservé .test.

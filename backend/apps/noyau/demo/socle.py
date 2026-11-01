@@ -18,7 +18,7 @@ from typing import Any
 from django.utils import timezone
 
 from apps.noyau import fichiers
-from apps.noyau.demo import cityresa
+from apps.noyau.demo import cityresa, simulation
 from apps.referentiel.calendrier import feries_calcules, periodes_depuis_open_data
 from apps.referentiel.models import Espace, PeriodeCalendrier, Saison, Site
 from apps.reservations import services
@@ -193,7 +193,7 @@ def existant() -> dict[str, Any]:
     return {"bilan": {}, "espaces": espaces, "usagers": par_type, "saison": Saison.objects.get(nom="2026-2027")}
 
 
-def charger(graine: int = 92320) -> dict[str, Any]:
+def charger(graine: int = 92320, *, simuler: bool = True) -> dict[str, Any]:
     random.seed(graine)
     faux = Generateur(graine)
     bilan = Bilan()
@@ -202,6 +202,9 @@ def charger(graine: int = 92320) -> dict[str, Any]:
     s = saison(bilan)
     par_type, par_cle = cityresa.usagers(d, bilan, faux, _contact, _pieces_valides)
     materiels = cityresa.reservations(d, bilan, espaces, par_cle, s)
+    if simuler:
+        for cle, nombre in simulation.charger(s, graine).items():
+            bilan.ajouter(cle, nombre)
     aujourd_hui = timezone.localdate()
     Campagne.objects.create(
         saison=Saison.objects.get(nom="2027-2028"),

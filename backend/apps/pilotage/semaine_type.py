@@ -18,6 +18,7 @@ from apps.documents import impression
 from apps.habilitations.models import Utilisateur
 from apps.habilitations.services import exiger, sites_autorises
 from apps.noyau.exceptions import ErreurValidation
+from apps.pilotage.impressions import nom_complet
 from apps.referentiel.models import Espace, Saison, Site
 from apps.reservations.models import Reservation
 
@@ -156,7 +157,7 @@ def edition(
     impression.verifier_mise_en_page(mise_en_page)
     liste = creneaux(agent, saison=saison, site=site, espace=espace)
     if espace is not None:
-        cible, lien = f"{espace.nom} — {espace.batiment.site.nom}", f"semaine-type?espace={espace.pk}"
+        cible, lien = nom_complet(espace), f"semaine-type?espace={espace.pk}"
     else:
         assert site is not None
         cible, lien = site.nom, f"semaine-type?site={site.pk}"
