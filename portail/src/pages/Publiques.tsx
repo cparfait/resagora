@@ -1,4 +1,5 @@
 /** Pages sans compte : accueil, catalogue (POR-03), fiche d'un équipement, disponibilités anonymisées (POR-02). */
+import { classesBouton } from "../ui/Bouton";
 import { useQuery } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 import { Link, useParams, useSearchParams } from "react-router";
@@ -165,7 +166,7 @@ export function FicheEquipement() {
             <ul>
               {e.documents.map((d) => (
                 <li key={d.id}>
-                  <button type="button" className="bouton bouton--lien" onClick={() => void telecharger(d.url, `${d.titre}.pdf`)}>
+                  <button type="button" className={classesBouton("lien")} onClick={() => void telecharger(d.url, `${d.titre}.pdf`)}>
                     {d.titre} ({d.nature}, {d.format}, {taille(d.taille)})
                   </button>
                 </li>
@@ -176,10 +177,10 @@ export function FicheEquipement() {
       </div>
       <SimulateurTarif espace={e.id} />
       <p className="actions">
-        <Link className="bouton bouton--secondaire" to={`/disponibilites?espace=${e.id}`}>
+        <Link className={classesBouton("secondaire")} to={`/disponibilites?espace=${e.id}`}>
           Voir les disponibilités
         </Link>
-        <Link className="bouton bouton--principal" to={connecte ? `/espace/demande?espace=${e.id}` : "/connexion"}>
+        <Link className={classesBouton("principal")} to={connecte ? `/espace/demande?espace=${e.id}` : "/connexion"}>
           {connecte ? "Faire une demande" : "Se connecter pour faire une demande"}
         </Link>
       </p>

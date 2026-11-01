@@ -81,7 +81,7 @@ export function ListePieces({ pieces, dossier }: { pieces: PiecePortail[]; dossi
             </p>
             {p.lignes.length ? (
               <table className="tableau">
-                <caption className="visuellement-masque">Détail de {p.numero}</caption>
+                <caption className="sr-only">Détail de {p.numero}</caption>
                 <thead>
                   <tr>
                     <th scope="col">Désignation</th>
@@ -123,17 +123,17 @@ export function ListePieces({ pieces, dossier }: { pieces: PiecePortail[]; dossi
             <p className="actions">
               {p.pdf ? (
                 <Bouton variante="secondaire" onClick={() => void telecharger(`/api/portail/factures/${p.id}/fichier`, `${p.numero}.pdf`)}>
-                  Télécharger<span className="visuellement-masque"> {p.nature_libelle} {p.numero}</span> (PDF)
+                  Télécharger<span className="sr-only"> {p.nature_libelle} {p.numero}</span> (PDF)
                 </Bouton>
               ) : null}
               {p.a_accepter ? (
                 <Bouton onClick={() => accepter.mutate(p)} enCours={accepter.isPending}>
-                  Accepter le devis<span className="visuellement-masque"> {p.numero}</span>
+                  Accepter le devis<span className="sr-only"> {p.numero}</span>
                 </Bouton>
               ) : null}
               {p.paiement_en_ligne ? (
                 <Bouton onClick={() => payer.mutate(p)} enCours={payer.isPending}>
-                  Payer en ligne {p.reste_texte}<span className="visuellement-masque"> la facture {p.numero}</span> (PayFiP, site de la DGFiP)
+                  Payer en ligne {p.reste_texte}<span className="sr-only"> la facture {p.numero}</span> (PayFiP, site de la DGFiP)
                 </Bouton>
               ) : null}
             </p>

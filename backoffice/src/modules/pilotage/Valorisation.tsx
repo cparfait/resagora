@@ -210,17 +210,17 @@ export function Valorisation() {
               <span className="actions">
                 {calcul && ouvert ? (
                   <Bouton variante="lien" onClick={() => operation.mutate({ url: `/api/gestion/valorisation/exercices/${exercice?.id}/calculer`, corps: { usager: l.usager } })}>
-                    Recalculer<span className="visuellement-masque"> : {l.usager_nom}</span>
+                    Recalculer<span className="sr-only"> : {l.usager_nom}</span>
                   </Bouton>
                 ) : null}
                 {calcul && l.figee && !l.attestation && l.usager_type === "association" && l.nature > 0 ? (
                   <Bouton variante="lien" onClick={() => operation.mutate({ url: `/api/gestion/valorisation/valorisations/${l.valorisation}/attestation` })}>
-                    Éditer et faire signer l'attestation<span className="visuellement-masque"> : {l.usager_nom}</span>
+                    Éditer et faire signer l'attestation<span className="sr-only"> : {l.usager_nom}</span>
                   </Bouton>
                 ) : null}
                 {peut("cloturer_valorisation") && !ouvert ? (
                   <Bouton variante="lien" onClick={() => { setSaisie({ ...saisie, motif: "", valorisation: l.valorisation ?? 0 }); setDialogue("recalcul"); }}>
-                    Procédure de recalcul<span className="visuellement-masque"> : {l.usager_nom}</span>
+                    Procédure de recalcul<span className="sr-only"> : {l.usager_nom}</span>
                   </Bouton>
                 ) : null}
               </span>

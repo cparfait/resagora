@@ -2,6 +2,8 @@
  * Gabarit des pages (RGAA 9 et 12) : lien d'évitement, en-tête, navigation principale, contenu, pied de
  * page avec l'état d'accessibilité ; à chaque changement de page, le focus est placé sur le titre (TitrePage).
  */
+import { classesAlerte } from "./ui/Elements";
+import { classesBouton } from "./ui/Bouton";
 import { useQuery } from "@tanstack/react-query";
 import type { ReactNode } from "react";
 import { Link, NavLink, useNavigate } from "react-router";
@@ -43,7 +45,7 @@ function Navigation() {
               <NavLink to="/espace/compte">Mon compte{contact ? ` (${contact.prenom})` : ""}</NavLink>
             </li>
             <li>
-              <button type="button" className="bouton bouton--lien" onClick={() => void deconnecter().then(() => naviguer("/"))}>
+              <button type="button" className={classesBouton("lien")} onClick={() => void deconnecter().then(() => naviguer("/"))}>
                 Se déconnecter
               </button>
             </li>
@@ -82,7 +84,7 @@ export function Cadre({ children }: { children: ReactNode }) {
       </header>
       <main id="contenu" tabIndex={-1} className="contenu">
         {expiree ? (
-          <div className="alerte alerte--attention" role="status">
+          <div className={classesAlerte("attention")} role="status">
             <p>
               Votre session a expiré. <Link to="/connexion">Reconnectez-vous</Link> pour continuer.
             </p>

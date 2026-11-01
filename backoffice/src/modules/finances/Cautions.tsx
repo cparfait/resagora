@@ -150,37 +150,37 @@ export function Cautions({ alertes = false }: { alertes?: boolean }) {
             <>
               {peut("gerer_caution") && c.statut === "attendue" ? (
                 <Bouton variante="lien" onClick={() => setAction({ type: "recevoir", caution: c })}>
-                  Enregistrer le dépôt<span className="visuellement-masque"> : {c.dossier_numero}</span>
+                  Enregistrer le dépôt<span className="sr-only"> : {c.dossier_numero}</span>
                 </Bouton>
               ) : null}
               {peut("gerer_caution") && ["recue", "restituable"].includes(c.statut) && !c.etat_sortie && c.derniere_seance ? (
                 <Bouton variante="lien" onClick={() => setAction({ type: "etat", caution: c })}>
-                  État des lieux de sortie<span className="visuellement-masque"> : {c.dossier_numero}</span>
+                  État des lieux de sortie<span className="sr-only"> : {c.dossier_numero}</span>
                 </Bouton>
               ) : null}
               {peut("gerer_caution") && c.statut === "restituable" ? (
                 <Bouton variante="lien" onClick={() => operation.mutate({ url: `/api/gestion/finances/cautions/${c.id}/restituer` })}>
-                  Restituer<span className="visuellement-masque"> : {c.dossier_numero}</span>
+                  Restituer<span className="sr-only"> : {c.dossier_numero}</span>
                 </Bouton>
               ) : null}
               {peut("proposer_retenue") && ["recue", "restituable"].includes(c.statut) && c.etat_sortie ? (
                 <Bouton variante="lien" onClick={() => setAction({ type: "retenue", caution: c })}>
-                  Proposer une retenue<span className="visuellement-masque"> : {c.dossier_numero}</span>
+                  Proposer une retenue<span className="sr-only"> : {c.dossier_numero}</span>
                 </Bouton>
               ) : null}
               {peut("valider_retenue") && c.statut === "retenue_a_valider" ? (
                 <Bouton variante="lien" onClick={() => setAction({ type: "validation", caution: c })}>
-                  Statuer sur la retenue<span className="visuellement-masque"> : {c.dossier_numero}</span>
+                  Statuer sur la retenue<span className="sr-only"> : {c.dossier_numero}</span>
                 </Bouton>
               ) : null}
               {peut("gerer_caution") && c.statut === "retenue_partielle" ? (
                 <Bouton variante="lien" onClick={() => operation.mutate({ url: `/api/gestion/finances/cautions/${c.id}/restituer` })}>
-                  Restituer le solde<span className="visuellement-masque"> : {c.dossier_numero}</span>
+                  Restituer le solde<span className="sr-only"> : {c.dossier_numero}</span>
                 </Bouton>
               ) : null}
               {peut("gerer_caution") && ["solde_restitue", "retenue_totale"].includes(c.statut) ? (
                 <Bouton variante="lien" onClick={() => setAction({ type: "encaisser", caution: c })}>
-                  Encaisser la retenue<span className="visuellement-masque"> : {c.dossier_numero}</span>
+                  Encaisser la retenue<span className="sr-only"> : {c.dossier_numero}</span>
                 </Bouton>
               ) : null}
             </>

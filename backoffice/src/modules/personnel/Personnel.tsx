@@ -70,7 +70,7 @@ function ActionsAgent({ agent }: { agent: Ligne }) {
   const nom = `${String(agent.prenom)} ${String(agent.nom)}`;
   const voir = (
     <Link to={`/personnel/vacations?agent=${agent.id}`}>
-      Voir son planning<span className="visuellement-masque"> : {nom}</span>
+      Voir son planning<span className="sr-only"> : {nom}</span>
     </Link>
   );
   if (!peut("planifier_personnel")) return voir;
@@ -78,10 +78,10 @@ function ActionsAgent({ agent }: { agent: Ligne }) {
     <>
       {voir}
       <Bouton variante="lien" onClick={() => emettre.mutate()} enCours={emettre.isPending}>
-        Lien iCal<span className="visuellement-masque"> de {nom}</span>
+        Lien iCal<span className="sr-only"> de {nom}</span>
       </Bouton>
       <Bouton variante="lien" onClick={() => revoquer.mutate()}>
-        Révoquer l'iCal<span className="visuellement-masque"> de {nom}</span>
+        Révoquer l'iCal<span className="sr-only"> de {nom}</span>
       </Bouton>
       <Bouton
         variante="lien"
@@ -90,7 +90,7 @@ function ActionsAgent({ agent }: { agent: Ligne }) {
           void telecharger(construireChemin("/api/gestion/personnel/vacations/planning-pdf", { agent: agent.id, du: isoJour(du), au: isoJour(ajouterJours(du, 27)) }), `planning-${String(agent.matricule)}.pdf`);
         }}
       >
-        Planning PDF<span className="visuellement-masque"> de {nom}</span>
+        Planning PDF<span className="sr-only"> de {nom}</span>
       </Bouton>
       <Dialogue ouvert={lien !== null} titre={`Abonnement iCal — ${nom}`} onFermer={() => setLien(null)}>
         <p>Transmettez ce lien à l'agent : il ne sera plus affiché. Le lien précédent ne fonctionne plus.</p>
@@ -228,7 +228,7 @@ function AppliquerTrame({ trame }: { trame: Ligne }) {
   if (!peut("planifier_personnel")) return null;
   return (
     <Bouton variante="lien" onClick={() => appliquer.mutate()} enCours={appliquer.isPending}>
-      Appliquer sur la saison<span className="visuellement-masque"> : {String(trame.nom)}</span>
+      Appliquer sur la saison<span className="sr-only"> : {String(trame.nom)}</span>
     </Bouton>
   );
 }
@@ -452,13 +452,13 @@ function RetirerAppareil({ appareil }: { appareil: Ligne }) {
   if (appareil.a_autoriser && !appareil.revoque_le)
     return (
       <Bouton variante="lien" onClick={() => operation.mutate("autoriser")} enCours={operation.isPending}>
-        Autoriser cet appareil<span className="visuellement-masque"> : {String(appareil.libelle)}</span>
+        Autoriser cet appareil<span className="sr-only"> : {String(appareil.libelle)}</span>
       </Bouton>
     );
   if (!appareil.actif) return null;
   return (
     <Bouton variante="lien" onClick={() => operation.mutate("retirer")} enCours={operation.isPending}>
-      Retirer (perte, vol)<span className="visuellement-masque"> : {String(appareil.libelle)}</span>
+      Retirer (perte, vol)<span className="sr-only"> : {String(appareil.libelle)}</span>
     </Bouton>
   );
 }
@@ -578,7 +578,7 @@ export function Saisies() {
           actions={(s) =>
             s.statut !== "acceptee" && peut("planifier_personnel") ? (
               <Bouton variante="lien" onClick={() => examiner.mutate(s.id)}>
-                Marquer examinée<span className="visuellement-masque"> : saisie de {s.agent_nom} du {dateHeure(s.horodatage_appareil)}</span>
+                Marquer examinée<span className="sr-only"> : saisie de {s.agent_nom} du {dateHeure(s.horodatage_appareil)}</span>
               </Bouton>
             ) : null
           }

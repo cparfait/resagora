@@ -405,7 +405,7 @@ export function MaStructure() {
                 <li key={p.id}>
                   {p.type_libelle} — {p.nom_fichier} — {p.statut_libelle}, déposée le {date(p.depose_le)}{" "}
                   <Bouton variante="lien" onClick={() => void telecharger(`/api/portail/usagers/${id}/pieces/${p.id}/fichier`, p.nom_fichier)}>
-                    Télécharger<span className="visuellement-masque"> {p.nom_fichier}</span>
+                    Télécharger<span className="sr-only"> {p.nom_fichier}</span>
                   </Bouton>
                 </li>
               ))}
@@ -427,14 +427,14 @@ export function MaStructure() {
                 <span className="actions">
                   <Bouton variante="lien" onClick={() => modifierContact.mutate({ id: c.id, peut_signer: !c.peut_signer })}>
                     {c.peut_signer ? "Retirer l'habilitation à signer" : "Habiliter à signer"}
-                    <span className="visuellement-masque">
+                    <span className="sr-only">
                       {" "}
                       : {c.prenom} {c.nom}
                     </span>
                   </Bouton>
                   <Bouton variante="lien" onClick={() => retirerContact.mutate(c)}>
                     Retirer de la structure
-                    <span className="visuellement-masque">
+                    <span className="sr-only">
                       {" "}
                       : {c.prenom} {c.nom}
                     </span>
@@ -509,7 +509,7 @@ export function Campagnes() {
             </p>
             {c.sites.length ? <p>Sites : {c.sites.join(", ")}</p> : null}
             <Bouton onClick={() => deposer.mutate(c)} enCours={deposer.isPending} disabled={!valides.length}>
-              Demander des créneaux<span className="visuellement-masque"> — {c.nom}</span>
+              Demander des créneaux<span className="sr-only"> — {c.nom}</span>
             </Bouton>
           </li>
         ))}

@@ -103,7 +103,7 @@ function Grille({ donnees, espace }: { donnees: Reponse; espace: string }) {
                     </span>
                     <span className="seance__titre">{c.occupant}</span>
                     {espace !== String(c.espace) ? <span className="seance__titre">{c.espace_nom}</span> : null}
-                    <span className="visuellement-masque">{`, ${libelle}${details(c) ? `, ${details(c)}` : ""}`}</span>
+                    <span className="sr-only">{`, ${libelle}${details(c) ? `, ${details(c)}` : ""}`}</span>
                   </Link>
                 );
               })}

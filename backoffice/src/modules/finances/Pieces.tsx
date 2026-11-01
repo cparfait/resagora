@@ -118,12 +118,12 @@ export function TableauPieces({ pieces, legende, rafraichir }: { pieces: Piece[]
           <>
             {p.document ? (
               <Bouton variante="lien" onClick={() => void telecharger(`/api/gestion/finances/pieces/${p.id}/fichier`, `${p.numero ?? "piece"}.pdf`)}>
-                PDF<span className="visuellement-masque"> de {p.numero}</span>
+                PDF<span className="sr-only"> de {p.numero}</span>
               </Bouton>
             ) : null}
             {peut("emettre_facture") && p.nature === "devis" && p.statut === "emis" ? (
               <Bouton variante="lien" onClick={() => operation.mutate({ url: `/api/gestion/finances/pieces/${p.id}/accepter` })}>
-                Enregistrer l'acceptation<span className="visuellement-masque"> de {p.numero}</span>
+                Enregistrer l'acceptation<span className="sr-only"> de {p.numero}</span>
               </Bouton>
             ) : null}
             {peut("emettre_avoir") && ["facture", "acompte"].includes(p.nature) && p.statut !== "annulee" ? (
@@ -134,17 +134,17 @@ export function TableauPieces({ pieces, legende, rafraichir }: { pieces: Piece[]
                   setAction({ type: "avoir", piece: p });
                 }}
               >
-                Avoir…<span className="visuellement-masque"> sur {p.numero}</span>
+                Avoir…<span className="sr-only"> sur {p.numero}</span>
               </Bouton>
             ) : null}
             {peut("encaisser") && ["facture", "acompte"].includes(p.nature) && ["a_titrer", "titre_emis", "solde_partiel", "en_recouvrement"].includes(p.statut) ? (
               <Bouton variante="lien" onClick={() => setAction({ type: "pointer", piece: p })}>
-                Pointer un règlement<span className="visuellement-masque"> de {p.numero}</span>
+                Pointer un règlement<span className="sr-only"> de {p.numero}</span>
               </Bouton>
             ) : null}
             {peut("exporter_titres") && p.nature !== "devis" && !p.titre_numero ? (
               <Bouton variante="lien" onClick={() => setAction({ type: "titre", piece: p })}>
-                Numéro de titre…<span className="visuellement-masque"> de {p.numero}</span>
+                Numéro de titre…<span className="sr-only"> de {p.numero}</span>
               </Bouton>
             ) : null}
           </>
@@ -337,11 +337,11 @@ export function TitresCiril() {
           actions={(l) => (
             <>
               <Bouton variante="lien" onClick={() => void telecharger(`/api/gestion/finances/lots-titres/${l.id}/fichier`, `titres-${l.numero}.${l.format}`)}>
-                Retélécharger<span className="visuellement-masque"> le lot {l.numero}</span>
+                Retélécharger<span className="sr-only"> le lot {l.numero}</span>
               </Bouton>
               {l.annule_le ? null : (
                 <Bouton variante="lien" onClick={() => setRejet({ lot: l, motif: "" })}>
-                  Rejeté par Ciril…<span className="visuellement-masque"> lot {l.numero}</span>
+                  Rejeté par Ciril…<span className="sr-only"> lot {l.numero}</span>
                 </Bouton>
               )}
             </>

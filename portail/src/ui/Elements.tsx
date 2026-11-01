@@ -1,6 +1,8 @@
 /** Éléments communs du portail : titre de page, états de chargement et d'erreur, alertes, formats. */
 import { useEffect, useRef, type ReactNode } from "react";
 import { messageErreur } from "../api/http";
+import { classesBouton } from "./Bouton";
+import { cn } from "./cn";
 
 const SUFFIXE = "Portail des équipements — Ville de Châtillon";
 let premierAffichage = true;
@@ -21,8 +23,13 @@ export function TitrePage({ titre, sousTitre, children }: { titre: string; sousT
     titreRef.current?.focus();
   }, []);
   return (
-    <div className="entete-page">
-      <h1 tabIndex={-1} id="titre-page" ref={titreRef}>
+    <div className="mb-6">
+      <h1
+        tabIndex={-1}
+        id="titre-page"
+        ref={titreRef}
+        className="m-0 text-[1.75rem] leading-tight font-bold text-encre after:mt-2 after:block after:h-1 after:w-10 after:bg-anis after:content-[''] focus:outline-none sm:text-h1"
+      >
         {titre}
       </h1>
       {children}
@@ -32,7 +39,7 @@ export function TitrePage({ titre, sousTitre, children }: { titre: string; sousT
 
 export function Chargement({ texte = "Chargement en cours…" }: { texte?: string }) {
   return (
-    <p className="chargement" role="status" aria-live="polite">
+    <p className="text-encre-douce" role="status" aria-live="polite">
       {texte}
     </p>
   );
@@ -40,10 +47,10 @@ export function Chargement({ texte = "Chargement en cours…" }: { texte?: strin
 
 export function ErreurChargement({ erreur, reessayer }: { erreur: unknown; reessayer?: () => void }) {
   return (
-    <div className="alerte alerte--erreur" role="alert">
-      <p>{messageErreur(erreur, "Les informations n'ont pas pu être chargées.")}</p>
+    <div className={classesAlerte("erreur")} role="alert">
+      <p className="mt-0">{messageErreur(erreur, "Les informations n'ont pas pu être chargées.")}</p>
       {reessayer ? (
-        <button type="button" className="bouton bouton--secondaire" onClick={reessayer}>
+        <button type="button" className={classesBouton("secondaire")} onClick={reessayer}>
           Réessayer
         </button>
       ) : null}
@@ -51,17 +58,40 @@ export function ErreurChargement({ erreur, reessayer }: { erreur: unknown; reess
   );
 }
 
+type TonAlerte = "info" | "succes" | "attention" | "erreur";
+
+const TONS_ALERTE: Record<TonAlerte, string> = {
+  info: "border-l-vert bg-info-fond",
+  succes: "border-l-succes bg-succes-fond",
+  attention: "border-l-attention bg-attention-fond",
+  erreur: "border-l-danger bg-danger-fond",
+};
+
+/** Bandeau d'alerte de la charte : fond teinté, filet de 6 px à gauche, texte encre (le message dit le statut). */
+export function classesAlerte(ton: TonAlerte = "info"): string {
+  return cn("my-4 border-l-[6px] px-4 py-3 text-encre focus:outline-3 focus:outline-offset-3 focus:outline-vert-profond", TONS_ALERTE[ton]);
+}
+
 export function Alerte({ ton = "info", titre, children }: { ton?: "info" | "succes" | "attention" | "erreur"; titre?: string; children: ReactNode }) {
   return (
-    <div className={`alerte alerte--${ton}`} role={ton === "erreur" ? "alert" : "status"}>
-      {titre ? <p className="alerte__titre">{titre}</p> : null}
+    <div className={classesAlerte(ton)} role={ton === "erreur" ? "alert" : "status"}>
+      {titre ? <p className="m-0 mb-1 font-bold">{titre}</p> : null}
       {children}
     </div>
   );
 }
 
+const TONS_ETIQUETTE = {
+  neutre: "bg-fond text-encre-douce",
+  info: "bg-info-fond text-info",
+  succes: "bg-succes-fond text-succes",
+  attention: "bg-attention-fond text-attention",
+  danger: "bg-danger-fond text-danger",
+};
+
+/** Pastille de statut : le statut est toujours écrit, la couleur ne fait que le souligner. */
 export function Etiquette({ texte, ton = "neutre" }: { texte: string; ton?: "neutre" | "info" | "succes" | "attention" | "danger" }) {
-  return <span className={`etiquette etiquette--${ton}`}>{texte}</span>;
+  return <span className={cn("ml-1 inline-flex items-center rounded-full border border-current px-2.5 text-sm font-semibold", TONS_ETIQUETTE[ton])}>{texte}</span>;
 }
 
 const PARIS = "Europe/Paris";

@@ -203,13 +203,13 @@ export function DocumentsDossier({ dossier }: { dossier: number }) {
               {peut("envoyer_signature") && d.statut === "scan_a_controler" ? (
                 <>
                   <Bouton variante="lien" onClick={() => void telecharger(`/api/gestion/documents/documents/${d.id}/scan`, `${d.numero}-scan.pdf`)}>
-                    Voir le scan déposé<span className="visuellement-masque"> : {d.numero}</span>
+                    Voir le scan déposé<span className="sr-only"> : {d.numero}</span>
                   </Bouton>
                   <Bouton variante="lien" onClick={() => operation.mutate({ url: `/api/gestion/documents/documents/${d.id}/controler-scan`, corps: { accepter: true } })}>
-                    Constater la signature<span className="visuellement-masque"> : {d.numero}</span>
+                    Constater la signature<span className="sr-only"> : {d.numero}</span>
                   </Bouton>
                   <Bouton variante="lien" onClick={() => setAction({ type: "controle", document: d })}>
-                    Refuser le scan<span className="visuellement-masque"> : {d.numero}</span>
+                    Refuser le scan<span className="sr-only"> : {d.numero}</span>
                   </Bouton>
                 </>
               ) : null}
@@ -221,7 +221,7 @@ export function DocumentsDossier({ dossier }: { dossier: number }) {
               {peut("generer_document") && d.statut !== "annule" ? (
                 <Bouton variante="lien" onClick={() => operation.mutate({ url: `/api/gestion/documents/documents/${d.id}/visibilite`, corps: { visible_portail: !d.visible_portail } })}>
                   {d.visible_portail ? "Retirer du portail" : "Publier sur le portail"}
-                  <span className="visuellement-masque"> : {d.numero}</span>
+                  <span className="sr-only"> : {d.numero}</span>
                 </Bouton>
               ) : null}
               {peut("generer_document") && ["signe", "signe_manuellement"].includes(d.statut) ? (

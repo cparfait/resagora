@@ -255,7 +255,7 @@ export function LotsDocuments() {
           actions={(l) =>
             peut("generer_document") && (l.statut === "echec" || l.erreurs.length > 0) ? (
               <Bouton variante="lien" onClick={() => relancer.mutate(l)} enCours={relancer.isPending}>
-                Relancer<span className="visuellement-masque"> le lot {l.libelle}</span>
+                Relancer<span className="sr-only"> le lot {l.libelle}</span>
               </Bouton>
             ) : null
           }

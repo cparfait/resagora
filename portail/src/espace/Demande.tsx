@@ -33,7 +33,7 @@ export function Indicateur({ etape }: { etape: number }) {
         {ETAPES.map((libelle, i) => (
           <li key={libelle} aria-current={i + 1 === etape ? "step" : undefined} className={i + 1 < etape ? "etapes__faite" : undefined}>
             {libelle}
-            {i + 1 < etape ? <span className="visuellement-masque"> (terminée)</span> : null}
+            {i + 1 < etape ? <span className="sr-only"> (terminée)</span> : null}
           </li>
         ))}
       </ol>
@@ -280,7 +280,7 @@ export function Demande() {
             />
           ))}
           {apercuCreneaux.length ? (
-            <ul className="visuellement-masque" aria-live="polite">
+            <ul className="sr-only" aria-live="polite">
               {apercuCreneaux.map((c, i) => (
                 <li key={i}>
                   Créneau {i + 1} : {c.erreur || `${c.seances} séance(s)`}
@@ -447,7 +447,7 @@ function PieceADeposer({ piece, deposer, enCours }: { piece: PieceExigee; depose
           <Champ libelle={`Fichier : ${piece.libelle}`} type="file" accept=".pdf,.jpg,.jpeg,.png" obligatoire aide="PDF, JPEG ou PNG, 10 Mo au plus." onChange={(e) => setFichier(e.target.files?.[0] ?? null)} />
           <Champ libelle="Valable jusqu'au (si indiqué sur le document)" type="date" aide="Format : jj/mm/aaaa." value={fin} onChange={(e) => setFin(e.target.value)} />
           <Bouton type="submit" variante="secondaire" enCours={enCours} disabled={!fichier}>
-            Déposer<span className="visuellement-masque"> {piece.libelle}</span>
+            Déposer<span className="sr-only"> {piece.libelle}</span>
           </Bouton>
         </form>
       ) : null}

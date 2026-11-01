@@ -60,7 +60,7 @@ export function MesAttestations() {
                     }}
                   >
                     Télécharger l'attestation {a.exercice}
-                    <span className="visuellement-masque"> de {a.usager_nom} (PDF)</span>
+                    <span className="sr-only"> de {a.usager_nom} (PDF)</span>
                   </Bouton>
                 </td>
               </tr>

@@ -76,15 +76,15 @@ export function Grilles() {
           <>
             {g.statut === "brouillon" ? (
               <Bouton variante="lien" onClick={() => action.mutate({ id: g.id, verbe: "voter" })}>
-                Déclarer votée<span className="visuellement-masque"> : {String(g.nom)}</span>
+                Déclarer votée<span className="sr-only"> : {String(g.nom)}</span>
               </Bouton>
             ) : null}
             <Bouton variante="lien" onClick={() => action.mutate({ id: g.id, verbe: "dupliquer" })}>
-              Dupliquer<span className="visuellement-masque"> : {String(g.nom)}</span>
+              Dupliquer<span className="sr-only"> : {String(g.nom)}</span>
             </Bouton>
             {g.statut === "votee" ? (
               <Bouton variante="lien" onClick={() => action.mutate({ id: g.id, verbe: "archiver" })}>
-                Archiver<span className="visuellement-masque"> : {String(g.nom)}</span>
+                Archiver<span className="sr-only"> : {String(g.nom)}</span>
               </Bouton>
             ) : null}
           </>

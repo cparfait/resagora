@@ -1,4 +1,6 @@
 /** Cadre des écrans : lien d'évitement, en-tête, navigation filtrée par les droits, contenu principal. */
+import { BASE_BOUTON, CLASSES_BOUTON } from "../ui/Bouton";
+import { cn } from "../ui/cn";
 import { useQueryClient } from "@tanstack/react-query";
 import { Suspense, useEffect, useRef } from "react";
 import { NavLink, Outlet, useLocation } from "react-router";
@@ -41,7 +43,7 @@ export function Cadre() {
         </p>
         <div className="cadre__utilisateur">
           <span>{moi?.nom_affiche}</span>
-          <button type="button" className="bouton bouton--secondaire" onClick={() => void deconnecter()}>
+          <button type="button" className={cn(BASE_BOUTON, CLASSES_BOUTON.secondaire, "border-blanc bg-transparent text-blanc hover:bg-vert-fonce hover:text-blanc")} onClick={() => void deconnecter()}>
             Se déconnecter
           </button>
         </div>

@@ -1,4 +1,5 @@
 /** POR-05 suivi des dossiers ; POR-08 messagerie ; POR-10 signature ; SIG-05 scan signé ; PLA-10 annulation. */
+import { classesBouton } from "../ui/Bouton";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { Link, useNavigate, useParams } from "react-router";
@@ -55,7 +56,7 @@ export function TableauDeBord() {
           ) : null}
           <p className="actions">
             {premiere ? (
-              <Link className="bouton bouton--principal" to="/espace/demande">
+              <Link className={classesBouton("principal")} to="/espace/demande">
                 Nouvelle demande
               </Link>
             ) : null}
@@ -121,7 +122,7 @@ export function MesDossiers() {
     <>
       <TitrePage titre="Mes demandes" />
       <p>
-        <Link className="bouton bouton--principal" to="/espace/demande">
+        <Link className={classesBouton("principal")} to="/espace/demande">
           Nouvelle demande
         </Link>
       </p>
@@ -205,16 +206,16 @@ function Documents({ dossier }: { dossier: number }) {
             </p>
             <p className="actions">
               <Bouton variante="secondaire" onClick={() => void telecharger(`/api/portail/dossiers/${dossier}/documents/${d.id}/fichier`, `${d.numero}.pdf`)}>
-                Télécharger<span className="visuellement-masque"> {d.titre}</span> (PDF, {taille(d.taille)})
+                Télécharger<span className="sr-only"> {d.titre}</span> (PDF, {taille(d.taille)})
               </Bouton>
               {d.a_signer_en_ligne ? (
                 <Bouton onClick={() => signer.mutate(d)} enCours={signer.isPending}>
-                  Signer en ligne<span className="visuellement-masque"> {d.titre}</span>
+                  Signer en ligne<span className="sr-only"> {d.titre}</span>
                 </Bouton>
               ) : null}
               {d.scan_attendu ? (
                 <Bouton variante="lien" onClick={() => setScan({ document: d, fichier: null })}>
-                  Déposer le document signé à la main<span className="visuellement-masque"> : {d.titre}</span>
+                  Déposer le document signé à la main<span className="sr-only"> : {d.titre}</span>
                 </Bouton>
               ) : null}
             </p>
@@ -360,7 +361,7 @@ export function FicheDossier() {
                     {s.signalement ? ` — ${s.signalement}` : ""}{" "}
                     {s.annulable ? (
                       <Bouton variante="lien" onClick={() => setAnnulation({ seance: s, motif: "" })}>
-                        Annuler<span className="visuellement-masque"> la séance du {dateHeure(s.debut)}</span>
+                        Annuler<span className="sr-only"> la séance du {dateHeure(s.debut)}</span>
                       </Bouton>
                     ) : null}
                   </li>

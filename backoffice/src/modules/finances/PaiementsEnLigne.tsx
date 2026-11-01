@@ -125,17 +125,17 @@ export default function PaiementsEnLigne() {
             <span className="actions">
               {["creee", "redirigee", "remplacee", "expiree"].includes(t.statut) ? (
                 <Bouton variante="lien" onClick={() => operation.mutate({ url: `${base}/${t.id}/verifier` })}>
-                  Vérifier auprès de PayFiP<span className="visuellement-masque"> : {t.facture}</span>
+                  Vérifier auprès de PayFiP<span className="sr-only"> : {t.facture}</span>
                 </Bouton>
               ) : null}
               {t.statut === "a_controler" ? (
                 <Bouton variante="lien" onClick={() => setAction({ genre: "clore", tentative: t })}>
-                  Clore après contrôle<span className="visuellement-masque"> : {t.facture}</span>
+                  Clore après contrôle<span className="sr-only"> : {t.facture}</span>
                 </Bouton>
               ) : null}
               {t.trop_percu > 0 && !t.rembourse_le ? (
                 <Bouton variante="lien" onClick={() => setAction({ genre: "rembourser", tentative: t })}>
-                  Enregistrer le remboursement<span className="visuellement-masque"> : {t.facture}</span>
+                  Enregistrer le remboursement<span className="sr-only"> : {t.facture}</span>
                 </Bouton>
               ) : null}
             </span>

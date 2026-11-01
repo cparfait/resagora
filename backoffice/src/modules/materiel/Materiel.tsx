@@ -61,7 +61,7 @@ function TarifMateriel({ materiel }: { materiel: Ligne }) {
           setOuvert(true);
         }}
       >
-        Tarif<span className="visuellement-masque"> : {String(materiel.libelle)}</span>
+        Tarif<span className="sr-only"> : {String(materiel.libelle)}</span>
       </Bouton>
       <Dialogue ouvert={ouvert} titre={`Tarif — ${String(materiel.libelle)}`} onFermer={() => setOuvert(false)}>
         <form
@@ -255,21 +255,21 @@ export function Stocks() {
           actions={(s) => (
             <span className="actions">
               <Bouton variante="lien" onClick={() => ouvrir({ type: "panne", stock: s })}>
-                Panne<span className="visuellement-masque"> : {s.materiel_libelle}, {s.site_nom}</span>
+                Panne<span className="sr-only"> : {s.materiel_libelle}, {s.site_nom}</span>
               </Bouton>
               {ecriture ? (
                 <>
                   <Bouton variante="lien" onClick={() => ouvrir({ type: "controle", stock: s })}>
-                    Contrôle<span className="visuellement-masque"> : {s.materiel_libelle}, {s.site_nom}</span>
+                    Contrôle<span className="sr-only"> : {s.materiel_libelle}, {s.site_nom}</span>
                   </Bouton>
                   <Bouton variante="lien" onClick={() => ouvrir({ type: "transferer", stock: s })}>
-                    Transférer<span className="visuellement-masque"> : {s.materiel_libelle}, {s.site_nom}</span>
+                    Transférer<span className="sr-only"> : {s.materiel_libelle}, {s.site_nom}</span>
                   </Bouton>
                   <Bouton variante="lien" onClick={() => ouvrir({ type: "perte", stock: s })}>
-                    Perte<span className="visuellement-masque"> : {s.materiel_libelle}, {s.site_nom}</span>
+                    Perte<span className="sr-only"> : {s.materiel_libelle}, {s.site_nom}</span>
                   </Bouton>
                   <Bouton variante="lien" onClick={() => ouvrir({ type: "inventaire", stock: s })}>
-                    Inventaire<span className="visuellement-masque"> : {s.materiel_libelle}, {s.site_nom}</span>
+                    Inventaire<span className="sr-only"> : {s.materiel_libelle}, {s.site_nom}</span>
                   </Bouton>
                 </>
               ) : null}
@@ -402,33 +402,33 @@ function TableauPrets({ prets, titre }: { prets: Pret[]; titre: string }) {
           <span className="actions">
             {p.statut === "demandee" && peut("creer_reservation") ? (
               <Bouton variante="lien" onClick={() => operation.mutate({ url: `/api/gestion/materiel/prets/${p.id}/valider` })}>
-                Valider<span className="visuellement-masque"> : {decrire(p)}</span>
+                Valider<span className="sr-only"> : {decrire(p)}</span>
               </Bouton>
             ) : null}
             {["demandee", "validee"].includes(p.statut) && peut("creer_reservation") ? (
               <Bouton variante="lien" onClick={() => ouvrir("refuser", p)}>
                 {p.statut === "demandee" ? "Refuser" : "Annuler"}
-                <span className="visuellement-masque"> : {decrire(p)}</span>
+                <span className="sr-only"> : {decrire(p)}</span>
               </Bouton>
             ) : null}
             {p.statut === "validee" && peut("gerer_materiel") ? (
               <Bouton variante="lien" onClick={() => ouvrir("sortir", p)}>
-                Remettre<span className="visuellement-masque"> : {decrire(p)}</span>
+                Remettre<span className="sr-only"> : {decrire(p)}</span>
               </Bouton>
             ) : null}
             {p.statut === "sortie" && peut("gerer_materiel") ? (
               <Bouton variante="lien" onClick={() => ouvrir("rendre", p)}>
-                Enregistrer le retour<span className="visuellement-masque"> : {decrire(p)}</span>
+                Enregistrer le retour<span className="sr-only"> : {decrire(p)}</span>
               </Bouton>
             ) : null}
             {p.manquants > 0 && peut("gerer_materiel") ? (
               <Bouton variante="lien" onClick={() => ouvrir("retrouver", p)}>
-                Manquants rapportés<span className="visuellement-masque"> : {decrire(p)}</span>
+                Manquants rapportés<span className="sr-only"> : {decrire(p)}</span>
               </Bouton>
             ) : null}
             {p.manquants > 0 && !p.manquants_regles && peut("gerer_materiel") ? (
               <Bouton variante="lien" onClick={() => ouvrir("regler-manquants", p)}>
-                Statuer sur les manquants<span className="visuellement-masque"> : {decrire(p)}</span>
+                Statuer sur les manquants<span className="sr-only"> : {decrire(p)}</span>
               </Bouton>
             ) : null}
           </span>
@@ -681,7 +681,7 @@ export function Pannes() {
           actions={(p) =>
             p.statut === "ouverte" && peut("gerer_materiel") ? (
               <Bouton variante="lien" onClick={() => setResolution({ panne: p, issue: "reparee", texte: "" })}>
-                Résoudre<span className="visuellement-masque"> : {String(p.stock_libelle)}</span>
+                Résoudre<span className="sr-only"> : {String(p.stock_libelle)}</span>
               </Bouton>
             ) : null
           }

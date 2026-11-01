@@ -3,6 +3,8 @@
  * Le glisser-déposer (PLA-02) déclenche un contrôle côté serveur avant tout déplacement ; la vue liste
  * et le bouton « Déplacer… » offrent la même fonction au clavier.
  */
+import { BASE_BOUTON, CLASSES_BOUTON } from "../../../ui/Bouton";
+import { cn } from "../../../ui/cn";
 import type { CSSProperties, DragEvent, KeyboardEvent } from "react";
 import type { Espace, SeancePlanning, Site } from "../../../api/types";
 import { ajouterJours, COULEURS_TYPE, heure, isoJour, jourCourt, jourLong, memeJour, minutesDuJour, STATUTS, TYPES_USAGER } from "../../../ui/metier";
@@ -53,7 +55,7 @@ function Pastille({ seance, coloration, onOuvrir, style, glissable }: { seance: 
         {heure(seance.debut)}–{heure(seance.fin)}
       </span>
       <span className="seance__titre">{seance.usager}</span>
-      <span className="visuellement-masque">{complementSeance(seance)}</span>
+      <span className="sr-only">{complementSeance(seance)}</span>
       {seance.signalement ? <span aria-hidden="true"> ⚠</span> : null}
     </button>
   );
@@ -181,7 +183,7 @@ export function VueMois({ seances, debut, coloration, onOuvrir, onJour }: Commun
   const cases = Array.from({ length: 42 }, (_, i) => ajouterJours(premier, i - decalage));
   return (
     <table className="mois">
-      <caption className="visuellement-masque">Planning du mois</caption>
+      <caption className="sr-only">Planning du mois</caption>
       <thead>
         <tr>
           {["Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi", "Dimanche"].map((j) => (
@@ -272,7 +274,7 @@ export function VueListe({ seances, onOuvrir }: Pick<Commun, "seances" | "onOuvr
   return (
     <div className="tableau-conteneur">
       <table className="tableau">
-        <caption className="visuellement-masque">Liste des séances de la période</caption>
+        <caption className="sr-only">Liste des séances de la période</caption>
         <thead>
           <tr>
             <th scope="col">Date</th>
@@ -282,7 +284,7 @@ export function VueListe({ seances, onOuvrir }: Pick<Commun, "seances" | "onOuvr
             <th scope="col">Type</th>
             <th scope="col">Statut</th>
             <th scope="col">
-              <span className="visuellement-masque">Actions</span>
+              <span className="sr-only">Actions</span>
             </th>
           </tr>
         </thead>
@@ -312,7 +314,7 @@ export function VueListe({ seances, onOuvrir }: Pick<Commun, "seances" | "onOuvr
                   {s.signalement ? <Badge libelle={`À traiter : ${s.signalement}`} ton="attention" /> : null}
                 </td>
                 <td>
-                  <button type="button" className="bouton bouton--lien" onClick={() => onOuvrir(s)}>
+                  <button type="button" className={cn(BASE_BOUTON, CLASSES_BOUTON.lien)} onClick={() => onOuvrir(s)}>
                     Ouvrir
                   </button>
                 </td>

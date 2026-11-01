@@ -263,7 +263,7 @@ export default function Vacations() {
                 {jourLong(b.debut)}, {heure(b.debut)} – {heure(b.fin)} — {b.site_nom}{" "}
                 {ecriture ? (
                   <Bouton variante="lien" onClick={() => operation.mutate({ methode: "POST", url: `/api/gestion/personnel/besoins/${b.id}/vacation` })}>
-                    Créer la vacation<span className="visuellement-masque"> du {jourLong(b.debut)} {heure(b.debut)}</span>
+                    Créer la vacation<span className="sr-only"> du {jourLong(b.debut)} {heure(b.debut)}</span>
                   </Bouton>
                 ) : null}
               </li>
@@ -309,7 +309,7 @@ export default function Vacations() {
                       <div className="actions">
                         <Bouton variante="lien" onClick={() => setAction({ type: "affecter", vacation: v })}>
                           {v.agent ? "Changer d'agent" : "Affecter un agent"}
-                          <span className="visuellement-masque"> — {jourLong(v.debut)} {heure(v.debut)}</span>
+                          <span className="sr-only"> — {jourLong(v.debut)} {heure(v.debut)}</span>
                         </Bouton>
                         <Bouton
                           variante="lien"
@@ -318,7 +318,7 @@ export default function Vacations() {
                             setAction({ type: "modifier", vacation: v });
                           }}
                         >
-                          Modifier les horaires<span className="visuellement-masque"> — {jourLong(v.debut)} {heure(v.debut)}</span>
+                          Modifier les horaires<span className="sr-only"> — {jourLong(v.debut)} {heure(v.debut)}</span>
                         </Bouton>
                         <Bouton
                           variante="lien"
@@ -327,7 +327,7 @@ export default function Vacations() {
                             setAction({ type: "annuler", vacation: v });
                           }}
                         >
-                          Annuler<span className="visuellement-masque"> la vacation — {jourLong(v.debut)} {heure(v.debut)}</span>
+                          Annuler<span className="sr-only"> la vacation — {jourLong(v.debut)} {heure(v.debut)}</span>
                         </Bouton>
                       </div>
                     ) : null}
