@@ -11,6 +11,8 @@ RUN uv sync --frozen --no-dev --no-install-project
 
 FROM python:3.14.10-slim-trixie@sha256:3cabfd7d7aaf394e6040e79fa1eec6ca1c52b74ed9188650472695d9a9326999
 RUN apt-get update && apt-get upgrade -y && rm -rf /var/lib/apt/lists/* \
+    && rm -rf /usr/local/lib/python3.14/site-packages/pip /usr/local/lib/python3.14/site-packages/pip-* \
+       /usr/local/lib/python3.14/site-packages/setuptools* /usr/local/lib/python3.14/ensurepip /usr/local/bin/pip* \
     && useradd --uid 10001 --create-home --shell /usr/sbin/nologin app
 WORKDIR /app
 COPY --from=construction /app/.venv /app/.venv

@@ -16,6 +16,9 @@ RUN npm run build --workspace ${APPLICATION}
 
 FROM nginxinc/nginx-unprivileged:1.30.6-trixie@sha256:ec0f7ecb1fbd84959ac114e65fb36074ffc97d4d51db0f18ee925162d889dcef
 ARG APPLICATION
+# Correctifs de sécurité Debian appliqués à la construction, sur l'image épinglée (D-074).
+USER root
+RUN apt-get update && apt-get upgrade -y && rm -rf /var/lib/apt/lists/*
 COPY deploy/nginx/commun.inc /etc/nginx/conf.d/commun.inc
 COPY deploy/nginx/${APPLICATION}.conf /etc/nginx/conf.d/default.conf
 COPY --from=construction /src/${APPLICATION}/dist /usr/share/nginx/html

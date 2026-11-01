@@ -4,32 +4,17 @@ Report Summary
 ┌──────────────────────────────────────────┬────────┬─────────────────┬─────────┐
 │                  Target                  │  Type  │ Vulnerabilities │ Secrets │
 ├──────────────────────────────────────────┼────────┼─────────────────┼─────────┤
-│ equipements/backoffice:dev (debian 13.7) │ debian │        1        │    -    │
+│ equipements/backoffice:dev (debian 13.7) │ debian │        0        │    -    │
 └──────────────────────────────────────────┴────────┴─────────────────┴─────────┘
 Legend:
 - '-': Not scanned
 - '0': Clean (no security findings detected)
 
-
-equipements/backoffice:dev (debian 13.7)
-========================================
-Total: 1 (HIGH: 0, CRITICAL: 1)
-
-┌────────────┬─────────────────┬──────────┬────────┬───────────────────┬─────────────────┬──────────────────────────────────────────────────────┐
-│  Library   │  Vulnerability  │ Severity │ Status │ Installed Version │  Fixed Version  │                        Title                         │
-├────────────┼─────────────────┼──────────┼────────┼───────────────────┼─────────────────┼──────────────────────────────────────────────────────┤
-│ libbrotli1 │ CVE-2026-111497 │ CRITICAL │ fixed  │ 1.1.0-2+b7        │ 1.1.0-2+deb13u1 │ brotli: Out-of-Bounds Write in Google Brotli Decoder │
-│            │                 │          │        │                   │                 │ https://avd.aquasec.com/nvd/cve-2026-111497          │
-└────────────┴─────────────────┴──────────┴────────┴───────────────────┴─────────────────┴──────────────────────────────────────────────────────┘
-2026-10-31T23:23:05Z	INFO	[vuln] Vulnerability scanning is enabled
-2026-10-31T23:23:05Z	INFO	[secret] Secret scanning is enabled
-2026-10-31T23:23:05Z	INFO	[secret] If your scanning is slow, please try '--scanners vuln' to disable secret scanning
-2026-10-31T23:23:05Z	INFO	[secret] Please see https://trivy.dev/docs/v0.76/guide/scanner/secret#recommendation for faster secret detection
-2026-10-31T23:23:09Z	INFO	[javadb] Downloading Java DB...
-2026-10-31T23:23:09Z	INFO	[javadb] Downloading artifact...	repo="mirror.gcr.io/aquasec/trivy-java-db:1"
-2026-10-31T23:24:27Z	INFO	[javadb] Artifact successfully downloaded	repo="mirror.gcr.io/aquasec/trivy-java-db:1"
-2026-10-31T23:24:27Z	INFO	[javadb] Java DB is cached for 3 days. If you want to update the database more frequently, "trivy clean --java-db" command clears the DB cache.
-2026-10-31T23:24:27Z	INFO	Detected OS	family="debian" version="13.7"
-2026-10-31T23:24:27Z	INFO	[debian] Detecting vulnerabilities...	os_version="13" pkg_num=145
-2026-10-31T23:24:27Z	INFO	Number of language-specific files	num=0
-2026-10-31T23:24:27Z	WARN	Using severities from other vendors for some vulnerabilities. Read https://trivy.dev/docs/v0.76/guide/scanner/vulnerability#severity-selection for details.
+2026-11-01T00:02:48Z	INFO	[vuln] Vulnerability scanning is enabled
+2026-11-01T00:02:48Z	INFO	[secret] Secret scanning is enabled
+2026-11-01T00:02:48Z	INFO	[secret] If your scanning is slow, please try '--scanners vuln' to disable secret scanning
+2026-11-01T00:02:48Z	INFO	[secret] Please see https://trivy.dev/docs/v0.76/guide/scanner/secret#recommendation for faster secret detection
+2026-11-01T00:02:48Z	INFO	Detected OS	family="debian" version="13.7"
+2026-11-01T00:02:48Z	INFO	[debian] Detecting vulnerabilities...	os_version="13" pkg_num=145
+2026-11-01T00:02:48Z	INFO	Number of language-specific files	num=0
+2026-11-01T00:02:48Z	WARN	Using severities from other vendors for some vulnerabilities. Read https://trivy.dev/docs/v0.76/guide/scanner/vulnerability#severity-selection for details.

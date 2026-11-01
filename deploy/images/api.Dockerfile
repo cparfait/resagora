@@ -10,13 +10,17 @@ RUN apt-get update \
     && rm -rf /var/lib/apt/lists/*
 WORKDIR /app
 COPY backend/pyproject.toml backend/uv.lock ./
-RUN uv sync --frozen --no-dev --no-install-project
+# Jeux d'essai de python-ldap (clés privées de test) retirés avant la copie dans l'image d'exécution (D-074).
+RUN uv sync --frozen --no-dev --no-install-project \
+    && rm -rf /app/.venv/lib/python3.14/site-packages/slapdtest
 
 FROM python:3.14.10-slim-trixie@sha256:3cabfd7d7aaf394e6040e79fa1eec6ca1c52b74ed9188650472695d9a9326999
 RUN apt-get update \
     && apt-get install -y --no-install-recommends libldap2 libsasl2-2 fonts-dejavu-core \
     && apt-get upgrade -y \
     && rm -rf /var/lib/apt/lists/* \
+    && rm -rf /usr/local/lib/python3.14/site-packages/pip /usr/local/lib/python3.14/site-packages/pip-* \
+       /usr/local/lib/python3.14/site-packages/setuptools* /usr/local/lib/python3.14/ensurepip /usr/local/bin/pip* \
     && useradd --uid 10001 --create-home --shell /usr/sbin/nologin app \
     && mkdir -p /stockage /app/static && chown 10001:10001 /stockage /app/static
 WORKDIR /app
@@ -26,7 +30,8 @@ COPY --chown=10001:10001 backend/ .
 ENV PATH="/app/.venv/bin:$PATH" PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1 \
     DJANGO_SETTINGS_MODULE=config.settings.prod STOCKAGE_FICHIERS=/stockage \
     FORWARDED_ALLOW_IPS=127.0.0.1
-RUN rm -rf tests conftest.py && find /app/apps -type d -name tests -prune -exec rm -rf {} + && python -m compileall -q /app/apps /app/config
+RUN rm -rf tests conftest.py \
+    && find /app/apps -type d -name tests -prune -exec rm -rf {} + && python -m compileall -q /app/apps /app/config
 USER 10001
 EXPOSE 8000 8443
 HEALTHCHECK --interval=30s --timeout=5s CMD ["python", "-c", "import urllib.request;urllib.request.urlopen('http://127.0.0.1:8000/sante', timeout=4)"]

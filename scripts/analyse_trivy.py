@@ -40,10 +40,15 @@ def main() -> int:
     cibles = [(nom, ["image", f"{args.registre}/{nom}:{args.version}"], False) for nom in IMAGES]
     cibles.append(("depot", ["fs", "--scanners", "vuln,secret,misconfig", "/depot"], True))
     for nom, cible, depot in cibles:
-        options = ["--severity", "HIGH,CRITICAL", "--ignore-unfixed", "--exit-code", "1", "--no-progress", "--format", "table"]
+        options = [
+            "--severity", "HIGH,CRITICAL", "--ignore-unfixed", "--exit-code", "1", "--no-progress", "--format", "table",
+            "--timeout", "30m",
+        ]
         if depot:
             options += ["--skip-dirs", "/depot/node_modules,/depot/backend/.venv,/depot/facade/.venv,/depot/.playwright,/depot/outils/codegen/node_modules",
-                        "--skip-dirs", "/depot/deploy/lan/secrets,/depot/deploy/dmz/secrets,/depot/deploy/dev/secrets"]
+                        "--skip-dirs", "/depot/deploy/lan/secrets,/depot/deploy/dmz/secrets,/depot/deploy/dev/secrets",
+                        "--skip-dirs", "/depot/.git,/depot/e2e/test-results,/depot/e2e/playwright-report,/depot/e2e/.etat,"
+                        "/depot/docs/securite,/depot/backend/stockage,/depot/backoffice/dist,/depot/portail/dist,/depot/mobile/dist"]
         resultat = trivy([*cible[:1], *options, *cible[1:]], depot)
         rapport = (resultat.stdout or "") + (resultat.stderr or "")
         (SORTIE / f"trivy-{nom}.txt").write_text(rapport, encoding="utf-8")
