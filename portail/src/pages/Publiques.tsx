@@ -29,7 +29,7 @@ export function Accueil() {
           <p>Les créneaux libres et occupés, semaine par semaine, sans créer de compte.</p>
           <Link to="/disponibilites">Voir les disponibilités</Link>
         </li>
-        <li className="tuile">
+        <li className="tuile tuile--prioritaire">
           <h2>{connecte ? "Mon espace" : "Faire une demande"}</h2>
           <p>
             {connecte

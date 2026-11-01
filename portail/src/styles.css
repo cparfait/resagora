@@ -16,8 +16,8 @@
   --gris-texte: var(--color-encre);
   --gris-doux: var(--color-encre-douce);
   --gris-bord: var(--color-contour-champ);
-  --fond: var(--color-carte);
-  --fond-doux: var(--color-fond);
+  --fond: var(--color-fond);
+  --fond-doux: var(--color-carte);
   --focus: var(--color-vert-profond);
   --rayon: 0;
 }
@@ -65,7 +65,8 @@ body {
 
 .chapo {
   font-size: 1.125rem;
-  color: var(--gris-doux);
+  color: var(--color-encre-douce);
+  max-width: 70ch;
 }
 
 .actions {
@@ -111,10 +112,34 @@ body {
 
 .tuile,
 .carte {
-  border: 1px solid var(--gris-bord);
-  border-radius: var(--rayon);
-  padding: 1rem;
-  background: #fff;
+  border: 1px solid var(--color-filet);
+  padding: 1.5rem;
+  background: var(--color-carte);
+}
+
+.tuile h2,
+.carte h2 {
+  margin-top: 0;
+  font-size: var(--text-h3);
+  line-height: var(--text-h3--line-height);
+  font-weight: 700;
+}
+
+.tuile h2::after,
+.carte h2::after {
+  content: "";
+  display: block;
+  width: 2.5rem;
+  height: 4px;
+  margin-top: 0.5rem;
+  background: var(--color-anis);
+}
+
+/* Bloc prioritaire : un seul par écran (DESIGN.md), fond anis clair et filet anis. */
+.tuile--prioritaire {
+  background: var(--color-anis-clair);
+  border-color: var(--color-anis-clair);
+  border-left: 6px solid var(--color-anis);
 }
 
 .carte img,
@@ -137,7 +162,8 @@ body {
   flex-wrap: wrap;
   gap: 0 1rem;
   align-items: flex-end;
-  background: var(--fond-doux);
+  background: var(--color-carte);
+  border: 1px solid var(--color-filet);
   padding: 1rem;
   border-radius: var(--rayon);
   margin-bottom: 1rem;
@@ -161,6 +187,7 @@ body {
 .grille-dispo {
   border-collapse: collapse;
   width: 100%;
+  background: var(--color-carte);
 }
 
 .tableau caption,
@@ -170,11 +197,17 @@ body {
   padding: 0.5rem 0;
 }
 
+.tableau thead th,
+.grille-dispo thead th {
+  background: var(--color-info-fond);
+  color: var(--color-vert-profond);
+}
+
 .tableau th,
 .tableau td,
 .grille-dispo th,
 .grille-dispo td {
-  border: 1px solid var(--gris-bord);
+  border: 1px solid var(--color-filet);
   padding: 0.4rem 0.6rem;
   text-align: left;
   vertical-align: top;
@@ -190,20 +223,20 @@ body {
 }
 
 .etat-libre {
-  background: #e7f4ec;
+  background: var(--color-succes-fond);
 }
 
 .etat-occupe {
-  background: #fbe9ea;
+  background: var(--color-danger-fond);
   font-weight: 700;
 }
 
 .etat-demande {
-  background: #fdf1e3;
+  background: var(--color-attention-fond);
 }
 
 .etat-ferme {
-  background: #e5e7eb;
+  background: var(--color-filet);
 }
 
 .barre-semaine {
@@ -258,7 +291,7 @@ body {
 }
 
 .liste-documents > li {
-  border-bottom: 1px solid var(--gris-bord);
+  border-bottom: 1px solid var(--color-filet);
   padding: 0.5rem 0;
 }
 
@@ -275,11 +308,12 @@ body {
 }
 
 .message--ville {
-  background: var(--bleu-clair);
+  background: var(--color-info-fond);
 }
 
 .message--usager {
-  background: var(--fond-doux);
+  background: var(--color-carte);
+  border: 1px solid var(--color-filet);
   margin-left: auto;
 }
 
@@ -307,17 +341,8 @@ body {
 }
 
 @media (max-width: 40rem) {
-  h1 {
-    font-size: 1.6rem;
-  }
   .details {
     grid-template-columns: 1fr;
   }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  * {
-    scroll-behavior: auto !important;
-    transition: none !important;
-  }
-}

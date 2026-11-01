@@ -21,7 +21,8 @@ export interface Compteur {
 function Compteurs({ code, titre, compteurs, vide }: { code: string; titre: string; compteurs: Compteur[]; vide: string }) {
   const actifs = compteurs.filter((c) => c.nombre > 0);
   return (
-    <section aria-labelledby={`titre-${code}`}>
+    // « À traiter aujourd'hui » est le bloc prioritaire de l'écran (un seul par écran, DESIGN.md).
+    <section aria-labelledby={`titre-${code}`} className={code === "a-traiter" ? "bloc-prioritaire" : undefined}>
       <h2 id={`titre-${code}`}>{titre}</h2>
       {actifs.length === 0 ? <p>{vide}</p> : null}
       <ul className="compteurs">

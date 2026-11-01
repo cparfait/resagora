@@ -21,8 +21,8 @@ function decrits(id: string, aide?: ReactNode, erreur?: string): string | undefi
 
 /** La classe « champ » reste un repère pour les mises en page (formulaire__ligne). Erreur au-dessus du champ
  * (charte), champ de 48 px à angles droits, contour 1 px (2 px rouge en erreur). */
-const CONTENEUR = "champ mb-4 flex flex-col gap-1";
-const SAISIE = "min-h-12 max-w-full border border-contour-champ bg-carte px-3 py-2 font-sans text-base text-encre";
+const CONTENEUR = "champ mb-4 flex min-w-0 max-w-full flex-col gap-1";
+const SAISIE = "min-h-12 w-full max-w-full border border-contour-champ bg-carte px-3 py-2 font-sans text-base text-encre";
 const SAISIE_ERREUR = "border-2 border-danger";
 
 function Libelle({ id, libelle, obligatoire }: { id: string; libelle: string; obligatoire?: boolean }) {

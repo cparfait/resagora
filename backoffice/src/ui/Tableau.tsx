@@ -37,8 +37,9 @@ export function Tableau<T>({ legende, colonnes, lignes, cleLigne, actions, messa
     });
   }, [lignes, tri, colonnes]);
 
+  // relative : les textes masqués (sr-only, positionnés) restent dans la zone qui défile, pas dans la page.
   return (
-    <div className="overflow-x-auto border border-filet bg-carte">
+    <div className="relative overflow-x-auto border border-filet bg-carte">
       <table className="w-full border-collapse text-petit">
         <caption className="sr-only">{legende}</caption>
         <thead>
