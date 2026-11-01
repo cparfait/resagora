@@ -63,18 +63,38 @@ function complementSeance(s: SeancePlanning): string {
   return `, ${s.espace_nom}, ${jourLong(s.debut)}, ${STATUTS[s.statut]?.libelle ?? s.statut}${s.signalement ? `, à traiter : ${s.signalement}` : ""}`;
 }
 
-function Pastille({ seance, coloration, onOuvrir, style, glissable }: { seance: SeancePlanning; coloration: Coloration; onOuvrir: (s: SeancePlanning) => void; style?: CSSProperties; glissable: boolean }) {
+function Pastille({
+  seance,
+  coloration,
+  onOuvrir,
+  style,
+  glissable,
+  carte = false,
+}: {
+  seance: SeancePlanning;
+  coloration: Coloration;
+  onOuvrir: (s: SeancePlanning) => void;
+  style?: CSSProperties;
+  glissable: boolean;
+  /** Carte dans le flux (chronologie) : horaire, usager et statut en clair, au lieu d'un bloc positionné. */
+  carte?: boolean;
+}) {
   const glisser = (e: DragEvent<HTMLButtonElement>) => {
     e.dataTransfer.setData("text/plain", String(seance.id));
     e.dataTransfer.effectAllowed = "move";
   };
   return (
-    <button type="button" className={classeSeance(seance, coloration)} style={style} draggable={glissable} onDragStart={glisser} onClick={() => onOuvrir(seance)}>
+    <button type="button" className={cn(classeSeance(seance, coloration), carte && "seance--carte")} style={style} draggable={glissable} onDragStart={glisser} onClick={() => onOuvrir(seance)}>
       <span className="seance__heure">
         {heure(seance.debut)}–{heure(seance.fin)}
       </span>
       <span className="seance__titre">{seance.usager}</span>
       <span className="sr-only">{complementSeance(seance)}</span>
+      {carte ? (
+        <span aria-hidden="true" className="seance__statut">
+          {STATUTS[seance.statut]?.libelle ?? seance.statut}
+        </span>
+      ) : null}
       {seance.signalement ? <span aria-hidden="true"> ⚠</span> : null}
     </button>
   );
@@ -198,51 +218,64 @@ export function VueSemaine({ seances, debut, coloration, onOuvrir, onDeposer, jo
   );
 }
 
+/** Initiales d'un espace pour la vignette de la chronologie (« Gymnase Gabriel Péri » → « GP »). */
+function initialesEspace(nom: string): string {
+  const mots = nom.split(/[\s-]+/).filter((mot) => /^[A-ZÀ-Ý0-9]/u.test(mot));
+  return (mots.length > 1 ? mots.slice(-2) : mots).map((mot) => mot[0]).join("") || "?";
+}
+
+/** Chronologie par espace façon Mariloo : une ligne par espace (vignette, nom, capacité), une colonne par jour,
+ * les séances du jour en cartes empilées. Déposer une carte dans une autre case garde son horaire et change le jour
+ * et l'espace (contrôle serveur avant déplacement, PLA-02). */
 export function VueChronologie({ seances, debut, coloration, onOuvrir, onDeposer, espaces, jours = 7 }: Commun & { espaces: Espace[]; jours?: number }) {
   const colonnes = Array.from({ length: jours }, (_, i) => ajouterJours(debut, i));
-  const largeurJour = 100 / jours;
+  const gabarit: CSSProperties = { gridTemplateColumns: `minmax(11rem, 14rem) repeat(${jours}, minmax(7.5rem, 1fr))` };
   return (
     // Zone qui défile horizontalement : focalisable pour défiler au clavier (WCAG 2.1.1, règle axe scrollable-region-focusable).
     // oxlint-disable-next-line jsx-a11y/no-noninteractive-tabindex
     <div className="chronologie" role="group" aria-label="Chronologie par espace" tabIndex={0}>
-      <div className="chronologie__ligne chronologie__ligne--entete">
+      <div className="chronologie__ligne chronologie__ligne--entete" style={gabarit}>
         <div className="chronologie__espace">Espace</div>
-        <div className="chronologie__piste">
-          {colonnes.map((j) => (
-            <div key={isoJour(j)} className="chronologie__jour" style={{ width: `${largeurJour}%` }}>
-              {jourCourt(j)}
-            </div>
-          ))}
-        </div>
+        {colonnes.map((j) => (
+          <div key={isoJour(j)} className="chronologie__jour">
+            {jourCourt(j)}
+          </div>
+        ))}
       </div>
       {espaces.map((espace) => {
         const lignes = seances.filter((s) => s.espace === espace.id);
         return (
-          <div key={espace.id} className="chronologie__ligne">
-            <div className="chronologie__espace">{espace.nom}</div>
-            <div
-              className="chronologie__piste"
-              {...zoneDepot(onDeposer, seances, (e) => {
-                const zone = e.currentTarget.getBoundingClientRect();
-                const ratio = (e.clientX - zone.left) / zone.width;
-                const minutes = Math.round((ratio * jours * (HEURE_MAX - HEURE_MIN) * 60) / PAS_MINUTES) * PAS_MINUTES;
-                const jour = Math.floor(minutes / ((HEURE_MAX - HEURE_MIN) * 60));
-                const r = ajouterJours(debut, jour);
-                r.setHours(HEURE_MIN, 0, 0, 0);
-                r.setMinutes(minutes - jour * (HEURE_MAX - HEURE_MIN) * 60);
-                return { espace: espace.id, debut: r };
-              })}
-            >
-              {lignes.map((s) => {
-                const d = new Date(s.debut);
-                const f = new Date(s.fin);
-                const indexJour = Math.floor((new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime() - debut.getTime()) / 86400000);
-                const portee = (HEURE_MAX - HEURE_MIN) * 60;
-                const gauche = indexJour * largeurJour + (Math.max(0, minutesDuJour(d) - HEURE_MIN * 60) / portee) * largeurJour;
-                const largeur = Math.max(0.6, (((f.getTime() - d.getTime()) / 60000) / portee) * largeurJour);
-                return <Pastille key={s.id} seance={s} coloration={coloration} onOuvrir={onOuvrir} style={{ left: `${gauche}%`, width: `${largeur}%` }} glissable={Boolean(onDeposer)} />;
-              })}
+          <div key={espace.id} className="chronologie__ligne" style={gabarit}>
+            <div className="chronologie__espace">
+              <span aria-hidden="true" className="chronologie__vignette">
+                {initialesEspace(espace.nom)}
+              </span>
+              <span className="chronologie__identite">
+                <span className="chronologie__nom">{espace.nom}</span>
+                {espace.capacite ? <span className="chronologie__capacite">{espace.capacite} personnes</span> : null}
+              </span>
             </div>
+            {colonnes.map((jour) => {
+              const duJour = lignes.filter((s) => memeJour(new Date(s.debut), jour)).toSorted((a, b) => a.debut.localeCompare(b.debut));
+              return (
+                <div
+                  key={isoJour(jour)}
+                  className="chronologie__case"
+                  {...zoneDepot(onDeposer, seances, (e) => {
+                    const deplacee = seances.find((s) => String(s.id) === e.dataTransfer.getData("text/plain"));
+                    if (!deplacee) return null;
+                    const origine = new Date(deplacee.debut);
+                    const r = new Date(jour);
+                    r.setHours(origine.getHours(), origine.getMinutes(), 0, 0);
+                    return { espace: espace.id, debut: r };
+                  })}
+                >
+                  {duJour.map((s) => (
+                    <Pastille key={s.id} seance={s} coloration={coloration} onOuvrir={onOuvrir} glissable={Boolean(onDeposer)} carte />
+                  ))}
+                </div>
+              );
+            })}
           </div>
         );
       })}

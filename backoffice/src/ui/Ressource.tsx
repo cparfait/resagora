@@ -9,6 +9,7 @@ import { useSearchParams } from "react-router";
 import { construireChemin, ErreurApi, requete, type ErreursChamps, type Page as PageApi } from "../api/http";
 import { useSession } from "../auth/session";
 import { Bouton } from "./Bouton";
+import { cn } from "./cn";
 import { CaseACocher, ChampSelection, ChampTexte, ChampZone, type Option } from "./Champ";
 import { Dialogue } from "./Dialogue";
 import { Chargement, DroitsInsuffisants, Erreur } from "./Etats";
@@ -55,6 +56,8 @@ interface Proprietes<T extends Objet> {
   actionsLigne?: (ligne: T) => ReactNode;
   actionsPage?: ReactNode;
   valeursInitiales?: Partial<T>;
+  /** Filtres en pilules au-dessus de la liste (façon Mariloo) : une valeur exclusive du paramètre `nom`. */
+  pilules?: { nom: string; libelle: string; options: { valeur: string; libelle: string; nombre?: number }[] };
 }
 
 function versSaisieLocale(d: Date): string {
@@ -182,7 +185,11 @@ export function EcranRessource<T extends Objet>(p: Proprietes<T>) {
   // DSH-06 : un compteur du tableau de bord ouvre la liste déjà filtrée (paramètres de l'adresse).
   const [parametresUrl] = useSearchParams();
   const [filtres, setFiltres] = useState<Record<string, string>>(() =>
-    Object.fromEntries((p.filtres ?? []).flatMap((f) => (parametresUrl.get(f.nom) ? [[f.nom, parametresUrl.get(f.nom) ?? ""]] : []))),
+    Object.fromEntries(
+      [...(p.filtres ?? []).map((f) => f.nom), ...(p.pilules ? [p.pilules.nom] : [])].flatMap((nom) =>
+        parametresUrl.get(nom) ? [[nom, parametresUrl.get(nom) ?? ""]] : [],
+      ),
+    ),
   );
   const [edition, setEdition] = useState<Partial<T> | null>(null);
   const [valeurs, setValeurs] = useState<Record<string, unknown>>({});
@@ -263,6 +270,35 @@ export function EcranRessource<T extends Objet>(p: Proprietes<T>) {
         </>
       }
     >
+      {p.pilules ? (
+        <div role="group" aria-label={p.pilules.libelle} className="mb-4 flex flex-wrap gap-2">
+          {p.pilules.options.map((o) => {
+            const active = (filtres[p.pilules?.nom ?? ""] ?? "") === o.valeur;
+            return (
+              <button
+                key={o.valeur || "toutes"}
+                type="button"
+                aria-pressed={active}
+                onClick={() => {
+                  const nom = p.pilules?.nom ?? "";
+                  setPage(1);
+                  setFiltres({ ...filtres, [nom]: o.valeur });
+                }}
+                className={cn(
+                  "inline-flex min-h-10 cursor-pointer items-center gap-2 rounded-full border border-filet bg-carte px-4 font-sans text-[0.9rem] font-medium text-encre transition-colors hover:border-vert hover:text-vert",
+                  active && "border-encre bg-encre text-blanc hover:border-encre hover:text-blanc",
+                )}
+              >
+                {o.libelle}
+                {o.nombre ? " " : null}
+                {o.nombre ? (
+                  <span className={cn("min-w-5 rounded-full px-1.5 text-center text-xs leading-5 font-bold", active ? "bg-blanc text-encre" : "bg-vert text-blanc")}>{o.nombre}</span>
+                ) : null}
+              </button>
+            );
+          })}
+        </div>
+      ) : null}
       <div className="rounded-lg bg-carte shadow-carte">
       <div className="flex flex-wrap items-end justify-between gap-x-4 gap-y-2 border-b border-filet px-4 pt-3 pb-1">
       {p.filtres?.length ? (

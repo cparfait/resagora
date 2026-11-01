@@ -1,5 +1,8 @@
-/** Fiche d'un dossier : réservations, séances, transitions de statut, conditions de confirmation (PLA-06, RG-06). */
+/** Fiche d'un dossier : réservations, séances, transitions de statut, conditions de confirmation (PLA-06, RG-06).
+ * Mise en page façon Mariloo : retour à la liste, carte de synthèse (usager, statut, chiffres clés), réservations en
+ * cartes à gauche, échanges avec l'usager en fil de discussion à droite sur grand écran. */
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { ArrowLeft } from "lucide-react";
 import { useState } from "react";
 import { Link, useParams } from "react-router";
 import { construireChemin, ErreurApi, requete, type Page as PageApi } from "../../api/http";
@@ -25,6 +28,17 @@ const CONDITIONS: Record<string, string> = {
   acompte: "Acompte payé",
   caution: "Caution reçue",
 };
+
+function initiales(nom: string): string {
+  return (
+    nom
+      .split(/[\s-]+/)
+      .filter((mot) => /^[A-ZÀ-Ý]/u.test(mot))
+      .slice(0, 2)
+      .map((mot) => mot[0])
+      .join("") || "?"
+  );
+}
 
 type ActionMotivee = { reservation: Reservation; type: "refuser" | "annuler" } | { seance: Seance; type: "annuler_seance" } | null;
 
@@ -167,37 +181,59 @@ export default function Dossier() {
   };
 
   return (
-    <Page titre={`Dossier ${d.numero}`} description={`${d.objet} — ${d.usager_nom}`}>
-      <dl className="details details--grille">
-        <dt>Usager</dt>
-        <dd>
-          <Link to={`/usagers/${d.usager}`}>{d.usager_nom}</Link>
-        </dd>
-        <dt>Type</dt>
-        <dd>{d.type_reservation_libelle}</dd>
-        <dt>Statut</dt>
-        <dd>
+    <Page
+      titre={`Dossier ${d.numero}`}
+      description={`${d.objet} — ${d.usager_nom}`}
+      retour={
+        <Link to="/reservations/dossiers" className="inline-flex min-h-11 items-center gap-2 text-petit font-medium text-vert no-underline hover:underline print:hidden">
+          <ArrowLeft aria-hidden="true" size={18} strokeWidth={1.8} />
+          Retour aux dossiers
+        </Link>
+      }
+    >
+      <div className="mb-6 rounded-lg bg-carte p-5 shadow-carte">
+        <div className="flex flex-wrap items-center justify-between gap-4">
+          <div className="flex items-center gap-3">
+            <span aria-hidden="true" className="inline-flex size-12 shrink-0 items-center justify-center rounded-full bg-vert-pale text-sm font-bold text-vert">
+              {initiales(d.usager_nom)}
+            </span>
+            <div className="flex flex-col">
+              <Link to={`/usagers/${d.usager}`} className="text-base font-semibold text-encre">
+                {d.usager_nom}
+              </Link>
+              <span className="text-[0.85rem] text-encre-douce">{d.type_reservation_libelle}</span>
+            </div>
+          </div>
           <Badge libelle={STATUTS[d.statut]?.libelle ?? d.statut} ton={STATUTS[d.statut]?.ton ?? "neutre"} />
-        </dd>
-        <dt>Effectif</dt>
-        <dd>{d.effectif || "—"}</dd>
-        <dt>Origine</dt>
-        <dd>{{ guichet: "Guichet", portail: "Portail", campagne: "Campagne annuelle", ville: "Service municipal" }[d.origine] ?? d.origine}</dd>
+        </div>
+        <dl className="m-0 mt-5 grid grid-cols-[repeat(auto-fit,minmax(10rem,1fr))] gap-4 border-t border-filet pt-4">
+          {[
+            ["Statut", STATUTS[d.statut]?.libelle ?? d.statut],
+            ["Réservations", String(d.reservations.length)],
+            ["Effectif", d.effectif ? String(d.effectif) : "—"],
+            ["Origine", { guichet: "Guichet", portail: "Portail", campagne: "Campagne annuelle", ville: "Service municipal" }[d.origine] ?? d.origine],
+          ].map(([terme, valeur]) => (
+            <div key={terme}>
+              <dt className="text-[0.8rem] font-medium text-encre-douce">{terme}</dt>
+              <dd className="m-0 mt-0.5 font-semibold text-encre">{valeur}</dd>
+            </div>
+          ))}
+        </dl>
         {Object.keys(d.conditions_attestees ?? {}).length ? (
-          <>
-            <dt>Conditions constatées</dt>
-            <dd>
-              <ul className="liste-simple">
-                {Object.entries(d.conditions_attestees as Record<string, { par: string; le: string; motif: string }>).map(([code, a]) => (
-                  <li key={code}>
-                    {CONDITIONS[code] ?? code} : {a.motif} ({a.par}, {dateHeure(a.le)})
-                  </li>
-                ))}
-              </ul>
-            </dd>
-          </>
+          <div className="mt-4 border-t border-filet pt-4">
+            <h2 className="m-0 mb-2 text-[0.9rem] font-semibold text-encre">Conditions constatées</h2>
+            <ul className="liste-simple">
+              {Object.entries(d.conditions_attestees as Record<string, { par: string; le: string; motif: string }>).map(([code, a]) => (
+                <li key={code}>
+                  {CONDITIONS[code] ?? code} : {a.motif} ({a.par}, {dateHeure(a.le)})
+                </li>
+              ))}
+            </ul>
+          </div>
         ) : null}
-      </dl>
+      </div>
+      <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_24rem] xl:items-start">
+        <div className="min-w-0">
       {d.reservations.length === 0 ? <p>Aucune réservation dans ce dossier.</p> : null}
       {d.reservations.map((r) => (
         <section key={r.id} className="carte carte--reservation" aria-labelledby={`reservation-${r.id}`}>
@@ -257,10 +293,19 @@ export default function Dossier() {
           </details>
         </section>
       ))}
-      {peut("lire_finances") ? <FinancesDossier dossier={d.id} /> : null}
-      {peut("lire_materiel") ? <MaterielDossier dossier={d.id} reservations={d.reservations.filter((r) => !["annulee", "refusee"].includes(r.statut)).map((r) => ({ id: r.id, espace_nom: r.espace_nom, site: r.site }))} /> : null}
-      {peut("lire_document") ? <DocumentsDossier dossier={d.id} /> : null}
-      {peut("lire_message") ? <MessagesDossier dossier={d.id} /> : null}
+        </div>
+        {peut("lire_message") ? (
+          <div className="min-w-0 xl:sticky xl:top-20">
+            <MessagesDossier dossier={d.id} />
+          </div>
+        ) : null}
+      </div>
+      {/* Tableaux larges (devis, prêts, documents) en pleine largeur sous les réservations. */}
+      <div className="mt-6 flex flex-col gap-6">
+        {peut("lire_finances") ? <FinancesDossier dossier={d.id} /> : null}
+        {peut("lire_materiel") ? <MaterielDossier dossier={d.id} reservations={d.reservations.filter((r) => !["annulee", "refusee"].includes(r.statut)).map((r) => ({ id: r.id, espace_nom: r.espace_nom, site: r.site }))} /> : null}
+        {peut("lire_document") ? <DocumentsDossier dossier={d.id} /> : null}
+      </div>
       <Dialogue ouvert={actionMotivee !== null} titre={actionMotivee?.type === "refuser" ? "Refuser la demande" : "Annuler la réservation"} onFermer={() => setActionMotivee(null)}>
         {actionMotivee && "reservation" in actionMotivee ? (
           <form

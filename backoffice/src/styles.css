@@ -160,12 +160,20 @@
 
 /* Chronologie par espace */
 .chronologie { background: var(--color-carte); border: 1px solid var(--color-filet); overflow-x: auto; }
-.chronologie__ligne { display: grid; grid-template-columns: 13rem 1fr; border-bottom: 1px solid var(--color-filet); min-height: 2.6rem; }
-.chronologie__ligne--entete { background: var(--color-info-fond); color: var(--color-vert-profond); font-weight: 700; min-height: 2rem; }
-.chronologie__espace { padding: 0.4rem 0.6rem; border-right: 1px solid var(--color-filet); }
-.chronologie__piste { position: relative; display: flex; min-width: 48rem; }
-.chronologie__jour { border-right: 1px solid var(--color-filet); text-align: center; padding: 0.4rem 0; text-transform: capitalize; }
-.chronologie__piste .seance { top: 3px; bottom: 3px; height: auto; right: auto; }
+.chronologie__ligne { display: grid; min-width: 62rem; border-bottom: 1px solid var(--color-filet); }
+.chronologie__ligne:last-child { border-bottom: 0; }
+.chronologie__ligne--entete { position: sticky; top: 0; z-index: 1; font-weight: 600; font-size: 0.85rem; }
+.chronologie__espace { display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem 1rem; border-right: 1px solid var(--color-filet); }
+.chronologie__vignette { display: inline-flex; flex-shrink: 0; align-items: center; justify-content: center; width: 2.5rem; height: 2.5rem; border-radius: var(--radius-md); background: var(--color-vert-pale); color: var(--color-vert); font-size: 0.75rem; font-weight: 700; }
+.chronologie__identite { display: flex; min-width: 0; flex-direction: column; line-height: 1.25; }
+.chronologie__nom { font-weight: 600; color: var(--color-encre); overflow-wrap: anywhere; }
+.chronologie__capacite { font-size: 0.8rem; color: var(--color-encre-douce); }
+.chronologie__jour { padding: 0.75rem 0.5rem; text-align: center; text-transform: capitalize; border-right: 1px solid var(--color-filet); }
+.chronologie__jour:last-child, .chronologie__case:last-child { border-right: 0; }
+.chronologie__case { display: flex; min-width: 0; flex-direction: column; gap: 0.375rem; padding: 0.5rem; border-right: 1px solid var(--color-filet); }
+.seance.seance--carte { position: static; display: flex; flex-direction: column; align-items: flex-start; gap: 0.125rem; width: 100%; min-height: 0; padding: 0.4rem 0.5rem; font-size: 0.8rem; line-height: 1.25; }
+.seance--carte .seance__titre { font-weight: 600; white-space: normal; overflow-wrap: anywhere; }
+.seance--carte .seance__statut { margin-top: 0.125rem; font-size: 0.72rem; font-weight: 600; }
 
 /* Mois */
 .mois { width: 100%; border-collapse: collapse; table-layout: fixed; background: var(--color-carte); }
@@ -233,3 +241,11 @@
 .legende__pastille { border-radius: 4px; }
 .jauge, .jauge__remplissage, .barres__barre { border-radius: 9999px; }
 .tableau-conteneur { border: 0; border-radius: var(--radius-lg); box-shadow: var(--shadow-carte); }
+
+/* Fiche dossier : échanges avec l'usager en fil de discussion (ergonomie Mariloo) */
+.fil-messages { display: flex; flex-direction: column; gap: 0.75rem; margin: 0 0 1rem; padding: 0; list-style: none; }
+.message { max-width: 90%; padding: 0.625rem 0.875rem; border-radius: var(--radius-lg); }
+.message--usager { align-self: flex-start; background: var(--color-fond); border-bottom-left-radius: 4px; }
+.message--ville { align-self: flex-end; background: var(--color-vert-pale); border-bottom-right-radius: 4px; }
+.message__entete { margin: 0 0 0.25rem; font-size: 0.8rem; font-weight: 600; color: var(--color-encre); }
+.message__corps { margin: 0; white-space: pre-line; overflow-wrap: anywhere; }

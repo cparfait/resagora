@@ -6,12 +6,15 @@ export function Page({
   titre,
   description,
   actions,
+  retour,
   children,
   className,
 }: {
   titre: string;
   description?: ReactNode;
   actions?: ReactNode;
+  /** Lien de retour à la liste, au-dessus du titre (fiches). */
+  retour?: ReactNode;
   children: ReactNode;
   className?: string;
 }) {
@@ -20,6 +23,7 @@ export function Page({
   }, [titre]);
   return (
     <section className={cn("page", className)} aria-labelledby="titre-page">
+      {retour ? <div className="-mt-2 mb-1">{retour}</div> : null}
       <header className="mb-5 flex flex-wrap items-end justify-between gap-4">
         <div>
           <h1 id="titre-page" tabIndex={-1} className="m-0 text-[1.75rem] leading-tight font-semibold text-encre focus:outline-none">

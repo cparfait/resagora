@@ -51,6 +51,22 @@ describe("PLA-01 vues du planning", () => {
     expect(screen.getAllByRole("button")).toHaveLength(1);
   });
 
+  it("PLA-02 déposer une carte dans une case de la chronologie garde l'horaire et change le jour et l'espace", () => {
+    const deposer = vi.fn();
+    const espaces = [{ id: 1, nom: "Gymnase", capacite: 120 }, { id: 2, nom: "Dojo" }] as Espace[];
+    const { container } = render(<VueChronologie seances={[seance(1, 10, 18)]} debut={lundi} espaces={espaces} coloration="statut" onOuvrir={vi.fn()} onDeposer={deposer} />);
+    expect(screen.getByText("120 personnes")).toBeInTheDocument();
+    const cases = container.querySelectorAll(".chronologie__case");
+    const evenement = new Event("drop", { bubbles: true, cancelable: true });
+    Object.assign(evenement, { dataTransfer: { getData: () => "1" } });
+    fireEvent(cases[7 + 3] as HTMLElement, evenement); // Dojo, jeudi 12
+    const [{ debut, fin, espace }] = deposer.mock.calls[0] as [{ debut: Date; fin: Date; espace: number }];
+    expect(espace).toBe(2);
+    expect(debut.getDate()).toBe(12);
+    expect(debut.getHours()).toBe(18);
+    expect((fin.getTime() - debut.getTime()) / 3600000).toBe(2);
+  });
+
   it("PLA-03 la légende suit la coloration choisie", () => {
     const { rerender } = render(<Legende coloration="statut" />);
     expect(screen.getByText("Confirmée")).toBeInTheDocument();

@@ -104,10 +104,13 @@ angles droits et le « design plat » de la direction B ; le portail public gard
   teinte, barre empilée à 100 %) et leur tableau de données en alternative. Les séries des graphiques ont leur propre
   palette validée (`--color-serie-1` à `7`, ordre fixe, réservée aux marques de données) : les couleurs de la charte
   échouent aux contrôles de daltonisme en palette catégorielle.
-- **Planning par espace** : une ligne par espace (vignette, capacité), séances en cartes arrondies avec filet de
-  couleur, pastilles de statut et initiales de l'usager.
-- **Fiche réservation** : retour, numéro, statut en pastille ; actions principales en gros boutons ; échanges façon
-  messagerie ; sections repliables.
+- **Planning par espace** (vue « Chronologie par espace ») : une ligne par espace (vignette à initiales, capacité),
+  une colonne par jour, les séances du jour en cartes arrondies avec filet de couleur (horaire, usager, statut écrit).
+  Déposer une carte dans une autre case garde l'horaire et change le jour ou l'espace, après contrôle serveur.
+- **Fiche réservation** : lien de retour au-dessus du titre, carte de synthèse (usager à initiales, statut en
+  pastille, chiffres clés) ; réservations et actions en gros boutons à gauche, échanges avec l'usager en bulles de
+  discussion à droite (grand écran) ; devis, matériel et documents en pleine largeur dessous, car leurs tableaux sont
+  larges.
 
 ## Planning du back-office : sans défilement
 

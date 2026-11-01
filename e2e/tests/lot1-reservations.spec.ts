@@ -2,11 +2,12 @@
 import { expect, test } from "@playwright/test";
 import { connecterAgent, sansViolationAxe } from "./outils";
 
-/** Créneau propre à chaque exécution (mardi à jeudi matin, hors vacances zone C et jours fériés) : le parcours est rejouable. */
-function creneauDeRecette(): { date: string; debut: string; fin: string } {
+/** Créneau propre à chaque exécution (mardi à jeudi matin, hors vacances zone C et jours fériés) : le parcours est rejouable.
+ * `decalage` passe au candidat suivant quand la base de recette a déjà validé une réservation sur ce créneau. */
+function creneauDeRecette(decalage = 0): { date: string; debut: string; fin: string } {
   const semaines = ["2027-01-05", "2027-01-12", "2027-01-19", "2027-01-26", "2027-02-02", "2027-02-23", "2027-03-02", "2027-03-09", "2027-03-16", "2027-03-23", "2027-03-30"];
   const candidats = semaines.flatMap((mardi) => [0, 1, 2].flatMap((j) => [8, 9, 10, 11].map((h) => ({ mardi, j, h }))));
-  const choix = candidats[Math.floor(Date.now() / 60_000) % candidats.length]!;
+  const choix = candidats[(Math.floor(Date.now() / 60_000) + decalage) % candidats.length]!;
   const jour = new Date(`${choix.mardi}T12:00:00Z`);
   jour.setUTCDate(jour.getUTCDate() + choix.j);
   const deux = (n: number) => String(n).padStart(2, "0");
@@ -41,13 +42,20 @@ test.describe("Lot 1 — réservations", () => {
     await page.getByLabel(/^Type de réservation/).selectOption({ label: "Réservation ponctuelle" });
     await page.getByLabel(/^Objet/).fill("Tournoi de fin d'année");
     await page.getByLabel(/^Espace/).selectOption({ label: "Espace Maison Blanche — Salle de réunion du 1er étage - Espace Maison Blanche" });
-    const creneau = creneauDeRecette();
-    await page.getByLabel(/^Date de début/).fill(creneau.date);
-    await page.getByLabel(/^Heure de début/).fill(creneau.debut);
-    await page.getByLabel(/^Heure de fin/).fill(creneau.fin);
-    await page.getByRole("button", { name: "Vérifier les disponibilités" }).click();
-    await expect(page.getByRole("heading", { name: /Aperçu : 1 séance/ })).toBeVisible();
-    await expect(page.getByText("Aucun conflit avec les réservations validées.")).toBeVisible();
+    const libre = page.getByText("Aucun conflit avec les réservations validées.");
+    for (let essai = 0; essai < 12; essai += 1) {
+      const creneau = creneauDeRecette(essai * 11);
+      await page.getByLabel(/^Date de début/).fill(creneau.date);
+      await page.getByLabel(/^Heure de début/).fill(creneau.debut);
+      await page.getByLabel(/^Heure de fin/).fill(creneau.fin);
+      // On attend la réponse de cet aperçu-ci : le précédent reste affiché tant qu'elle n'est pas arrivée.
+      const reponse = page.waitForResponse((r) => r.url().includes("/dossiers/apercu"));
+      await page.getByRole("button", { name: "Vérifier les disponibilités" }).click();
+      await reponse;
+      await expect(page.getByRole("heading", { name: /Aperçu : 1 séance/ })).toBeVisible();
+      if (await libre.isVisible()) break;
+    }
+    await expect(libre).toBeVisible();
     await page.getByRole("button", { name: "Enregistrer la demande" }).click();
     await expect(page.getByRole("heading", { level: 1, name: /Dossier D\d{4}-\d{5}/ })).toBeVisible();
     await sansViolationAxe(page, "la fiche du dossier");
