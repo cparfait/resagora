@@ -226,6 +226,7 @@ sont retirées, une classe hors charte ne produit aucun style. Tous les contrast
   - durées de conservation (ADR 0006) ;
   - anonymisation ;
   - aucune donnée personnelle réelle dans les jeux de test et de démonstration.
+- Sauvegardes chiffrées et restauration éprouvée (ADR 0010, `docs/sauvegarde-restauration.md`, `make test-sauvegarde`).
 - Secrets uniquement dans `deploy/*/secrets` (ignorés par Git), jamais dans le code.
 
 ## Règles de développement
@@ -246,11 +247,12 @@ Les règles complètes sont dans `CLAUDE.md` et les skills de `.claude/skills/`.
 | --- | --- |
 | `docs/rapport-livraison.md` | Ce qui est livré, vérifications, limites connues |
 | `docs/a-brancher.md` | Ce que la Ville doit fournir pour la mise en service, et où le saisir |
-| `docs/adr/` | Décisions d'architecture numérotées (DMZ, façade, AD, outillage, droits, conservation, valorisation, PayFiP, charte graphique) |
+| `docs/adr/` | Décisions d'architecture numérotées (DMZ, façade, AD, outillage, droits, conservation, valorisation, PayFiP, charte graphique, sauvegarde) |
 | `docs/decisions.md` | Décisions de détail (D-001 et suivantes) |
 | `docs/api/` | Schémas OpenAPI de l'API de gestion et de l'API du portail |
 | `docs/recette/` | Référentiel d'exigences et matrice de traçabilité |
 | `docs/securite/` | Analyses Trivy et nomenclatures logicielles (SBOM) |
+| `docs/sauvegarde-restauration.md` | Procédure de sauvegarde et de restauration |
 | `DESIGN.md` | Charte graphique |
 
 ## Avant la mise en service
