@@ -76,6 +76,7 @@ def edition_planning(
     au: date,
     format_papier: str = "A4",
     diffusion: bool = False,
+    mise_en_page: str = "calendrier",
 ) -> impression.Edition:
     """Planning d'un espace ou d'un site. En diffusion (envoi programmé hors de l'application) : pas de nom de
     particulier, pas d'objet de demande, lien vers le portail public plutôt que vers le back-office."""
@@ -85,16 +86,33 @@ def edition_planning(
     if diffusion:
         portail = settings.PORTAIL_URL.rstrip("/")
         lien = f"{portail}/equipements/{espace.pk}" if espace is not None else f"{portail}/equipements"
+    impression.verifier_mise_en_page(mise_en_page)
     par_jour: dict[date, list[list[str]]] = {}
+    seances = []
     for o in _seances(espaces, du, au):
-        local = timezone.localtime(o.debut, PARIS)
-        horaires = f"{local:%H:%M} – {timezone.localtime(o.fin, PARIS):%H:%M}"
+        local, fin = timezone.localtime(o.debut, PARIS), timezone.localtime(o.fin, PARIS)
+        horaires = f"{local:%H:%M} – {fin:%H:%M}"
+        occupant = _occupant(o) if diffusion else o.reservation.dossier.usager.nom
         if diffusion:
-            ligne = [horaires, o.espace.nom, _occupant(o)]
+            ligne = [horaires, o.espace.nom, occupant]
         else:
-            ligne = [horaires, o.espace.nom, o.reservation.dossier.usager.nom, o.reservation.dossier.objet[:80]]
+            ligne = [horaires, o.espace.nom, occupant, o.reservation.dossier.objet[:80]]
         par_jour.setdefault(local.date(), []).append(ligne)
+        seances.append((o, local, fin, [horaires, occupant]))
     groupes = [(f"{JOURS[j.weekday()]} {j:%d/%m/%Y}", lignes) for j, lignes in sorted(par_jour.items())]
+    grilles = []
+    if mise_en_page == "calendrier":
+        # Une grille par espace (et par semaine) : un site entier sur une seule grille serait illisible. Le nom de
+        # l'espace n'apparaît dans un bloc que s'il diffère de la grille (gymnase entier vu de l'une de ses moitiés).
+        for cible in sorted(espaces, key=lambda e: e.nom):
+            lies = cible.ids_lies()
+            blocs = [
+                (local, fin, [*lignes, *([o.espace.nom] if o.espace_id != cible.pk else [])], False)
+                for o, local, fin, lignes in seances
+                if o.espace_id in lies
+            ]
+            if blocs or espace is not None:
+                grilles += impression.grilles_datees(du, au, blocs, prefixe=cible.nom if site is not None else "")
     return impression.Edition(
         titre=f"Planning — {intitule}",
         sous_titre=f"Du {du:%d/%m/%Y} au {au:%d/%m/%Y}",
@@ -105,19 +123,28 @@ def edition_planning(
         format_papier=format_papier,
         paysage=format_papier == "A3",
         mention_vide="Aucune séance sur la période.",
+        grilles=grilles,
     )
 
 
 def imprimer_planning(
-    *, acteur: Any, site: Site | None = None, espace: Espace | None = None, du: date, au: date, format_papier: str = "A4"
+    *,
+    acteur: Any,
+    site: Site | None = None,
+    espace: Espace | None = None,
+    du: date,
+    au: date,
+    format_papier: str = "A4",
+    mise_en_page: str = "calendrier",
 ) -> bytes:
-    """IMP-01 : planning imprimé d'un espace ou d'un site."""
+    """IMP-01 : planning imprimé d'un espace ou d'un site, en calendrier (grille de la semaine) ou en liste."""
     _controler(acteur, espace or site)
-    pdf = impression.imprimer(edition_planning(site=site, espace=espace, du=du, au=au, format_papier=format_papier))
+    edition = edition_planning(site=site, espace=espace, du=du, au=au, format_papier=format_papier, mise_en_page=mise_en_page)
+    pdf = impression.imprimer(edition)
     journaliser(
         "imprimer_planning",
         espace or site,
-        apres={"du": str(du), "au": str(au), "format": format_papier},
+        apres={"du": str(du), "au": str(au), "format": format_papier, "mise_en_page": mise_en_page},
         acteur=acteur if isinstance(acteur, Utilisateur) else None,
     )
     return pdf
@@ -128,17 +155,12 @@ def feuille_de_salle(*, acteur: Any, espace: Espace, jour: date) -> bytes:
     (disponibilités en ligne), sans nom de particulier."""
     _controler(acteur, espace)
     lundi = jour - timedelta(days=jour.weekday())
-    lignes = []
+    lignes, blocs = [], []
     for o in _seances([espace], lundi, lundi + timedelta(days=6)):
-        local = timezone.localtime(o.debut, PARIS)
-        lignes.append(
-            [
-                f"{JOURS[local.weekday()]} {local:%d/%m}",
-                f"{local:%H:%M} – {timezone.localtime(o.fin, PARIS):%H:%M}",
-                o.espace.nom,
-                _occupant(o),
-            ]
-        )
+        local, fin = timezone.localtime(o.debut, PARIS), timezone.localtime(o.fin, PARIS)
+        horaires = f"{local:%H:%M} – {fin:%H:%M}"
+        lignes.append([f"{JOURS[local.weekday()]} {local:%d/%m}", horaires, o.espace.nom, _occupant(o)])
+        blocs.append((local, fin, [horaires, _occupant(o), *([o.espace.nom] if o.espace_id != espace.pk else [])], False))
     edition = impression.Edition(
         titre=f"{espace.nom} — semaine du {lundi:%d/%m/%Y}",
         sous_titre=f"{espace.batiment.site.nom}. Disponibilités et demandes en ligne : flashez le code.",
@@ -148,6 +170,7 @@ def feuille_de_salle(*, acteur: Any, espace: Espace, jour: date) -> bytes:
         format_papier="A4",
         paysage=False,
         mention_vide="Aucune séance cette semaine.",
+        grilles=impression.grilles_datees(lundi, lundi + timedelta(days=6), blocs),
     )
     pdf = impression.imprimer(edition)
     journaliser(

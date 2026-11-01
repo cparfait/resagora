@@ -768,9 +768,17 @@ JOURS = ["lundi", "mardi", "mercredi", "jeudi", "vendredi", "samedi", "dimanche"
 
 
 def planning_pdf(
-    *, acteur: Any, du: date, au: date, agent: Agent | None = None, site: Site | None = None, format_papier: str = "A4"
+    *,
+    acteur: Any,
+    du: date,
+    au: date,
+    agent: Agent | None = None,
+    site: Site | None = None,
+    format_papier: str = "A4",
+    mise_en_page: str = "calendrier",
 ) -> bytes:
-    """Planning des vacations d'un agent ou d'un site, groupé par jour ; limité aux sites du périmètre du lecteur."""
+    """Planning des vacations d'un agent ou d'un site, en calendrier (une grille par semaine) ou en liste groupée par
+    jour ; limité aux sites du périmètre du lecteur."""
     from django.conf import settings
 
     from apps.documents import impression
@@ -780,6 +788,7 @@ def planning_pdf(
         raise ErreurValidation("Choisissez un agent ou un site.", code="cible_requise")
     if au < du or (au - du).days > 62:
         raise ErreurValidation("Période de 2 mois au plus.", code="periode_invalide")
+    impression.verifier_mise_en_page(mise_en_page)
     _controler(acteur, "lire_personnel", agent or site)
     debut, _ = _bornes_jour(du)
     _, fin = _bornes_jour(au)
@@ -793,16 +802,17 @@ def planning_pdf(
     else:
         vacations = vacations.filter(site=site)
     par_jour: dict[date, list[list[str]]] = {}
+    blocs = []
     for v in vacations.order_by("debut"):
-        jour = timezone.localtime(v.debut, PARIS).date()
-        par_jour.setdefault(jour, []).append(
-            [
-                f"{timezone.localtime(v.debut, PARIS):%H:%M} – {timezone.localtime(v.fin, PARIS):%H:%M}",
-                v.site.nom if agent is not None else (str(v.agent) if v.agent else "NON COUVERTE"),
-                v.get_type_display(),
-                f"{v.duree_minutes // 60} h {v.duree_minutes % 60:02d}",
-            ]
-        )
+        debut, fin = timezone.localtime(v.debut, PARIS), timezone.localtime(v.fin, PARIS)
+        ligne = [
+            f"{debut:%H:%M} – {fin:%H:%M}",
+            v.site.nom if agent is not None else (str(v.agent) if v.agent else "NON COUVERTE"),
+            v.get_type_display(),
+            f"{v.duree_minutes // 60} h {v.duree_minutes % 60:02d}",
+        ]
+        par_jour.setdefault(debut.date(), []).append(ligne)
+        blocs.append((debut, fin, ligne[:3], v.agent_id is None))
     groupes = [(f"{JOURS[j.weekday()].capitalize()} {j:%d/%m/%Y}", lignes) for j, lignes in sorted(par_jour.items())]
     cible = f"{agent.prenom} {agent.nom} (matricule {agent.matricule})" if agent is not None else site.nom  # type: ignore[union-attr]
     edition = impression.Edition(
@@ -815,6 +825,7 @@ def planning_pdf(
         format_papier=format_papier,
         paysage=False,
         mention_vide="Aucune vacation sur la période.",
+        grilles=impression.grilles_datees(du, au, blocs) if mise_en_page == "calendrier" else [],
     )
     journaliser(
         "imprimer_planning_personnel",

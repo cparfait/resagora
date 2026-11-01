@@ -23,6 +23,7 @@ export const MODULES: Module[] = [
   { chemin: "/pilotage/direction", libelle: "Tableau de bord de la direction", groupe: "Pilotage", action: "lire_tableau_direction", composant: charger(() => import("../modules/pilotage/Pilotage").then((m) => ({ default: m.Direction }))) },
   { chemin: "/pilotage/valorisation", libelle: "Valorisation des avantages en nature", groupe: "Pilotage", action: "lire_valorisation", composant: charger(() => import("../modules/pilotage/Valorisation").then((m) => ({ default: m.Valorisation }))) },
   { chemin: "/pilotage/methodes-valorisation", libelle: "Méthodes de valorisation", groupe: "Pilotage", action: "lire_valorisation", composant: charger(() => import("../modules/pilotage/Valorisation").then((m) => ({ default: m.MethodesValorisation }))) },
+  { chemin: "/pilotage/semaine-type", libelle: "Semaine type", groupe: "Pilotage", action: "lire_reservation", composant: charger(() => import("../modules/pilotage/SemaineType")) },
   { chemin: "/pilotage/editions", libelle: "Éditions du planning", groupe: "Pilotage", action: "lire_reservation", composant: charger(() => import("../modules/pilotage/Valorisation").then((m) => ({ default: m.Editions }))) },
   { chemin: "/reservations/planning", libelle: "Planning", groupe: "Réservations", action: "lire_reservation", composant: charger(() => import("../modules/reservations/Planning")) },
   { chemin: "/reservations/dossiers", libelle: "Dossiers", groupe: "Réservations", action: "lire_reservation", composant: charger(() => import("../modules/reservations/Dossiers")) },

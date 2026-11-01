@@ -10,6 +10,8 @@ urlpatterns = [
     path("pilotage/statistiques/recettes", api.VueRecettes.as_view(), name="statistiques-recettes"),
     path("pilotage/statistiques/personnel", api.VuePersonnel.as_view(), name="statistiques-personnel"),
     path("pilotage/planning.pdf", vues_impressions.VuePlanningPdf.as_view(), name="planning-pdf"),
+    path("pilotage/semaine-type", vues_impressions.VueSemaineType.as_view(), name="semaine-type"),
+    path("pilotage/semaine-type.pdf", vues_impressions.VueSemaineTypePdf.as_view(), name="semaine-type-pdf"),
     path("pilotage/feuille-de-salle.pdf", vues_impressions.VueFeuilleDeSalle.as_view(), name="feuille-de-salle"),
     *vues_impressions.routeur.urls,
 ]

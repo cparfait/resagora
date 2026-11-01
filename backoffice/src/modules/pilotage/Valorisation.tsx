@@ -2,6 +2,7 @@
  * du compte administratif, import des subventions, simulation en cours d'année, clôture et recalcul tracé. */
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
+import { Link } from "react-router";
 import { construireChemin, ErreurApi, jetonCsrf, requete, telecharger, type Page as PageApi } from "../../api/http";
 import { useSession } from "../../auth/session";
 import { Badge } from "../../ui/Badge";
@@ -332,7 +333,7 @@ export function Editions() {
   const lecture = peut("lire_reservation");
   const sites = useOptions("sites", "/api/gestion/referentiel/sites", (s) => String(s.nom), lecture);
   const espaces = useOptions("espaces", "/api/gestion/referentiel/espaces", (e) => `${String(e.site_nom)} — ${String(e.nom)}`, lecture);
-  const [saisie, setSaisie] = useState(() => ({ site: "", espace: "", du: isoJour(new Date()), papier: "A4" }));
+  const [saisie, setSaisie] = useState(() => ({ site: "", espace: "", du: isoJour(new Date()), papier: "A4", mise_en_page: "calendrier" }));
   if (!lecture) return <DroitsInsuffisants />;
   const au = (() => {
     const d = new Date(saisie.du);
@@ -341,16 +342,32 @@ export function Editions() {
   })();
   return (
     <>
-      <Page titre="Éditions du planning" description="Planning hebdomadaire d'un espace ou d'un site (A4 ou A3, noir et blanc, date d'édition, QR code vers la version en ligne) et feuille à afficher en salle.">
+      <Page
+        titre="Éditions du planning"
+        description={
+          <>
+            Planning hebdomadaire d'un espace ou d'un site (A4 ou A3, noir et blanc, date d'édition, QR code vers la version en ligne), en calendrier ou en liste, et feuille à afficher en salle. Pour les créneaux réguliers de la saison, voir la <Link to="/pilotage/semaine-type">semaine type</Link>.
+          </>
+        }
+      >
         <form className="formulaire" onSubmit={(e) => e.preventDefault()}>
           <ChampSelection libelle="Site" videLibelle="—" options={sites} value={saisie.site} onChange={(e) => setSaisie({ ...saisie, site: e.target.value, espace: "" })} />
           <ChampSelection libelle="ou espace" videLibelle="—" options={espaces} value={saisie.espace} onChange={(e) => setSaisie({ ...saisie, espace: e.target.value, site: "" })} />
           <ChampTexte libelle="Semaine du" type="date" value={saisie.du} onChange={(e) => setSaisie({ ...saisie, du: e.target.value })} />
           <ChampSelection libelle="Format" options={[{ valeur: "A4", libelle: "A4" }, { valeur: "A3", libelle: "A3 (paysage)" }]} value={saisie.papier} onChange={(e) => setSaisie({ ...saisie, papier: e.target.value })} />
+          <ChampSelection
+            libelle="Mise en page"
+            options={[
+              { valeur: "calendrier", libelle: "Calendrier (grille de la semaine)" },
+              { valeur: "liste", libelle: "Liste par jour" },
+            ]}
+            value={saisie.mise_en_page}
+            onChange={(e) => setSaisie({ ...saisie, mise_en_page: e.target.value })}
+          />
           <div className="actions">
             <Bouton
               disabled={!saisie.site && !saisie.espace}
-              onClick={() => void telecharger(construireChemin("/api/gestion/pilotage/planning.pdf", { site: saisie.site || undefined, espace: saisie.espace || undefined, du: saisie.du, au, papier: saisie.papier }), "planning.pdf")}
+              onClick={() => void telecharger(construireChemin("/api/gestion/pilotage/planning.pdf", { site: saisie.site || undefined, espace: saisie.espace || undefined, du: saisie.du, au, papier: saisie.papier, mise_en_page: saisie.mise_en_page }), "planning.pdf")}
             >
               Imprimer le planning
             </Bouton>

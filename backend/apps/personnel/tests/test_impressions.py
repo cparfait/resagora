@@ -58,8 +58,14 @@ def test_imp02_planning_pdf_d_un_gardien(client_agent, documents_convertis):
     )
     assert reponse.status_code == 200 and reponse["Content-Type"] == "application/pdf" and reponse.content == PDF
     texte = _texte(documents_convertis[0])
-    assert "Camille Martin" in texte and "Mardi 10/11/2026" in texte and "17:00 – 22:00" in texte
+    # Calendrier par défaut : grille de la semaine, en-tête de colonne par jour.
+    assert "Camille Martin" in texte and "Mar. 10/11" in texte and "17:00 – 22:00" in texte
     assert "Édité le" in texte and "version en ligne" in texte.lower()
+    client_agent(agent("planificateur", site)).get(
+        "/api/gestion/personnel/vacations/planning-pdf",
+        {"agent": martin.pk, "du": "2026-11-09", "au": "2026-11-15", "mise_en_page": "liste"},
+    )
+    assert "Mardi 10/11/2026" in _texte(documents_convertis[1])
 
 
 def test_imp02_planning_pdf_d_un_site_signale_les_vacations_non_couvertes(client_agent, documents_convertis):

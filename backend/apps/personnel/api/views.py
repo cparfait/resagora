@@ -312,7 +312,13 @@ class VueVacations(VuePerimetre):
         if (p.get("agent") and agent is None) or (p.get("site") and site is None):
             raise NotFound()
         pdf = services.planning_pdf(
-            acteur=agent_courant(request), du=du, au=au, agent=agent, site=site, format_papier=p.get("papier", "A4")
+            acteur=agent_courant(request),
+            du=du,
+            au=au,
+            agent=agent,
+            site=site,
+            format_papier=p.get("papier", "A4"),
+            mise_en_page=p.get("mise_en_page", "calendrier"),
         )
         reponse = HttpResponse(pdf, content_type="application/pdf")
         reponse["Content-Disposition"] = f'attachment; filename="planning-{du:%Y%m%d}-{au:%Y%m%d}.pdf"'

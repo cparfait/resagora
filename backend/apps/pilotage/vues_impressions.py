@@ -12,6 +12,7 @@ from django.utils import timezone
 from drf_spectacular.utils import OpenApiParameter, extend_schema
 from rest_framework import serializers
 from rest_framework.request import Request
+from rest_framework.response import Response
 from rest_framework.routers import SimpleRouter
 from rest_framework.views import APIView
 
@@ -19,9 +20,9 @@ from apps.audit.services import instantane, journaliser
 from apps.habilitations.authentification import agent_courant
 from apps.noyau.api import VuePerimetre
 from apps.noyau.exceptions import ErreurValidation
-from apps.referentiel.models import Espace, Site
+from apps.referentiel.models import Espace, Saison, Site
 
-from . import impressions
+from . import impressions, semaine_type
 from .models import EnvoiProgramme
 
 
@@ -39,12 +40,12 @@ def _pdf(contenu: bytes, nom: str) -> HttpResponse:
 
 
 class VuePlanningPdf(APIView):
-    """IMP-01 : planning d'un espace ou d'un site, A4 ou A3."""
+    """IMP-01 : planning d'un espace ou d'un site, A4 ou A3, en calendrier (par défaut) ou en liste."""
 
     actions_requises = {"get": "lire_reservation"}
 
     @extend_schema(
-        parameters=[OpenApiParameter(n, str) for n in ("site", "espace", "du", "au", "papier")],
+        parameters=[OpenApiParameter(n, str) for n in ("site", "espace", "du", "au", "papier", "mise_en_page")],
         responses={(200, "application/pdf"): bytes},
     )
     def get(self, request: Request) -> HttpResponse:
@@ -61,9 +62,72 @@ class VuePlanningPdf(APIView):
         au = _date(p.get("au", ""), du + timedelta(days=6))
         papier = p.get("papier", "A4")
         contenu = impressions.imprimer_planning(
-            acteur=agent_courant(request), site=site, espace=espace, du=du, au=au, format_papier=papier
+            acteur=agent_courant(request),
+            site=site,
+            espace=espace,
+            du=du,
+            au=au,
+            format_papier=papier,
+            mise_en_page=p.get("mise_en_page", "calendrier"),
         )
         return _pdf(contenu, f"planning-{du:%Y%m%d}")
+
+
+def _cible_semaine_type(request: Request) -> dict[str, Any]:
+    p = request.query_params
+    site = Site.objects.filter(pk=int(p["site"])).first() if p.get("site", "").isdecimal() else None
+    espace = (
+        Espace.objects.select_related("batiment__site").filter(pk=int(p["espace"])).first()
+        if p.get("espace", "").isdecimal()
+        else None
+    )
+    saison = (
+        Saison.objects.filter(pk=int(p["saison"])).first()
+        if p.get("saison", "").isdecimal()
+        else semaine_type.saison_par_defaut()
+    )
+    if saison is None:
+        raise ErreurValidation("Aucune saison n'est définie.", code="saison_requise")
+    return {"site": site, "espace": espace, "saison": saison}
+
+
+class VueSemaineType(APIView):
+    """IMP-01 : semaine type d'un espace ou d'un site — créneaux réguliers de la saison, par jour de la semaine."""
+
+    actions_requises = {"get": "lire_reservation"}
+
+    @extend_schema(parameters=[OpenApiParameter(n, str) for n in ("site", "espace", "saison")], responses={200: dict})
+    def get(self, request: Request) -> Response:
+        cible = _cible_semaine_type(request)
+        saison = cible["saison"]
+        liste = semaine_type.creneaux(agent_courant(request), **cible)
+        return Response(
+            {
+                "saison": {"id": saison.pk, "nom": saison.nom, "debut": saison.debut, "fin": saison.fin},
+                "jours": semaine_type.JOURS,
+                "creneaux": [c.en_dict() for c in liste],
+            }
+        )
+
+
+class VueSemaineTypePdf(APIView):
+    """IMP-01 : semaine type imprimée, en calendrier (par défaut) ou en liste, A4 ou A3."""
+
+    actions_requises = {"get": "lire_reservation"}
+
+    @extend_schema(
+        parameters=[OpenApiParameter(n, str) for n in ("site", "espace", "saison", "papier", "mise_en_page")],
+        responses={(200, "application/pdf"): bytes},
+    )
+    def get(self, request: Request) -> HttpResponse:
+        cible = _cible_semaine_type(request)
+        contenu = semaine_type.imprimer(
+            agent_courant(request),
+            **cible,
+            format_papier=request.query_params.get("papier", "A4"),
+            mise_en_page=request.query_params.get("mise_en_page", "calendrier"),
+        )
+        return _pdf(contenu, f"semaine-type-{cible['saison'].nom}")
 
 
 class VueFeuilleDeSalle(APIView):
