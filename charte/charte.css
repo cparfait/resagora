@@ -36,6 +36,15 @@
   --color-info: #1a5d36;
   --color-info-fond: #e8efe9;
   --color-vert-pale: #eef4f0;
+  /* Séries des graphiques (palette catégorielle validée par validate_palette.js ; ordre fixe, la couleur suit l'entité) :
+     uniquement pour les marques de données, jamais pour du texte. */
+  --color-serie-1: #2a78d6;
+  --color-serie-2: #eb6834;
+  --color-serie-3: #1baf7a;
+  --color-serie-4: #eda100;
+  --color-serie-5: #e87ba4;
+  --color-serie-6: #008300;
+  --color-serie-7: #6250d6;
 
   --font-*: initial;
   --font-sans: "Montserrat Variable", Arial, Tahoma, sans-serif;

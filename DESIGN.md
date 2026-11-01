@@ -100,8 +100,10 @@ angles droits et le « design plat » de la direction B ; le portail public gard
 - **Menu** : élément actif sur fond vert pâle `#EEF4F0`, texte vert (7,1:1) ; pastilles de comptage.
 - **Listes** : carte titrée avec compteur de résultats, vignette (photo ou pictogramme) devant chaque espace ou usager,
   filtres en pilules avec compteur (« Toutes / À traiter 2 / … »).
-- **Tableau de bord** : cartes chiffres-clés avec pastille d'icône teintée, graphiques sobres (barres, anneau) et leur
-  tableau de données en alternative.
+- **Tableau de bord** : cartes chiffres-clés avec pastille d'icône teintée, graphiques sobres (barres triées d'une seule
+  teinte, barre empilée à 100 %) et leur tableau de données en alternative. Les séries des graphiques ont leur propre
+  palette validée (`--color-serie-1` à `7`, ordre fixe, réservée aux marques de données) : les couleurs de la charte
+  échouent aux contrôles de daltonisme en palette catégorielle.
 - **Planning par espace** : une ligne par espace (vignette, capacité), séances en cartes arrondies avec filet de
   couleur, pastilles de statut et initiales de l'usager.
 - **Fiche réservation** : retour, numéro, statut en pastille ; actions principales en gros boutons ; échanges façon

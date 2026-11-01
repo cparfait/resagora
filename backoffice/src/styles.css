@@ -199,15 +199,6 @@
   .tableau tbody tr:hover { @apply bg-fond; }
 }
 
-/* Tableau de bord (DSH-01) : compteurs cliquables, contrastés, dont la gravité ne repose pas que sur la couleur. */
-.compteurs { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(min(14rem, 100%), 1fr)); gap: 0.75rem; }
-.compteur a { display: flex; flex-direction: column; gap: 0.35rem; padding: 1rem 1.25rem; border: 1px solid var(--color-filet); border-left: 6px solid var(--color-vert); background: var(--color-carte); color: var(--color-encre); text-decoration: none; }
-.compteur a:hover, .compteur a:focus-visible { text-decoration: underline; border-color: var(--color-encre); }
-.compteur--attention a { border-left-color: var(--color-attention); }
-.compteur--danger a { border-left-color: var(--color-danger); }
-.compteur--info a { border-left-color: var(--color-vert); }
-.compteur__nombre { font-size: var(--text-chiffre); font-weight: 700; line-height: 1; letter-spacing: -0.02em; }
-.compteur__libelle { font-weight: 600; }
 .indicateurs { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(13rem, 100%), 1fr)); gap: 0.75rem; list-style: none; padding: 0; }
 .indicateur { padding: 1rem 1.25rem; border: 1px solid var(--color-filet); background: var(--color-carte); }
 .indicateur__valeur { display: block; font-size: 2rem; font-weight: 700; line-height: 1.1; }
@@ -230,10 +221,6 @@
 .carte, .details--grille, .groupe, .indicateur { border: 0; border-radius: var(--radius-lg); box-shadow: var(--shadow-carte); }
 .raccourcis a { border-radius: 9999px; }
 .raccourcis a:hover { background: var(--color-vert-pale); }
-.compteur a { border: 0; border-left: 0; border-radius: var(--radius-lg); box-shadow: var(--shadow-carte); }
-.compteur a::before { content: ""; display: block; width: 2.25rem; height: 0.3rem; border-radius: 9999px; background: var(--color-vert); }
-.compteur--attention a::before { background: var(--color-attention); }
-.compteur--danger a::before { background: var(--color-danger); }
 .segments { border: 0; border-radius: 9999px; background: var(--color-carte); box-shadow: var(--shadow-carte); padding: 4px; }
 .segment { border-radius: 9999px; padding: 0 1rem; }
 .segment:not(.segment--actif):hover { background: var(--color-vert-pale); }
