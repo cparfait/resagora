@@ -1,5 +1,6 @@
-import type { ButtonHTMLAttributes, ReactNode } from "react";
+import { createElement, type ButtonHTMLAttributes, type ReactNode } from "react";
 import { cn } from "./cn";
+import { iconeAction } from "./iconeAction";
 
 type Variante = "principal" | "secondaire" | "danger" | "lien";
 
@@ -26,10 +27,17 @@ export function classesBouton(variante: Variante = "principal", ...autres: (stri
   );
 }
 
-/** Bouton : libellé explicite, état « en cours » annoncé et bouton désactivé pendant l'envoi. */
+/** Bouton : libellé explicite, état « en cours » annoncé et bouton désactivé pendant l'envoi. Icône au trait déduite
+ * du verbe du libellé (iconeAction), décorative : le libellé reste le nom du bouton. */
 export function Bouton({ variante = "principal", enCours = false, children, type = "button", disabled, className, ...autres }: Proprietes) {
+  const Icone = typeof children === "string" ? iconeAction(children) : undefined;
   return (
-    <button type={type} className={classesBouton(variante, className)} disabled={disabled || enCours} aria-busy={enCours || undefined} {...autres}>
+    <button type={type} className={classesBouton(variante, "gap-2", className)} disabled={disabled || enCours} aria-busy={enCours || undefined} {...autres}>
+      {Icone ? (
+        <span className="inline-flex shrink-0" aria-hidden="true">
+          {createElement(Icone, { size: variante === "lien" ? 16 : 18, strokeWidth: 1.8 })}
+        </span>
+      ) : null}
       {children}
       {enCours ? <span className="sr-only"> (en cours)</span> : null}
     </button>
