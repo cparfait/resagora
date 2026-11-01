@@ -1,13 +1,18 @@
-"""Flux iCalendar (RFC 5545) des plannings : abonnement personnel des agents (PER-08) et export du planning d'un
-espace (IMP-05). Bibliothèque `icalendar` : échappement et pliage des lignes conformes."""
+"""Flux iCalendar (RFC 5545) des plannings, au format qu'Outlook importe et auquel il s'abonne (« Ajouter un
+calendrier → S'abonner à partir du web ») : abonnement personnel des agents (PER-08), plannings d'un espace, d'un
+site ou d'un usager (IMP-05). Heures en UTC (Outlook les affiche dans le fuseau du poste), statut confirmé,
+provisoire ou annulé, disponibilité « occupé » ou « provisoire » pour Outlook, intervalle d'actualisation d'une heure.
+Bibliothèque `icalendar` : échappement et pliage des lignes conformes."""
 
 from __future__ import annotations
 
 from dataclasses import dataclass
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timedelta
 
 from django.utils import timezone
-from icalendar import Calendar, Event
+from icalendar import Calendar, Event, vDuration
+
+ACTUALISATION = timedelta(hours=1)
 
 
 @dataclass
@@ -19,9 +24,11 @@ class Evenement:
     lieu: str = ""
     description: str = ""
     annule: bool = False
+    provisoire: bool = False
+    categorie: str = ""
 
 
-def calendrier(nom: str, evenements: list[Evenement]) -> bytes:
+def calendrier(nom: str, evenements: list[Evenement], *, description: str = "") -> bytes:
     cal = Calendar()
     cal.add("prodid", "-//Ville de Chatillon//Planning des equipements//FR")
     cal.add("version", "2.0")
@@ -29,6 +36,11 @@ def calendrier(nom: str, evenements: list[Evenement]) -> bytes:
     cal.add("method", "PUBLISH")
     cal.add("x-wr-calname", nom)
     cal.add("x-wr-timezone", "Europe/Paris")
+    if description:
+        cal.add("x-wr-caldesc", description)
+    # Outlook, Google Agenda et Thunderbird relisent l'abonnement à cet intervalle.
+    cal.add("refresh-interval", vDuration(ACTUALISATION), parameters={"VALUE": "DURATION"})
+    cal.add("x-published-ttl", vDuration(ACTUALISATION))
     horodatage = timezone.now().astimezone(UTC)
     for e in evenements:
         evenement = Event()
@@ -41,6 +53,11 @@ def calendrier(nom: str, evenements: list[Evenement]) -> bytes:
             evenement.add("location", e.lieu)
         if e.description:
             evenement.add("description", e.description)
-        evenement.add("status", "CANCELLED" if e.annule else "CONFIRMED")
+        if e.categorie:
+            evenement.add("categories", [e.categorie])
+        statut = "CANCELLED" if e.annule else "TENTATIVE" if e.provisoire else "CONFIRMED"
+        evenement.add("status", statut)
+        evenement.add("transp", "TRANSPARENT" if e.annule else "OPAQUE")
+        evenement.add("x-microsoft-cdo-busystatus", "FREE" if e.annule else "TENTATIVE" if e.provisoire else "BUSY")
         cal.add_component(evenement)
     return cal.to_ical()

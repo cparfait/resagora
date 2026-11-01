@@ -2,7 +2,7 @@
  * incidents, appareils mobiles, saisies reçues du terrain. Les règles (temps de travail, périmètre) sont dans l'API. */
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
-import { useSearchParams } from "react-router";
+import { Link, useSearchParams } from "react-router";
 import { construireChemin, ErreurApi, requete, telecharger, type Page as PageApi } from "../../api/http";
 import { useSession } from "../../auth/session";
 import { Badge } from "../../ui/Badge";
@@ -67,10 +67,16 @@ function ActionsAgent({ agent }: { agent: Ligne }) {
     mutationFn: () => requete<{ revoques: number }>("POST", `/api/gestion/personnel/agents/${agent.id}/revoquer-ical`),
     onSuccess: (r) => annoncer(r.revoques ? "Abonnement iCal révoqué." : "Aucun abonnement actif."),
   });
-  if (!peut("planifier_personnel")) return null;
   const nom = `${String(agent.prenom)} ${String(agent.nom)}`;
+  const voir = (
+    <Link to={`/personnel/vacations?agent=${agent.id}`}>
+      Voir son planning<span className="visuellement-masque"> : {nom}</span>
+    </Link>
+  );
+  if (!peut("planifier_personnel")) return voir;
   return (
     <>
+      {voir}
       <Bouton variante="lien" onClick={() => emettre.mutate()} enCours={emettre.isPending}>
         Lien iCal<span className="visuellement-masque"> de {nom}</span>
       </Bouton>
@@ -88,6 +94,9 @@ function ActionsAgent({ agent }: { agent: Ligne }) {
       </Bouton>
       <Dialogue ouvert={lien !== null} titre={`Abonnement iCal — ${nom}`} onFermer={() => setLien(null)}>
         <p>Transmettez ce lien à l'agent : il ne sera plus affiché. Le lien précédent ne fonctionne plus.</p>
+        <p className="aide">
+          Dans Outlook : Calendrier → Ajouter un calendrier → S'abonner à partir du web, puis coller l'adresse. Le planning se met à jour tout seul (environ toutes les heures).
+        </p>
         <ChampTexte libelle="Adresse d'abonnement" readOnly value={lien ?? ""} onFocus={(e) => e.currentTarget.select()} />
         <Bouton onClick={() => setLien(null)}>Fermer</Bouton>
       </Dialogue>

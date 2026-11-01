@@ -155,16 +155,19 @@ export default function Vacations() {
   const { annoncer } = useNotifications();
   const lecture = peut("lire_personnel");
   const sites = useOptions("sites", "/api/gestion/referentiel/sites", (s) => String(s.nom), lecture);
+  const agents = useOptions("agents-personnel", "/api/gestion/personnel/agents?actif=true", (a) => `${String(a.prenom)} ${String(a.nom)}`, lecture);
   const [parametres] = useSearchParams();
   // DSH-02, DSH-06 : depuis le tableau de bord, les besoins non couverts des N prochains jours (comme le compteur).
   const horizon = Number(parametres.get("besoins_jours") ?? 0);
   const [maintenant] = useState(() => new Date());
   const [site, setSite] = useState(() => parametres.get("site") ?? "");
+  // PER-05 : planning d'un agent (toutes ses vacations, tous sites), depuis la liste des agents ou ce filtre.
+  const [agent, setAgent] = useState(() => parametres.get("agent") ?? "");
   const [semaine, setSemaine] = useState(() => debutSemaine(new Date()));
   const [action, setAction] = useState<Action>(null);
   const [saisie, setSaisie] = useState({ motif: "", debut: "", fin: "", type: "normale", site: "" });
   const fin = ajouterJours(semaine, 7);
-  const filtres = { site: site || undefined, debut__gte: semaine.toISOString(), debut__lt: fin.toISOString(), taille: 500 };
+  const filtres = { site: site || undefined, agent: agent || undefined, debut__gte: semaine.toISOString(), debut__lt: fin.toISOString(), taille: 500 };
   const vacations = useQuery({
     queryKey: ["vacations", filtres],
     queryFn: async () => (await requete<PageApi<Vacation>>("GET", construireChemin("/api/gestion/personnel/vacations", filtres))).results,
@@ -235,6 +238,7 @@ export default function Vacations() {
     >
       <form className="formulaire-ligne" onSubmit={(e) => e.preventDefault()}>
         <ChampSelection libelle="Site" videLibelle="Tous mes sites" options={sites} value={site} onChange={(e) => setSite(e.target.value)} />
+        <ChampSelection libelle="Agent" videLibelle="Tous les agents" options={agents} value={agent} onChange={(e) => setAgent(e.target.value)} />
         <div className="actions">
           <Bouton variante="secondaire" onClick={() => setSemaine(ajouterJours(semaine, -7))}>
             Semaine précédente

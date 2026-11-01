@@ -81,4 +81,15 @@ describe("Planning du personnel", () => {
     afficher(<Vacations />);
     expect(await screen.findByText(/droits/i)).toBeInTheDocument();
   });
+
+  it("PER-05 : le planning d'un agent s'ouvre filtré sur ses vacations (lien « Voir son planning »)", async () => {
+    const appels = simulerApi((_m, url) => {
+      if (url.startsWith("/api/gestion/moi")) return { json: profil(["lire_personnel"]) };
+      if (url.startsWith("/api/gestion/")) return { json: { count: 0, next: null, previous: null, results: [] } };
+      return undefined;
+    });
+    afficher(<Vacations />, "/personnel/vacations?agent=4");
+    await waitFor(() => expect(appels.some((appel) => appel.url.startsWith("/api/gestion/personnel/vacations?") && appel.url.includes("agent=4"))).toBe(true));
+    expect(await screen.findByLabelText("Agent")).toBeInTheDocument();
+  });
 });
