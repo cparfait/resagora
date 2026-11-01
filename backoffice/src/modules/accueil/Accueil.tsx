@@ -2,11 +2,12 @@
  * par l'API dans le périmètre de l'agent ; chaque compteur ouvre la liste filtrée qu'il résume. Rôles et périmètres. */
 import { Link } from "react-router";
 import { useQuery } from "@tanstack/react-query";
-import { Building2, CalendarCheck, Clock, Gauge, Inbox, TriangleAlert, type LucideIcon } from "lucide-react";
+import { Building2, CalendarCheck, Clock, Gauge, Inbox, TriangleAlert } from "lucide-react";
 import { construireChemin, requete, type Page as PageApi } from "../../api/http";
 import type { Site } from "../../api/types";
 import { useSession } from "../../auth/session";
 import { MODULES } from "../../cadre/modules";
+import { Chiffre } from "../../ui/Chiffre";
 import { Chargement, Erreur } from "../../ui/Etats";
 import { isoJour } from "../../ui/metier";
 import { Page } from "../../ui/Page";
@@ -59,19 +60,6 @@ function Compteurs({ code, titre, compteurs, vide }: { code: string; titre: stri
 }
 
 /** Carte chiffre-clé façon Mariloo : pastille d'icône teintée, libellé, valeur (guide dataviz : stat tile). */
-function Chiffre({ icone: Icone, libelle, valeur, detail }: { icone: LucideIcon; libelle: string; valeur: string; detail?: string }) {
-  return (
-    <div className="rounded-lg bg-carte p-4 shadow-carte">
-      <span aria-hidden="true" className="inline-flex size-9 items-center justify-center rounded-md bg-vert-pale text-vert">
-        <Icone size={18} strokeWidth={1.8} />
-      </span>
-      <p className="mt-3 mb-0 text-[0.85rem] text-encre-douce">{libelle}</p>
-      <p className="m-0 text-[1.75rem] leading-tight font-semibold text-encre">{valeur}</p>
-      {detail ? <p className="m-0 text-[0.8rem] text-encre-douce">{detail}</p> : null}
-    </div>
-  );
-}
-
 function bornesDuMois(): { du: string; au: string; libelle: string } {
   const aujourd_hui = new Date();
   const premier = new Date(aujourd_hui.getFullYear(), aujourd_hui.getMonth(), 1);

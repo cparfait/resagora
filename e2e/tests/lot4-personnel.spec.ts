@@ -9,10 +9,11 @@ import { BACKOFFICE, MOBILE, connecterAvecTotp, motDePasseDemo, sansViolationAxe
 /** Code de déverrouillage choisi par le gardien de recette (propre à l'application, distinct du mot de passe). */
 const CODE = "582047";
 
-test("PER-02 PER-03 PER-07 IMP-02 @a11y les écrans du planificateur sont accessibles", async ({ page }) => {
+test("PER-02 PER-03 PER-07 IMP-02 REF-04 @a11y les écrans du planificateur sont accessibles", async ({ page }) => {
   await connecterAvecTotp(page, "planif.recette");
   for (const [chemin, titre] of [
     ["/personnel/vacations", "Planning du personnel"],
+    ["/personnel/presence", "Présence par site"],
     ["/personnel/agents", "Agents d'équipement et gardiens"],
     ["/personnel/trames", "Trames hebdomadaires"],
     ["/personnel/absences", "Absences"],

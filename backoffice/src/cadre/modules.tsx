@@ -54,6 +54,7 @@ export const MODULES: Module[] = [
   { chemin: "/finances/prestations", libelle: "Prestations annexes", groupe: "Finances", action: "lire_finances", composant: charger(() => import("../modules/finances/Tarifs").then((m) => ({ default: m.Prestations }))) },
   { chemin: "/finances/reductions", libelle: "Gratuités et réductions", groupe: "Finances", action: "lire_finances", composant: charger(() => import("../modules/finances/Tarifs").then((m) => ({ default: m.Reductions }))) },
   { chemin: "/personnel/vacations", libelle: "Planning du personnel", groupe: "Personnel", action: "lire_personnel", composant: charger(() => import("../modules/personnel/Vacations")) },
+  { chemin: "/personnel/presence", libelle: "Présence par site", groupe: "Personnel", action: "lire_personnel", composant: charger(() => import("../modules/personnel/Presence")) },
   { chemin: "/personnel/agents", libelle: "Agents et gardiens", groupe: "Personnel", action: "lire_personnel", composant: charger(() => import("../modules/personnel/Personnel").then((m) => ({ default: m.Agents }))) },
   { chemin: "/personnel/habilitations", libelle: "Habilitations", groupe: "Personnel", action: "lire_personnel", composant: charger(() => import("../modules/personnel/Personnel").then((m) => ({ default: m.Habilitations }))) },
   { chemin: "/personnel/trames", libelle: "Trames hebdomadaires", groupe: "Personnel", action: "lire_personnel", composant: charger(() => import("../modules/personnel/Personnel").then((m) => ({ default: m.Trames }))) },

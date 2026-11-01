@@ -7,22 +7,15 @@ import { useSession } from "../../auth/session";
 import { Badge } from "../../ui/Badge";
 import { Bouton } from "../../ui/Bouton";
 import { dateSimple, STATUTS, TYPES_USAGER } from "../../ui/metier";
+import { Avatar } from "../../ui/Avatar";
 import { EcranRessource, useOptions } from "../../ui/Ressource";
 import type { Compteur } from "../accueil/Accueil";
 
 /** Avatar à initiales de l'usager (listes façon Mariloo). */
 function Usager({ nom, type }: { nom: string; type: string }) {
-  const initiales = nom
-    .split(/[\s-]+/)
-    .filter((mot) => /^[A-ZÀ-Ý]/u.test(mot))
-    .slice(0, 2)
-    .map((mot) => mot[0])
-    .join("");
   return (
     <span className="flex min-w-[14rem] items-center gap-3">
-      <span aria-hidden="true" className="inline-flex size-9 shrink-0 items-center justify-center rounded-full bg-vert-pale text-[0.75rem] font-bold text-vert">
-        {initiales || "?"}
-      </span>
+      <Avatar nom={nom} />
       <span className="flex flex-col">
         <span className="font-medium text-encre">{nom}</span>
         <span className="text-[0.8rem] text-encre-douce">{type}</span>

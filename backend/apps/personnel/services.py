@@ -93,7 +93,8 @@ def _plages_du_jour(site_id: int, jour: date) -> list[tuple[datetime, datetime, 
 def _mettre_a_revoir(vacations: Iterable[Vacation], motif: str) -> int:
     nombre = 0
     for vacation in vacations:
-        if vacation.statut not in {"planifiee", "a_pourvoir"}:
+        # Un agent déjà arrivé sur place reste planifié : son pointage de départ tomberait sinon en conflit (MOB-05).
+        if vacation.statut not in {"planifiee", "a_pourvoir"} or vacation.arrivee_reelle:
             continue
         vacation.statut, vacation.signalement = "a_revoir", motif[:300]
         vacation.save(update_fields=["statut", "signalement"])
@@ -143,10 +144,11 @@ def _rattacher_vacations(besoin: Besoin) -> None:
 
 
 @transaction.atomic
-def recalculer_besoins(site_id: int, jour: date) -> dict[str, int]:
+def recalculer_besoins(site_id: int, jour: date, *, depuis: datetime | None = None) -> dict[str, int]:
     """Recalcule les besoins d'un site pour une journée ; une plage modifiée ou supprimée met ses vacations « à revoir »
     et prévient l'agent (RG-09). Seuls les besoins rattachés à ce jour sont repris (une plage du soir qui déborde
-    sur le lendemain, ou qui commence la veille, reste à son jour)."""
+    sur le lendemain, ou qui commence la veille, reste à son jour). Avec `depuis` (réglage d'un espace changé en cours
+    de journée, REF-04), les besoins et plages commencés avant cet instant restent tels quels."""
     debut, fin = _bornes_jour(jour)
     existants = list(
         Besoin.objects.select_for_update()
@@ -154,9 +156,13 @@ def recalculer_besoins(site_id: int, jour: date) -> dict[str, int]:
         .filter(Q(jour=jour) | Q(jour__isnull=True, debut__gte=debut, debut__lt=fin))
         .exclude(statut="supprime")
     )
+    if depuis is not None:
+        existants = [b for b in existants if b.debut >= depuis]
     bilan = {"crees": 0, "modifies": 0, "supprimes": 0, "a_revoir": 0}
     utilises: set[int] = set()
     for plage_debut, plage_fin, seances in _plages_du_jour(site_id, jour):
+        if depuis is not None and plage_debut < depuis:
+            continue
         identique = next((b for b in existants if b.pk not in utilises and b.debut == plage_debut and b.fin == plage_fin), None)
         chevauchant = identique or next(
             (b for b in existants if b.pk not in utilises and b.debut < plage_fin and b.fin > plage_debut), None

@@ -105,6 +105,7 @@ export const RUBRIQUES: Rubrique[] = [
     section: "general",
     chemins: [
       "/personnel/vacations",
+      "/personnel/presence",
       "/personnel/agents",
       "/personnel/absences",
       "/personnel/trames",

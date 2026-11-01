@@ -206,9 +206,20 @@ class VueBesoins(VuePerimetre):
         return Response(bilan)
 
 
+class NomAgentFacultatif(serializers.CharField):
+    """Nom de l'agent, vide sans agent. `source="agent.__str__"` rendait la méthode de None (« <method-wrapper …> »)."""
+
+    def __init__(self, **kwargs: Any) -> None:
+        super().__init__(read_only=True, **kwargs)
+
+    def get_attribute(self, instance: Any) -> str:
+        agent = getattr(instance, "agent", None)
+        return "" if agent is None else str(agent)
+
+
 class VacationSerializer(serializers.ModelSerializer):
     site_nom = serializers.CharField(source="site.nom", read_only=True)
-    agent_nom = serializers.CharField(source="agent.__str__", read_only=True, default="")
+    agent_nom = NomAgentFacultatif()
     duree_minutes = serializers.IntegerField(read_only=True)
 
     class Meta:
@@ -368,7 +379,7 @@ class VueVacations(VuePerimetre):
 
 
 class LigneTrameSerializer(serializers.ModelSerializer):
-    agent_nom = serializers.CharField(source="agent.__str__", read_only=True, default="")
+    agent_nom = NomAgentFacultatif()
 
     class Meta:
         model = LigneTrame

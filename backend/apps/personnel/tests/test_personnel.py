@@ -15,7 +15,7 @@ from freezegun import freeze_time
 
 from apps.personnel import services
 from apps.personnel.models import Absence, Agent, Besoin, HabilitationAgent, LigneTrame, Trame, TypeHabilitation, Vacation
-from apps.referentiel.models import Saison
+from apps.referentiel.models import Batiment, Saison
 from apps.reservations import services as reservations
 from apps.reservations.recurrence import PARIS
 from tests.fabriques import SiteFabrique, agent
@@ -277,3 +277,173 @@ def test_rg14_agents_et_vacations_lus_dans_le_perimetre(client_agent):
     )
     assert client_agent(agent("gardien")).get("/api/gestion/personnel/vacations").status_code == 403
     assert Agent.objects.count() == 1 and Absence.objects.count() == 0
+
+
+# --- REF-04, RG-09 : présence requise réglée par espace -------------------------------------------------
+
+
+def test_ref04_decocher_la_presence_requise_supprime_les_besoins_a_venir_et_met_la_vacation_a_revoir(
+    django_capture_on_commit_callbacks,
+):
+    site, espace = site_gardienne()
+    seance(espace, JOUR)
+    services.recalculer_besoins(site.pk, JOUR)
+    vacation = services.creer_vacation_pour_besoin(Besoin.objects.get(), acteur="système")
+    with django_capture_on_commit_callbacks(execute=True):
+        espace.gardiennage_requis = False
+        espace.save()
+    vacation.refresh_from_db()
+    assert not Besoin.objects.exclude(statut="supprime").exists()
+    assert vacation.statut == "a_revoir" and "supprimé" in vacation.signalement
+
+
+def test_ref04_cocher_la_presence_requise_cree_les_besoins_a_venir_sans_toucher_au_passe(django_capture_on_commit_callbacks):
+    _site, espace = site_gardienne()
+    espace.gardiennage_requis = False
+    espace.save()
+    with freeze_time("2026-10-01 10:00"):
+        seance(espace, date(2026, 10, 20))
+    seance(espace, JOUR)
+    with django_capture_on_commit_callbacks(execute=True):
+        espace.gardiennage_requis = True
+        espace.save()
+    besoins = list(Besoin.objects.exclude(statut="supprime"))
+    assert [b.jour for b in besoins] == [JOUR]
+
+
+def test_ref04_allonger_le_temps_d_ouverture_recalcule_la_plage(django_capture_on_commit_callbacks):
+    site, espace = site_gardienne()
+    seance(espace, JOUR)
+    services.recalculer_besoins(site.pk, JOUR)
+    with django_capture_on_commit_callbacks(execute=True):
+        espace.temps_ouverture_min = 30
+        espace.save()
+    assert Besoin.objects.exclude(statut="supprime").get().debut == paris(JOUR, 17, 30)
+
+
+def test_ref04_renommer_un_espace_ne_recalcule_rien(django_capture_on_commit_callbacks):
+    _site, espace = site_gardienne()
+    seance(espace, JOUR)
+    with django_capture_on_commit_callbacks(execute=True) as rappels:
+        espace.nom = "Gymnase B"
+        espace.save()
+    assert rappels == [] and not Besoin.objects.exists()
+
+
+def test_per03_vacation_sans_agent_n_affiche_aucun_nom(client_agent):
+    """Une vacation à pourvoir n'a pas de nom d'agent (et non la représentation d'une méthode de None)."""
+    site, _espace = site_gardienne()
+    martin = gardien(site)
+    debut = paris(JOUR, 17)
+    libre = Vacation.objects.create(site=site, debut=debut, fin=paris(JOUR, 22))
+    services.affecter(Vacation.objects.create(site=site, debut=paris(JOUR, 8), fin=paris(JOUR, 12)), martin, acteur="système")
+    reponse = client_agent(agent("planificateur", site)).get("/api/gestion/personnel/vacations", {"site": site.pk})
+    assert reponse.status_code == 200
+    noms = {v["id"]: v["agent_nom"] for v in reponse.json()["results"]}
+    assert noms[libre.pk] == "" and sorted(noms.values()) == ["", "Camille Martin"]
+
+
+def test_per03_ligne_de_trame_sans_agent_n_affiche_aucun_nom(client_agent):
+    site, _espace = site_gardienne()
+    trame = Trame.objects.create(
+        site=site,
+        saison=Saison.objects.create(nom="2026-2027", debut=date(2026, 9, 1), fin=date(2027, 8, 31)),
+        nom="Semaine type",
+    )
+    LigneTrame.objects.create(trame=trame, jour=1, heure_debut=time(17), heure_fin=time(22))
+    reponse = client_agent(agent("planificateur", site)).get("/api/gestion/personnel/lignes-trame", {"trame": trame.pk})
+    assert reponse.status_code == 200
+    assert [ligne["agent_nom"] for ligne in reponse.json()["results"]] == [""]
+
+
+def test_rg09_decocher_la_presence_requise_previent_l_agent_affecte(django_capture_on_commit_callbacks):
+    site, espace = site_gardienne()
+    seance(espace, JOUR)
+    services.recalculer_besoins(site.pk, JOUR)
+    vacation = services.creer_vacation_pour_besoin(Besoin.objects.get(), acteur="système")
+    martin = gardien(site)
+    with django_capture_on_commit_callbacks(execute=True):
+        services.affecter(vacation, martin, acteur="système")
+    mail.outbox.clear()
+    with django_capture_on_commit_callbacks(execute=True):
+        espace.gardiennage_requis = False
+        espace.save()
+    vacation.refresh_from_db()
+    assert vacation.statut == "a_revoir"
+    assert any(martin.courriel in m.to and "modifiée" in m.subject for m in mail.outbox)
+
+
+def test_rg09_decocher_en_cours_de_journee_ne_touche_pas_la_seance_du_matin(django_capture_on_commit_callbacks):
+    """Décoché à 15 h : la présence du matin (déjà assurée) reste, celle du soir disparaît."""
+    site, espace = site_gardienne()
+    with freeze_time("2026-11-01 10:00"):
+        seance(espace, JOUR, "09:00", "11:00")
+        soir = seance(espace, JOUR, "18:00", "20:00")
+        services.recalculer_besoins(site.pk, JOUR)
+    matin_besoin = Besoin.objects.exclude(statut="supprime").get(debut=paris(JOUR, 8, 45))
+    vacation_matin = services.creer_vacation_pour_besoin(matin_besoin, acteur="système")
+    martin = gardien(site)
+    with django_capture_on_commit_callbacks(execute=True):
+        services.affecter(vacation_matin, martin, acteur="système")
+    Vacation.objects.filter(pk=vacation_matin.pk).update(arrivee_reelle=paris(JOUR, 8, 40))
+    with freeze_time("2026-11-10 15:00"), django_capture_on_commit_callbacks(execute=True):
+        espace.gardiennage_requis = False
+        espace.save()
+    matin_besoin.refresh_from_db()
+    vacation_matin.refresh_from_db()
+    assert matin_besoin.statut != "supprime" and vacation_matin.statut == "planifiee"
+    assert not Besoin.objects.exclude(statut="supprime").filter(occurrences=soir).exists()
+
+
+def test_rg09_vacation_pointee_jamais_mise_a_revoir():
+    """Un agent déjà arrivé sur place n'est pas renvoyé « à revoir » (le pointage de départ tomberait en conflit)."""
+    site, _espace = site_gardienne()
+    vacation = Vacation.objects.create(site=site, debut=paris(JOUR, 17), fin=paris(JOUR, 22), arrivee_reelle=paris(JOUR, 17))
+    assert services._mettre_a_revoir([vacation], "Séances annulées") == 0
+    vacation.refresh_from_db()
+    assert vacation.statut == "a_pourvoir"
+
+
+def test_ref04_deplacer_un_espace_gardienne_recalcule_l_ancien_et_le_nouveau_site(django_capture_on_commit_callbacks):
+    site, espace = site_gardienne()
+    seance(espace, JOUR)
+    services.recalculer_besoins(site.pk, JOUR)
+    autre = SiteFabrique(nom="Gymnase du Nord")
+    nouveau_batiment = Batiment.objects.create(site=autre, nom="Bâtiment principal")
+    with django_capture_on_commit_callbacks(execute=True):
+        espace.batiment = nouveau_batiment
+        espace.save()
+    assert not Besoin.objects.filter(site=site).exclude(statut="supprime").exists()
+    assert Besoin.objects.filter(site=autre).exclude(statut="supprime").count() == 1
+
+
+def test_ref04_allonger_le_temps_de_fermeture_recalcule_la_plage(django_capture_on_commit_callbacks):
+    site, espace = site_gardienne()
+    seance(espace, JOUR)
+    services.recalculer_besoins(site.pk, JOUR)
+    with django_capture_on_commit_callbacks(execute=True):
+        espace.temps_fermeture_min = 45
+        espace.save()
+    assert Besoin.objects.exclude(statut="supprime").get().fin == paris(JOUR, 20, 45)
+
+
+def test_ref04_decocher_par_l_api_recalcule_les_besoins(client_agent, django_capture_on_commit_callbacks):
+    site, espace = site_gardienne()
+    seance(espace, JOUR)
+    services.recalculer_besoins(site.pk, JOUR)
+    with django_capture_on_commit_callbacks(execute=True):
+        reponse = client_agent(agent("gestionnaire", site)).patch(
+            f"/api/gestion/referentiel/espaces/{espace.pk}", {"gardiennage_requis": False}, format="json"
+        )
+    assert reponse.status_code == 200
+    assert not Besoin.objects.exclude(statut="supprime").exists()
+
+
+def test_ref04_le_planificateur_ne_peut_pas_changer_la_presence_requise(client_agent):
+    site, espace = site_gardienne()
+    reponse = client_agent(agent("planificateur", site)).patch(
+        f"/api/gestion/referentiel/espaces/{espace.pk}", {"gardiennage_requis": False}, format="json"
+    )
+    assert reponse.status_code == 403
+    espace.refresh_from_db()
+    assert espace.gardiennage_requis

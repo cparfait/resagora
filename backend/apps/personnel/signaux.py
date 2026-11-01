@@ -4,7 +4,7 @@ concernés, après validation de la transaction (une fois par site et par jour, 
 from __future__ import annotations
 
 import threading
-from datetime import date, datetime
+from datetime import date, datetime, time
 from typing import Any
 
 from django.db import transaction
@@ -12,6 +12,7 @@ from django.db.models.signals import post_save, pre_save
 from django.dispatch import receiver
 from django.utils import timezone
 
+from apps.referentiel.models import Espace
 from apps.reservations.models import Occurrence, Reservation
 from apps.reservations.recurrence import PARIS
 
@@ -74,3 +75,39 @@ def reservation_modifiee(sender: Any, instance: Reservation, **kwargs: Any) -> N
         "espace__batiment__site_id", "debut"
     )
     planifier({_cle(site, debut) for site, debut in seances})
+
+
+# REF-04 : la présence d'un agent se règle par espace. Cocher ou décocher « gardiennage requis », changer les temps
+# d'ouverture et de fermeture ou déplacer l'espace vers un autre site recalcule les besoins à venir de l'ancien et du
+# nouveau site : jamais ceux des jours passés, ni une présence déjà commencée aujourd'hui. Une vacation devenue inutile
+# passe « à revoir » et l'agent est prévenu (RG-09).
+_REGLAGES_GARDIENNAGE = ("gardiennage_requis", "temps_ouverture_min", "temps_fermeture_min", "batiment__site_id")
+
+
+@receiver(pre_save, sender=Espace)
+def memoriser_reglages_gardiennage(sender: Any, instance: Espace, **kwargs: Any) -> None:
+    if instance.pk:
+        instance._anciens_reglages = Espace.objects.filter(pk=instance.pk).values_list(*_REGLAGES_GARDIENNAGE).first()  # type: ignore[attr-defined]
+
+
+@receiver(post_save, sender=Espace)
+def reglages_gardiennage_modifies(sender: Any, instance: Espace, created: bool, **kwargs: Any) -> None:
+    from .services import STATUTS_GARDIENNES, recalculer_besoins
+
+    anciens = getattr(instance, "_anciens_reglages", None)
+    actuels = (instance.gardiennage_requis, instance.temps_ouverture_min, instance.temps_fermeture_min, instance.batiment.site_id)
+    if created or anciens is None or anciens == actuels or not (anciens[0] or actuels[0]):
+        return
+    maintenant = timezone.now()
+    minuit = datetime.combine(timezone.localdate(maintenant, timezone=PARIS), time.min, tzinfo=PARIS)
+    debuts = Occurrence.objects.filter(espace=instance, debut__gte=minuit, statut__in=STATUTS_GARDIENNES).values_list(
+        "debut", flat=True
+    )
+    cles = {(site, timezone.localtime(debut, PARIS).date()) for site in {anciens[3], actuels[3]} for debut in debuts}
+
+    def recalculer() -> None:
+        for site, jour in sorted(cles):
+            recalculer_besoins(site, jour, depuis=maintenant)
+
+    if cles:
+        transaction.on_commit(recalculer)

@@ -8,6 +8,7 @@ import { Link, useParams } from "react-router";
 import { construireChemin, ErreurApi, requete, type Page as PageApi } from "../../api/http";
 import type { Dossier as TypeDossier, Reservation, Seance } from "../../api/types";
 import { useSession } from "../../auth/session";
+import { Avatar } from "../../ui/Avatar";
 import { Badge } from "../../ui/Badge";
 import { Bouton } from "../../ui/Bouton";
 import { CaseACocher, ChampSelection, ChampTexte, ChampZone } from "../../ui/Champ";
@@ -28,17 +29,6 @@ const CONDITIONS: Record<string, string> = {
   acompte: "Acompte payé",
   caution: "Caution reçue",
 };
-
-function initiales(nom: string): string {
-  return (
-    nom
-      .split(/[\s-]+/)
-      .filter((mot) => /^[A-ZÀ-Ý]/u.test(mot))
-      .slice(0, 2)
-      .map((mot) => mot[0])
-      .join("") || "?"
-  );
-}
 
 type ActionMotivee = { reservation: Reservation; type: "refuser" | "annuler" } | { seance: Seance; type: "annuler_seance" } | null;
 
@@ -194,9 +184,7 @@ export default function Dossier() {
       <div className="mb-6 rounded-lg bg-carte p-5 shadow-carte">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <span aria-hidden="true" className="inline-flex size-12 shrink-0 items-center justify-center rounded-full bg-vert-pale text-sm font-bold text-vert">
-              {initiales(d.usager_nom)}
-            </span>
+            <Avatar nom={d.usager_nom} className="size-12 text-sm" />
             <div className="flex flex-col">
               <Link to={`/usagers/${d.usager}`} className="text-base font-semibold text-encre">
                 {d.usager_nom}
