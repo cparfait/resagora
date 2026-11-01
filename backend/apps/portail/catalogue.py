@@ -17,7 +17,7 @@ from .securite import VuePublique
 class SitePublicSerializer(serializers.ModelSerializer):
     class Meta:
         model = Site
-        fields = ["id", "nom", "adresse", "code_postal", "commune"]
+        fields = ["id", "nom", "adresse", "code_postal", "commune", "latitude", "longitude", "acces"]
 
 
 class FamillePubliqueSerializer(serializers.ModelSerializer):
@@ -30,6 +30,11 @@ class EspacePublicSerializer(serializers.ModelSerializer):
     site = serializers.IntegerField(source="batiment.site_id", read_only=True)
     site_nom = serializers.CharField(source="batiment.site.nom", read_only=True)
     adresse = serializers.CharField(source="batiment.site.adresse", read_only=True)
+    code_postal = serializers.CharField(source="batiment.site.code_postal", read_only=True)
+    commune = serializers.CharField(source="batiment.site.commune", read_only=True)
+    latitude = serializers.DecimalField(source="batiment.site.latitude", max_digits=8, decimal_places=6, read_only=True)
+    longitude = serializers.DecimalField(source="batiment.site.longitude", max_digits=9, decimal_places=6, read_only=True)
+    acces = serializers.CharField(source="batiment.site.acces", read_only=True)
     famille_libelle = serializers.CharField(source="famille.libelle", read_only=True)
     parent = serializers.SerializerMethodField()  # type: ignore[assignment]
     parent_nom = serializers.SerializerMethodField()
@@ -44,6 +49,11 @@ class EspacePublicSerializer(serializers.ModelSerializer):
             "site",
             "site_nom",
             "adresse",
+            "code_postal",
+            "commune",
+            "latitude",
+            "longitude",
+            "acces",
             "famille",
             "famille_libelle",
             "parent",

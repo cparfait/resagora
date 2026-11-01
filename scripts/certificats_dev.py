@@ -93,7 +93,35 @@ def certificat(
     return cle, constructeur.sign(ac[0], hashes.SHA256())
 
 
+def cle_de_sauvegarde() -> None:
+    """EXP-01 : certificat de chiffrement des sauvegardes (clé publique) et clé privée de restauration."""
+    if (LAN / "sauvegarde_certificat.pem").exists() and "--forcer" not in sys.argv:
+        return
+    from cryptography.hazmat.primitives.asymmetric import rsa
+
+    cle = rsa.generate_private_key(public_exponent=65537, key_size=3072)
+    maintenant = datetime.datetime.now(datetime.UTC)
+    cert = (
+        x509.CertificateBuilder()
+        .subject_name(nom("Sauvegardes (dev)"))
+        .issuer_name(nom("Sauvegardes (dev)"))
+        .public_key(cle.public_key())
+        .serial_number(x509.random_serial_number())
+        .not_valid_before(maintenant - datetime.timedelta(minutes=5))
+        .not_valid_after(maintenant + datetime.timedelta(days=3650))
+        .add_extension(x509.KeyUsage(False, False, True, False, False, False, False, False, False), critical=True)
+        .sign(cle, hashes.SHA256())
+    )
+    ecrire(LAN / "sauvegarde_certificat.pem", pem(cert))
+    ecrire(
+        LAN / "sauvegarde_cle_privee.pem",
+        cle.private_bytes(serialization.Encoding.PEM, serialization.PrivateFormat.PKCS8, serialization.NoEncryption()),
+        prive=True,
+    )
+
+
 def main() -> int:
+    cle_de_sauvegarde()
     if (LAN / "ac_interne.crt").exists() and "--forcer" not in sys.argv:
         print("Certificats de développement déjà présents (utiliser --forcer pour régénérer).")
         return 0

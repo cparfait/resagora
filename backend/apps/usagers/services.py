@@ -195,6 +195,10 @@ def changer_statut(usager: Usager, cible: str, *, depuis: set[str], acteur: Any,
     if cible == "suspendu":
         usager.observations = f"{usager.observations}\nSuspension : {motif.strip()}".strip()
     usager.save(update_fields=["statut", "observations"])
+    if cible == "suspendu":
+        from .agenda import revoquer_abonnements
+
+        revoquer_abonnements(usager=usager, acteur=acteur, motif="structure suspendue")
     journaliser(f"usager_{cible}", usager, avant={"statut": avant}, apres={"statut": cible, "motif": motif}, acteur=acteur)
     return usager
 

@@ -179,3 +179,30 @@ class PieceJustificative(models.Model):
         if self.valide_du and jour < self.valide_du:
             return False
         return self.valide_jusqu_au is None or jour <= self.valide_jusqu_au
+
+
+class AbonnementAgenda(models.Model):
+    """POR-05 : abonnement iCal d'un contact aux séances de sa structure. Seule l'empreinte du jeton est
+    conservée ; l'abonnement cesse à sa révocation, à son échéance ou quand le contact quitte la structure."""
+
+    usager = models.ForeignKey(Usager, on_delete=models.CASCADE, related_name="abonnements_agenda")
+    contact = models.ForeignKey(Contact, on_delete=models.CASCADE, related_name="abonnements_agenda")
+    empreinte = models.CharField(max_length=64, unique=True)
+    cree_le = models.DateTimeField(auto_now_add=True)
+    expire_le = models.DateTimeField()
+    revoque_le = models.DateTimeField(null=True, blank=True)
+    dernier_acces = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        ordering = ["-cree_le"]
+        constraints = [
+            models.UniqueConstraint(
+                fields=["usager", "contact"], condition=models.Q(revoque_le__isnull=True), name="abonnement_agenda_unique_actif"
+            )
+        ]
+
+    def __str__(self) -> str:
+        return f"Abonnement agenda de {self.contact} pour {self.usager}"
+
+    def sites_concernes(self) -> None:
+        return None

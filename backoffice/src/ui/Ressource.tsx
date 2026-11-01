@@ -27,6 +27,8 @@ export interface DefinitionChamp {
   options?: Option[];
   lectureSeule?: boolean;
   enCreationSeulement?: boolean;
+  /** Pas des champs « nombre » (« any » pour des décimales). */
+  pas?: string;
 }
 
 export interface DefinitionFiltre {
@@ -158,6 +160,7 @@ export function Formulaire({
                 key={champ.nom}
                 {...commun}
                 type={types[champ.type] ?? "text"}
+                step={champ.type === "nombre" ? champ.pas : undefined}
                 inputMode={champ.type === "euros" ? "decimal" : undefined}
                 aide={champ.aide ?? (champ.type === "euros" ? "Montant en euros, par exemple 12,50." : undefined)}
                 value={String(valeurs[champ.nom] ?? "")}

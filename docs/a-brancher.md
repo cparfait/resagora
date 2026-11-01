@@ -55,7 +55,9 @@ répond `{"etat": "ok"}` ; sans `--cert`, la poignée de main TLS échoue.
 | `audit_cle_hmac` | secret LAN | Clé aléatoire (≥ 32 caractères) de la chaîne du journal d'audit ; à conserver avec les sauvegardes |
 | Journaux techniques | exploitation | Serveur syslog de la Ville : remplacer le pilote `json-file` (`x-journaux` des compose) par `syslog` ou un agent de collecte ; conservation ≥ 6 mois (SEC-08). Les lignes `ANCRAGE_JOURNAL_AUDIT` y sont l'ancrage externe du journal. |
 | Purge du journal d'audit | exploitation | Tâche planifiée annuelle avec le rôle propriétaire : `docker compose run --rm migrations python manage.py purger_journal_audit` (archive JSON Lines + empreinte, conservation `AUDIT_CONSERVATION_JOURS`, 400 jours par défaut, 183 minimum) |
-| Archivage des WAL, sauvegarde | exploitation | Cible de sauvegarde, RPO 1 h (skill `docker-deploiement`) |
+| `postgres_sauvegarde_password` | secret LAN | Mot de passe du rôle `equipements_sauvegarde` (réplication seule, EXP-01) ; sur une base déjà créée, créer le rôle une fois (`docs/sauvegarde-restauration.md`) |
+| `sauvegarde_certificat.pem` | secret LAN | Certificat (clé publique) de chiffrement des sauvegardes ; la clé privée correspondante est conservée au coffre de la DSI, avec `audit_cle_hmac` et `cle_chiffrement`, et n'est déposée sur l'hôte que pour une restauration (`docs/sauvegarde-restauration.md`) |
+| Cible des sauvegardes | exploitation | Stockage distinct de l'hôte pour le volume `sauvegardes` (`VOLUME_SAUVEGARDES`), avec instantanés non modifiables depuis l'hôte et copie hors site ; état de santé du service `sauvegarde` à brancher sur la supervision (ADR 0010) |
 
 **Tester** : `docker compose -f deploy/lan/compose.yaml run --rm migrations python manage.py accorder_droits equipements_app`
 affiche les tables en ajout seul ; `python manage.py verifier_deploiement` doit répondre « Instance prête ».

@@ -48,6 +48,7 @@ def main() -> int:
     ecrire(LAN / "cle_chiffrement", base64.urlsafe_b64encode(secrets.token_bytes(32)).decode())
     ecrire(LAN / "postgres_password", jeton(24))
     ecrire(LAN / "postgres_app_password", jeton(24))
+    ecrire(LAN / "postgres_sauvegarde_password", jeton(24))
     ecrire(LAN / "audit_cle_hmac", jeton(32))
     ecrire(LAN / "valkey_mot_de_passe", jeton(24))
     ecrire(DMZ / "valkey_mot_de_passe", jeton(24))

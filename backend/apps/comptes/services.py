@@ -37,6 +37,7 @@ from apps.habilitations.services import exiger
 from apps.noyau.chiffrement import chiffrer, dechiffrer, empreinte_hmac
 from apps.noyau.exceptions import ErreurMetier, ErreurValidation
 from apps.noyau.parametres import parametre
+from apps.usagers.agenda import revoquer_abonnements
 from apps.usagers.models import Contact, Rattachement, Usager
 
 from .models import CompteUsager, JetonPortail, JetonUnique
@@ -416,6 +417,7 @@ def refuser_compte(compte: CompteUsager, *, acteur: Any, motif: str) -> CompteUs
     compte.statut = "ferme"
     compte.motif_suspension = motif[:250]
     compte.save(update_fields=["statut", "motif_suspension"])
+    revoquer_abonnements(contact=compte.contact, acteur=acteur, motif="compte refusé")
     for usager in Usager.objects.filter(rattachements__contact=compte.contact, statut="en_attente"):
         if not usager.dossiers.exists():
             usager.delete()
@@ -434,6 +436,7 @@ def suspendre_compte(compte: CompteUsager, *, acteur: Any, motif: str) -> Compte
     compte.motif_suspension = motif[:250]
     compte.save(update_fields=["statut", "motif_suspension"])
     fermer_sessions(compte)
+    revoquer_abonnements(contact=compte.contact, acteur=acteur, motif="compte suspendu")
     journaliser("suspendre_compte_portail", compte, apres={"motif": motif}, acteur=acteur)
     return compte
 

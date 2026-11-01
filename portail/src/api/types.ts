@@ -23,6 +23,9 @@ export interface Site {
   adresse: string;
   code_postal: string;
   commune: string;
+  latitude: number | null;
+  longitude: number | null;
+  acces: string;
 }
 
 export interface Famille {
@@ -37,6 +40,11 @@ export interface EspacePublic {
   site: number;
   site_nom: string;
   adresse: string;
+  code_postal: string;
+  commune: string;
+  latitude: number | null;
+  longitude: number | null;
+  acces: string;
   famille: number;
   famille_libelle: string;
   parent: number | null;
@@ -50,6 +58,13 @@ export interface EspacePublic {
   partageable: boolean;
   photos: { id: number; description: string; url: string }[];
   documents: { id: number; titre: string; nature: string; taille: number; format: string; url: string }[];
+}
+
+export interface AbonnementAgenda {
+  actif: boolean;
+  cree_le: string | null;
+  expire_le: string | null;
+  dernier_acces: string | null;
 }
 
 export interface Disponibilites {

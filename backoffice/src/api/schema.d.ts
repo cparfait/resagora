@@ -3117,8 +3117,42 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** @description IMP-01 : planning d'un espace ou d'un site, A4 ou A3. */
+        /** @description IMP-01 : planning d'un espace ou d'un site, A4 ou A3, en calendrier (par défaut) ou en liste. */
         get: operations["gestion_pilotage_planning.pdf_retrieve"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gestion/pilotage/semaine-type": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description IMP-01 : semaine type d'un espace ou d'un site — créneaux réguliers de la saison, par jour de la semaine. */
+        get: operations["gestion_pilotage_semaine_type_retrieve"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gestion/pilotage/semaine-type.pdf": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description IMP-01 : semaine type imprimée, en calendrier (par défaut) ou en liste, A4 ou A3. */
+        get: operations["gestion_pilotage_semaine_type.pdf_retrieve"];
         put?: never;
         post?: never;
         delete?: never;
@@ -8107,6 +8141,15 @@ export interface components {
             code_postal?: string;
             commune?: string;
             telephone?: string;
+            /** Format: double */
+            latitude?: number | null;
+            /** Format: double */
+            longitude?: number | null;
+            /**
+             * Consignes d'accès
+             * @description Publiées sur le portail : entrée, stationnement, transports. Jamais de code d'accès ni de digicode.
+             */
+            acces?: string;
             actif?: boolean;
         };
         PatchedTarifRequest: {
@@ -8773,6 +8816,15 @@ export interface components {
             code_postal?: string;
             commune?: string;
             telephone?: string;
+            /** Format: double */
+            latitude?: number | null;
+            /** Format: double */
+            longitude?: number | null;
+            /**
+             * Consignes d'accès
+             * @description Publiées sur le portail : entrée, stationnement, transports. Jamais de code d'accès ni de digicode.
+             */
+            acces?: string;
             actif?: boolean;
         };
         SiteRequest: {
@@ -8782,6 +8834,15 @@ export interface components {
             code_postal?: string;
             commune?: string;
             telephone?: string;
+            /** Format: double */
+            latitude?: number | null;
+            /** Format: double */
+            longitude?: number | null;
+            /**
+             * Consignes d'accès
+             * @description Publiées sur le portail : entrée, stationnement, transports. Jamais de code d'accès ni de digicode.
+             */
+            acces?: string;
             actif?: boolean;
         };
         SortiePretRequest: {
@@ -16005,7 +16066,58 @@ export interface operations {
                 au?: string;
                 du?: string;
                 espace?: string;
+                mise_en_page?: string;
                 papier?: string;
+                site?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/pdf": string;
+                };
+            };
+        };
+    };
+    gestion_pilotage_semaine_type_retrieve: {
+        parameters: {
+            query?: {
+                espace?: string;
+                saison?: string;
+                site?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
+    "gestion_pilotage_semaine_type.pdf_retrieve": {
+        parameters: {
+            query?: {
+                espace?: string;
+                mise_en_page?: string;
+                papier?: string;
+                saison?: string;
                 site?: string;
             };
             header?: never;

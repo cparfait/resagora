@@ -15,9 +15,12 @@ VALEURS_SENSIBLES = re.compile(
 
 
 AUTORISATION = re.compile(r"(authorization[\"']?\s*[:=]\s*)([^\n\"']+)", re.IGNORECASE)
+# Chemins qui portent un jeton : flux d'agenda du portail (POR-05) et des agents (PER-08).
+CHEMINS_A_JETON = re.compile(r"(/(?:agenda|ical)/)[A-Za-z0-9_-]+(\.ics)")
 
 
 def masquer(texte: str) -> str:
+    texte = CHEMINS_A_JETON.sub(r"\1***\2", texte)
     return VALEURS_SENSIBLES.sub(r"\1***", AUTORISATION.sub(r"\1***", texte))
 
 

@@ -218,3 +218,34 @@ def test_com04_rappel_la_veille_aux_seuls_contacts_qui_l_ont_demande(django_capt
         assert reservations.rappeler_seances() == 0
     rappels = [m for m in mail.outbox if "Rappel" in m.subject]
     assert len(rappels) == 1 and rappels[0].to == [contact.courriel] and "Gymnase des rappels" in rappels[0].subject
+
+
+def test_com01_rappel_reprend_adresse_et_consignes_d_acces(django_capture_on_commit_callbacks):
+    usager = usager_avec_contact()
+    PreferenceNotification.objects.create(contact=usager.rattachements.first().contact, rappels=True)
+    espace = EspaceFabrique(nom="Gymnase des accès")
+    site = espace.batiment.site
+    site.adresse, site.acces = "12 rue de la Mairie", "Entrée par le parking, côté stade."
+    site.save()
+    valider_systeme(reserver(espace, date(2026, 11, 10), "18:00", "20:00", usager=usager))
+    with freeze_time("2026-11-09 17:00"), django_capture_on_commit_callbacks(execute=True):
+        assert reservations.rappeler_seances() == 1
+    rappel = next(m for m in mail.outbox if "Rappel" in m.subject)
+    assert "Adresse : 12 rue de la Mairie" in rappel.body
+    assert "Accès : Entrée par le parking, côté stade." in rappel.body
+
+
+def test_com01_correction_du_rappel_respecte_un_modele_personnalise():
+    from importlib import import_module
+
+    from django.apps import apps
+
+    migration = import_module("apps.communication.migrations.0015_rappel_seance_acces")
+    modele = ModeleMessage.objects.get(code="rappel_seance")
+    assert "{{ acces }}" in modele.corps
+    modele.corps = "Texte de la Ville"
+    modele.save()
+    migration.creer(apps, None)
+    migration.supprimer(apps, None)
+    modele.refresh_from_db()
+    assert modele.corps == "Texte de la Ville"

@@ -26,6 +26,20 @@ export default function Sites() {
         { nom: "code_postal", libelle: "Code postal", type: "texte" },
         { nom: "commune", libelle: "Commune", type: "texte" },
         { nom: "telephone", libelle: "Téléphone", type: "texte" },
+        {
+          nom: "latitude",
+          libelle: "Latitude",
+          type: "nombre",
+          pas: "any",
+          aide: "En degrés décimaux, par exemple 48,8034. Copiez-la depuis OpenStreetMap ou Géoportail. Laissez vide avec la longitude si vous ne la connaissez pas.",
+        },
+        { nom: "longitude", libelle: "Longitude", type: "nombre", pas: "any", aide: "En degrés décimaux, par exemple 2,2880." },
+        {
+          nom: "acces",
+          libelle: "Consignes d'accès",
+          type: "zone",
+          aide: "Publiées sur le portail et rappelées la veille des séances : entrée, stationnement, transports. N'y mettez jamais de code d'accès ni de digicode.",
+        },
         { nom: "actif", libelle: "Site actif", type: "booleen" },
       ]}
       valeursInitiales={{ actif: true, code_postal: "92320", commune: "Châtillon" }}

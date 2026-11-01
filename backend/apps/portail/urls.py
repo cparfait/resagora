@@ -2,12 +2,13 @@
 la liste blanche de la façade (facade/facade/routes.py), sinon elle reste injoignable depuis Internet ;
 `apps/portail/tests/test_contrat_facade.py` vérifie la correspondance dans les deux sens."""
 
-from django.urls import path
+from django.urls import path, register_converter
 
 from apps.paiements import vues_portail as vues_paiements
 
 from . import (
     catalogue,
+    vues_agenda,
     vues_comptes,
     vues_documents,
     vues_dossiers,
@@ -17,6 +18,8 @@ from . import (
     vues_usagers,
     vues_valorisation,
 )
+
+register_converter(vues_agenda.JetonAgenda, "jeton")
 
 urlpatterns = [
     # Public
@@ -55,6 +58,8 @@ urlpatterns = [
     path("usagers/<int:pk>/documents/<int:document>/fichier", vues_documents.VueFichierDocumentUsager.as_view()),
     path("usagers/<int:pk>/pieces", vues_usagers.VuePiecesUsager.as_view()),
     path("usagers/<int:pk>/pieces/<int:piece>/fichier", vues_usagers.VueFichierPiece.as_view()),
+    path("usagers/<int:pk>/agenda", vues_agenda.VueAgendaUsager.as_view()),
+    path("agenda/<jeton:jeton>.ics", vues_agenda.VueAgendaIcal.as_view()),
     path("pieces-exigees", vues_usagers.VuePiecesExigees.as_view()),
     path("types-demande", vues_dossiers.VueTypesDemande.as_view()),
     # Demandes et dossiers

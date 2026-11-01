@@ -60,6 +60,9 @@ test-facade:
 test-front:
 	npm run test --workspaces --if-present
 
+test-sauvegarde: ## EXP-01 : sauvegarde chiffrée puis restauration réelles, conteneurs jetables (Docker requis)
+	cd backend && $(BACK_PY) -m pytest -o addopts="" -p no:cacheprovider --noconftest -m integration tests/test_sauvegarde_restauration.py
+
 test-integration: ## Tests contre les conteneurs de test (annuaire, Mailpit, Gotenberg, ClamAV, DocuSeal, simulateurs)
 	cd backend && $(BACK_PY) -m pytest -m integration
 

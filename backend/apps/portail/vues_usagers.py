@@ -22,6 +22,7 @@ from apps.audit.services import instantane, journaliser
 from apps.comptes.services import inviter_contact
 from apps.noyau import fichiers
 from apps.noyau.exceptions import AccesRefuse, ErreurValidation
+from apps.usagers import agenda
 from apps.usagers import services as services_usagers
 from apps.usagers.models import Contact, PieceJustificative, Rattachement, TypePiece, Usager
 
@@ -219,6 +220,7 @@ class VueContactUsager(VueContact):
             raise AccesRefuse("Le contact principal ne peut pas être retiré.", code="contact_principal")
         with transaction.atomic():
             journaliser("retirer_contact_portail", lien.contact, apres={"usager": usager.pk}, acteur=contact)
+            agenda.revoquer_abonnements(usager=usager, contact=lien.contact, acteur=contact, motif="contact retiré")
             lien.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 

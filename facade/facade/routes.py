@@ -35,10 +35,13 @@ class Route:
 
 ID = r"[0-9]{1,12}"
 UUID = r"[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}"
+# Jeton d'un lien d'abonnement (secrets.token_urlsafe(32)) ; il remplace la session pour un logiciel d'agenda.
+JETON = r"[A-Za-z0-9_-]{43}"
 
 
 def r(methode: str, chemin: str, nature: Nature = Nature.JSON, session: bool = False, debit: str = "public") -> Route:
-    return Route(methode, re.compile(chemin.replace("{id}", ID).replace("{uuid}", UUID), re.ASCII), nature, session, debit)
+    motif = chemin.replace("{id}", ID).replace("{uuid}", UUID).replace("{jeton}", JETON)
+    return Route(methode, re.compile(motif, re.ASCII), nature, session, debit)
 
 
 ROUTES: list[Route] = [
@@ -86,6 +89,11 @@ ROUTES: list[Route] = [
     r("GET", "/api/portail/usagers/{id}/pieces", session=True),
     r("POST", "/api/portail/usagers/{id}/pieces", Nature.TELEVERSEMENT, session=True, debit="televersement"),
     r("GET", "/api/portail/usagers/{id}/pieces/{id}/fichier", Nature.TELECHARGEMENT, session=True),
+    # Agenda des séances (POR-05) : lien d'abonnement géré par le contact, flux lu sans session par le jeton.
+    r("GET", "/api/portail/usagers/{id}/agenda", session=True),
+    r("POST", "/api/portail/usagers/{id}/agenda", session=True, debit="depot"),
+    r("DELETE", "/api/portail/usagers/{id}/agenda", session=True),
+    r("GET", r"/api/portail/agenda/{jeton}\.ics", Nature.TELECHARGEMENT, debit="agenda"),
     r("GET", "/api/portail/pieces-exigees", session=True),
     r("GET", "/api/portail/types-demande", session=True),
     # Demandes et dossiers (POR-04, POR-05)
@@ -143,6 +151,9 @@ DEBITS: dict[str, tuple[int, int]] = {
     "depot": (30, 3600),
     "televersement": (60, 3600),
     "webhook": (300, 60),
+    # Un logiciel d'agenda relit l'abonnement toutes les heures, souvent depuis des adresses partagées (Google,
+    # Microsoft) : limite large ; le jeton de 256 bits rend vaine toute recherche par force brute.
+    "agenda": (300, 60),
 }
 
 

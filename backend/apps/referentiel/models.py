@@ -2,9 +2,24 @@
 
 from __future__ import annotations
 
+import re
 from datetime import datetime, timedelta
 
+from django.core.exceptions import ValidationError
+from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
+
+CODE_D_ACCES = re.compile(
+    r"digicode|code\s+(?:d'|d’|de\s+l'|de\s+la\s+|du\s+)?(?:accès|acces|porte|portail|entrée|entree|alarme)", re.I
+)
+
+
+def sans_code_d_acces(texte: str) -> None:
+    """REF-01 : les consignes d'accès sont publiques (portail, agenda, rappel) : jamais de code d'accès."""
+    if CODE_D_ACCES.search(texte):
+        raise ValidationError(
+            "Ces consignes sont publiées sur le portail : retirez le code d'accès. Transmettez-le à part, à l'usager concerné."
+        )
 
 
 class Site(models.Model):
@@ -14,10 +29,32 @@ class Site(models.Model):
     code_postal = models.CharField(max_length=5, blank=True, default="92320")
     commune = models.CharField(max_length=80, blank=True, default="Châtillon")
     telephone = models.CharField(max_length=20, blank=True, default="")
+    # REF-01, POR-03 : situation et accès publiés sur le portail et rappelés la veille des séances (COM-01).
+    latitude = models.DecimalField(
+        max_digits=8, decimal_places=6, null=True, blank=True, validators=[MinValueValidator(-90), MaxValueValidator(90)]
+    )
+    longitude = models.DecimalField(
+        max_digits=9, decimal_places=6, null=True, blank=True, validators=[MinValueValidator(-180), MaxValueValidator(180)]
+    )
+    acces = models.TextField(
+        "consignes d'accès",
+        max_length=1000,
+        blank=True,
+        default="",
+        help_text="Publiées sur le portail : entrée, stationnement, transports. Jamais de code d'accès ni de digicode.",
+        validators=[sans_code_d_acces],
+    )
     actif = models.BooleanField(default=True)
 
     class Meta:
         ordering = ["nom"]
+        constraints = [
+            models.CheckConstraint(
+                name="site_coordonnees_completes",
+                condition=models.Q(latitude__isnull=True, longitude__isnull=True)
+                | models.Q(latitude__isnull=False, longitude__isnull=False),
+            )
+        ]
 
     def __str__(self) -> str:
         return self.nom

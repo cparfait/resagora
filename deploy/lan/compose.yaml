@@ -55,10 +55,16 @@ services:
       POSTGRES_USER: equipements
       POSTGRES_PASSWORD_FILE: /run/secrets/postgres_password
       POSTGRES_INITDB_ARGS: "--data-checksums"
-    secrets: [postgres_password, postgres_app_password]
+    # EXP-01 (ADR 0010) : archivage continu des WAL par le serveur (copie atomique et synchronisée de `basic_archive`)
+    # dans le volume `wal`, seul volume de sauvegarde visible de postgres ; un segment est forcé au plus tard toutes
+    # les 15 minutes s'il y a eu des écritures, puis le service `sauvegarde` l'expédie chiffré (RPO 1 h).
+    command: ["postgres", "-c", "archive_mode=on", "-c", "archive_library=basic_archive",
+              "-c", "basic_archive.archive_directory=/archives", "-c", "archive_timeout=900"]
+    secrets: [postgres_password, postgres_app_password, postgres_sauvegarde_password]
     volumes:
       - pgdata:/var/lib/postgresql
       - ./postgres/initdb:/docker-entrypoint-initdb.d:ro
+      - wal:/archives
     networks: [lan_data]
     cap_drop: [ALL]
     cap_add: [CHOWN, SETUID, SETGID, DAC_OVERRIDE, FOWNER]
@@ -68,6 +74,88 @@ services:
     shm_size: 256m
     restart: unless-stopped
     healthcheck: { test: ["CMD-SHELL", "pg_isready -U equipements"], interval: 5s, retries: 30 }
+    # Volume local : la base démarre même si la cible des sauvegardes (NAS) est indisponible.
+    depends_on: { preparer-wal: { condition: service_completed_successfully } }
+
+  preparer-wal:
+    # Tâche ponctuelle : le volume d'archivage des WAL appartient à postgres (999).
+    <<: *journaux
+    image: postgres:18.6-trixie@sha256:979bccfde35445db618c65107d27d08c6c21339d8dc3ad4c830c6633947be0e4
+    user: "0:0"
+    entrypoint: ["sh", "-c", "chown 999:999 /archives /travail && chmod 700 /archives /travail"]
+    cap_drop: [ALL]
+    cap_add: [CHOWN, FOWNER]
+    security_opt: ["no-new-privileges:true"]
+    read_only: true
+    network_mode: none
+    volumes: [wal:/archives, sauvegarde-travail:/travail]
+    restart: "no"
+
+  preparer-sauvegardes:
+    # Tâche ponctuelle : la cible des sauvegardes appartient au service `sauvegarde` (999) et n'est lisible que par lui.
+    # Sur un partage NFS avec root_squash, créer le répertoire à l'avance, propriétaire 999 (docs/sauvegarde-restauration.md).
+    <<: *journaux
+    image: postgres:18.6-trixie@sha256:979bccfde35445db618c65107d27d08c6c21339d8dc3ad4c830c6633947be0e4
+    user: "0:0"
+    entrypoint: ["sh", "-c", "mkdir -p /sauvegardes/wal /sauvegardes/base /sauvegardes/fichiers && chown 999:999 /sauvegardes /sauvegardes/wal /sauvegardes/base /sauvegardes/fichiers && chmod 700 /sauvegardes"]
+    cap_drop: [ALL]
+    cap_add: [CHOWN, FOWNER]
+    security_opt: ["no-new-privileges:true"]
+    read_only: true
+    network_mode: none
+    volumes: [sauvegardes:/sauvegardes]
+    restart: "no"
+
+  sauvegarde:
+    # EXP-01 : expédition chiffrée des WAL et miroir chiffré des fichiers déposés toutes les 30 minutes, sauvegarde de
+    # base quotidienne, rotation, contrôle de l'archivage (deploy/lan/sauvegarde/sauvegarder.sh).
+    # Seul service qui voit la cible : ni postgres ni l'API ne peuvent effacer les sauvegardes.
+    <<: *durci
+    image: postgres:18.6-trixie@sha256:979bccfde35445db618c65107d27d08c6c21339d8dc3ad4c830c6633947be0e4
+    user: "999:999"
+    entrypoint: ["sh", "/opt/sauvegarde/sauvegarder.sh"]
+    environment:
+      PGHOST: postgres
+      PGUSER: equipements_sauvegarde
+      SAUVEGARDE_RETENTION_JOURS: "${SAUVEGARDE_RETENTION_JOURS:-14}"
+      SAUVEGARDE_BASE_HEURES: "${SAUVEGARDE_BASE_HEURES:-24}"
+    secrets: [postgres_sauvegarde_password, sauvegarde_certificat]
+    volumes:
+      - sauvegardes:/sauvegardes
+      - wal:/archives
+      - sauvegarde-travail:/travail
+      - stockage:/stockage:ro
+      - ./sauvegarde:/opt/sauvegarde:ro
+    healthcheck: { test: ["CMD-SHELL", "test -n \"$$(find /tmp/derniere-reussite -mmin -70 2>/dev/null)\""], interval: 5m, start_period: 30m }
+    networks: [lan_data]
+    depends_on:
+      postgres: { condition: service_healthy }
+      preparer-sauvegardes: { condition: service_completed_successfully }
+
+  restauration:
+    # EXP-01 : à lancer à la main, pile arrêtée, vers des volumes NEUFS (VOLUME_PGDATA, VOLUME_STOCKAGE), avec la clé
+    # privée sortie du coffre le temps de la restauration (docs/sauvegarde-restauration.md) :
+    #   docker compose -f deploy/lan/compose.yaml --profile restauration run --rm restauration
+    profiles: [restauration]
+    <<: *journaux
+    image: postgres:18.6-trixie@sha256:979bccfde35445db618c65107d27d08c6c21339d8dc3ad4c830c6633947be0e4
+    user: "0:0"
+    entrypoint: ["sh", "/opt/sauvegarde/restaurer.sh"]
+    environment: { SAUVEGARDE: "${SAUVEGARDE:-}", CIBLE: "${CIBLE:-}", FICHIERS: "${FICHIERS:-0}" }
+    secrets: [sauvegarde_cle_privee]
+    cap_drop: [ALL]
+    cap_add: [CHOWN, DAC_OVERRIDE, FOWNER]
+    security_opt: ["no-new-privileges:true"]
+    read_only: true
+    tmpfs: [/tmp]
+    network_mode: none
+    volumes:
+      - pgdata:/var/lib/postgresql
+      - stockage:/stockage
+      - sauvegardes:/sauvegardes:ro
+      - wal:/archives:ro
+      - ./sauvegarde:/opt/sauvegarde:ro
+    restart: "no"
 
   valkey:
     image: valkey/valkey:9.1.3-trixie@sha256:3add1a336a920ea54770a001ab6feb3da5fceea96a40373a3a2cd469b815f0b7
@@ -202,9 +290,16 @@ networks:
   sortie_lan: {}
 
 volumes:
-  pgdata:
-  stockage:
+  # Noms explicites (identiques aux noms par défaut) : une restauration se fait dans un volume neuf, désigné
+  # par VOLUME_PGDATA / VOLUME_STOCKAGE ; le volume d'origine reste intact.
+  pgdata: { name: "${VOLUME_PGDATA:-equipements-lan_pgdata}" }
+  stockage: { name: "${VOLUME_STOCKAGE:-equipements-lan_stockage}" }
   clamav-lan:
+  # EXP-01 : WAL archivés en attente d'expédition et préparation de la sauvegarde de base (disque local) ; cible des
+  # sauvegardes chiffrées, en production sur un stockage distinct de l'hôte (docs/a-brancher.md § 3).
+  wal:
+  sauvegarde-travail:
+  sauvegardes: { name: "${VOLUME_SAUVEGARDES:-equipements-lan_sauvegardes}" }
 
 secrets:
   django_secret_key: { file: ./secrets/django_secret_key }
@@ -212,6 +307,10 @@ secrets:
   audit_cle_hmac: { file: ./secrets/audit_cle_hmac }
   postgres_password: { file: ./secrets/postgres_password }
   postgres_app_password: { file: ./secrets/postgres_app_password }
+  postgres_sauvegarde_password: { file: ./secrets/postgres_sauvegarde_password }
+  sauvegarde_certificat: { file: ./secrets/sauvegarde_certificat.pem }
+  # Clé privée de restauration : conservée au coffre de la DSI, déposée ici le temps d'une restauration seulement.
+  sauvegarde_cle_privee: { file: ./secrets/sauvegarde_cle_privee.pem }
   valkey_url: { file: ./secrets/valkey_url }
   valkey_mot_de_passe: { file: ./secrets/valkey_mot_de_passe }
   ldap_mot_de_passe: { file: ./secrets/ldap_mot_de_passe }

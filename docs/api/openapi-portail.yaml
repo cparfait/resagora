@@ -147,6 +147,28 @@ paths:
                 type: object
                 additionalProperties: {}
           description: ''
+  /api/portail/agenda/{jeton}.ics:
+    get:
+      operationId: portail_agenda_.ics_retrieve
+      description: 'Base des vues publiques du portail : pas d''authentification,
+        débit limité.'
+      parameters:
+      - in: path
+        name: jeton
+        schema:
+          type: string
+          pattern: ^[A-Za-z0-9_-]{43}$
+        required: true
+      tags:
+      - portail
+      responses:
+        '200':
+          content:
+            text/calendar:
+              schema:
+                type: string
+                format: binary
+          description: ''
   /api/portail/attestations:
     get:
       operationId: portail_attestations_retrieve
@@ -1588,6 +1610,62 @@ paths:
                 type: object
                 additionalProperties: {}
           description: ''
+  /api/portail/usagers/{id}/agenda:
+    get:
+      operationId: portail_usagers_agenda_retrieve
+      description: Base des vues réservées à un contact connecté (jeton de session
+        relayé par la façade).
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - portail
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+    post:
+      operationId: portail_usagers_agenda_create
+      description: Base des vues réservées à un contact connecté (jeton de session
+        relayé par la façade).
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - portail
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+    delete:
+      operationId: portail_usagers_agenda_destroy
+      description: Base des vues réservées à un contact connecté (jeton de session
+        relayé par la façade).
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - portail
+      responses:
+        '204':
+          description: No response body
   /api/portail/usagers/{id}/contacts:
     get:
       operationId: portail_usagers_contacts_retrieve
@@ -2093,6 +2171,31 @@ components:
         adresse:
           type: string
           readOnly: true
+        code_postal:
+          type: string
+          readOnly: true
+        commune:
+          type: string
+          readOnly: true
+        latitude:
+          type: number
+          format: double
+          maximum: 100
+          minimum: -100
+          exclusiveMaximum: true
+          exclusiveMinimum: true
+          readOnly: true
+        longitude:
+          type: number
+          format: double
+          maximum: 1000
+          minimum: -1000
+          exclusiveMaximum: true
+          exclusiveMinimum: true
+          readOnly: true
+        acces:
+          type: string
+          readOnly: true
         famille:
           type: integer
         famille_libelle:
@@ -2138,11 +2241,16 @@ components:
           type: string
           readOnly: true
       required:
+      - acces
       - adresse
+      - code_postal
+      - commune
       - documents
       - famille
       - famille_libelle
       - id
+      - latitude
+      - longitude
       - nom
       - parent
       - parent_nom
@@ -2603,6 +2711,24 @@ components:
         commune:
           type: string
           maxLength: 80
+        latitude:
+          type: number
+          format: double
+          maximum: 90
+          minimum: -90
+          nullable: true
+        longitude:
+          type: number
+          format: double
+          maximum: 180
+          minimum: -180
+          nullable: true
+        acces:
+          type: string
+          title: Consignes d'accès
+          description: 'Publiées sur le portail : entrée, stationnement, transports.
+            Jamais de code d''accès ni de digicode.'
+          maxLength: 1000
       required:
       - id
       - nom

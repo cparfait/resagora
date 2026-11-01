@@ -505,3 +505,14 @@ MODELES_LOT7: dict[str, tuple[str, str, str, str]] = {
         "",
     ),
 }
+
+
+# REF-01, COM-01 : le rappel de la veille reprend l'adresse et les consignes d'accès du site. Un modèle déjà
+# personnalisé par l'administrateur n'est pas remplacé.
+CORRECTIONS_ACCES: dict[str, tuple[str, str]] = {
+    "rappel_seance": (
+        MODELES_LOT2["rappel_seance"][2],
+        "Bonjour {{ contact.prenom }},\n\nNous vous rappelons votre réservation de {{ espace }} demain {{ jour }} à {{ heure }}."
+        "\n\nAdresse : {{ adresse }}{% if acces %}\nAccès : {{ acces }}{% endif %}" + SIGNATURE,
+    ),
+}

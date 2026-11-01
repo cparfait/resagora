@@ -99,6 +99,16 @@ def exporter_contact(contact: Contact) -> dict[str, Any]:
             "telephone": contact.telephone,
             "cree_le": _date(contact.cree_le),
         },
+        "abonnements_agenda": [
+            {
+                "structure": a.usager.nom,
+                "cree_le": _date(a.cree_le),
+                "expire_le": _date(a.expire_le),
+                "revoque_le": _date(a.revoque_le),
+                "dernier_acces": _date(a.dernier_acces),
+            }
+            for a in contact.abonnements_agenda.select_related("usager").exclude(usager__statut="anonymise")
+        ],
         "compte": {
             "identifiant": compte.identifiant,
             "statut": compte.get_statut_display(),
@@ -223,6 +233,9 @@ def anonymiser_usager(usager: Usager, *, acteur: Any, motif: str) -> Usager:
         )
     for piece in list(usager.pieces.select_related("fichier")):
         _supprimer_piece(piece)
+    from .agenda import revoquer_abonnements
+
+    revoquer_abonnements(usager=usager, acteur=acteur, motif="structure anonymisée")
     for rattachement in usager.rattachements.select_related("contact"):
         contact = rattachement.contact
         if not contact.rattachements.exclude(usager=usager).exclude(usager__statut="anonymise").exists():

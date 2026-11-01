@@ -11,7 +11,7 @@ from django.urls import URLPattern, URLResolver, get_resolver
 RACINE = Path(__file__).resolve().parents[4]
 sys.path.insert(0, str(RACINE / "facade"))
 
-from facade.routes import ROUTES, ROUTES_MOBILE, UUID  # noqa: E402
+from facade.routes import JETON, ROUTES, ROUTES_MOBILE, UUID  # noqa: E402
 
 
 def _motifs_django() -> set[str]:
@@ -23,6 +23,7 @@ def _motifs_django() -> set[str]:
                 resultat += parcourir(motif.url_patterns, texte)
             else:
                 texte = re.sub(r"<uuid:\w+>", "{uuid}", re.sub(r"<int:\w+>", "{id}", texte))
+                texte = re.sub(r"<jeton:\w+>", "{jeton}", texte)
                 resultat.append("/" + texte.removeprefix("^").removesuffix("$"))
         return resultat
 
@@ -34,7 +35,10 @@ def _motifs_django() -> set[str]:
 
 
 def _motifs_facade() -> set[str]:
-    return {r.motif.pattern.replace("[0-9]{1,12}", "{id}").replace(UUID, "{uuid}") for r in [*ROUTES, *ROUTES_MOBILE]}
+    return {
+        r.motif.pattern.replace("[0-9]{1,12}", "{id}").replace(UUID, "{uuid}").replace(JETON, "{jeton}").replace(r"\.", ".")
+        for r in [*ROUTES, *ROUTES_MOBILE]
+    }
 
 
 def test_sec01_toute_route_de_la_facade_existe_dans_l_api():

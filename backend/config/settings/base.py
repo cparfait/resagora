@@ -159,6 +159,7 @@ DEBITS_PAR_DEFAUT = {
     "depot": "30/hour",
     "televersement": "60/hour",
     "public": "120/min",
+    "agenda": "300/min",
 }
 
 REST_FRAMEWORK: dict[str, Any] = {

@@ -443,3 +443,55 @@ def test_reglages_de_recette_refuses_en_production(config, reglage):
     """Revue sécurité du lot 2 (M9) : un réglage de recette arrivé en production empêche le démarrage."""
     with pytest.raises(RuntimeError, match="recette"):
         creer_application(replace(config, environnement="production", **reglage))
+
+
+def test_por05_flux_agenda_relaye_sans_session_et_jeton_controle(config, api):
+    c = client(config, api)
+    jeton = "Abc_-" + "x" * 38
+    assert c.get(f"/api/portail/agenda/{jeton}.ics").status_code == 200
+    assert api.requetes[-1].url.path == f"/api/portail/agenda/{jeton}.ics"
+    assert "authorization" not in api.requetes[-1].headers
+    relayees = len(api.requetes)
+    # Jeton de mauvaise longueur, caractère hors base64url, traversée, autre méthode : refusés sans appel à l'API.
+    for chemin in [
+        f"/api/portail/agenda/{jeton}x.ics",
+        "/api/portail/agenda/" + "x" * 42 + "%2F.ics",
+        "/api/portail/agenda/../gestion/moi.ics",
+        f"/api/portail/agenda/{jeton}.icsx",
+    ]:
+        assert c.get(chemin).status_code == 404, chemin
+    assert c.delete(f"/api/portail/agenda/{jeton}.ics").status_code == 404
+    assert len(api.requetes) == relayees
+
+
+def test_por05_gestion_du_lien_d_agenda_exige_la_session(config, api):
+    c = client(config, api)
+    assert c.get("/api/portail/usagers/3/agenda").status_code == 401
+    csrf = connecter(c)
+    reponse = c.post("/api/portail/usagers/3/agenda", headers={"X-CSRF-Token": csrf, "Origin": ORIGINE})
+    assert reponse.status_code == 200
+    assert api.requetes[-1].headers["authorization"] == "Portail JETON-SECRET-API"
+
+
+def test_sec06_debit_du_flux_agenda(config, api):
+    c = client(config, api)
+    jeton = "y" * 43
+    codes = [c.get(f"/api/portail/agenda/{jeton}.ics").status_code for _ in range(302)]
+    assert codes[:300] == [200] * 300 and codes[300:] == [429, 429]
+
+
+def test_por05_jeton_d_agenda_masque_dans_le_journal_d_acces(caplog):
+    import logging
+
+    from facade.journaux import FiltreMasquage, installer
+
+    installer()
+    logging.getLogger().addHandler(caplog.handler)  # installer() remplace les gestionnaires de la racine
+    acces = logging.getLogger("uvicorn.access")
+    assert any(isinstance(f, FiltreMasquage) for f in acces.filters)
+    jeton = "Abc_-" + "x" * 38
+    with caplog.at_level(logging.INFO, logger="uvicorn.access"):
+        # Format exact du journal d'accès d'uvicorn : adresse, méthode, chemin, version, statut.
+        acces.info('%s - "%s %s HTTP/%s" %d', "198.51.100.7:5000", "GET", f"/api/portail/agenda/{jeton}.ics", "1.1", 200)
+    assert jeton not in caplog.text
+    assert "/api/portail/agenda/***.ics" in caplog.text

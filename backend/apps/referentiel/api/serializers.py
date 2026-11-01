@@ -10,7 +10,27 @@ from ..models import Batiment, Espace, FamilleEspace, Site
 class SiteSerializer(serializers.ModelSerializer):
     class Meta:
         model = Site
-        fields = ["id", "code", "nom", "adresse", "code_postal", "commune", "telephone", "actif"]
+        fields = [
+            "id",
+            "code",
+            "nom",
+            "adresse",
+            "code_postal",
+            "commune",
+            "telephone",
+            "latitude",
+            "longitude",
+            "acces",
+            "actif",
+        ]
+
+    def validate(self, attrs: dict[str, Any]) -> dict[str, Any]:
+        latitude = attrs.get("latitude", getattr(self.instance, "latitude", None))
+        longitude = attrs.get("longitude", getattr(self.instance, "longitude", None))
+        if (latitude is None) != (longitude is None):
+            champ = "longitude" if longitude is None else "latitude"
+            raise serializers.ValidationError({champ: "Renseignez la latitude et la longitude, ou aucune des deux."})
+        return attrs
 
 
 class BatimentSerializer(serializers.ModelSerializer):

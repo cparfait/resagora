@@ -10,6 +10,7 @@ import { useSession } from "../session";
 import { Bouton } from "../ui/Bouton";
 import { Case, Champ, Liste } from "../ui/Champs";
 import { Chargement, ErreurChargement, TitrePage, date, heure, taille } from "../ui/Elements";
+import { adresseComplete, lienCarte } from "./carte";
 
 export function Accueil() {
   const { connecte } = useSession();
@@ -132,7 +133,23 @@ export function FicheEquipement() {
             <dt>Accessibilité</dt>
             <dd>{e.accessible_pmr ? "Accessible aux personnes à mobilité réduite" : "Accès non adapté aux personnes à mobilité réduite"}</dd>
             <dt>Adresse</dt>
-            <dd>{e.adresse}</dd>
+            <dd>
+              {adresseComplete(e)}
+              {lienCarte(e) ? (
+                <>
+                  {" "}
+                  <a href={lienCarte(e) ?? undefined} rel="external noreferrer" referrerPolicy="no-referrer">
+                    Situer {e.site_nom} sur la carte OpenStreetMap (site externe)
+                  </a>
+                </>
+              ) : null}
+            </dd>
+            {e.acces ? (
+              <>
+                <dt>Accès</dt>
+                <dd className="whitespace-pre-line">{e.acces}</dd>
+              </>
+            ) : null}
             {e.equipements ? (
               <>
                 <dt>Équipements</dt>

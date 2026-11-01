@@ -7849,7 +7849,8 @@ paths:
   /api/gestion/pilotage/planning.pdf:
     get:
       operationId: gestion_pilotage_planning.pdf_retrieve
-      description: 'IMP-01 : planning d''un espace ou d''un site, A4 ou A3.'
+      description: 'IMP-01 : planning d''un espace ou d''un site, A4 ou A3, en calendrier
+        (par défaut) ou en liste.'
       parameters:
       - in: query
         name: au
@@ -7864,7 +7865,79 @@ paths:
         schema:
           type: string
       - in: query
+        name: mise_en_page
+        schema:
+          type: string
+      - in: query
         name: papier
+        schema:
+          type: string
+      - in: query
+        name: site
+        schema:
+          type: string
+      tags:
+      - gestion
+      security:
+      - sessionAgent: []
+      responses:
+        '200':
+          content:
+            application/pdf:
+              schema:
+                type: string
+                format: binary
+          description: ''
+  /api/gestion/pilotage/semaine-type:
+    get:
+      operationId: gestion_pilotage_semaine_type_retrieve
+      description: 'IMP-01 : semaine type d''un espace ou d''un site — créneaux réguliers
+        de la saison, par jour de la semaine.'
+      parameters:
+      - in: query
+        name: espace
+        schema:
+          type: string
+      - in: query
+        name: saison
+        schema:
+          type: string
+      - in: query
+        name: site
+        schema:
+          type: string
+      tags:
+      - gestion
+      security:
+      - sessionAgent: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+  /api/gestion/pilotage/semaine-type.pdf:
+    get:
+      operationId: gestion_pilotage_semaine_type.pdf_retrieve
+      description: 'IMP-01 : semaine type imprimée, en calendrier (par défaut) ou
+        en liste, A4 ou A3.'
+      parameters:
+      - in: query
+        name: espace
+        schema:
+          type: string
+      - in: query
+        name: mise_en_page
+        schema:
+          type: string
+      - in: query
+        name: papier
+        schema:
+          type: string
+      - in: query
+        name: saison
         schema:
           type: string
       - in: query
@@ -19680,6 +19753,24 @@ components:
         telephone:
           type: string
           maxLength: 20
+        latitude:
+          type: number
+          format: double
+          maximum: 90
+          minimum: -90
+          nullable: true
+        longitude:
+          type: number
+          format: double
+          maximum: 180
+          minimum: -180
+          nullable: true
+        acces:
+          type: string
+          title: Consignes d'accès
+          description: 'Publiées sur le portail : entrée, stationnement, transports.
+            Jamais de code d''accès ni de digicode.'
+          maxLength: 1000
         actif:
           type: boolean
     PatchedTarifRequest:
@@ -21324,6 +21415,24 @@ components:
         telephone:
           type: string
           maxLength: 20
+        latitude:
+          type: number
+          format: double
+          maximum: 90
+          minimum: -90
+          nullable: true
+        longitude:
+          type: number
+          format: double
+          maximum: 180
+          minimum: -180
+          nullable: true
+        acces:
+          type: string
+          title: Consignes d'accès
+          description: 'Publiées sur le portail : entrée, stationnement, transports.
+            Jamais de code d''accès ni de digicode.'
+          maxLength: 1000
         actif:
           type: boolean
       required:
@@ -21354,6 +21463,24 @@ components:
         telephone:
           type: string
           maxLength: 20
+        latitude:
+          type: number
+          format: double
+          maximum: 90
+          minimum: -90
+          nullable: true
+        longitude:
+          type: number
+          format: double
+          maximum: 180
+          minimum: -180
+          nullable: true
+        acces:
+          type: string
+          title: Consignes d'accès
+          description: 'Publiées sur le portail : entrée, stationnement, transports.
+            Jamais de code d''accès ni de digicode.'
+          maxLength: 1000
         actif:
           type: boolean
       required:

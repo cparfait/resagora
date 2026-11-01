@@ -56,6 +56,17 @@ tests:
     reports: { coverage_report: { coverage_format: cobertura, path: backend/coverage.xml } }
     paths: [docs/recette/matrice.csv]
 
+sauvegarde:
+  # EXP-01 : sauvegarde chiffrée et restauration réelles (ADR 0010). Les volumes montés doivent être visibles du
+  # démon Docker : dossier temporaire dans le projet, comme pour le job e2e.
+  stage: tests
+  image: docker:29.8.2-cli
+  services: [docker:29.8.2-dind]
+  script:
+    - apk add --no-cache python3 py3-pytest py3-yaml py3-cryptography
+    - cd backend && python3 -m pytest -o addopts="" -p no:cacheprovider --noconftest -m integration --basetemp="$CI_PROJECT_DIR/.tmp-sauvegarde" tests/test_sauvegarde_restauration.py
+  rules: [{ changes: [deploy/lan/**/*, backend/tests/test_sauvegarde_restauration.py] }]
+
 images:
   stage: images
   image: docker:29.8.2-cli

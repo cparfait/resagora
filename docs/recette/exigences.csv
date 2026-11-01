@@ -9,7 +9,8 @@ SEC-07;2;M;skill securite-dmz;Fichiers déposés : quarantaine DMZ, taille, exte
 SEC-08;0;M;skill securite-dmz;Journal d'audit et journaux techniques conservés 6 mois minimum, intégrité protégée;R0-08 Modifier une ligne du journal en base : la vérification d'intégrité la signale
 SEC-09;0;M;skill securite-dmz;Secrets fournis par fichiers, jamais dans le dépôt ni journalisés;R0-09 Rechercher un secret dans les journaux et le dépôt : aucun résultat
 SEC-10;4;M;skill securite-dmz §6.7;Accès mobile des gardiens : option A (VPN, LAN) et option B (façade DMZ, double facteur, certificat d'appareil), jeton d'appareil révocable;R4-10 Révoquer un appareil : sa synchronisation suivante est refusée
-REF-01;0;M;reconstitué;Référentiel des sites, bâtiments et espaces (capacité, surface, accessibilité, équipements, photos);R1-01 Créer un site, un bâtiment et un espace et les retrouver au planning
+EXP-01;0;M;skill docker-deploiement;Sauvegarde PostgreSQL par archivage continu des WAL (RPO 1 h), sauvegardes de base vérifiées, fichiers déposés, rotation, restauration testée;R0-15 Restaurer la base à un instant donné et les fichiers déposés dans des volumes neufs
+REF-01;0;M;reconstitué;Référentiel des sites, bâtiments et espaces (capacité, surface, accessibilité, équipements, photos, situation et consignes d'accès des sites);R1-01 Créer un site, un bâtiment et un espace et les retrouver au planning
 REF-02;0;M;reconstitué;Types et familles d'espaces (gymnase, salle, terrain, salle des fêtes…);R1-02 Filtrer le catalogue par famille
 REF-03;1;M;reconstitué;Horaires d'ouverture par espace et par saison;R1-03 Une demande hors horaires d'ouverture est refusée avec un message clair
 REF-04;1;M;skill planning-personnel;Gardiennage requis par espace et temps d'ouverture/fermeture;R1-04 Un espace gardienné génère un besoin de personnel élargi des temps d'ouverture et de fermeture
@@ -39,7 +40,7 @@ POR-01;2;M;reconstitué;Compte usager sur le portail : inscription, validation p
 POR-02;2;M;skill portail-rgaa;Disponibilités publiques anonymisées;R2-02 Consulter les disponibilités sans compte : aucun nom d'usager
 POR-03;2;M;reconstitué;Catalogue des espaces avec fiches, photos décrites et capacité;R2-03 Parcourir le catalogue au clavier
 POR-04;2;M;skill portail-rgaa;Demande guidée en quatre étapes avec brouillon;R2-05 Déposer une demande en quatre étapes, quitter, reprendre le brouillon
-POR-05;2;M;reconstitué;Suivi des dossiers, documents et factures par l'usager;R2-06 Suivre le statut d'un dossier et télécharger sa convention
+POR-05;2;M;reconstitué;Suivi des dossiers, documents et factures par l'usager, et abonnement de son agenda à ses séances (iCal);R2-06 Suivre le statut d'un dossier et télécharger sa convention
 POR-06;2;M;reconstitué;Dépôt des pièces justificatives depuis le portail;R2-08 Déposer une attestation d'assurance PDF
 POR-07;7;M;skill finances-ciril;Paiement en ligne PayFiP depuis le portail;R7-01 Payer une facture en ligne sur le simulateur PayFiP
 POR-08;2;S;reconstitué;Messagerie avec la Ville rattachée au dossier;R2-09 Envoyer un message sur un dossier et recevoir la réponse de l'agent

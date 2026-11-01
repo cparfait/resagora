@@ -55,3 +55,19 @@ def test_sec01_liens_de_pagination_sans_nom_de_serveur_interne(client_api):
         EspaceFabrique(nom=f"Salle {numero}")
     suivant = client_api.get("/api/portail/catalogue/espaces", {"taille": 1}).json()["next"]
     assert suivant.startswith("/api/portail/catalogue/espaces?") and "testserver" not in suivant
+
+
+@override_settings(CANAL="portail")
+def test_por03_fiche_publie_la_localisation_et_les_consignes_d_acces(client_api):
+    espace = EspaceFabrique(nom="Gymnase Sud")
+    site = espace.batiment.site
+    site.latitude, site.longitude, site.acces = "48.803400", "2.288000", "Entrée côté parking."
+    site.save()
+    fiche = client_api.get(f"/api/portail/catalogue/espaces/{espace.pk}").json()
+    assert (fiche["latitude"], fiche["longitude"], fiche["acces"]) == (48.8034, 2.288, "Entrée côté parking.")
+    assert fiche["code_postal"] == site.code_postal and fiche["commune"] == site.commune
+    # Le téléphone et le code interne du site restent hors du portail.
+    assert "telephone" not in fiche
+    sites = client_api.get("/api/portail/catalogue/sites").json()
+    publies = sites["results"] if isinstance(sites, dict) else sites
+    assert {"latitude", "longitude", "acces"} <= set(publies[0]) and "telephone" not in publies[0]

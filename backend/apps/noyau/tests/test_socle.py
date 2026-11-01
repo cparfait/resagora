@@ -99,3 +99,14 @@ def test_montants_en_centimes():
     assert centimes("1.234,56") == 123456
     assert repartir(1000, [1, 1, 1]) == [334, 333, 333]
     assert sum(repartir(1999, [3, 5, 7])) == 1999
+
+
+def test_sec09_journaux_masquent_les_jetons_des_flux_d_agenda():
+    jeton = "Abc_-" + "x" * 38
+    assert masquer(f"Not Found: /api/portail/agenda/{jeton}.ics") == "Not Found: /api/portail/agenda/***.ics"
+    assert masquer(f"GET /api/gestion/personnel/ical/{jeton}.ics") == "GET /api/gestion/personnel/ical/***.ics"
+    enregistrement = logging.LogRecord(
+        "django.request", logging.WARNING, "", 0, "Not Found: %s", (f"/api/portail/agenda/{jeton}.ics",), None
+    )
+    FiltreDonneesSensibles().filter(enregistrement)
+    assert jeton not in enregistrement.getMessage()

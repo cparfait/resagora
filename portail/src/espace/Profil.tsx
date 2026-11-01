@@ -8,6 +8,7 @@ import { REGLES_MOT_DE_PASSE } from "../pages/Comptes";
 import { Bouton } from "../ui/Bouton";
 import { Case, Champ, Liste } from "../ui/Champs";
 import { Alerte, Chargement, ErreurChargement, Etiquette, TitrePage, date, dateHeure } from "../ui/Elements";
+import { AgendaStructure } from "./Agenda";
 
 function useAnnonce() {
   const [annonce, setAnnonce] = useState<{ ton: "succes" | "erreur"; texte: string } | null>(null);
@@ -413,6 +414,7 @@ export function MaStructure() {
           </>
         ) : null}
       </section>
+      <AgendaStructure usager={s.id} />
       <section aria-labelledby="titre-contacts" className="carte">
         <h2 id="titre-contacts">Contacts</h2>
         <ul className="liste-simple">

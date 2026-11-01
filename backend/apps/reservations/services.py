@@ -1091,7 +1091,7 @@ def rappeler_seances(maintenant: datetime | None = None) -> int:
     debut = datetime.combine(demain, time.min, tzinfo=PARIS)
     seances = Occurrence.objects.filter(
         debut__gte=debut, debut__lt=debut + timedelta(days=1), statut__in=["validee", "confirmee"]
-    ).select_related("espace", "reservation__dossier__usager")
+    ).select_related("espace__batiment__site", "reservation__dossier__usager")
     nombre = 0
     for occurrence in seances:
         usager = occurrence.reservation.dossier.usager
@@ -1110,9 +1110,17 @@ def rappeler_seances(maintenant: datetime | None = None) -> int:
         if not a_prevenir:
             continue
         local = timezone.localtime(occurrence.debut, PARIS)
+        site = occurrence.espace.batiment.site
         notifier(
             "rappel_seance",
-            {"espace": occurrence.espace.nom, "jour": date_format(local, "l j F"), "heure": local.strftime("%H h %M")},
+            {
+                "espace": occurrence.espace.nom,
+                "jour": date_format(local, "l j F"),
+                "heure": local.strftime("%H h %M"),
+                # REF-01 : adresse et consignes d'accès du site, publiques (jamais de code d'accès).
+                "adresse": ", ".join(filter(None, [site.adresse, " ".join(filter(None, [site.code_postal, site.commune]))])),
+                "acces": site.acces,
+            },
             contacts=a_prevenir,
             usager=usager,
             objet=occurrence,
